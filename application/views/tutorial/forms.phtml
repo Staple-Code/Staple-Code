@@ -1,0 +1,189 @@
+<?php 
+//ini_set('display_errors', 1);
+//error_reporting(0);
+?>
+
+<h1>Tutorial - Forms</h1>
+
+<?php include ELEMENTS_ROOT.'tutorial/toc.php';?>
+<div class="tutorialtext">
+<h2>Introduction</h2>
+<p>Creating HTML forms has always been a labor intensive process for web developers. STAPLE includes a set of objects to significantly 
+reduce the amount of time spent on this tedious task, allowing the developer to spend more time creating actual functionality rather
+than form checking.</p>
+
+<h2 id="firstform">Your First Form</h2>
+
+<p>There are two different ways to create forms in STAPLE. The first method is to instantiate the <code class="inline">Staple_Form</code> 
+class and add instantiated field to the instantiated object. The second method is to inherit from and extend the 
+<code class="inline">Staple_Form</code> class.</p>
+
+<h3>Creating a Staple_Form Instance</h3>
+
+<p>To create an instance of <code class="inline">Staple_Form</code> simple instantiate it using the <code class="inline">new</code> keyword:</p>
+
+<?php 
+$form = new Staple_Form();
+
+echo highlight_string('<?php
+$form = new Staple_Form(); 
+?>',true);
+?>
+
+<p>This creates a new instance of the form object with default settings. By default the form will use POST as it's method 
+and the action will be set to blank, which will cause the form to submit to the current page it is located on.</p>
+
+<p>To modify settings of the form, you can use member functions to set various properties of the form itself:</p>
+<ul>
+	<li><code class="inline">setAction(string $action)</code> &mdash; Sets the action URL of the form.</li>
+	<li><code class="inline">setEnctype(string $enctype)</code> &mdash; Sets the Encoding of the form. A few class constants exist to make the 
+		encoding a little easier:
+		<ul>
+			<li>ENC_APP = 'application/x-www-form-urlencoded'</li>
+			<li>ENC_FILE = 'multipart/form-data'</li>
+			<li>ENC_TEXT = 'text/plain'</li>
+		</ul>
+	</li>
+	<li><code class="inline">setLayout(string $layout)</code> &mdash; Sets the layout name for a form. Layouts are stored in the 
+		/application/forms/layouts folder by default</li>
+	<li><code class="inline">setMethod(string $method)</code> &mdash; Sets the form method.</li>
+	<li><code class="inline">setName(string $name)</code> &mdash; Sets the name of the form. Setting the name is actually quite important. It will 
+		set the HTML name attribute, prefix all of the form generated CSS classes and allow the form to be checked for submission.</li>
+	<li><code class="inline">setTitle(string $title)</code> &mdash; Sets the HTML title attribute for the form.</li>
+</ul>
+
+<p>Let's set some properties for the form that we just created:</p>
+
+<?php 
+$form->setAction($this->link(array('process','form')))
+	->setName('myform')
+	->setMethod('GET');
+
+highlight_string('<?php
+$form->setAction("/process/form")
+	->setName("myform")
+	->setMethod("GET");
+?>');
+?>
+
+<p>The code above sets the form method to GET, the form name to "myform", and the action where the form will submit to "/process/form".
+It's usually a good idea to use the <code class="inline">link()</code> or <code class="inline">_link()</code> helper methods to 
+set links in form actions to ensure that forms are submitted to the proper place. These methods also return an instance of the original
+object back to the script so that multiple methods can be chained together.</p>
+
+<h2 id="fields">Form Fields</h2>
+
+<p>Forms don't do very much until you add fields to collect information from your users. All form elements within STAPLE inherit from
+the abstract class <code class="inline">Staple_Form_Element</code>.</p>
+
+<p>Some of the available elements include:</p>
+<ul>
+	<li>Text Boxes &mdash; <code class="inline">Staple_Form_TextElement</code></li>
+	<li>Textareas &mdash; <code class="inline">Staple_Form_TextareaElement</code></li>
+	<li>Select Boxes &mdash; <code class="inline">Staple_Form_SelectElement</code></li>
+	<li>Radio Buttons &mdash; <code class="inline">Staple_Form_RadioGroup</code></li>
+	<li>Check Boxes &mdash; <code class="inline">Staple_Form_CheckboxElement</code></li>
+	<li>Image, Submit, &amp; Button Elements <code class="inline">Staple_Form_ImageElement, Staple_Form_SubmitElement, Staple_Form_ButtonElement</code></li>
+</ul>
+
+<h3>Text Elements</h3>
+
+<p>To create a text field in your code, first create a new instance of <code class="inline">Staple_Form_TextElement</code> 
+and assign it to a variable.</p>
+<?php 
+$myText = new Staple_Form_TextElement('yourname','Enter Your Name:');
+
+highlight_string('<?php 
+$myText = new Staple_Form_TextElement("yourname","Enter Your Name:");
+?>');
+?>
+<p>The default constructor allows you to set a few properties right off the bat. The propeties set will vary by class and type
+of field. For this class the first parameter set the field name and the second parameter sets the field label.</p>
+<p>You can set size and maxlength using the methods <code class="inline">setSize(int $size)</code> and 
+<code class="inline">setMax(int $max)</code>. To make the field required use the 
+<code class="inline">setRequired([bool $bool = true])</code> method. You may also supply an initial value using the 
+<code class="inline">setValue(string $value)</code> method.</p>
+
+<?php 
+$myText->setSize(40)
+	->setMax(100)
+	->setRequired()
+	->setValue('Your name here...');
+
+highlight_string('<?php
+$myText->setSize(40)
+	->setMax(100)
+	->setRequired()
+	->setValue("Your name here...");
+?>');
+?>
+
+<p>Finally you need to add your element to the form.</p>
+
+<?php 
+$form->addField($myText);
+
+highlight_string('<?php 
+$form->addField($myText);
+?>');
+?>
+
+<p>When you add the element to the form, the object is stored in the form's public property <code class="inline">$fields</code>. When
+the form is eventually built, all of the elements will be written to the page in the order that they were added to the form. Although,
+you can change the form's build routine significantly by setting up a form layout.</p>
+
+<p>Let's add a few more text fields to this form:</p>
+
+<?php 
+$address = new Staple_Form_TextElement('address','Address');
+$address->setRequired();
+
+$city = new Staple_Form_TextElement('city','City');
+$city->setRequired();
+
+$state = new Staple_Form_TextElement('state','State');
+$state->setRequired()
+	->setSize(2)
+	->setMax(2);
+
+$zip = new Staple_Form_TextElement('zip','Zip');
+$zip->setRequired()
+	->setSize(5)
+	->setMax(5);
+?>
+
+<h3>Staple_Form_SelectElement</h3>
+<h3>Staple_Form_RadioGroup</h3>
+<h3>Staple_Form_CheckboxElement</h3>
+<h3>Staple_Form_SubmitElement</h3>
+
+<h2 id="building">Building Your Forms</h2>
+<p>Now that we have a form with at some elements attached to it, the time has come to build the form.</p>
+
+<p>To build your form, simply send the form object to your view and type <code class="inline">echo [$formvariable];</code></p>
+<?php 
+highlight_string('<?php 
+echo $form;
+?>');
+?>
+<p>Which outputs:</p>
+<hr>
+<?php echo $form; ?>
+<hr>
+
+<h2 id="validators">Creating Form Validators</h2>
+
+<h2 id="receiving">Receiving Form Data</h2>
+
+<h2 id="extending">Extending the Staple_Form Class</h2>
+
+<h3>Creating Your Own Form Object</h3>
+
+<h3>Extended Validation</h3>
+
+<h3>Creating Your Own Form Fields</h3>
+
+<h2 id="extending">Styling Your Forms</h2>
+
+</div>
+<br class="clearboth">
