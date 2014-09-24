@@ -27,9 +27,12 @@ class Staple_Autoload
 	const FORM_SUFFIX = 'Form';
 	const MODEL_SUFFIX = 'Model';
 	const STAPLE_PREFIX = 'Staple_';
+	const STAPLE_TRAIT_PREFIX = 'Staple_Trait';
 	const PHP_FILE_EXTENSION = '.php';
 	const CLASS_FILE_EXTENSION = '.class.php';
+	const TRAIT_FILE_EXTENSION = '.trait.php';
 	const VIEW_FILE_EXTENSION = '.phtml';
+	const TRAIT_FOLDER = 'Traits';
 	
 	/**
 	 * Controller Class Suffix Value
@@ -121,7 +124,41 @@ class Staple_Autoload
 	 */
 	public function loadClass($class_name)
 	{
-		if(substr($class_name,0,strlen(static::STAPLE_PREFIX)) == static::STAPLE_PREFIX)			//Look for STAPLE classes
+	    if(substr($class_name,0,strlen(static::STAPLE_TRAIT_PREFIX)) == static::STAPLE_TRAIT_PREFIX)       //Look for STAPLE Traits
+	    {
+	        $class_name = substr($class_name,strlen(static::STAPLE_TRAIT_PREFIX),strlen($class_name));
+	        $folders = explode('_', $class_name);
+	        if(count($folders) > 1)
+	        {
+	            $subpath = '';
+	            for($i = 0; $i < count($folders)-1; $i++)
+	            {
+	                $subpath .= $folders[$i].DIRECTORY_SEPARATOR;
+	            }
+	            $include = STAPLE_ROOT.static::TRAIT_FOLDER.DIRECTORY_SEPARATOR.$subpath.$folders[count($folders)-1].static::TRAIT_FILE_EXTENSION;
+	            if(file_exists($include))
+	            {
+	                require_once $include;
+	            }
+	            else
+	            {
+	                throw new Exception('Error Loading Framework'.$include, Staple_Error::LOADER_ERROR);
+	            }
+	        }
+	        else
+	        {
+	            $include = STAPLE_ROOT.static::TRAIT_FOLDER.DIRECTORY_SEPARATOR.$class_name.static::TRAIT_FILE_EXTENSION;
+	            if(file_exists($include))
+	            {
+	                require_once $include;
+	            }
+	            else
+	            {
+	                throw new Exception('Error Loading Framework'.$include, Staple_Error::LOADER_ERROR);
+	            }
+	        }
+	    }
+		elseif(substr($class_name,0,strlen(static::STAPLE_PREFIX)) == static::STAPLE_PREFIX)			//Look for STAPLE classes
 		{
 			$class_name = substr($class_name,strlen(static::STAPLE_PREFIX),strlen($class_name));
 			$folders = explode('_', $class_name);
@@ -132,7 +169,7 @@ class Staple_Autoload
 				{
 					$path .= $folders[$i].DIRECTORY_SEPARATOR;
 				}
-				$include = $path.$folders[count($folders)-1].'.class.php';
+				$include = $path.$folders[count($folders)-1].static::CLASS_FILE_EXTENSION;
 				if(file_exists($include))
 				{
 					require_once $include;
@@ -144,7 +181,7 @@ class Staple_Autoload
 			}
 			else 
 			{
-				$include = STAPLE_ROOT.$class_name.'.class.php';
+				$include = STAPLE_ROOT.$class_name.static::CLASS_FILE_EXTENSION;
 				if(file_exists($include))
 				{ 
 					require_once $include;

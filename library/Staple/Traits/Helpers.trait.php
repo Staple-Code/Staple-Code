@@ -6,7 +6,7 @@
  * @author ironpilot
  *        
  */
-trait Staple_Helpers
+trait Staple_Trait_Helpers
 {
 	/**
 	 * Generate a relative link within the framework.
