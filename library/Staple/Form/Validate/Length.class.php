@@ -94,22 +94,24 @@ class Staple_Form_Validate_Length extends Staple_Form_Validator
 	public function check($data)
 	{
 		$data = (string)$data;
-		if(strlen($data) <= $this->max)
+		if(strlen($data) >= $this->min)
 		{
-			if(strlen($data) >= $this->min)
+			if(isset($this->max) && strlen($data) <= $this->max)
+			{
+				return true;
+			}
+			elseif(!isset($this->max))
 			{
 				return true;
 			}
 			else 
 			{
-				$this->addError();
-				$this->addError("Minimum Length Not Met");
+				$this->addError("Maximum Length Exceeded");
 			}
 		}
 		else
 		{
-			$this->addError();
-			$this->addError("Maximum Length Exceeded");
+			$this->addError("Minimum Length Not Met");
 		}
 		return false;
 	}
