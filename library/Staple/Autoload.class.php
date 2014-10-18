@@ -21,8 +21,13 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Autoload
+namespace Staple;
+
+use \Exception;
+
+class Autoload
 {
+    const STAPLE_NAMESPACE = 'Staple';
 	const CONTROLLER_SUFFIX = 'Controller';
 	const FORM_SUFFIX = 'Form';
 	const MODEL_SUFFIX = 'Model';
@@ -124,74 +129,46 @@ class Staple_Autoload
 	 */
 	public function loadClass($class_name)
 	{
-	    if(substr($class_name,0,strlen(static::STAPLE_TRAIT_PREFIX)) == static::STAPLE_TRAIT_PREFIX)       //Look for STAPLE Traits
+	    //Split the class into it's namespace components.
+	    $namespace = explode('\\',$class_name);
+	    
+	    //Set the final class name
+	    $className = $namespace[count($namespace)-1];
+	    
+	    if($namespace[0] == static::STAPLE_NAMESPACE)       //Look for STAPLE Namespace
 	    {
-	        $class_name = substr($class_name,strlen(static::STAPLE_TRAIT_PREFIX),strlen($class_name));
-	        $folders = explode('_', $class_name);
-	        if(count($folders) > 1)
-	        {
-	            $subpath = '';
-	            for($i = 0; $i < count($folders)-1; $i++)
+	        //Path for classes
+	        $path = LIBRARY_ROOT;
+            for($i = 0; $i < count($namespace)-1; $i++)
+            {
+                $path .= $namespace[$i].DIRECTORY_SEPARATOR;
+            }
+            
+            //Sub namespace switches
+            if(array_key_exists(1, $namespace))
+            {
+	            switch($namespace[1])
 	            {
-	                $subpath .= $folders[$i].DIRECTORY_SEPARATOR;
+	            	case 'Traits':
+	            	    $extension = static::TRAIT_FILE_EXTENSION;
+	            	    break;
+	            	default:
+	            	    $extension = static::CLASS_FILE_EXTENSION;
+	            	    break;
 	            }
-	            $include = STAPLE_ROOT.static::TRAIT_FOLDER.DIRECTORY_SEPARATOR.$subpath.$folders[count($folders)-1].static::TRAIT_FILE_EXTENSION;
-	            if(file_exists($include))
-	            {
-	                require_once $include;
-	            }
-	            else
-	            {
-	                throw new Exception('Error Loading Framework'.$include, Staple_Error::LOADER_ERROR);
-	            }
-	        }
-	        else
-	        {
-	            $include = STAPLE_ROOT.static::TRAIT_FOLDER.DIRECTORY_SEPARATOR.$class_name.static::TRAIT_FILE_EXTENSION;
-	            if(file_exists($include))
-	            {
-	                require_once $include;
-	            }
-	            else
-	            {
-	                throw new Exception('Error Loading Framework'.$include, Staple_Error::LOADER_ERROR);
-	            }
-	        }
+            }
+            
+            //Location
+            $include = $path.$className.$extension;
+            if(file_exists($include))
+            {
+                require_once $include;
+            }
+            else
+            {
+                throw new Exception('Error Loading Framework: '.$class_name, 501);
+            }
 	    }
-		elseif(substr($class_name,0,strlen(static::STAPLE_PREFIX)) == static::STAPLE_PREFIX)			//Look for STAPLE classes
-		{
-			$class_name = substr($class_name,strlen(static::STAPLE_PREFIX),strlen($class_name));
-			$folders = explode('_', $class_name);
-			if(count($folders) > 1)
-			{
-				$path = STAPLE_ROOT;
-				for($i = 0; $i < count($folders)-1; $i++)
-				{
-					$path .= $folders[$i].DIRECTORY_SEPARATOR;
-				}
-				$include = $path.$folders[count($folders)-1].static::CLASS_FILE_EXTENSION;
-				if(file_exists($include))
-				{
-					require_once $include;
-				}
-				else
-				{
-					throw new Exception('Error Loading Framework', Staple_Error::LOADER_ERROR);
-				}
-			}
-			else 
-			{
-				$include = STAPLE_ROOT.$class_name.static::CLASS_FILE_EXTENSION;
-				if(file_exists($include))
-				{ 
-					require_once $include;
-				}
-				else
-				{
-					throw new Exception('Error Loading Framework', Staple_Error::LOADER_ERROR);
-				}
-			}
-		}
 		elseif(substr($class_name,strlen($class_name)-strlen($this->getControllerSuffix()),strlen($this->getControllerSuffix())) == $this->getControllerSuffix())			//Look for Controllers
 		{
 			$include = CONTROLLER_ROOT.$class_name.static::PHP_FILE_EXTENSION;
@@ -203,7 +180,7 @@ class Staple_Autoload
 			{
 				if($this->throwOnFailure === true)
 				{
-					throw new Exception('Page Not Found',Staple_Error::PAGE_NOT_FOUND);
+					throw new Exception('Page Not Found',Error::PAGE_NOT_FOUND);
 				}
 			}
 		}
@@ -218,7 +195,7 @@ class Staple_Autoload
 			{
 				if($this->throwOnFailure === true)
 				{
-					throw new Exception('Model Not Found',Staple_Error::LOADER_ERROR);
+					throw new Exception('Model Not Found',Error::LOADER_ERROR);
 				}
 			}
 		}
@@ -233,7 +210,7 @@ class Staple_Autoload
 			{
 				if($this->throwOnFailure === true)
 				{
-					throw new Exception('Form Not Found',Staple_Error::LOADER_ERROR);
+					throw new Exception('Form Not Found',Error::LOADER_ERROR);
 				}
 			}
 		}
@@ -269,7 +246,7 @@ class Staple_Autoload
 			{
 				if($this->throwOnFailure === true)
 				{
-					throw new Exception("Class Not Found",Staple_Error::LOADER_ERROR);
+					throw new Exception("Class Not Found".$class_name,Error::LOADER_ERROR);
 				}
 			}
 		}
@@ -298,7 +275,7 @@ class Staple_Autoload
 		}
 		if($required === true)
 		{
-			throw new Exception('Failed to load the view.', Staple_Error::LOADER_ERROR);
+			throw new Exception('Failed to load the view.', Error::LOADER_ERROR);
 		}
 	}
 	
@@ -323,7 +300,7 @@ class Staple_Autoload
 				return $theLayout;
 			}
 		}
-		throw new Exception('Unable to locate layout.', Staple_Error::LOADER_ERROR);
+		throw new Exception('Unable to locate layout.', Error::LOADER_ERROR);
 	}
 	
 	/**

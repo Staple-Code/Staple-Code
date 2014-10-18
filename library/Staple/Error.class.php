@@ -21,7 +21,11 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Error implements SplSubject
+namespace Staple;
+
+use \SplObjectStorage, \SplSubject, \SplObserver, \ErrorException, \Exception;
+
+class Error implements SplSubject
 {
 	const PAGE_NOT_FOUND = 404;
 	const APPLICATION_ERROR = 500;
@@ -128,7 +132,7 @@ class Staple_Error implements SplSubject
 		ob_clean();
 		
 		//Get the Front Controller
-		$main = Staple_Main::get();
+		$main = Main::get();
 		
 		//Process the Header
 		$main->processHeader(true);
@@ -153,14 +157,14 @@ class Staple_Error implements SplSubject
 		}
 		
 		//If the site uses layout, build the default layout and put the error message inside.
-		if(Staple_Layout::layoutExists(Staple_Config::getValue('layout', 'default')))
+		if(Layout::layoutExists(Config::getValue('layout', 'default')))
 		{
 		    //Grab the current buffer contents to add to the layout
 			$buffer = ob_get_contents();
 			ob_clean();
 			
 			//Create the layout object and build the layout
-			$layout = new Staple_Layout(Staple_Config::getValue('layout', 'default'));
+			$layout = new Layout(Config::getValue('layout', 'default'));
 			$layout->build($buffer);
 		}
 	}

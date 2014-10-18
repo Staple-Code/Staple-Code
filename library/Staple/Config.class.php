@@ -20,7 +20,11 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Config extends Staple_Registry
+namespace Staple;
+
+use \Exception;
+
+class Config extends Registry
 {
 	protected static $read = false;
 	
@@ -55,7 +59,7 @@ class Staple_Config extends Staple_Registry
 	 */
 	public function __set($name,$value)
 	{
-		throw new Exception('Config changes are not allowed at execution', Staple_Error::APPLICATION_ERROR);
+		throw new Exception('Config changes are not allowed at execution',Error::APPLICATION_ERROR);
 	}
 	
 	/**
@@ -124,7 +128,7 @@ class Staple_Config extends Staple_Registry
 	 */
 	public static function set($name,$value,$storeInSession = false)
 	{
-		throw new Exception('Config changes are not allowed at execution', Staple_Error::APPLICATION_ERROR);
+		throw new Exception('Config changes are not allowed at execution', Error::APPLICATION_ERROR);
 	}
 	
 	/**

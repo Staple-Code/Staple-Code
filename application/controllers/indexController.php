@@ -1,4 +1,5 @@
 <?php
+use Staple\DB;
 /**
  * @author Ironpilot
  * @copyright Copywrite (c) 2011, STAPLE CODE
@@ -18,7 +19,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class indexController extends Staple_Controller
+class indexController extends \Staple\Controller
 {
 	public function _start()
 	{
@@ -27,7 +28,7 @@ class indexController extends Staple_Controller
 	
 	public function index()
 	{
-		
+		$db = new DB();
 	}
 	
 	public function documentation()

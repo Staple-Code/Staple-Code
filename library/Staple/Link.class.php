@@ -21,7 +21,11 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Link
+namespace Staple;
+
+use \Exception;
+
+class Link
 {
 	protected $link;
 	
@@ -63,7 +67,7 @@ class Staple_Link
 		$getString = self::getArraytoString($get);
 		
 		//Set the link base
-		$base = Staple_Config::getValue('application', 'public_location');
+		$base = Config::getValue('application', 'public_location');
 		
 		//Is the link an array or a string?
 		if(!is_array($route))
@@ -103,7 +107,7 @@ class Staple_Link
 				}
 				else
 				{
-					throw new Exception('Bad Link',Staple_Error::LINK_ERROR);
+					throw new Exception('Bad Link',Error::LINK_ERROR);
 				}
 			}
 			else

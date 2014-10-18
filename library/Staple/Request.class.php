@@ -20,7 +20,11 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Request
+namespace Staple;
+
+use \Exception;
+
+class Request
 {
 	protected static $inst;
 	
@@ -160,12 +164,12 @@ class Staple_Request
 		}
 	}
 	
-	public static function Redirect(Staple_Route $route, array $get = array())
+	public static function Redirect(Route $route, array $get = array())
 	{
 		$to = (string)$route;
 		if($get != array())
 		{
-			$to .= '?'.Staple_Link::getArraytoString($get);
+			$to .= '?'.Link::getArraytoString($get);
 		}
 		header('Location: '.$to);
 		exit(0);

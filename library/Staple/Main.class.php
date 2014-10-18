@@ -23,7 +23,11 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Main
+namespace Staple;
+
+use \Exception, \ReflectionMethod;
+
+class Main
 {
 	const DONT_THROW_LOADER_ERRORS = 504;
 	const DEFAULT_AUTOLOAD_CLASS = 'Staple_Autoload';
@@ -139,7 +143,7 @@ class Staple_Main
 			if(class_exists($this->settings['application']['loader']))
 			{
 				$loader = new $this->settings['application']['loader']();
-				if($loader instanceof Staple_Autoload)
+				if($loader instanceof Autoload)
 				{
 					$this->loader = $loader;
 					spl_autoload_register(array($this->loader, 'load'));
@@ -148,14 +152,14 @@ class Staple_Main
 		}
 		
 		//If no other loader is found or set, use the Staple_Autoload class
-		if(!($this->loader instanceof Staple_Autoload))
+		if(!($this->loader instanceof Autoload))
 		{
-			$this->loader = new Staple_Autoload();
+			$this->loader = new Autoload();
 			spl_autoload_register(array($this->loader, 'load'));
 		}
 			
 		// Setup Error Handlers
-		$this->setErrorHander(new Staple_Error());
+		$this->setErrorHander(new Error());
 		
 		//Start Output buffering
 		ob_start();
@@ -164,7 +168,7 @@ class Staple_Main
 		session_start();
 		if($this->settings['errors']['devmode'] == 1)
 		{
-			Staple_Dev::StartTimer();
+			Dev::StartTimer();
 		}
 	}
 	
@@ -181,25 +185,20 @@ class Staple_Main
 	 *
 	 * @param Staple_Error $errorHander        	
 	 */
-	public function setErrorHander(Staple_Error $errorHander)
+	public function setErrorHander(Error $errorHander)
 	{
 		$this->errorHander = $errorHander;
 		
-		set_error_handler(array(
-				$this->errorHander,
-				'handleError'
-		), E_USER_ERROR | E_USER_WARNING | E_WARNING);
-		set_exception_handler(array(
-				$this->errorHander,
-				'handleException'
-		));
+		//Set the error handlers
+		set_error_handler(array($this->errorHander,'handleError'), E_USER_ERROR | E_USER_WARNING | E_WARNING);
+		set_exception_handler(array($this->errorHander,'handleException'));
 		
 		return $this;
 	}
 	
 	public function inDevMode()
 	{
-	    return (bool)Staple_Config::getValue('errors', 'devmode');
+	    return (bool)Config::getValue('errors', 'devmode');
 	}
 
 	/**
@@ -225,7 +224,7 @@ class Staple_Main
 	 */
 	public static function get()
 	{
-		if (!(self::$instance instanceof Staple_Main)) {
+		if (!(self::$instance instanceof Main)) {
             $c = __CLASS__;
             self::$instance = new $c();
         }
@@ -301,12 +300,12 @@ class Staple_Main
 		//Create and enable site-wide authorization.
 		if(array_key_exists('enabled', $this->settings['auth']))
 			if($this->settings['auth']['enabled'] == 1)
-				$this->auth = Staple_Auth::get();
+				$this->auth = Auth::get();
 		
 		//Create and connect to the database.
 		if(array_key_exists('autoconnect', $this->settings['db']))
 			if($this->settings['db']['autoconnect'] == 1)
-				$this->db = Staple_DB::get();
+				$this->db = DB::get();
 		
 		//Load the controllers from the session.
 		if(array_key_exists('Staple', $_SESSION))
@@ -358,7 +357,7 @@ class Staple_Main
 				}
 				else
 				{
-					throw new Exception('Invalid Header Location', Staple_Error::APPLICATION_ERROR);
+					throw new Exception('Invalid Header Location', Error::APPLICATION_ERROR);
 				}
 			}
 		}
@@ -385,7 +384,7 @@ class Staple_Main
 				}
 				else
 				{
-					throw new Exception('Invalid Footer Location', Staple_Error::APPLICATION_ERROR);
+					throw new Exception('Invalid Footer Location', Error::APPLICATION_ERROR);
 				}
 			}
 		}
@@ -444,10 +443,10 @@ class Staple_Main
 			if(ctype_alnum(str_replace(array('/','_','-'),'',self::$route)))
 			{
 				//Authentication Check
-				if(Staple_Config::getValue('auth', 'enabled') != 0)
+				if(Config::getValue('auth', 'enabled') != 0)
 				{
 					//Check for an excluded script route
-					$allowedScripts = (array)Staple_Config::getValue('auth', 'allowedRoute');
+					$allowedScripts = (array)Config::getValue('auth', 'allowedRoute');
 					if(in_array(self::$route, $allowedScripts) === true)
 					{
 						//Script does not require auth, Dispatch Script
@@ -502,8 +501,8 @@ class Staple_Main
 					array_unshift($splitRoute, $shift, 'index');
 				}
 			}
-			$class = Staple_Link::methodCase(array_shift($splitRoute));
-			$method = Staple_Link::methodCase(array_shift($splitRoute));
+			$class = Link::methodCase(array_shift($splitRoute));
+			$method = Link::methodCase(array_shift($splitRoute));
 			if(ctype_alnum($class) && ctype_alnum($method))
 			{
 				$dispatchClass = $class.'Controller';
@@ -524,10 +523,10 @@ class Staple_Main
 						}
 						
 						//Verify that an instance of the controller class exists and is of the right type
-						if(self::$controllers[$class] instanceof Staple_Controller)
+						if(self::$controllers[$class] instanceof Controller)
 						{
 							//Check if global Auth is enabled.
-							if(Staple_Config::getValue('auth', 'enabled') != 0)
+							if(Config::getValue('auth', 'enabled') != 0)
 							{
 								//Check the sub-controller for access to the method
 								if(self::$controllers[$class]->_auth($method) === true)
@@ -551,7 +550,7 @@ class Staple_Main
 		}
 		
 		//If a valid page cannot be found, throw page not found exception
-		throw new Exception('Page Not Found',Staple_Error::PAGE_NOT_FOUND);
+		throw new Exception('Page Not Found',Error::PAGE_NOT_FOUND);
 	}
 	
 	/**
@@ -589,7 +588,7 @@ class Staple_Main
 		//Process the header
 		$this->processHeader();
 		
-		if(self::$controllers[$controller]->layout instanceof Staple_Layout)
+		if(self::$controllers[$controller]->layout instanceof Layout)
 		{
 			self::$controllers[$controller]->layout->build($buffer);
 		}
@@ -608,10 +607,10 @@ class Staple_Main
 	protected function dispatchScript($route)
 	{
 		//Create a blank layout
-		$layout = new Staple_Layout();
+		$layout = new Layout();
 		
 		//Find the default Layout
-		$defaultLayout = Staple_Config::getValue('layout', 'default');
+		$defaultLayout = Config::getValue('layout', 'default');
 		
 		//Setup the default layout
 		if($defaultLayout != '') $layout->setName($defaultLayout);
@@ -643,7 +642,7 @@ class Staple_Main
 	 * Any errors that occur will return a boolean false.
 	 * @return string | boolean
 	 */
-	public function pocketDispatch(Staple_Route $route)
+	public function pocketDispatch(Route $route)
 	{
 		//@todo complete the function
 	}
@@ -664,7 +663,7 @@ class Staple_Main
 	 */
 	public function link($route, array $get = array())
 	{
-		return Staple_Link::get($route,$get);
+		return Link::get($route,$get);
 	}
 	
 	/**
@@ -689,7 +688,7 @@ class Staple_Main
 	public function redirect($newRoute)
 	{
 		ob_clean();
-		$this->route(Staple_Link::get($newRoute));
+		$this->route(Link::get($newRoute));
 		exit(0);
 	}
 	/**
@@ -697,7 +696,7 @@ class Staple_Main
 	 * Registers a controller that was instantiated outside of the Staple_Main class.
 	 * @param Staple_Controller $controller
 	 */
-	public function registerController(Staple_Controller $controller)
+	public function registerController(Controller $controller)
 	{
 		$class_name = substr(get_class($controller),strlen(get_class($controller))-10,10);
 		if(!array_key_exists($class_name, self::$controllers))
@@ -721,7 +720,7 @@ class Staple_Main
 	/**
 	 * @param Staple_Autoload $loader
 	 */
-	public function setLoader(Staple_Autoload $loader)
+	public function setLoader(Autoload $loader)
 	{
 		$this->loader = $loader;
 	}

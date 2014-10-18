@@ -22,7 +22,9 @@
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-class Staple_Dev
+namespace Staple;
+
+class Dev
 {
 	protected static $timer;
 	
@@ -33,7 +35,7 @@ class Staple_Dev
 	{
 		if(class_exists('Staple_Config'))
 		{
-			if(Staple_Config::getValue('errors', 'devmode') == 1)
+			if(Config::getValue('errors', 'devmode') == 1)
 			{
 				$args = func_get_args();
 				echo "<pre>";
@@ -76,7 +78,7 @@ class Staple_Dev
 	
 	public static function GetRouteInfo()
 	{
-		$blah = Staple_Main::getRoute();
+		$blah = Main::getRoute();
 	} 
 	
 	/*public static function ResetController(Staple_Controller $controllerRef)

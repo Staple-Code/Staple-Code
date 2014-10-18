@@ -4,7 +4,9 @@
  * @author Ironpilot
  *        
  */
-abstract class Staple_Log
+namespace Staple;
+
+abstract class Log
 {
 	private $encryptLog = false;
 	

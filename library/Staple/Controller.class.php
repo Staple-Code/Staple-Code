@@ -20,7 +20,11 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-abstract class Staple_Controller
+namespace Staple;
+
+use \Exception;
+
+abstract class Controller
 {
 	protected $openMethods = array();
 	protected $accessLevels = array();
@@ -29,19 +33,19 @@ abstract class Staple_Controller
 	/**
 	 * 
 	 * The $view property holds the view object for the controller. 
-	 * @var Staple_View
+	 * @var View
 	 */
 	public $view;
 	
 	/**
 	 * Holds and instance of a Staple Layout object.
-	 * @var Staple_Layout
+	 * @var Layout
 	 */
 	public $layout;
 	
 	/**
 	 * 
-	 * Controller constructor creates an instance of Staple_View and saves it in the $view
+	 * Controller constructor creates an instance of View and saves it in the $view
 	 * property. It then calls the overridable method _start() for additional boot time
 	 * procedures.
 	 */
@@ -58,16 +62,16 @@ abstract class Staple_Controller
 		}
 		
 		//Create a view object
-		$this->view = new Staple_View();
+		$this->view = new View();
 		
 		//Assign the default layout to the controller, if specified in config.
-		$settings = Staple_Config::get('layout');
+		$settings = Config::get('layout');
 		if(array_key_exists('default', $settings))
 		{
 			if($settings['default'] != '')
 			{
 				$this->_setLayout($settings['default']);
-				$pageSettings = Staple_Config::get('page');
+				$pageSettings = Config::get('page');
 				if(array_key_exists('title', $pageSettings))
 				{
 					$this->layout->setTitle($pageSettings['title']);
@@ -95,10 +99,10 @@ abstract class Staple_Controller
 		}
 		
 		//Erase the view and start from scratch
-		$this->view = new Staple_View();
+		$this->view = new View();
 		
 		//Reset the view inside the layout
-		if($this->layout instanceof Staple_Layout)
+		if($this->layout instanceof Layout)
 			$this->layout->setView($this->view);
 	}
 	
@@ -129,7 +133,7 @@ abstract class Staple_Controller
 		$method = (string)$method;
 		if(!ctype_alnum($method))
 		{
-			throw new Exception('Authentication Validation Error', Staple_Error::AUTH_ERROR);
+			throw new Exception('Authentication Validation Error', Error::AUTH_ERROR);
 		}
 		else
 		{
@@ -144,14 +148,14 @@ abstract class Staple_Controller
 				{
 					return true;
 				}
-				elseif(Staple_Auth::get()->isAuthed() && Staple_Auth::get()->getAuthLevel() >= $this->_authLevel($method))	//Does the authed user have the required access level?
+				elseif(Auth::get()->isAuthed() && Auth::get()->getAuthLevel() >= $this->_authLevel($method))	//Does the authed user have the required access level?
 				{
 					return true;
 				}
 			}
 			else
 			{
-				throw new Exception('Authentication Validation Error', Staple_Error::AUTH_ERROR);
+				throw new Exception('Authentication Validation Error', Error::AUTH_ERROR);
 			}
 		}
 		return false;
@@ -168,7 +172,7 @@ abstract class Staple_Controller
 		$method = (string)$method;
 		if(!ctype_alnum($method))
 		{
-			throw new Exception('Authentication Validation Error: Invalid Method', Staple_Error::AUTH_ERROR);
+			throw new Exception('Authentication Validation Error: Invalid Method', Error::AUTH_ERROR);
 		}
 		else
 		{
@@ -182,12 +186,12 @@ abstract class Staple_Controller
 				{
 					//return default auth level if non assigned.
 					return 1;
-					//throw new Exception('Authentication Validation Error: No Auth Level', Staple_Error::AUTH_ERROR);
+					//throw new Exception('Authentication Validation Error: No Auth Level', Error::AUTH_ERROR);
 				}
 			}
 			else
 			{
-				throw new Exception('Authentication Validation Error: Method Not Found', Staple_Error::AUTH_ERROR);
+				throw new Exception('Authentication Validation Error: Method Not Found', Error::AUTH_ERROR);
 			}
 		}
 		return 1;
@@ -225,7 +229,7 @@ abstract class Staple_Controller
 		$for = (string)$for;
 		if(!ctype_alnum($for))
 		{
-			throw new Exception('Cannot change method permissions.', Staple_Error::AUTH_ERROR);
+			throw new Exception('Cannot change method permissions.', Error::AUTH_ERROR);
 		}
 		else
 		{
@@ -233,7 +237,7 @@ abstract class Staple_Controller
 			{
 				if($level < 0)
 				{
-					throw new Exception('Cannot change method permissions.', Staple_Error::AUTH_ERROR);
+					throw new Exception('Cannot change method permissions.', Error::AUTH_ERROR);
 				}
 				else
 				{
@@ -253,7 +257,7 @@ abstract class Staple_Controller
 			}
 			else 
 			{
-				throw new Exception('Cannot change method permissions on a non-existant method.', Staple_Error::AUTH_ERROR);
+				throw new Exception('Cannot change method permissions on a non-existant method.', Error::AUTH_ERROR);
 			}
 		}
 	}
@@ -273,7 +277,7 @@ abstract class Staple_Controller
 			{
 				if(!ctype_alnum($mName))
 				{
-					throw new Exception('Cannot change method permissions.', Staple_Error::AUTH_ERROR);
+					throw new Exception('Cannot change method permissions.', Error::AUTH_ERROR);
 				}
 				else
 				{
@@ -290,7 +294,7 @@ abstract class Staple_Controller
 		{
 			if(!ctype_alnum($method))
 			{
-				throw new Exception('Cannot change method permissions.', Staple_Error::AUTH_ERROR);
+				throw new Exception('Cannot change method permissions.', Error::AUTH_ERROR);
 			}
 			else
 			{
@@ -331,7 +335,7 @@ abstract class Staple_Controller
 	 */
 	public function _setLayout($layout)
 	{
-		$this->layout = new Staple_Layout($layout);
+		$this->layout = new Layout($layout);
 		$this->layout->setView($this->view);
 	}
 	
@@ -353,7 +357,7 @@ abstract class Staple_Controller
 	 */
 	protected function _redirect($to)
 	{
-		Staple_Main::get()->redirect($to);
+		Main::get()->redirect($to);
 		$this->view->noRender();
 	} 
 	/**
@@ -365,16 +369,16 @@ abstract class Staple_Controller
 	 */
 	protected function _link($link,array $get = array())
 	{
-		return Staple_Link::get($link,$get);
+		return Link::get($link,$get);
 	}
 	
 	/**
-	 * @see Staple_View::escape()
+	 * @see View::escape()
 	 * @param string $estring
 	 * @param boolean $strip
 	 */
 	public static function _escape($estring, $strip = false)
 	{
-		return Staple_View::escape($estring,$strip);
+		return View::escape($estring,$strip);
 	}
 }

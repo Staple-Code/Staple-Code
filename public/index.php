@@ -16,5 +16,5 @@ defined('ELEMENTS_ROOT')
 
 require_once LIBRARY_ROOT.'Staple/Main.class.php';
 
-$main = Staple_Main::get();
+$main = \Staple\Main::get();
 $main->run();

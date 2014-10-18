@@ -23,9 +23,13 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_View 
+namespace Staple;
+
+use \Exception;
+
+class View 
 {
-	use Staple_Trait_Helpers;
+	use Traits\Helpers;
 	
 	/**
 	 * Whether or not to render the view. Set to false to skip view rendering.
@@ -100,7 +104,7 @@ class Staple_View
 		catch (Exception $e)
 		{
 			$msg = '<p class=\"viewerror\">The View threw an Uncaught Exception when converting to a string....</p>';
-			if(Staple_Config::getValue('errors', 'devmode'))
+			if(Config::getValue('errors', 'devmode'))
 			{
 				$msg .= '<p>'.$e->getMessage().'</p>';
 			}
@@ -181,7 +185,7 @@ class Staple_View
 		if($this->_render === true)
 		{
 			//Load the view from the default loader
-			$view = Staple_Main::get()->getLoader()->loadView($this->controller,$this->view);
+			$view = Main::get()->getLoader()->loadView($this->controller,$this->view);
 			if(strlen($view) >= 1)
 			{
 				include $view;

@@ -32,8 +32,18 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_DB extends mysqli
+namespace Staple;
+
+use \mysqli, \Exception, \SplObserver, \SplSubject, \SplObjectStorage;
+
+class DB extends mysqli implements SplSubject
 {
+    /**
+     * The object observers
+     * @var SplObjectStorage
+     */
+    private $_observers;
+    
 	/**
 	 * 
 	 * Holds the singleton instance for the object.
@@ -94,6 +104,9 @@ class Staple_DB extends mysqli
 	 */
 	public function __construct(array $config = array())
 	{
+	    //Setup Object Storage for observers
+	    $this->_observers = new SplObjectStorage();
+	    
 		if($this->checkConfig($config))
 		{
 			$this->host = $config['host'];
@@ -103,7 +116,7 @@ class Staple_DB extends mysqli
 		}
 		elseif(!$this->isReady())
 		{
-			$globalSettings = Staple_Config::get('db');
+			$globalSettings = Config::get('db');
 			if($this->checkConfig($globalSettings))
 			{
 				$this->host = $globalSettings['host'];
@@ -383,4 +396,32 @@ class Staple_DB extends mysqli
 		}
 		return true;
 	}
+	
+	/* (non-PHPdoc)
+	 * @see SplSubject::attach()
+	 */
+	public function attach(SplObserver $observer)
+	{
+		$this->_observers->attach($observer);
+	}
+
+	/* (non-PHPdoc)
+	 * @see SplSubject::detach()
+	 */
+	public function detach(SplObserver $observer)
+	{
+		$this->_observers->detach($observer);
+	}
+
+	/* (non-PHPdoc)
+	 * @see SplSubject::notify()
+	 */
+	public function notify()
+	{
+		foreach($this->_observers as $observer)
+		{
+		    $observer->update($this);
+		}
+	}
+
 }

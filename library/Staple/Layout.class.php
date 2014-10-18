@@ -21,7 +21,11 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Layout
+namespace Staple;
+
+use \Exception;
+
+class Layout
 {
 	const DOC_HTML4_TRANS = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">';
 	const DOC_HTML4_STRICT = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">';
@@ -107,7 +111,7 @@ class Staple_Layout
 				$this->doctype = self::DOC_HTML5;
 		}
 		
-		$settings = Staple_Config::get('layout');
+		$settings = Config::get('layout');
 		
 		if(is_array($settings))
 		{
@@ -303,7 +307,7 @@ class Staple_Layout
 		return $this;
 	}
 
-	public function setView(Staple_View $view)
+	public function setView(View $view)
 	{
 		$this->view = $view;
 		return $this;
@@ -347,7 +351,7 @@ class Staple_Layout
 		}
 		else
 		{
-			throw new Exception('Invalid Layout', Staple_Error::APPLICATION_ERROR);
+			throw new Exception('Invalid Layout', Error::APPLICATION_ERROR);
 		}
 		return $this;
 	}
@@ -375,7 +379,7 @@ class Staple_Layout
 	 */
 	public function link($link,array $get = array())
 	{
-		return Staple_Link::get($link,$get);
+		return Link::get($link,$get);
 	}
 	
 	/**
@@ -385,7 +389,7 @@ class Staple_Layout
 	 */
 	public static function escape($estring, $strip = false)
 	{
-		return Staple_View::escape($estring,$strip);
+		return View::escape($estring,$strip);
 	}
 	
 	/*---------------------------------------Builder Fuctions---------------------------------------*/
@@ -419,7 +423,7 @@ class Staple_Layout
 	
 	public function scripts()
 	{
-		$secure = Staple_Request::isSecure();
+		$secure = Request::isSecure();
 		foreach($this->scripts as $src)
 		{
 			if($secure === true)
@@ -462,7 +466,7 @@ class Staple_Layout
 		{
 			echo $this->buffer;
 		}
-		if($this->view instanceof Staple_View)
+		if($this->view instanceof View)
 		{
 			$this->view->build();
 		}
@@ -476,12 +480,12 @@ class Staple_Layout
 			{
 				$this->buffer = $buffer;
 			}
-			$layout = Staple_Main::get()->getLoader()->loadLayout($this->name);
+			$layout = Main::get()->getLoader()->loadLayout($this->name);
 			include $layout;
 		}
 		else
 		{
-			throw new Exception("Attempted to build unknown layout.", Staple_Error::APPLICATION_ERROR);
+			throw new Exception("Attempted to build unknown layout.", Error::APPLICATION_ERROR);
 		}
 	}
 }

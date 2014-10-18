@@ -6,7 +6,11 @@
  * @author ironpilot
  *        
  */
-trait Staple_Trait_Helpers
+namespace Staple\Traits;
+
+use \DateTime, \stdClass, Staple;
+
+trait Helpers
 {
 	/**
 	 * Generate a relative link within the framework.
@@ -16,7 +20,7 @@ trait Staple_Trait_Helpers
 	 */
 	public function link($route, array $get = array())
 	{
-		return Staple_Link::get($route,$get);
+		return \Staple\Link::get($route,$get);
 	}
 	
 	/**

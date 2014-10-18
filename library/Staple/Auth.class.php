@@ -21,7 +21,11 @@
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-class Staple_Auth
+namespace Staple;
+
+use \Exception;
+
+class Auth
 {
 	/**
 	 * 
