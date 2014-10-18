@@ -51,6 +51,11 @@ trait Staple_Trait_Helpers
 	{
 		return $obj;
 	} 
+	
+	public function dump()
+	{
+	    Staple_Dev::Dump(func_get_args());
+	}
 }
 
 ?>
