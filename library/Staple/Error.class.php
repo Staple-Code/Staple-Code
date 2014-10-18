@@ -21,7 +21,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Error
+class Staple_Error implements SplSubject
 {
 	const PAGE_NOT_FOUND = 404;
 	const APPLICATION_ERROR = 500;
@@ -33,7 +33,69 @@ class Staple_Error
 	const VALIDATION_ERROR = 506;
 	const LINK_ERROR = 507;
 	
-	private static $lastException;
+	/**
+	 * The object observers
+	 * @var SplObjectStorage
+	 */
+	private $_observers;
+	
+	/**
+	 * This is the callback for error handling.
+	 * @var SplObserver
+	 */
+	protected $logger;
+	
+	/**
+	 * The last exception that was thrown by the system.
+	 * @var Exception
+	 */
+	private $lastException;
+	
+	/**
+	 * The default constructor.
+	 */
+	public function __construct()
+	{
+	    $this->_observers = new SplObjectStorage();
+	}
+	
+	/**
+	 * Set the logger Object
+	 * @return SplObserver $logger
+	 */
+	public function getLogger()
+	{
+		return $this->logger;
+	}
+	
+	/**
+	 * Get the Logger Object
+	 * @param SplObserver $logger        	
+	 */
+	public function setLogger(SplObserver $logger)
+	{
+		$this->attach($logger);
+		$this->logger = $logger;
+		return $this;
+	}
+
+	/**
+	 * @return Exception $lastException
+	 */
+	public function getLastException()
+	{
+		return $this->lastException;
+	}
+
+	/**
+	 * @param Exception $lastException
+	 */
+	private function setLastException(Exception $lastException)
+	{
+		$this->lastException = $lastException;
+		return $this;
+	}
+
 	/**
 	 * 
 	 * handleError catches PHP Errors and displays an error page with the error details.
@@ -56,12 +118,26 @@ class Staple_Error
 	 */
 	public function handleException(Exception $ex)
 	{
-		self::$lastException = $ex;
+	    //handle the error
+		$this->setLastException($ex);
+		
+		//Notify observers
+		$this->notify();
+		
+		//Clear the output buffer
 		ob_clean();
+		
+		//Get the Front Controller
 		$main = Staple_Main::get();
+		
+		//Process the Header
 		$main->processHeader(true);
+		 
+		//Echo the error message
 		echo "<p>".$ex->getMessage()." Code: ".$ex->getCode()."</p>";
-		if(Staple_Config::getValue('errors', 'devmode') == 1)
+		
+		//Echo details if in dev mode
+		if($main->inDevMode())
 		{
 			if(($p = $ex->getPrevious()) instanceof Exception)
 			{
@@ -75,5 +151,53 @@ class Staple_Error
 				echo "</pre>";
 			}
 		}
+		
+		//If the site uses layout, build the default layout and put the error message inside.
+		if(Staple_Layout::layoutExists(Staple_Config::getValue('layout', 'default')))
+		{
+		    //Grab the current buffer contents to add to the layout
+			$buffer = ob_get_contents();
+			ob_clean();
+			
+			//Create the layout object and build the layout
+			$layout = new Staple_Layout(Staple_Config::getValue('layout', 'default'));
+			$layout->build($buffer);
+		}
 	}
+	
+	/**
+	 * Stub function for the future addition of error controller functionality
+	 */
+	private function dispatchErrorController()
+	{
+	    
+	}
+	
+	/* (non-PHPdoc)
+	 * @see SplSubject::attach()
+	 */
+	public function attach(SplObserver $observer)
+	{
+		$this->_observers->attach($observer);
+	}
+
+	/* (non-PHPdoc)
+	 * @see SplSubject::detach()
+	 */
+	public function detach(SplObserver $observer)
+	{
+		$this->_observers->detach($observer);
+	}
+
+	/* (non-PHPdoc)
+	 * @see SplSubject::notify()
+	 */
+	public function notify()
+	{
+		foreach($this->_observers as $observer)
+		{
+		    $observer->update($this);
+		}
+	}
+
 }
