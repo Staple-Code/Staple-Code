@@ -323,7 +323,7 @@ abstract class Staple_Form_Element
 		
 		if(count($this->errors) == 0)
 		{
-			if($this->isRequired() && $this->getValue() !== NULL)
+			if($this->isRequired() && $this->getValue() !== NULL && $this->getValue() !== '')
 			{
 				return true;
 			}
