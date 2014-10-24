@@ -72,11 +72,12 @@ class Staple_Form_SelectElement extends Staple_Form_Element
 	{
 		return $this->multiple;
 	}
-	
-	/**
-	 * Set the multiple attribute of the select element.
-	 * @param bool $bool
-	 */
+
+    /**
+     * Set the multiple attribute of the select element.
+     * @param bool $bool
+     * @return $this
+     */
 	public function setMultiple($bool = true)
 	{
 		$this->multiple = (bool)$bool;
@@ -93,11 +94,12 @@ class Staple_Form_SelectElement extends Staple_Form_Element
 		$this->selected = true;
 		return parent::setValue($val);
 	}
-	
-	/**
-	 * Sets the size of the select element
-	 * @param int $size
-	 */
+
+    /**
+     * Sets the size of the select element
+     * @param int $size
+     * @return $this
+     */
 	public function setSize($size)
 	{
 		$this->size = (int)$size;
@@ -112,14 +114,15 @@ class Staple_Form_SelectElement extends Staple_Form_Element
 	{
 		return $this->size;
 	}
-	
-	/**
-	 * Add a single option to the select list.
-	 * 
-	 * @param mixed $value
-	 * @param string $label
-	 * @throws Exception
-	 */
+
+    /**
+     * Add a single option to the select list.
+     *
+     * @param mixed $value
+     * @param string $label
+     * @return $this
+     * @throws Exception
+     */
 	public function addOption($value,$label = NULL)
 	{
 		if(is_array($value) || is_resource($value))
@@ -139,16 +142,17 @@ class Staple_Form_SelectElement extends Staple_Form_Element
 		}
 		return $this;
 	}
-	
-	/**
-	 * Add an array of values to the select list. Keys of the array become values of the options and the values
-	 * become the labels for the options. The second option allows the use of the labels as the values for the
-	 * options.
-	 * 
-	 * @param array $options
-	 * @param boolean $labelvalues
-	 * @throws Exception
-	 */
+
+    /**
+     * Add an array of values to the select list. Keys of the array become values of the options and the values
+     * become the labels for the options. The second option allows the use of the labels as the values for the
+     * options.
+     *
+     * @param array $options
+     * @param boolean $labelvalues
+     * @return $this
+     * @throws Exception
+     */
 	public function addOptionsArray(array $options, $labelvalues = FALSE)
 	{
 		foreach($options as $value=>$label)
@@ -189,11 +193,12 @@ class Staple_Form_SelectElement extends Staple_Form_Element
 	{
 		return $this->options;
 	}
-	
-	/**
-	 * Sorts the options list based on a set of preset sorts.
-	 * @param int $how
-	 */
+
+    /**
+     * Sorts the options list based on a set of preset sorts.
+     * @param int $how
+     * @return $this
+     */
 	public function sortOptions($how)
 	{
 		switch($how)
