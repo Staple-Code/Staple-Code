@@ -50,12 +50,12 @@ class downloadController extends Staple_Controller
 		{
 			$this->layout->setName('blank');
 			
-			$mail = new Staple_Mail();
+			/*$mail = new Staple_Mail();
 			$mail->addTo('contact@ironpilot.net')
 				->addTo('ironpilot@gmail.com')
 				->setSubject('Staple Download')
 				->setBody("Staple was just downloaded. <br><br>At:".date('m-d-Y H:i:s')."<br>Version: $version <br>User Agent:".$_SERVER["HTTP_USER_AGENT"])
-				->Send();
+				->Send();*/
 				
 			header('Content-type: application/zip');
 			header('Content-Disposition: attachment; filename="staple-'.$version.'.zip"');
