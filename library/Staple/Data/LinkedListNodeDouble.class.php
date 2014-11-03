@@ -20,7 +20,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Data_LinkedListNodeDouble extends Staple_Data_LinkedListNode
+namespace Staple\Data;
+
+class LinkedListNodeDouble extends LinkedListNode
 {
 	/**
 	 * The previous linked node.
@@ -34,7 +36,7 @@ class Staple_Data_LinkedListNodeDouble extends Staple_Data_LinkedListNode
 	 * @param Staple_Data_LinkedListNodeDouble $next
 	 * @param Staple_Data_LinkedListNodeDouble $prev
 	 */
-	public function __construct($data, Staple_Data_LinkedListNodeDouble $next = NULL, Staple_Data_LinkedListNodeDouble $prev = NULL)
+	public function __construct($data, LinkedListNodeDouble $next = NULL, LinkedListNodeDouble $prev = NULL)
 	{
 		//Call the parent constructor
 		parent::__construct($data,$next);

@@ -21,7 +21,11 @@
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Staple_Form_TextElement extends Staple_Form_Element
+namespace Staple\Form;
+
+use Staple;
+
+class TextElement extends FieldElement
 {
 	/**
 	 * Size of the text field.

@@ -20,7 +20,12 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Form_RadioGroup extends Staple_Form_Element
+namespace Staple\Form;
+
+use \Staple\Error;
+use \Exception;
+
+class RadioGroup extends FieldElement
 {
 	const SORT_VALUES = 1;
 	const SORT_LABELS_ALPHA = 2;
@@ -50,7 +55,7 @@ class Staple_Form_RadioGroup extends Staple_Form_Element
 	{
 		if(is_array($value) || is_resource($value))
 		{
-			throw new Exception('Select values must be strings or integers.', Staple_Error::APPLICATION_ERROR);
+			throw new Exception('Select values must be strings or integers.', Error::APPLICATION_ERROR);
 		}
 		else 
 		{
@@ -81,7 +86,7 @@ class Staple_Form_RadioGroup extends Staple_Form_Element
 		{
 			if(is_array($value) || is_resource($value))
 			{
-				throw new Exception('Select values must be strings or integers.', Staple_Error::APPLICATION_ERROR);
+				throw new Exception('Select values must be strings or integers.', Error::APPLICATION_ERROR);
 			}
 			else
 			{

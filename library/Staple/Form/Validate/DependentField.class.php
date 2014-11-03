@@ -1,5 +1,7 @@
 <?php
 /** 
+ * @todo not complete yet.
+ * 
  * @author Ironpilot
  * @copyright Copywrite (c) 2011, STAPLE CODE
  * 
@@ -18,12 +20,17 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Form_Validate_DependentField extends Staple_Form_Validator
+namespace Staple\Form\Validate;
+
+use \Staple\Form\FieldValidator;
+use \Staple\Form\FieldElement;
+
+class DependentField extends FieldValidator
 {
 	protected $fieldref;
 	protected $requiredval;
 	
-	public function __construct(Staple_Form_Element $field, $value)
+	public function __construct(FieldElement $field, $value)
 	{
 	
 	}

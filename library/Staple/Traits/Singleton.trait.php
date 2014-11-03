@@ -1,7 +1,7 @@
 <?php
 /**
- * Converts a string to a DateTime Object.
- *
+ * A trait to implement the singleton pattern.
+ * 
  * @author Ironpilot
  * @copyright Copywrite (c) 2011, STAPLE CODE
  *
@@ -20,37 +20,20 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Staple\Form\Filter;
+namespace Staple\Traits;
 
-use \Staple\Form\FieldFilter;
-use \DateTime;
-use \Exception;
-
-class ToDateTime extends FieldFilter
+trait Singleton
 {
-	/* (non-PHPdoc)
-	 * @see Staple_Form_Filter::filter()
-	 */
-	public function filter($text)
+	private static $inst;
+	
+	public static function getInstance()
 	{
-		try {
-			return new DateTime($text);
-		}
-		catch (Exception $e)
+		if (!isset(static::$conn)) 
 		{
-			return new DateTime();
+			static::$conn = new static();
 		}
+		return static::$inst;
 	}
-
-	/* (non-PHPdoc)
-	 * @see Staple_Form_Filter::getName()
-	 */
-	public function getName()
-	{
-		return 'datetime';
-	}
-
-
 }
 
 ?>

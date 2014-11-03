@@ -21,7 +21,11 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-abstract class Staple_Model
+namespace Staple;
+
+use \Exception;
+
+abstract class Model
 {
 	protected $_modelDB;
 	/**
@@ -102,14 +106,14 @@ abstract class Staple_Model
 		}
 		else							//Return the default connection
 		{
-			return Staple_DB::get();
+			return DB::get();
 		}
 	}
 
 	/**
 	 * @param Staple_DB $_modelDB
 	 */
-	public function setModelDB(Staple_DB $_modelDB)
+	public function setModelDB(DB $_modelDB)
 	{
 		$this->_modelDB = $_modelDB;
 		return $this;

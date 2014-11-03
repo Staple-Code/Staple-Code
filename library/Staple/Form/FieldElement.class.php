@@ -20,8 +20,16 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-abstract class Staple_Form_Element
+
+namespace Staple\Form;
+
+use \Staple\Error;
+use \Exception;
+
+abstract class FieldElement
 {
+	use \Staple\Traits\Helpers;
+	
 	/**
 	 * Name of the field on the form.
 	 * @var string
@@ -92,9 +100,9 @@ abstract class Staple_Form_Element
 	/**
 	 * Form field constructor. Requires a name, has an optional label, id and attribute array.
 	 *   
-	 * @param unknown_type $name
-	 * @param unknown_type $label
-	 * @param unknown_type $id
+	 * @param string $name
+	 * @param string $label
+	 * @param string $id
 	 * @param array $attrib
 	 */
 	public function __construct($name, $label = NULL, $id = NULL, array $attrib = array())
@@ -114,12 +122,13 @@ abstract class Staple_Form_Element
 			$this->addAttrib($key, $value);
 		}
 	}
-	
-	/**
-	 * Class overload either calls a getter for a protected value or gets the value from the attribute array.
-	 * 
-	 * @param string $name
-	 */
+
+    /**
+     * Class overload either calls a getter for a protected value or gets the value from the attribute array.
+     *
+     * @param string $name
+     * @return null|string
+     */
 	public function __get($name)
 	{
 		$method = 'get'.$name;
@@ -192,11 +201,12 @@ abstract class Staple_Form_Element
 		}
 		$this->filters = $filts;
 	}
-	
-	/**
-	 * Returns a string with all html entities replaced.
-	 * @param string $text
-	 */
+
+    /**
+     * Returns a string with all html entities replaced.
+     * @param string $text
+     * @return string
+     */
 	protected function escape($text)
 	{
 		return htmlentities($text);
@@ -223,8 +233,9 @@ abstract class Staple_Form_Element
 	/**
 	 * Adds a field filter to the form field.
 	 * @param Staple_Form_Filter $filter
+	 * @return $this
 	 */
-	public function addFilter(Staple_Form_Filter $filter)
+	public function addFilter(FieldFilter $filter)
 	{
 		$this->filters[$filter->getName()] = $filter;
 		return $this;
@@ -233,8 +244,9 @@ abstract class Staple_Form_Element
 	/**
 	 * Adds a field validator to the form field.
 	 * @param Staple_Form_Validator $validator
+	 * @return $this
 	 */
-	public function addValidator(Staple_Form_Validator $validator)
+	public function addValidator(FieldValidator $validator)
 	{
 		$this->validators[] = $validator;
 		return $this;
@@ -252,6 +264,7 @@ abstract class Staple_Form_Element
 	/**
 	 * Sets the field to be required to be completed to be valid. The optional parameter also allows you
 	 * to set required to false using this function.
+	 * @param bool $bool
 	 * @return Staple_Form_Element
 	 */
 	public function setRequired($bool = true)
@@ -305,7 +318,7 @@ abstract class Staple_Form_Element
 	{
 		foreach($this->validators as $val)
 		{
-			if($val instanceof Staple_Form_Validator)
+			if($val instanceof FieldValidator)
 			{
 				$val->clearErrors();
 				if(!$val->check($this->Value))
@@ -315,7 +328,7 @@ abstract class Staple_Form_Element
 			}
 			else
 			{
-				throw new Exception('Validation Error', Staple_Error::VALIDATION_ERROR);
+				throw new Exception('Validation Error', Error::VALIDATION_ERROR);
 			}
 		}
 		
@@ -323,7 +336,7 @@ abstract class Staple_Form_Element
 		
 		if(count($this->errors) == 0)
 		{
-			if($this->isRequired() && $this->getValue() !== NULL)
+			if($this->isRequired() && $this->getValue() !== NULL && $this->getValue() !== '')
 			{
 				return true;
 			}
@@ -354,13 +367,13 @@ abstract class Staple_Form_Element
 		$script = '';
 		foreach ($this->validators as $val)
 		{
-			if($val instanceof Staple_Form_Validator)
+			if($val instanceof FieldValidator)
 			{
 				$script .= $val->clientJQuery(get_class($this), $this);
 			}
 			else
 			{
-				throw new Exception('Form Error', Staple_Error::FORM_ERROR);
+				throw new Exception('Form Error', Error::FORM_ERROR);
 			}
 		}
 		return $script;
@@ -368,6 +381,7 @@ abstract class Staple_Form_Element
 	
 	/**
 	 * This function queries all of the validators for javascript to verify their data.
+	 * @throws Exception
 	 * @return string
 	 */
 	public function clientJS()
@@ -375,13 +389,13 @@ abstract class Staple_Form_Element
 		$script = '';
 		foreach ($this->validators as $val)
 		{
-			if($val instanceof Staple_Form_Validator)
+			if($val instanceof FieldValidator)
 			{
 				$script .= $val->clientJS(get_class($this), $this->id);
 			}
 			else
 			{
-				throw new Exception('Form Error', Staple_Error::FORM_ERROR);
+				throw new Exception('Form Error', Error::FORM_ERROR);
 			}
 		}
 		return $script;
@@ -413,6 +427,8 @@ abstract class Staple_Form_Element
 	/**
 	 * Sets the field label.
 	 * @param string $insert
+	 * @param bool $noescape
+	 * @return $this
 	 */
 	public function setLabel($insert, $noescape = FALSE)
 	{
@@ -438,6 +454,7 @@ abstract class Staple_Form_Element
 	/**
 	 * Sets the field value, if field is not read only.
 	 * @param string $insert
+	 * @throws Exception
 	 * @return Staple_Form_Element
 	 */
 	public function setValue($insert)
@@ -447,13 +464,13 @@ abstract class Staple_Form_Element
 			//Process Filters
 			foreach($this->filters as $name=>$filter)
 			{
-				if($filter instanceof Staple_Form_Filter)
+				if($filter instanceof FieldFilter)
 				{
 					$insert = $filter->filter($insert);
 				}
 				else
 				{
-					throw new Exception('Filter Error', Staple_Error::FORM_ERROR);
+					throw new Exception('Filter Error', Error::FORM_ERROR);
 				}
 			}
 			
@@ -471,7 +488,7 @@ abstract class Staple_Form_Element
 	}
 	
 	/**
-	 * @return the $id
+	 * @return string $id
 	 */
 	public function getId()
 	{
@@ -480,6 +497,7 @@ abstract class Staple_Form_Element
 
 	/**
 	 * @param string $id
+	 * @return $this
 	 */
 	public function setId($id)
 	{
@@ -488,7 +506,7 @@ abstract class Staple_Form_Element
 	}
 
 	/**
-	 * @return the $instructions
+	 * @return string $instructions
 	 */
 	public function getInstructions()
 	{
@@ -497,6 +515,7 @@ abstract class Staple_Form_Element
 
 	/**
 	 * @param string $instructions
+	 * @return $this
 	 */
 	public function setInstructions($instructions)
 	{
@@ -524,7 +543,7 @@ abstract class Staple_Form_Element
 	}
 	
 	/**
-	 * @return the $disabled
+	 * @return bool $disabled
 	 */
 	public function isDisabled()
 	{
@@ -533,6 +552,7 @@ abstract class Staple_Form_Element
 
 	/**
 	 * @param boolean $disabled
+	 * @return $this
 	 */
 	public function setDisabled($disabled = true)
 	{
@@ -545,6 +565,7 @@ abstract class Staple_Form_Element
 	 * Adds an attribute to the attributes array. $attrib is the key or attribute name, and $value is its value.
 	 * @param string $attrib
 	 * @param string $value
+	 * @return $this
 	 */
 	public function addAttrib($attrib, $value)
 	{
@@ -667,17 +688,4 @@ abstract class Staple_Form_Element
 	 * Build the field using a layout, or with the default build.
 	 */
 	abstract public function build();
-	
-	/*----------------------------------------Helpers----------------------------------------*/
-	/**
-	 * 
-	 * If an array is supplied, a link is created to a controller/action. If a string is
-	 * supplied, a file link is specified.
-	 * @param string | array $link
-	 * @param array $get
-	 */
-	public function link($link,array $get = array())
-	{
-		return Staple_Main::get()->link($link,$get);
-	}
 }

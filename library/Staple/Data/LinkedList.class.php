@@ -22,8 +22,11 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
+namespace Staple\Data;
 
-class Staple_Data_LinkedList implements Iterator, Countable, ArrayAccess
+use \Exception;
+
+class LinkedList implements \Iterator, \Countable, \ArrayAccess
 {
 	/**
 	 * Pointer to the starting list node
@@ -146,7 +149,7 @@ class Staple_Data_LinkedList implements Iterator, Countable, ArrayAccess
 	public function offsetSet($offset, $value)
 	{
 		$item = $this->findItemByKey($offset);
-		if($item instanceof Staple_Data_LinkedListNode)
+		if($item instanceof LinkedListNode)
 		{
 			$item->setData($value);
 		}
@@ -179,11 +182,11 @@ class Staple_Data_LinkedList implements Iterator, Countable, ArrayAccess
 	{
 		if($this->is_empty())
 		{
-			$this->first = $this->last = new Staple_Data_LinkedListNode($data);
+			$this->first = $this->last = new LinkedListNode($data);
 		}
 		else
 		{
-			$new = new Staple_Data_LinkedListNode($data,$this->first);
+			$new = new LinkedListNode($data,$this->first);
 			$this->first = $new;
 		}
 		
@@ -205,11 +208,11 @@ class Staple_Data_LinkedList implements Iterator, Countable, ArrayAccess
 		//Adds a node to the end of the list.
 		if($this->is_empty())
 		{
-			$this->first = $this->last = new Staple_Data_LinkedListNode($data);
+			$this->first = $this->last = new LinkedListNode($data);
 		}
 		else
 		{
-			$new = new Staple_Data_LinkedListNode($data);
+			$new = new LinkedListNode($data);
 			$this->last->next = $new;
 			$this->last = $new;
 		}
@@ -419,32 +422,14 @@ class Staple_Data_LinkedList implements Iterator, Countable, ArrayAccess
 	}
 	
 	/**
-	 * An internal troubleshooting test to see if the list is sizing correctly
-	 * @todo remove this function
-	 * @deprecated
-	 */
-	private function check_size()
-	{
-		echo "List thinks it is {$this->size} item(s) long.<br>";
-		$newSize = 0;
-		$current = $this->first;
-		while($current != null)
-		{
-			$newSize++;
-			$current = $current->next;
-		}
-		echo "List currently contains $newSize node(s)";
-	}
-	
-	/**
 	 * Returns the key for a specified node
 	 * @param Staple_Data_LinkedListNode $item
 	 */
-	private function findKey(Staple_Data_LinkedListNode $item)
+	private function findKey(LinkedListNode $item)
 	{
 		$counter = 0;
 		$current = $this->first;
-		while($item !== $current && $current instanceof Staple_Data_LinkedListNode)
+		while($item !== $current && $current instanceof LinkedListNode)
 		{
 			$current = $current->getNext();
 			$counter++;

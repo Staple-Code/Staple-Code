@@ -20,8 +20,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
+namespace Staple\Form;
 
-class Staple_Form_SubmitElement extends Staple_Form_Element
+class SubmitElement extends FieldElement
 {
 	public function __construct($name, $value=NULL, $label = NULL, $id = NULL, array $attrib = array())
 	{

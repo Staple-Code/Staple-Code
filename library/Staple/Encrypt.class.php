@@ -21,7 +21,11 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Encrypt
+namespace Staple;
+
+use \Exception;
+
+class Encrypt
 {	
 	const AES = MCRYPT_RIJNDAEL_128;
 	const ECB = MCRYPT_MODE_ECB;
@@ -184,7 +188,7 @@ class Staple_Encrypt
 		}
 		else
 		{
-			throw new Exception('No Encryption Key', Staple_Error::APPLICATION_ERROR);
+			throw new Exception('No Encryption Key', Error::APPLICATION_ERROR);
 		}
 		
 	}
@@ -209,7 +213,7 @@ class Staple_Encrypt
 		}
 		else
 		{
-			throw new Exception('No Decryption Key', Staple_Error::APPLICATION_ERROR);
+			throw new Exception('No Decryption Key', Error::APPLICATION_ERROR);
 		}
 	}
 	

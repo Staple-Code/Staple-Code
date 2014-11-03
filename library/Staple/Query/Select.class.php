@@ -21,7 +21,13 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Query_Select extends Staple_Query
+namespace Staple\Query;
+
+use \Staple\Error;
+use \Staple\Pager;
+use \Exception;
+
+class Select extends Query
 {
 	const ALL = 'ALL';
 	const DISTINCT = 'DISTINCT';
@@ -180,11 +186,11 @@ class Staple_Query_Select extends Staple_Query
 		{
 			$this->table = $table;
 		}
-		elseif($table instanceof Staple_Query || $table instanceof Staple_Query_Union)
+		elseif($table instanceof Query || $table instanceof Union)
 		{
 			if(!isset($alias))
 			{
-				throw new Exception('Every derived table must have its own alias', Staple_Error::DB_ERROR);
+				throw new Exception('Every derived table must have its own alias', Error::DB_ERROR);
 			}
 			$this->table = array($alias=>$table);
 		}
@@ -265,7 +271,7 @@ class Staple_Query_Select extends Staple_Query
 	 */
 	public function addColumn($col,$name = NULL)
 	{
-		if($col instanceof Staple_Query)
+		if($col instanceof Query)
 			$col = '('.(string)$col.')';
 		
 		if(isset($name))
@@ -364,7 +370,7 @@ class Staple_Query_Select extends Staple_Query
 	 */
 	public function limit($limit,$offset = NULL)
 	{
-		if($limit instanceof Staple_Pager)
+		if($limit instanceof Pager)
 		{
 			$this->setLimit($limit->getItemsPerPage());
 			$this->setLimitOffset($limit->getStartingItem());
@@ -380,7 +386,7 @@ class Staple_Query_Select extends Staple_Query
 
 	/*-----------------------------------------------HAVING CLAUSES-----------------------------------------------*/
 	
-	public function addHaving(Staple_Query_Condition $having)
+	public function addHaving(Condition $having)
 	{
 		$this->having[] = $having;
 		return $this;
@@ -394,43 +400,43 @@ class Staple_Query_Select extends Staple_Query
 	
 	public function havingCondition($column, $operator, $value, $columnJoin = NULL)
 	{
-		$this->addHaving(Staple_Query_Condition::Get($column, $operator, $value, $columnJoin));
+		$this->addHaving(Condition::Get($column, $operator, $value, $columnJoin));
 		return $this;
 	}
 	
 	public function havingStatement($statement)
 	{
-		$this->addHaving(Staple_Query_Condition::Statement($statement));
+		$this->addHaving(Condition::Statement($statement));
 		return $this;
 	}
 	
 	public function havingEqual($column, $value, $columnJoin = NULL)
 	{
-		$this->addHaving(Staple_Query_Condition::Equal($column, $value, $columnJoin));
+		$this->addHaving(Condition::Equal($column, $value, $columnJoin));
 		return $this;
 	}
 	
 	public function havingLike($column, $value)
 	{
-		$this->addHaving(Staple_Query_Condition::Like($column, $value));
+		$this->addHaving(Condition::Like($column, $value));
 		return $this;
 	}
 	
 	public function havingNull($column)
 	{
-		$this->addHaving(Staple_Query_Condition::Null($column));
+		$this->addHaving(Condition::Null($column));
 		return $this;
 	}
 	
 	public function havingIn($column, array $values)
 	{
-		$this->addHaving(Staple_Query_Condition::In($column, $values));
+		$this->addHaving(Condition::In($column, $values));
 		return $this;
 	}
 	
 	public function havingBetween($column, $start, $end)
 	{
-		$this->addHaving(Staple_Query_Condition::Between($column, $start, $end));
+		$this->addHaving(Condition::Between($column, $start, $end));
 		return $this;
 	}
 	
@@ -440,7 +446,7 @@ class Staple_Query_Select extends Staple_Query
 	 * Add a join to the query.
 	 * @param Staple_Query_Join $join
 	 */
-	public function addJoin(Staple_Query_Join $join)
+	public function addJoin(Join $join)
 	{
 		$this->joins[] = $join;
 		return $this;
@@ -483,13 +489,13 @@ class Staple_Query_Select extends Staple_Query
 	
 	public function leftJoin($table, $condition)
 	{
-		$this->addJoin(Staple_Query_Join::left($table, $condition));
+		$this->addJoin(Join::left($table, $condition));
 		return $this;
 	}
 	
 	public function innerJoin($table, $condition)
 	{
-		$this->addJoin(Staple_Query_Join::inner($table, $condition));
+		$this->addJoin(Join::inner($table, $condition));
 		return $this;
 	}
 	
@@ -532,7 +538,7 @@ class Staple_Query_Select extends Staple_Query
 				{
 					$columns .= ',';
 				}
-				if($col instanceof Staple_Query_Select)
+				if($col instanceof Select)
 				{
 					$columns .= '('.$col.')';
 				}
@@ -558,7 +564,7 @@ class Staple_Query_Select extends Staple_Query
 				{
 					$tables .= ',';
 				}
-				if($tbl instanceof Staple_Query || $tbl instanceof Staple_Query_Union)
+				if($tbl instanceof Query || $tbl instanceof Union)
 				{
 					$tables	= '('.$tbl.')';
 				}

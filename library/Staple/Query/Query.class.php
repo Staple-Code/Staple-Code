@@ -23,7 +23,15 @@
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-abstract class Staple_Query
+namespace Staple\Query;
+
+use \Exception;
+use \Staple\Error;
+use \Staple\DB;
+use \mysqli;
+use \DateTime;
+
+abstract class Query
 {
 	
 	/**
@@ -54,7 +62,7 @@ abstract class Staple_Query
 		else
 		{
 			try {
-				$this->setDb(Staple_DB::get());
+				$this->setDb(DB::get());
 			}
 			catch (Exception $e)
 			{
@@ -63,7 +71,7 @@ abstract class Staple_Query
 		}
 		if(!($this->db instanceof mysqli))
 		{
-			throw new Exception('Unable to create database object', Staple_Error::DB_ERROR);
+			throw new Exception('Unable to create database object', Error::DB_ERROR);
 		}
 		
 		//Set Table
@@ -139,12 +147,12 @@ abstract class Staple_Query
 		{
 			try 
 			{
-				$this->db = Staple_DB::get();
+				$this->db = DB::get();
 			}
 			catch (Exception $e)
 			{
 				//@todo try for a default connection if no staple connection
-				throw new Exception('No Database Connection', Staple_Error::DB_ERROR);
+				throw new Exception('No Database Connection', Error::DB_ERROR);
 			}
 			if($this->db instanceof mysqli)
 			{
@@ -157,7 +165,7 @@ abstract class Staple_Query
 	
 	/*-----------------------------------------------WHERE CLAUSES-----------------------------------------------*/
 	
-	public function addWhere(Staple_Query_Condition $where)
+	public function addWhere(Condition $where)
 	{
 		$this->where[] = $where;
 		return $this;
@@ -171,7 +179,7 @@ abstract class Staple_Query
 	
 	public function whereCondition($column, $operator, $value, $columnJoin = NULL)
 	{
-		$this->addWhere(Staple_Query_Condition::Get($column, $operator, $value, $columnJoin));
+		$this->addWhere(Condition::Get($column, $operator, $value, $columnJoin));
 		return $this;
 	}
 	
@@ -181,7 +189,7 @@ abstract class Staple_Query
 	 */
 	public function whereStatement($statement)
 	{
-		$this->addWhere(Staple_Query_Condition::Statement($statement));
+		$this->addWhere(Condition::Statement($statement));
 		return $this;
 	}
 	
@@ -193,7 +201,7 @@ abstract class Staple_Query
 	 */
 	public function whereEqual($column, $value, $columnJoin = NULL)
 	{
-		$this->addWhere(Staple_Query_Condition::Equal($column, $value, $columnJoin));
+		$this->addWhere(Condition::Equal($column, $value, $columnJoin));
 		return $this;
 	}
 	
@@ -204,7 +212,7 @@ abstract class Staple_Query
 	 */
 	public function whereLike($column, $value)
 	{
-		$this->addWhere(Staple_Query_Condition::Like($column, $value));
+		$this->addWhere(Condition::Like($column, $value));
 		return $this;
 	}
 	
@@ -214,7 +222,7 @@ abstract class Staple_Query
 	 */
 	public function whereNull($column)
 	{
-		$this->addWhere(Staple_Query_Condition::Null($column));
+		$this->addWhere(Condition::Null($column));
 		return $this;
 	}
 	
@@ -225,7 +233,7 @@ abstract class Staple_Query
 	 */
 	public function whereIn($column, $values)
 	{
-		$this->addWhere(Staple_Query_Condition::In($column, $values));
+		$this->addWhere(Condition::In($column, $values));
 		return $this;
 	}
 	
@@ -237,7 +245,7 @@ abstract class Staple_Query
 	 */
 	public function whereBetween($column, $start, $end)
 	{
-		$this->addWhere(Staple_Query_Condition::Between($column, $start, $end));
+		$this->addWhere(Condition::Between($column, $start, $end));
 		return $this;
 	}
 	
@@ -248,16 +256,16 @@ abstract class Staple_Query
 	 * @param mixed $inValue
 	 * @return string
 	 */
-	public static function convertTypes($inValue, Staple_DB $db = NULL)
+	public static function convertTypes($inValue, DB $db = NULL)
 	{
 		if(!($db instanceof mysqli))
 		{
 			try{
-				$db = Staple_DB::get();
+				$db = DB::get();
 			}
 			catch (Exception $e)
 			{
-				throw new Exception('No Database Connection', Staple_Error::DB_ERROR);
+				throw new Exception('No Database Connection', Error::DB_ERROR);
 			}
 		}
 		

@@ -20,7 +20,9 @@
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-class Staple_Pager
+namespace Staple;
+
+class Pager
 {
 	/**
 	 * Total number of items in the paged set.
@@ -399,7 +401,7 @@ class Staple_Pager
 		//Set a default link action location if none is submitted.
 		if($action == NULL)
 		{
-			$action = Staple_Main::getRoute();
+			$action = Main::getRoute();
 		}
 		$buffer = "<div class=\"staple_pager\">\n<div class=\"staple_pager_pages\">\nPage: ";
 		$pages = $this->getPages();
@@ -411,8 +413,8 @@ class Staple_Pager
 			}
 			elseif($this->getCurrentPage() > 1) 
 			{
-				$buffer .= '<a href="'.Staple_Link::get($action,array_merge($linkVars,array('page'=>1))).'">&lt;&lt;</a> - ';
-				$buffer .= '<a href="'.Staple_Link::get($action,array_merge($linkVars,array('page'=>($this->getCurrentPage()-1)))).'">&lt;</a> ';
+				$buffer .= '<a href="'.Link::get($action,array_merge($linkVars,array('page'=>1))).'">&lt;&lt;</a> - ';
+				$buffer .= '<a href="'.Link::get($action,array_merge($linkVars,array('page'=>($this->getCurrentPage()-1)))).'">&lt;</a> ';
 			}
 			if($pages[0] != 1)
 			{
@@ -426,7 +428,7 @@ class Staple_Pager
 				}
 				else 
 				{
-					$buffer .= '<a href="'.Staple_Link::get($action,array_merge($linkVars,array('page'=>(int)$page))).'">'.((int)$page).'</a> ';
+					$buffer .= '<a href="'.Link::get($action,array_merge($linkVars,array('page'=>(int)$page))).'">'.((int)$page).'</a> ';
 				}
 			}
 			if($pages[count($pages)-1] != $this->getNumberOfPages())
@@ -439,8 +441,8 @@ class Staple_Pager
 			}
 			else
 			{
-				$buffer .= '<a href="'.Staple_Link::get($action,array_merge($linkVars,array('page'=>($this->getCurrentPage()+1)))).'">&gt;</a> - '; 
-				$buffer .= '<a href="'.Staple_Link::get($action,array_merge($linkVars,array('page'=>$this->getNumberOfPages()))).'">&gt;&gt;</a> ';
+				$buffer .= '<a href="'.Link::get($action,array_merge($linkVars,array('page'=>($this->getCurrentPage()+1)))).'">&gt;</a> - '; 
+				$buffer .= '<a href="'.Link::get($action,array_merge($linkVars,array('page'=>$this->getNumberOfPages()))).'">&gt;&gt;</a> ';
 			}
 		}
 		else 
@@ -452,7 +454,7 @@ class Staple_Pager
 		{
 			
 			$buffer .= "<div class=\"staple_pager_items\">\n";
-			$buffer .= 'Items Per Page: <select onChange="window.location=\''.Staple_Link::get($action,array_merge($linkVars,array('page'=>1)))."&items='+this.value\">\n";
+			$buffer .= 'Items Per Page: <select onChange="window.location=\''.Link::get($action,array_merge($linkVars,array('page'=>1)))."&items='+this.value\">\n";
 			foreach($this->getItemAmountSelections() as $value)
 			{
 				$selected = '';

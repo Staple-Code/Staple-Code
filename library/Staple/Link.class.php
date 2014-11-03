@@ -152,7 +152,7 @@ class Link
 				}
 				else
 				{
-					throw new Exception('Bad Link',Staple_Error::LINK_ERROR);
+					throw new Exception('Bad Link',Error::LINK_ERROR);
 				}
 			}
 		}

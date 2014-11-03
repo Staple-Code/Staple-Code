@@ -23,7 +23,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-abstract class Staple_Form_Filter
+namespace Staple\Form;
+
+abstract class FieldFilter
 {
 	/**
 	 * Filters a field and returns the filtered value;

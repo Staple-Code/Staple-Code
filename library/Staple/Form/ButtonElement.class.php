@@ -21,7 +21,9 @@
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Staple_Form_ButtonElement extends Staple_Form_Element
+namespace Staple\Form;
+
+class ButtonElement extends FieldElement
 {
 	public function __construct($name, $value=NULL, $label = NULL, $id = NULL, array $attrib = array())
 	{

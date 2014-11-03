@@ -26,6 +26,8 @@ use \Exception;
 
 abstract class Controller
 {
+	use \Staple\Traits\Helpers;
+	
 	protected $openMethods = array();
 	protected $accessLevels = array();
 	protected $open = false;

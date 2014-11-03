@@ -20,7 +20,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Form_HiddenElement extends Staple_Form_Element
+namespace Staple\Form;
+
+class HiddenElement extends FieldElement
 {
 	/* (non-PHPdoc)
 	 * @see Staple_Form_Element::Create()

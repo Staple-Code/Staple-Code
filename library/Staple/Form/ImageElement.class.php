@@ -20,7 +20,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Form_ImageElement extends Staple_Form_Element
+namespace Staple\Form;
+
+class ImageElement extends FieldElement
 {
 	protected $src;
 	

@@ -33,7 +33,9 @@
  * You should have received a copy of the GNU General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_AD
+namespace Staple;
+
+class ActiveDirectory
 {
 	/**
 	 * 

@@ -21,7 +21,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Util
+namespace Staple;
+
+class Util
 {
 	const STATES_LONG = 1;
 	const STATES_SHORT = 2;

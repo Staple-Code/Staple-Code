@@ -23,6 +23,8 @@
 class Staple_Form_Validate_Length extends Staple_Form_Validator
 {
 	const DEFAULT_ERROR = 'Field does not meet length requirements.';
+	const MIN_LENGTH_ERROR = 'Minimum Length Not Met';
+	const MAX_LENGTH_ERROR = 'Maximum Length Exceeded';
 	protected $min = 0;
 	protected $max;
 	
@@ -106,13 +108,16 @@ class Staple_Form_Validate_Length extends Staple_Form_Validator
 			}
 			else 
 			{
-				$this->addError("Maximum Length Exceeded");
+				$this->addError(self::MAX_LENGTH_ERROR);
 			}
 		}
 		else
 		{
-			$this->addError("Minimum Length Not Met");
+			$this->addError(self::MIN_LENGTH_ERROR);
 		}
+		
+		//Additionally Add the default error message.
+		$this->addError();
 		return false;
 	}
 	

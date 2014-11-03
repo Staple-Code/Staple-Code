@@ -1,5 +1,4 @@
 <?php
- 
 /** 
  * A class for creating SQL SELECT statements
  * 
@@ -21,7 +20,13 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Query_Update extends Staple_Query
+namespace Staple\Query;
+
+use \Exception;
+use \Staple\Error;
+use \Staple\Pager;
+
+class Update extends Query
 {
 	const LOW_PRIORITY = 'LOW_PRIORITY';
 	const IGNORE = 'IGNORE';
@@ -54,7 +59,7 @@ class Staple_Query_Update extends Staple_Query
 	
 	public function __construct($table = NULL, array $data = NULL, $db = NULL, $order = NULL, $limit = NULL)
 	{
-		$this->data = new Staple_Query_DataSet();
+		$this->data = new DataSet();
 		if(isset($db))
 		{
 			$this->setDb($db);
@@ -191,17 +196,17 @@ class Staple_Query_Update extends Staple_Query
 	 */
 	public function setData($data)
 	{
-		if($data instanceof Staple_Query_DataSet)
+		if($data instanceof DataSet)
 		{
 			$this->data = $data;
 		}
 		elseif(is_array($data))
 		{
-			$this->data = new Staple_Query_DataSet($data);
+			$this->data = new DataSet($data);
 		}
 		else
 		{
-			throw new Exception('Data must be an instance of Staple_Query_DataSet or an array', Staple_Error::APPLICATION_ERROR);
+			throw new Exception('Data must be an instance of Staple_Query_DataSet or an array', Error::APPLICATION_ERROR);
 		}
 		return $this;
 	}
@@ -242,7 +247,7 @@ class Staple_Query_Update extends Staple_Query
 	 */
 	public function limit($limit,$offset = NULL)
 	{
-		if($limit instanceof Staple_Pager)
+		if($limit instanceof Pager)
 		{
 			$this->setLimit($limit->getItemsPerPage());
 			$this->setLimitOffset($limit->getStartingItem());

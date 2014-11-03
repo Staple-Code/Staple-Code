@@ -21,7 +21,11 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Route
+namespace Staple;
+
+use \Exception;
+
+class Route
 {
 	const ROUTE_MVC = 1;
 	const ROUTE_SCRIPT = 2;
@@ -77,10 +81,10 @@ class Staple_Route
 		//$link = Staple_Config::getValue('application', 'public_location');
 		
 		//Add Controller
-		$link = Staple_Link::urlCase($this->getController()).'/';
+		$link = Link::urlCase($this->getController()).'/';
 		
 		//Add Action
-		$link .= Staple_Link::urlCase($this->getAction());
+		$link .= Link::urlCase($this->getAction());
 		
 		//Add Parameters
 		if(count($this->params) >= 1)
@@ -129,7 +133,7 @@ class Staple_Route
 	 */
 	public function Redirect()
 	{
-		$base = Staple_Config::getValue('application', 'public_location');
+		$base = Config::getValue('application', 'public_location');
 		header('Location: '.$base.$this);
 		exit(0);
 	}
@@ -320,24 +324,24 @@ class Staple_Route
 			$controller = array_shift($splitRoute);
 			if(ctype_alnum(str_replace('-', '', $controller)) && ctype_alpha(substr($controller, 0, 1)))
 			{
-				$this->setController(Staple_Link::methodCase($controller));
+				$this->setController(Link::methodCase($controller));
 			}
 			else
 			{
 				//Bad info in the route, error out.
-				throw new Exception('Invalid Route', Staple_Error::PAGE_NOT_FOUND);
+				throw new Exception('Invalid Route', Error::PAGE_NOT_FOUND);
 			}
 			
 			//Check the Action Value and Set a valid value
 			$action = array_shift($splitRoute);
 			if(ctype_alnum(str_replace('-', '', $action)) && ctype_alpha(substr($action, 0, 1)))
 			{
-				$this->setAction(Staple_Link::methodCase($action));
+				$this->setAction(Link::methodCase($action));
 			}
 			else
 			{
 				//Bad info in the route, error out.
-				throw new Exception('Invalid Route', Staple_Error::PAGE_NOT_FOUND);
+				throw new Exception('Invalid Route', Error::PAGE_NOT_FOUND);
 			}
 			
 			$this

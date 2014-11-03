@@ -18,7 +18,12 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Form_Validate_IdenticalField extends Staple_Form_Validator
+namespace Staple\Form\Validate;
+
+use \Staple\Form\FieldValidator;
+use \Staple\Form\FieldElement;
+
+class IdenticalField extends FieldValidator
 {
 	const DEFAULT_ERROR = 'Data is not equal';
 	
@@ -29,7 +34,7 @@ class Staple_Form_Validate_IdenticalField extends Staple_Form_Validator
 	 */
 	protected $field;
 	
-	public function __construct(Staple_Form_Element $field = NULL, $strict = false, $usermsg = NULL)
+	public function __construct(FieldElement $field = NULL, $strict = false, $usermsg = NULL)
 	{
 		if(isset($field))
 		{
@@ -102,7 +107,7 @@ class Staple_Form_Validate_IdenticalField extends Staple_Form_Validator
 	/**
 	 * @param Staple_Form_Element $field
 	 */
-	public function setField(Staple_Form_Element $field)
+	public function setField(FieldElement $field)
 	{
 		$this->field = $field;
 		return $this;
@@ -112,7 +117,7 @@ class Staple_Form_Validate_IdenticalField extends Staple_Form_Validator
 	 * (non-PHPdoc)
 	 * @see Staple_Form_Validator::clientJQuery()
 	 */
-	public function clientJQuery($fieldType, Staple_Form_Element $field)
+	public function clientJQuery($fieldType, FieldElement $field)
 	{
 		switch ($fieldType)
 		{

@@ -8,7 +8,7 @@
  */
 namespace Staple\Traits;
 
-use \DateTime, \stdClass, Staple;
+use \DateTime, \stdClass, Staple, Staple\Link, Staple\Dev;
 
 trait Helpers
 {
@@ -18,9 +18,9 @@ trait Helpers
 	 * @param array $get
 	 * @return string
 	 */
-	public function link($route, array $get = array())
+	protected function link($route, array $get = array())
 	{
-		return \Staple\Link::get($route,$get);
+		return Link::get($route,$get);
 	}
 	
 	/**
@@ -30,7 +30,7 @@ trait Helpers
 	 * @param bool $strip
 	 * @return string
 	 */
-	public function escape($str, $strip = false)
+	protected function escape($str, $strip = false)
 	{
 		if($str instanceof DateTime)
 		{
@@ -51,14 +51,14 @@ trait Helpers
 	 * @param stdClass $obj
 	 * @return stdClass
 	 */
-	public function with(stdClass $obj)
+	protected function with(stdClass $obj)
 	{
 		return $obj;
 	} 
 	
-	public function dump()
+	protected function dump()
 	{
-	    Staple_Dev::Dump(func_get_args());
+	    Dev::Dump(func_get_args());
 	}
 }
 

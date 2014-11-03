@@ -21,7 +21,11 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Query_Condition
+namespace Staple\Query;
+
+use \Exception;
+
+class Condition
 {
 	const EQUAL = '=';
 	const GREATER = '>';
@@ -112,16 +116,16 @@ class Staple_Query_Condition
 						{
 							$value .= ",";
 						}
-						$value .= $this->columnJoin ? $aValue : Staple_Query::convertTypes($aValue);
+						$value .= $this->columnJoin ? $aValue : Query::convertTypes($aValue);
 					}
 				}
-				elseif($this->value instanceof Staple_Query_Select)
+				elseif($this->value instanceof Select)
 				{
 					$value .= $this->value;
 				}
 				else
 				{
-					$value = $this->columnJoin ? $this->value : Staple_Query::convertTypes($this->value);
+					$value = $this->columnJoin ? $this->value : Query::convertTypes($this->value);
 				}
 				$value .= ")";
 			}
@@ -131,7 +135,7 @@ class Staple_Query_Condition
 			}
 			else 
 			{
-				$value = $this->columnJoin ? $this->value : Staple_Query::convertTypes($this->value);
+				$value = $this->columnJoin ? $this->value : Query::convertTypes($this->value);
 			}
 			return $this->column.' '.$this->operator.' '.$value;
 		}
@@ -301,7 +305,7 @@ class Staple_Query_Condition
 		$obj = new static();
 		$obj->setColumn($column)
 			->setOperator(self::BETWEEN)
-			->setValue(Staple_Query::convertTypes($start)." AND ".Staple_Query::convertTypes($end))
+			->setValue(Query::convertTypes($start)." AND ".Query::convertTypes($end))
 			->setColumnJoin(true);
 		return $obj;
 	}

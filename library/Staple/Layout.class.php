@@ -27,6 +27,8 @@ use \Exception;
 
 class Layout
 {
+	use \Staple\Traits\Helpers;
+	
 	const DOC_HTML4_TRANS = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">';
 	const DOC_HTML4_STRICT = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">';
 	const DOC_HTML5 = '<!DOCTYPE HTML>';
@@ -367,29 +369,6 @@ class Layout
 		}
 		
 		return false;
-	}
-
-	/*---------------------------------------Helper Fuctions---------------------------------------*/
-	/**
-	 * 
-	 * If an array is supplied, a link is created to a controller/action. If a string is
-	 * supplied, a file link is specified.
-	 * @param string | array $link
-	 * @param array $get
-	 */
-	public function link($link,array $get = array())
-	{
-		return Link::get($link,$get);
-	}
-	
-	/**
-	 * @see Staple_View::escape()
-	 * @param string $estring
-	 * @param boolean $strip
-	 */
-	public static function escape($estring, $strip = false)
-	{
-		return View::escape($estring,$strip);
 	}
 	
 	/*---------------------------------------Builder Fuctions---------------------------------------*/

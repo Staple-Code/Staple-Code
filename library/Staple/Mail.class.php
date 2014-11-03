@@ -27,7 +27,11 @@
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-class Staple_Mail
+namespace Staple;
+
+use \Exception;
+
+class Mail
 {
 	const EMAIL_BODY_FIELD = '<!--STAPLE-EMAIL-BODY-->';
 	/**
@@ -98,7 +102,7 @@ class Staple_Mail
 	public function __construct($to = NULL, $from = NULL, array $cc = array(), array $bcc = array())
 	{
 		//Load the ini settings
-		$settings = Staple_Config::get('email');
+		$settings = Config::get('email');
 		if($settings['from'] != '')
 		{
 			$this->setFrom($settings['from']);
@@ -556,7 +560,7 @@ class Staple_Mail
 				}
 				else 
 				{
-					throw new Exception('Invalid Template File:'.$templateFile, Staple_Error::EMAIL_ERROR);
+					throw new Exception('Invalid Template File:'.$templateFile, Error::EMAIL_ERROR);
 				}
 			}
 			else

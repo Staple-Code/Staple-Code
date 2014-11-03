@@ -21,7 +21,12 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Form_Validate_UploadedFile extends Staple_Form_Validator
+namespace Staple\Form\Validate;
+
+use \Staple\Form\FieldValidator;
+use \finfo;
+
+class UploadedFile extends FieldValidator
 {
 	const DEFAULT_ERROR = 'File is not valid';
 	

@@ -20,7 +20,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Data_LinkedListNode
+namespace Staple\Data;
+
+class LinkedListNode
 {
 	/**
 	 * The data contained in the node
@@ -77,7 +79,7 @@ class Staple_Data_LinkedListNode
 	/**
 	 * @param Staple_Data_LinkedListNode $next
 	 */
-	public function setNext(Staple_Data_LinkedListNode $next)
+	public function setNext(LinkedListNode $next)
 	{
 		$this->next = $next;
 		return $this;

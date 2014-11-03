@@ -25,7 +25,12 @@
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-class Staple_Image
+namespace Staple;
+
+use \Staple\Error;
+use \Exception;
+
+class Image
 {
 	const MIME_JPG = 'image/jpeg';
 	const MIME_GIF = 'image/gif';
@@ -106,7 +111,7 @@ class Staple_Image
 			}
 			else
 			{
-				throw new Exception('Image File Not Found', Staple_Error::APPLICATION_ERROR);
+				throw new Exception('Image File Not Found', Error::APPLICATION_ERROR);
 			}
 		}
 	}
@@ -134,7 +139,7 @@ class Staple_Image
 		}
 		catch (Exception $e)
 		{
-			throw new Exception('Error creating image object', Staple_Error::APPLICATION_ERROR);
+			throw new Exception('Error creating image object', Error::APPLICATION_ERROR);
 		}
 	}
 	
@@ -163,7 +168,7 @@ class Staple_Image
 		}
 		else
 		{
-			throw new Exception('Invalid Image Type',Staple_Error::APPLICATION_ERROR);
+			throw new Exception('Invalid Image Type',Error::APPLICATION_ERROR);
 		}
 	}
 	
@@ -211,7 +216,7 @@ class Staple_Image
 		}
 		if(isset($this->destination))
 		{
-			throw new Exception('No destination.', Staple_Error::APPLICATION_ERROR);
+			throw new Exception('No destination.', Error::APPLICATION_ERROR);
 		}
 		else
 		{
@@ -234,14 +239,13 @@ class Staple_Image
 	
 	protected function setImageSettings()
 	{
-		if(($size = getimagesize($source)) !== false)
+		if(($size = getimagesize($this->source)) !== false)
 		{
-			$this->source = $source;
 			$this->width = $size[0];
 			$this->height = $size[1];
 			if(array_search($size['mime'], self::$mimes) === FALSE)
 			{
-				throw new Exception('Unsupported MIME Type', Staple_Error::APPLICATION_ERROR);
+				throw new Exception('Unsupported MIME Type', Error::APPLICATION_ERROR);
 			}
 			else
 			{
@@ -250,7 +254,7 @@ class Staple_Image
 		}
 		else
 		{
-			throw new Exception('Unable to get image properties', Staple_Error::APPLICATION_ERROR);
+			throw new Exception('Unable to get image properties', Error::APPLICATION_ERROR);
 		}
 	}
 	

@@ -21,7 +21,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Data_Queue extends Staple_Data_LinkedList
+namespace Staple\Data;
+
+class Queue extends LinkedList
 {
 	/**
 	 * Queue shift function adds to the end of the queue.

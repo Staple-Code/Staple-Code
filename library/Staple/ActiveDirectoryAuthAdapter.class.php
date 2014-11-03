@@ -28,7 +28,12 @@
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-class Staple_ADAuthAdapter implements Staple_AuthAdapter
+namespace Staple;
+
+use \Exception;
+use \Staple\ActiveDirectory as AD;
+
+class ActiveDirectoryAuthAdapter implements AuthAdapter
 {
 	/**
 	 * 
@@ -88,10 +93,10 @@ class Staple_ADAuthAdapter implements Staple_AuthAdapter
 			{
 				if(strlen($cred['username']) >= 1 && strlen($cred['password']) >= 1)
 				{
-					if(Staple_AD::validchars($cred['username']) == TRUE && Staple_AD::validchars($cred['password']) == TRUE)
+					if(AD::validchars($cred['username']) == TRUE && AD::validchars($cred['password']) == TRUE)
 					{
 						$pass = $cred['password'];
-						$LDAP = Staple_AD::get();
+						$LDAP = AD::get();
 						$this->uid = $cred['username'];
 						if($LDAP->bind($this->uid, $pass))
 						{
@@ -116,7 +121,7 @@ class Staple_ADAuthAdapter implements Staple_AuthAdapter
 		{
 			if(array_key_exists('rolefield', $this->_settings))
 			{
-				$db = Staple_DB::get();
+				$db = DB::get();
 				$sql = 'SELECT '.$db->real_escape_string($this->_settings['rolefield']).' 
 						FROM '.$db->real_escape_string($this->_settings['authtable']).'
 						WHERE '.$db->real_escape_string($this->_settings['uidfield']).' = '.
@@ -162,12 +167,12 @@ class Staple_ADAuthAdapter implements Staple_AuthAdapter
 		{
 			if(!array_key_exists($value, $config))
 			{
-				throw new Exception('Staple_ADAuthAdapter configuration error.',Staple_Error::AUTH_ERROR);
+				throw new Exception('Staple_ADAuthAdapter configuration error.',Error::AUTH_ERROR);
 			}
 		}
 		if($config['adapter'] != get_class($this))
 		{
-			throw new Exception('Staple_ADAuthAdapter configuration error.',Staple_Error::AUTH_ERROR);
+			throw new Exception('Staple_ADAuthAdapter configuration error.',Error::AUTH_ERROR);
 		}
 		return true;
 	}

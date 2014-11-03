@@ -22,8 +22,17 @@
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Staple_Form
+namespace Staple\Form;
+
+use \Exception;
+use \Staple\Error;
+use \Staple\Config;
+use \Staple\Encrypt;
+
+class Form
 {
+	use \Staple\Traits\Helpers;
+	
 	const METHOD_GET = 'GET';
 	const METHOD_POST = 'POST';
 	const ENC_APP = 'application/x-www-form-urlencoded';
@@ -215,8 +224,8 @@ class Staple_Form
 	 */
 	protected function createIdentifier()
 	{
-		$this->identifier = Staple_Encrypt::genHex(32);
-		$ident = new Staple_Form_HiddenElement('ident');
+		$this->identifier = Encrypt::genHex(32);
+		$ident = new HiddenElement('ident');
 		$ident->setValue($this->identifier)
 			->setReadOnly();
 		$this->addField($ident);
@@ -240,7 +249,7 @@ class Staple_Form
 		catch (Exception $e)
 		{
 			$msg = '<p class=\"formerror\">Form Error....</p>';
-			if(Staple_Config::getValue('errors', 'devmode'))
+			if(Config::getValue('errors', 'devmode'))
 			{
 				$msg .= '<p>'.$e->getMessage().'</p>';
 			}
@@ -266,16 +275,16 @@ class Staple_Form
 	 * Adds a field to the form from an already instantiated form element.
 	 * @param Staple_Form_Element $field
 	 */
-	public function addField(Staple_Form_Element $field)
+	public function addField(FieldElement $field)
 	{
 		$args = func_get_args();
 		foreach($args as $newField)
 		{
-			if($newField instanceof Staple_Form_FileElement)
+			if($newField instanceof FileElement)
 			{
 				$this->setEnctype(self::ENC_FILE);
 			}
-			if($newField instanceof Staple_Form_Element)
+			if($newField instanceof FieldElement)
 			{
 				$this->fields[$newField->getName()] = $newField;
 			}
@@ -295,7 +304,7 @@ class Staple_Form
 			{
 				$obj->setValue($data[$fieldname]);
 			}
-			elseif($obj instanceof Staple_Form_CheckboxGroup)
+			elseif($obj instanceof CheckboxGroup)
 			{
 				$boxes = $obj->getBoxes();
 				foreach($boxes as $chk)
@@ -309,7 +318,7 @@ class Staple_Form
 			else
 			{
 				//Checkbox Fix
-				if($obj->isDisabled() === false && $obj instanceof Staple_Form_CheckboxElement)
+				if($obj->isDisabled() === false && $obj instanceof CheckboxElement)
 				{
 					$obj->setValue(NULL);
 				}
@@ -387,7 +396,7 @@ class Staple_Form
 	{
 		if(array_key_exists($field, $this->fields))
 		{
-			if($this->fields[$field] instanceof Staple_Form_Element)
+			if($this->fields[$field] instanceof FieldElement)
 			{
 				return true;
 			}
@@ -415,7 +424,7 @@ JS;
 		
 		foreach($this->fields as $field)
 		{
-			if($field instanceof Staple_Form_Element)
+			if($field instanceof FieldElement)
 			{
 				if($field->isRequired())
 				{
@@ -424,7 +433,7 @@ JS;
 			}
 			else
 			{
-				throw new Exception('Form Error', Staple_Error::FORM_ERROR);
+				throw new Exception('Form Error', Error::FORM_ERROR);
 			}
 		}
 		
@@ -503,7 +512,7 @@ JS;
 		//Process all validation fields.
 		foreach($this->fields as $field)
 		{
-			if($field instanceof Staple_Form_Element)
+			if($field instanceof FieldElement)
 			{
 				if(!$field->isValid())
 				{
@@ -514,7 +523,7 @@ JS;
 					elseif($field->getValue() != '')
 					{
 						//A few extra steps to handle File Uploads
-						if($field instanceof Staple_Form_FileElement)
+						if($field instanceof FileElement)
 						{
 							if(is_array($field->getValue()))
 							{
@@ -545,7 +554,7 @@ JS;
 			}
 			else
 			{
-				throw new Exception('Form Error', Staple_Error::FORM_ERROR);
+				throw new Exception('Form Error', Error::FORM_ERROR);
 			}
 		}
 		
@@ -748,7 +757,7 @@ JS;
 	{
 		if(array_key_exists($fieldname,$this->fields))
 		{
-			if($this->fields[$fieldname] instanceof Staple_Form_Element)
+			if($this->fields[$fieldname] instanceof FieldElement)
 			{
 				return $this->fields[$fieldname]->getValue();
 			}
@@ -795,7 +804,7 @@ JS;
 		$buf = "\n";
 		if(array_key_exists('ident', $this->fields))
 		{
-			if($this->fields['ident'] instanceof Staple_Form_Element)
+			if($this->fields['ident'] instanceof FieldElement)
 			{
 				$buf .= $this->fields['ident']->build();
 			}
@@ -840,7 +849,7 @@ JS;
 			}
 			else 
 			{
-				throw new Exception('Unable to load form layout.', Staple_Error::FORM_ERROR);
+				throw new Exception('Unable to load form layout.', Error::FORM_ERROR);
 			}
 		}
 		else
@@ -851,27 +860,5 @@ JS;
 			$buf .= $this->formend();
 		}
 		return $buf;
-	}
-	
-	/*----------------------------------------Helpers----------------------------------------*/
-	/**
-	 * 
-	 * If an array is supplied, a link is created to a controller/action. If a string is
-	 * supplied, a file link is specified.
-	 * @param string | array $link
-	 * @param array $get
-	 */
-	public function link($link,array $get = array())
-	{
-		return Staple_Link::get($link,$get);
-	}
-	/**
-	 * @see Staple_View::escape()
-	 * @param string $estring
-	 * @param boolean $strip
-	 */
-	public static function escape($estring, $strip = false)
-	{
-		return Staple_View::escape($estring,$strip);
 	}
 }

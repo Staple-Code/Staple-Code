@@ -18,7 +18,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Form_CheckboxGroup extends Staple_Form_Element
+namespace Staple\Form;
+
+class CheckboxGroup extends FieldElement
 {
 	/**
 	 * An array that holds the Checkbox elements.
@@ -26,7 +28,7 @@ class Staple_Form_CheckboxGroup extends Staple_Form_Element
 	 */
 	protected $boxes = array();
 	
-	public function addCheckbox(Staple_Form_CheckboxElement $box)
+	public function addCheckbox(CheckboxElement $box)
 	{
 		$this->boxes[] = $box;
 		return $this;
@@ -40,7 +42,7 @@ class Staple_Form_CheckboxGroup extends Staple_Form_Element
 	{
 		foreach($boxes as $box)
 		{
-			if($box instanceof Staple_Form_CheckboxElement)
+			if($box instanceof CheckboxElement)
 			{
 				$this->addCheckbox($box);
 			}

@@ -21,7 +21,11 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Query_Delete extends Staple_Query
+namespace Staple\Query;
+
+use \mysqli;
+
+class Delete extends Query
 {
 	const IGNORE = 'IGNORE';
 	const LOW_PRIORITY = 'LOW_PRIORITY';
@@ -83,7 +87,7 @@ class Staple_Query_Delete extends Staple_Query
 
 	/*-----------------------------------------------JOIN FUNCTIONS-----------------------------------------------*/
 	
-	public function addJoin(Staple_Query_Join $join)
+	public function addJoin(Join $join)
 	{
 		$this->joins[] = $join;
 	}
@@ -103,13 +107,13 @@ class Staple_Query_Delete extends Staple_Query
 	
 	public function leftJoin($table, $condition)
 	{
-		$this->addJoin(Staple_Query_Join::left($table, $condition));
+		$this->addJoin(Join::left($table, $condition));
 		return $this;
 	}
 	
 	public function innerJoin($table, $condition)
 	{
-		$this->addJoin(Staple_Query_Join::inner($table, $condition));
+		$this->addJoin(Join::inner($table, $condition));
 		return $this;
 	}
 	

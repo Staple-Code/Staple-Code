@@ -1,6 +1,8 @@
 <?php
-/** 
- * Converts a string to lowercase.
+
+/**
+ * Incomplete Authentication Class
+ * @todo completed this class.
  * 
  * @author Ironpilot
  * @copyright Copywrite (c) 2011, STAPLE CODE
@@ -20,30 +22,37 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Staple\Form\Filter;
+namespace Staple\Auth;
 
-use \Staple\Form\FieldFilter;
-
-class ToLower extends FieldFilter
+class AdvancedAuthAdapter
 {
-
+	/**
+	 * This function must be implemented to check the authorization based on the adapter 
+	 * at hand. The function must return a boolean true for the Staple_Auth object to view
+	 * authentication as successful. If a non-boolean true is returned, authentication will
+	 * fail.
+	 * @return bool
+	 */
+	public function getAuth($credentials);
 	/**
 	 * 
-	 * @see FieldFilter::filter()
+	 * This function must be implemented to return a numeric level of access. This level is
+	 * used to determine feature access based on account type.
+	 * @return int
 	 */
-	public function filter($text)
-	{
-		return strtolower($text);
-	}
+	public function getAccess($route);
+	
 	/**
-	 * 
-	 * @see FieldFilter::getName()
+	 * Returns the userid from the adapater
+	 * @return string
 	 */
-	public function getName()
-	{
-		return 'tolower';
-	}
-
+	public function getUserId();
+	
+	public function noAccess();
+	
+	public function doLogin();
+	
+	public function afterLogin();
 }
 
 ?>

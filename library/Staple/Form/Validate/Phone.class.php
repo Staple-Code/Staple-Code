@@ -1,5 +1,7 @@
 <?php
 /** 
+ * Validates a Phone Number format.
+ * 
  * @author Ironpilot
  * @copyright Copywrite (c) 2011, STAPLE CODE
  * 
@@ -18,7 +20,12 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Form_Validate_Phone extends Staple_Form_Validator
+namespace Staple\Form\Validate;
+
+use \Staple\Form\FieldValidator;
+use \Staple\Form\FieldElement;
+
+class Phone extends FieldValidator
 {
 	const DEFAULT_ERROR = 'Phone Number is invalid.';
 	const REGEX = '/^(\d{0,4})?[\.\-\/ ]?\(?(\d{3})\)?[\.\-\/ ]?(\d{3})[\.\-\/ ]?(\d{4})$/';
@@ -44,7 +51,7 @@ class Staple_Form_Validate_Phone extends Staple_Form_Validator
 		}
 	}
 	
-	public function clientJQuery($fieldType, Staple_Form_Element $field)
+	public function clientJQuery($fieldType, FieldElement $field)
 	{
 		switch ($fieldType)
 		{

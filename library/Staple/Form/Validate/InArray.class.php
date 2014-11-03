@@ -20,7 +20,12 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Form_Validate_InArray extends Staple_Form_Validator
+namespace Staple\Form\Validate;
+
+use \Staple\Form\FieldValidator;
+use \Staple\Form\FieldElement;
+
+class InArray extends FieldValidator
 {
 	const DEFAULT_ERROR = 'Supplied data not in accepted list of values.';
 	/**
@@ -77,7 +82,7 @@ class Staple_Form_Validate_InArray extends Staple_Form_Validator
 	/**
 	 * @see Staple_Form_Validator::clientJQuery()
 	 */
-	public function clientJQuery($fieldType, Staple_Form_Element $field)
+	public function clientJQuery($fieldType, FieldElement $field)
 	{
 		switch ($fieldType)
 		{
@@ -119,7 +124,7 @@ class Staple_Form_Validate_InArray extends Staple_Form_Validator
 	/**
 	 * @see Staple_Form_Validator::clientJS()
 	 */
-	public function clientJS($fieldType, Staple_Form_Element $field)
+	public function clientJS($fieldType, FieldElement $field)
 	{
 		// TODO Auto-generated method stub
 		

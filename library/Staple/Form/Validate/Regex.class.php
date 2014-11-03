@@ -19,7 +19,12 @@
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-class Staple_Form_Validate_Regex extends Staple_Form_Validator
+namespace Staple\Form\Validate;
+
+use \Staple\Form\FieldValidator;
+use \Staple\Form\FieldElement;
+
+class Regex extends FieldValidator
 {
 	/**
 	 * Constant for validating usernames. Usernames must be 6-50 characters and include only letters, numbers and underscores.
@@ -107,7 +112,7 @@ class Staple_Form_Validate_Regex extends Staple_Form_Validator
 	 * (non-PHPdoc)
 	 * @see Staple_Form_Validator::clientJQuery()
 	 */
-	public function clientJQuery($fieldType, Staple_Form_Element $field)
+	public function clientJQuery($fieldType, FieldElement $field)
 	{
 		switch ($fieldType)
 		{

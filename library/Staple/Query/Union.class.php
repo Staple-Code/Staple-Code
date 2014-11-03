@@ -20,10 +20,16 @@
  * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
  */
-class Staple_Query_Union
+namespace Staple\Query;
+
+use \mysqli;
+use \Staple\Error;
+use \Staple\DB;
+use \Staple\Pager;
+use \Exception;
+
+class Union
 {
 	const DISTINCT = 'DISTINCT';
 	const ALL = 'ALL';
@@ -74,7 +80,7 @@ class Staple_Query_Union
 		else
 		{
 			try {
-				$this->setDb(Staple_DB::get());
+				$this->setDb(DB::get());
 			}
 			catch (Exception $e)
 			{
@@ -84,12 +90,12 @@ class Staple_Query_Union
 		//No DB = Bad
 		if(!($this->db instanceof mysqli))
 		{
-			throw new Exception('Unable to create database object', Staple_Error::DB_ERROR);
+			throw new Exception('Unable to create database object', Error::DB_ERROR);
 		}
 		
 		foreach($queries as $q)
 		{
-			if($q instanceof Staple_Query_Select)
+			if($q instanceof Select)
 			{
 				$this->addQuery($q);
 			}
@@ -216,7 +222,7 @@ class Staple_Query_Union
 	 * Add a query to the UNION
 	 * @param Staple_Query_Select $query
 	 */
-	public function addQuery(Staple_Query_Select $query)
+	public function addQuery(Select $query)
 	{
 		$this->queries[] = $query;
 		return $this;
@@ -226,7 +232,7 @@ class Staple_Query_Union
 	 * Remove a query from the UNION
 	 * @param Staple_Query_Select $query
 	 */
-	public function removeQuery(Staple_Query_Select $query)
+	public function removeQuery(Select $query)
 	{
 		if(($key = array_search($query, $this->queries, true)) !== false)
 		{
@@ -302,7 +308,7 @@ class Staple_Query_Union
 	 */
 	public function limit($limit,$offset = NULL)
 	{
-		if($limit instanceof Staple_Pager)
+		if($limit instanceof Pager)
 		{
 			$this->setLimit($limit->getItemsPerPage());
 			$this->setLimitOffset($limit->getStartingItem());
@@ -330,12 +336,12 @@ class Staple_Query_Union
 		{
 			try 
 			{
-				$this->db = Staple_DB::get();
+				$this->db = DB::get();
 			}
 			catch (Exception $e)
 			{
 				//@todo try for a default connection if no staple connection
-				throw new Exception('No Database Connection', Staple_Error::DB_ERROR);
+				throw new Exception('No Database Connection', Error::DB_ERROR);
 			}
 			if($this->db instanceof mysqli)
 			{

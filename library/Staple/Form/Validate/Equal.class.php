@@ -1,5 +1,7 @@
 <?php
 /** 
+ * Validate that a field is equal to a value.
+ * 
  * @author Ironpilot
  * @copyright Copywrite (c) 2011, STAPLE CODE
  * 
@@ -18,7 +20,12 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Form_Validate_Equal extends Staple_Form_Validator
+namespace Staple\Form\Validate;
+
+use \Staple\Form\FieldValidator;
+use \Staple\Form\FieldElement;
+
+class Equal extends FieldValidator
 {
 	const DEFAULT_ERROR = 'Data is not equal';
 	protected $strict;
@@ -70,7 +77,7 @@ class Staple_Form_Validate_Equal extends Staple_Form_Validator
 	 * (non-PHPdoc)
 	 * @see Staple_Form_Validator::clientJQuery()
 	 */
-	public function clientJQuery($fieldType, Staple_Form_Element $field)
+	public function clientJQuery($fieldType, FieldElement $field)
 	{
 		switch ($fieldType)
 		{

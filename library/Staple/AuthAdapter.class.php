@@ -24,7 +24,9 @@
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-interface Staple_AuthAdapter
+namespace Staple;
+
+interface AuthAdapter
 {
 	/**
 	 * This function must be implemented to check the authorization based on the adapter 

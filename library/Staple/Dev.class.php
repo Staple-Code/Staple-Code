@@ -26,6 +26,7 @@ namespace Staple;
 
 class Dev
 {
+	//Timer - @todo make this into it's own class.
 	protected static $timer;
 	
 	/**
@@ -75,23 +76,5 @@ class Dev
 	{
 		return microtime(true) - self::$timer;
 	}
-	
-	public static function GetRouteInfo()
-	{
-		$blah = Main::getRoute();
-	} 
-	
-	/*public static function ResetController(Staple_Controller $controllerRef)
-	{
-		//$controllerRef::__destruct();
-		unset($controllerRef);
-	}
-	public static function ResetAuth()
-	{
-		$auth = Staple_Auth::get();
-		$auth->clearAuth();
-		$auth::__destruct();
-		unset($auth);
-	}*/
 }
 ?>

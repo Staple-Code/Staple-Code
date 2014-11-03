@@ -1,7 +1,6 @@
 <?php
-
 /** 
- * A class for creating SQL INSERT statements
+ * A class for creating SQL INSERT statements.
  * 
  * @author Ironpilot
  * @copyright Copywrite (c) 2011, STAPLE CODE
@@ -21,7 +20,14 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Query_Insert
+namespace Staple\Query;
+
+use \Exception;
+use \mysqli;
+use \Staple\Error;
+use \Staple\DB;
+
+class Insert
 {
 	const LOW = "LOW_PRIORITY";
 	const DELAYED = "DELAYED";
@@ -66,7 +72,7 @@ class Staple_Query_Insert
 	
 	public function __construct($table = NULL, $data = NULL, $db = NULL, $priority = NULL)
 	{
-		$this->data = new Staple_Query_DataSet();
+		$this->data = new DataSet();
 		
 		//Process Database connection
 		if($db instanceof mysqli)
@@ -76,7 +82,7 @@ class Staple_Query_Insert
 		else
 		{
 			try {
-				$this->setDb(Staple_DB::get());
+				$this->setDb(DB::get());
 			}
 			catch (Exception $e)
 			{
@@ -86,7 +92,7 @@ class Staple_Query_Insert
 		//No DB = Bad
 		if(!($this->db instanceof mysqli))
 		{
-			throw new Exception('Unable to create database object', Staple_Error::DB_ERROR);
+			throw new Exception('Unable to create database object', Error::DB_ERROR);
 		}
 		
 		//Set Table
@@ -146,11 +152,11 @@ class Staple_Query_Insert
 		$stmt .= "\nINTO ".$this->table.' ';
 		
 		//Data
-		if($this->data instanceof Staple_Query_DataSet)
+		if($this->data instanceof DataSet)
 		{
 			$stmt .= $this->data->getInsertString();
 		}
-		elseif($this->data instanceof Staple_Query_Select)
+		elseif($this->data instanceof Select)
 		{
 			$stmt .= "\n".$this->data;
 		}
@@ -191,12 +197,12 @@ class Staple_Query_Insert
 		{
 			try 
 			{
-				$this->db = Staple_DB::get();
+				$this->db = DB::get();
 			}
 			catch (Exception $e)
 			{
 				//@todo try for a default connection if no staple connection
-				throw new Exception('No Database Connection', Staple_Error::DB_ERROR);
+				throw new Exception('No Database Connection', Error::DB_ERROR);
 			}
 			if($this->db instanceof mysqli)
 			{
@@ -214,9 +220,9 @@ class Staple_Query_Insert
 	 */	
 	public function addData(array $data)
 	{
-		if($this->data instanceof Staple_Query_Select)
+		if($this->data instanceof Select)
 		{
-			throw new Exception('Cannot add data to an INSERT ... SELECT statement.', Staple_Error::DB_ERROR);
+			throw new Exception('Cannot add data to an INSERT ... SELECT statement.', Error::DB_ERROR);
 		}
 		$this->data->addData($data);
 		return $this;
@@ -317,17 +323,17 @@ class Staple_Query_Insert
 	 */
 	public function setData($data)
 	{
-		if($data instanceof Staple_Query_Select || $data instanceof Staple_Query_DataSet)
+		if($data instanceof Select || $data instanceof DataSet)
 		{
 			$this->data = $data;
 		}
 		elseif(is_array($data))
 		{
-			$this->data = new Staple_Query_DataSet($data);
+			$this->data = new DataSet($data);
 		}
 		else
 		{
-			throw new Exception('Data must be an instance of Staple_Query_DataSet, an instance of Staple_Query_Select or an array', Staple_Error::APPLICATION_ERROR);
+			throw new Exception('Data must be an instance of Staple_Query_DataSet, an instance of Staple_Query_Select or an array', Error::APPLICATION_ERROR);
 		}
 		return $this;
 	}
@@ -341,9 +347,9 @@ class Staple_Query_Insert
 	 */
 	public function setDataColumn($column,$data,$literal = false)
 	{
-		if($this->data instanceof Staple_Query_Select)
+		if($this->data instanceof Select)
 		{
-			throw new Exception('Cannot add data to an INSERT ... SELECT statement.', Staple_Error::DB_ERROR);
+			throw new Exception('Cannot add data to an INSERT ... SELECT statement.', Error::DB_ERROR);
 		}
 		if($literal === true)
 		{

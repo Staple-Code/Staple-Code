@@ -105,7 +105,7 @@ class Auth
 		}
 		else
 		{
-			throw new Exception('Authentication Module Failure', Staple_Error::AUTH_ERROR);
+			throw new Exception('Authentication Module Failure', Error::AUTH_ERROR);
 		}
 	}
 	
@@ -133,7 +133,7 @@ class Auth
 		{
 			if(!array_key_exists($keyval, $conf))
 			{
-				throw new Exception('Authentication Module Configuration Error',Staple_Error::AUTH_ERROR);
+				throw new Exception('Authentication Module Configuration Error',Error::AUTH_ERROR);
 			}
 		}
 		return true;
@@ -147,13 +147,13 @@ class Auth
 	 */
 	public static function get()
 	{			
-		if(!(self::$instance instanceof Staple_Auth))
+		if(!(self::$instance instanceof Auth))
 		{
 			if(array_key_exists('Staple', $_SESSION))
 				if(array_key_exists('auth', $_SESSION['Staple']))
 					self::$instance = $_SESSION['Staple']['auth'];
-			if(!(self::$instance instanceof Staple_Auth))
-				self::$instance = new Staple_Auth();
+			if(!(self::$instance instanceof Auth))
+				self::$instance = new Auth();
 		}
 		return self::$instance;
 	}
@@ -201,13 +201,13 @@ class Auth
 	public function doAuth(array $credentials)
 	{
 		//Make sure an adapter is loaded.
-		if(!($this->adapter instanceof Staple_AuthAdapter))
+		if(!($this->adapter instanceof AuthAdapter))
 		{
 			$adapt = $this->_settings['adapter'];
 			$this->adapter = new $adapt();
-			if(!($this->adapter instanceof Staple_AuthAdapter))
+			if(!($this->adapter instanceof AuthAdapter))
 			{
-				throw new Exception('Invalid Authentication Adapter', Staple_Error::AUTH_ERROR);
+				throw new Exception('Invalid Authentication Adapter', Error::AUTH_ERROR);
 			}
 		}
 		
@@ -272,18 +272,18 @@ class Auth
 	{
 		$conString = $this->_settings['controller'];
 		$class = substr($conString, 0, strlen($conString)-10);
-		$authCon = Staple_Main::getController($class);
-		if(!($authCon instanceof Staple_AuthController))
+		$authCon = Main::getController($class);
+		if(!($authCon instanceof AuthController))
 		{
 			$authCon = new $conString();
 		}
-		if($authCon instanceof Staple_AuthController)
+		if($authCon instanceof AuthController)
 		{
 			//Start the Controller
 			$authCon->_start();
 			
 			//Register Auth Controller with the Front Controller
-			Staple_Main::get()->registerController($authCon);
+			Main::get()->registerController($authCon);
 			
 			//Set the view's controller to match the route
 			$authCon->view->setController($class);
@@ -293,16 +293,16 @@ class Auth
 			
 			//Call the controller action, Send the route requested to the action
 			//@todo Add option to customize the controller action
-			call_user_func_array(array($authCon,'index'), array(Staple_Main::getRoute()));
+			call_user_func_array(array($authCon,'index'), array(Main::getRoute()));
 			
 			//Grab the buffer contents from the controller and post it after the header.
 			$buffer = ob_get_contents();
 			ob_clean();
 			
 			//Process the header
-			Staple_Main::get()->processHeader();
+			Main::get()->processHeader();
 			
-			if($authCon->layout instanceof Staple_Layout)
+			if($authCon->layout instanceof Layout)
 			{
 				$authCon->layout->build($buffer);
 			}
@@ -314,7 +314,7 @@ class Auth
 		}
 		else
 		{
-			throw new Exception('Fatal Error connecting to Auth Controller', Staple_Error::AUTH_ERROR);
+			throw new Exception('Fatal Error connecting to Auth Controller', Error::AUTH_ERROR);
 		}
 	}
 }

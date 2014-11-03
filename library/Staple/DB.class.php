@@ -173,7 +173,7 @@ class DB extends mysqli implements SplSubject
 	{
 		if (!isset(self::$namedConnections[$name])) {
 			$c = __CLASS__;
-			self::$namedConnections[$name] = new $c(Staple_Config::get($name));
+			self::$namedConnections[$name] = new $c(Config::get($name));
 		}
 		return self::$namedConnections[$name];
 	}

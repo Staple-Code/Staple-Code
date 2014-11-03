@@ -1,6 +1,6 @@
 <?php
 /** 
- * Converts a string to lowercase.
+ * A partial class for logging events within the application.
  * 
  * @author Ironpilot
  * @copyright Copywrite (c) 2011, STAPLE CODE
@@ -20,30 +20,27 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Staple\Form\Filter;
+namespace Staple\Log;
 
-use \Staple\Form\FieldFilter;
-
-class ToLower extends FieldFilter
+abstract class Log implements \SplObserver
 {
-
+	private $encryptLog = false;
+	
+	protected $dateAndTime;
+	
 	/**
-	 * 
-	 * @see FieldFilter::filter()
 	 */
-	public function filter($text)
+	function __construct()
 	{
-		return strtolower($text);
+		
 	}
-	/**
-	 * 
-	 * @see FieldFilter::getName()
-	 */
-	public function getName()
+	
+	function update($subject)
 	{
-		return 'tolower';
+		return $this->Log($subject);
 	}
-
+	
+	abstract function Log($subject);
 }
 
 ?>

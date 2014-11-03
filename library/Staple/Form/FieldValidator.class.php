@@ -1,5 +1,9 @@
 <?php
-abstract class Staple_Form_Validator
+namespace Staple\Form;
+
+use Staple;
+
+abstract class FieldValidator
 {
 	/**
 	 * This class constant defines the default error message for the validator. Each child class should customize this value.
