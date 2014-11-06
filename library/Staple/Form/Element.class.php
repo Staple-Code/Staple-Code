@@ -289,6 +289,22 @@ abstract class Staple_Form_Element
 	}
 	
 	/**
+	 * Adds a custom error errors array for a specific field.
+	 * @param array $err
+	 */
+	public function addError($err = NULL)
+	{
+		if(isset($err))
+		{
+			$this->errors[] = $err;
+		}
+		else
+		{
+			$this->errors[] = static::DEFAULT_ERROR;
+		}
+	}
+
+	/**
 	 * Returns an array of the errors that occurred during form validation.
 	 * @return array
 	 */
