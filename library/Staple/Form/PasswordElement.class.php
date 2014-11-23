@@ -125,7 +125,7 @@ class Staple_Form_PasswordElement extends Staple_Form_Element
 	public function build()
 	{
 		$buf = '';
-		$view = FORMS_ROOT.'/fields/TextElement.phtml';
+		$view = FORMS_ROOT.'/fields/PasswordElement.phtml';
 		if(file_exists($view))
 		{
 			ob_start();
