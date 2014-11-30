@@ -92,9 +92,9 @@ abstract class Staple_Form_Element
 	/**
 	 * Form field constructor. Requires a name, has an optional label, id and attribute array.
 	 *   
-	 * @param unknown_type $name
-	 * @param unknown_type $label
-	 * @param unknown_type $id
+	 * @param string $name
+	 * @param string $label
+	 * @param string $id
 	 * @param array $attrib
 	 */
 	public function __construct($name, $label = NULL, $id = NULL, array $attrib = array())
@@ -114,12 +114,13 @@ abstract class Staple_Form_Element
 			$this->addAttrib($key, $value);
 		}
 	}
-	
-	/**
-	 * Class overload either calls a getter for a protected value or gets the value from the attribute array.
-	 * 
-	 * @param string $name
-	 */
+
+    /**
+     * Class overload either calls a getter for a protected value or gets the value from the attribute array.
+     *
+     * @param string $name
+     * @return null|string
+     */
 	public function __get($name)
 	{
 		$method = 'get'.$name;
@@ -192,11 +193,12 @@ abstract class Staple_Form_Element
 		}
 		$this->filters = $filts;
 	}
-	
-	/**
-	 * Returns a string with all html entities replaced.
-	 * @param string $text
-	 */
+
+    /**
+     * Returns a string with all html entities replaced.
+     * @param string $text
+     * @return string
+     */
 	protected function escape($text)
 	{
 		return htmlentities($text);
@@ -219,21 +221,23 @@ abstract class Staple_Form_Element
 	/*
 	 * -------------------------------------VALIDATION FUNCTIONS-------------------------------------
 	 */
-	
-	/**
-	 * Adds a field filter to the form field.
-	 * @param Staple_Form_Filter $filter
-	 */
+
+    /**
+     * Adds a field filter to the form field.
+     * @param Staple_Form_Filter $filter
+     * @return $this
+     */
 	public function addFilter(Staple_Form_Filter $filter)
 	{
 		$this->filters[$filter->getName()] = $filter;
 		return $this;
 	}
-	
-	/**
-	 * Adds a field validator to the form field.
-	 * @param Staple_Form_Validator $validator
-	 */
+
+    /**
+     * Adds a field validator to the form field.
+     * @param Staple_Form_Validator $validator
+     * @return $this
+     */
 	public function addValidator(Staple_Form_Validator $validator)
 	{
 		$this->validators[] = $validator;
@@ -248,12 +252,13 @@ abstract class Staple_Form_Element
 		$this->validators = array();
 		return $this;
 	}
-	
-	/**
-	 * Sets the field to be required to be completed to be valid. The optional parameter also allows you
-	 * to set required to false using this function.
-	 * @return Staple_Form_Element
-	 */
+
+    /**
+     * Sets the field to be required to be completed to be valid. The optional parameter also allows you
+     * to set required to false using this function.
+     * @param bool $bool
+     * @return Staple_Form_Element
+     */
 	public function setRequired($bool = true)
 	{
 		$this->required = (bool)$bool;
@@ -283,6 +288,22 @@ abstract class Staple_Form_Element
 		return (bool)$this->required;
 	}
 	
+	/**
+	 * Adds a custom error errors array for a specific field.
+	 * @param array $err
+	 */
+	public function addError($err = NULL)
+	{
+		if(isset($err))
+		{
+			$this->errors[] = $err;
+		}
+		else
+		{
+			$this->errors[] = static::DEFAULT_ERROR;
+		}
+	}
+
 	/**
 	 * Returns an array of the errors that occurred during form validation.
 	 * @return array
@@ -323,7 +344,7 @@ abstract class Staple_Form_Element
 		
 		if(count($this->errors) == 0)
 		{
-			if($this->isRequired() && $this->getValue() !== NULL)
+			if($this->isRequired() && $this->getValue() !== NULL && $this->getValue() !== '')
 			{
 				return true;
 			}
@@ -365,11 +386,12 @@ abstract class Staple_Form_Element
 		}
 		return $script;
 	}
-	
-	/**
-	 * This function queries all of the validators for javascript to verify their data.
-	 * @return string
-	 */
+
+    /**
+     * This function queries all of the validators for javascript to verify their data.
+     * @throws Exception
+     * @return string
+     */
 	public function clientJS()
 	{
 		$script = '';
@@ -409,11 +431,13 @@ abstract class Staple_Form_Element
 	{
 		return $this->name;
 	}
-	
-	/**
-	 * Sets the field label.
-	 * @param string $insert
-	 */
+
+    /**
+     * Sets the field label.
+     * @param string $insert
+     * @param bool $noescape
+     * @return $this
+     */
 	public function setLabel($insert, $noescape = FALSE)
 	{
 		if($noescape === true)
@@ -434,12 +458,13 @@ abstract class Staple_Form_Element
 	{
 		return $this->label;
 	}
-	
-	/**
-	 * Sets the field value, if field is not read only.
-	 * @param string $insert
-	 * @return Staple_Form_Element
-	 */
+
+    /**
+     * Sets the field value, if field is not read only.
+     * @param string $insert
+     * @throws Exception
+     * @return Staple_Form_Element
+     */
 	public function setValue($insert)
 	{
 		if(!$this->isReadOnly())
@@ -469,35 +494,37 @@ abstract class Staple_Form_Element
 	{
 		return $this->value;
 	}
-	
-	/**
-	 * @return the $id
-	 */
+
+    /**
+     * @return string $id
+     */
 	public function getId()
 	{
 		return $this->id;
 	}
 
-	/**
-	 * @param string $id
-	 */
+    /**
+     * @param string $id
+     * @return $this
+     */
 	public function setId($id)
 	{
 		$this->id = $id;
 		return $this;
 	}
 
-	/**
-	 * @return the $instructions
-	 */
+    /**
+     * @return string $instructions
+     */
 	public function getInstructions()
 	{
 		return $this->instructions;
 	}
 
-	/**
-	 * @param string $instructions
-	 */
+    /**
+     * @param string $instructions
+     * @return $this
+     */
 	public function setInstructions($instructions)
 	{
 		$this->instructions = $instructions;
@@ -522,30 +549,32 @@ abstract class Staple_Form_Element
 	{
 		return $this->readOnly;
 	}
-	
-	/**
-	 * @return the $disabled
-	 */
+
+    /**
+     * @return bool $disabled
+     */
 	public function isDisabled()
 	{
 		return $this->disabled;
 	}
 
-	/**
-	 * @param boolean $disabled
-	 */
+    /**
+     * @param boolean $disabled
+     * @return $this
+     */
 	public function setDisabled($disabled = true)
 	{
 		$this->disabled = (bool)$disabled;
 		return $this;
 	}
 
-	/**
-	 * 
-	 * Adds an attribute to the attributes array. $attrib is the key or attribute name, and $value is its value.
-	 * @param string $attrib
-	 * @param string $value
-	 */
+    /**
+     *
+     * Adds an attribute to the attributes array. $attrib is the key or attribute name, and $value is its value.
+     * @param string $attrib
+     * @param string $value
+     * @return $this
+     */
 	public function addAttrib($attrib, $value)
 	{
 		$this->attrib[$attrib] = $value;
@@ -669,13 +698,14 @@ abstract class Staple_Form_Element
 	abstract public function build();
 	
 	/*----------------------------------------Helpers----------------------------------------*/
-	/**
-	 * 
-	 * If an array is supplied, a link is created to a controller/action. If a string is
-	 * supplied, a file link is specified.
-	 * @param string | array $link
-	 * @param array $get
-	 */
+    /**
+     *
+     * If an array is supplied, a link is created to a controller/action. If a string is
+     * supplied, a file link is specified.
+     * @param string | array $link
+     * @param array $get
+     * @return string
+     */
 	public function link($link,array $get = array())
 	{
 		return Staple_Main::get()->link($link,$get);

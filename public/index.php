@@ -14,7 +14,7 @@ defined('PROGRAM_ROOT')
 defined('ELEMENTS_ROOT')
 	|| define('ELEMENTS_ROOT', FOLDER_ROOT . '/elements/');
 
-include(LIBRARY_ROOT.'Staple/Main.class.php');
+require_once LIBRARY_ROOT.'Staple/Main.class.php';
 
 $main = Staple_Main::get();
 $main->run();

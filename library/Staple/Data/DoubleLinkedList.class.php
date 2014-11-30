@@ -257,6 +257,7 @@ class Staple_Data_DoubleLinkedList implements Iterator, Countable, ArrayAccess
 		else
 		{
 			$new = new Staple_Data_LinkedListNodeDouble($data);
+			$new->prev = $this->last;
 			$this->last->next = $new;
 			$this->last = $new;
 		}
@@ -278,6 +279,11 @@ class Staple_Data_DoubleLinkedList implements Iterator, Countable, ArrayAccess
 		return $this->removeBack();
 	}
 	
+	/**
+	 * Removes the specified node and returns it's data
+	 * @param Staple_Data_LinkedListNodeDouble $node
+	 * @return boolean|Ambigous <the, mixed>
+	 */
 	public function removeNode(Staple_Data_LinkedListNodeDouble $node)
 	{
 		if($this->is_empty())
@@ -293,10 +299,10 @@ class Staple_Data_DoubleLinkedList implements Iterator, Countable, ArrayAccess
 		}
 		else
 		{
-			$next = $node->next;
-			$prev = $node->prev;
+			$next = $node->getNext();
+			$prev = $node->getPrev();
 			
-			if($this->current() == $node && $node->prev != NULL)
+			if($this->getCurrentNode() == $node && $node->prev != NULL)
 			{
 				//Set the Current Node to the previous node in the list.
 				$this->current = $node->prev;
@@ -413,6 +419,22 @@ class Staple_Data_DoubleLinkedList implements Iterator, Countable, ArrayAccess
 	{
 		$this->name = $name;
 		return $this;
+	}
+	
+	/**
+	 * Return the current node
+	 * @return Staple_Data_LinkedListNodeDouble|NULL
+	 */
+	public function getCurrentNode()
+	{
+		if(!is_null($this->current))
+		{
+			return $this->current;
+		}
+		else
+		{
+			return NULL;
+		}
 	}
 	
 	/**

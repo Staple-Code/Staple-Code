@@ -76,14 +76,25 @@ class Staple_Form_FileElement extends Staple_Form_Element
 	public function build()
 	{
 		$buf = '';
-		$this->addClass('form_element');
-		$this->addClass('element_file');
-		$classes = $this->getClassString();
-		$buf .= "<div$classes id=\"".$this->escape($this->id)."_element\">\n";
-		$buf .= $this->label();
-		$buf .= $this->field();
-		$buf .= $this->instructions();
-		$buf .= "</div>\n";
+		$view = FORMS_ROOT.'/fields/FileElement.phtml';
+		if(file_exists($view))
+		{
+			ob_start();
+			include $view;
+			$buf = ob_get_contents();
+			ob_end_clean();
+		}
+		else
+		{
+			$this->addClass('form_element');
+			$this->addClass('element_file');
+			$classes = $this->getClassString();
+			$buf .= "<div$classes id=\"".$this->escape($this->id)."_element\">\n";
+			$buf .= $this->label();
+			$buf .= $this->field();
+			$buf .= $this->instructions();
+			$buf .= "</div>\n";
+		}
 		return $buf;
 	}
 }

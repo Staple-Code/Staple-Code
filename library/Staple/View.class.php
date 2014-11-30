@@ -25,7 +25,7 @@
  */
 class Staple_View 
 {
-	use Staple_Helpers;
+	use Staple_Trait_Helpers;
 	
 	/**
 	 * Whether or not to render the view. Set to false to skip view rendering.

@@ -153,11 +153,9 @@ class Staple_Main
 			$this->loader = new Staple_Autoload();
 			spl_autoload_register(array($this->loader, 'load'));
 		}
-		
-		//Setup Error Handlers
-		$this->errorHander = new Staple_Error();
-		set_error_handler('Staple_Error::handleError',E_USER_ERROR | E_USER_WARNING | E_WARNING);
-		set_exception_handler(array($this->errorHander,'handleException'));
+			
+		// Setup Error Handlers
+		$this->setErrorHander(new Staple_Error());
 		
 		//Start Output buffering
 		ob_start();
@@ -170,6 +168,40 @@ class Staple_Main
 		}
 	}
 	
+	/**
+	 *
+	 * @return Staple_Error $errorHander
+	 */
+	public function getErrorHander()
+	{
+		return $this->errorHander;
+	}
+	
+	/**
+	 *
+	 * @param Staple_Error $errorHander        	
+	 */
+	public function setErrorHander(Staple_Error $errorHander)
+	{
+		$this->errorHander = $errorHander;
+		
+		set_error_handler(array(
+				$this->errorHander,
+				'handleError'
+		), E_USER_ERROR | E_USER_WARNING | E_WARNING);
+		set_exception_handler(array(
+				$this->errorHander,
+				'handleException'
+		));
+		
+		return $this;
+	}
+	
+	public function inDevMode()
+	{
+	    return (bool)Staple_Config::getValue('errors', 'devmode');
+	}
+
 	/**
 	 * The application destructor renders the footer of the website and flushes the 
 	 * output buffer.
