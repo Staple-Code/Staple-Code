@@ -43,7 +43,7 @@ class Main
 	 * Settings array
 	 * @var array
 	 */
-	protected $settings = array();
+	//protected $settings = array();
 	
 	/**
 	 * 
@@ -91,8 +91,6 @@ class Main
 	 * Private constructor insures that the application is instantiated as a Singleton
 	 */
 	
-	private $headersent = false;
-	private $footersent = false;
 	
 	/**
 	 * 
@@ -128,45 +126,52 @@ class Main
 		defined('STAPLE_ROOT')
 			|| define('STAPLE_ROOT',LIBRARY_ROOT . 'Staple/');
 		
-		//Parse the settings file
-		$this->settings = parse_ini_file(CONFIG_ROOT.'application.ini',true);
-		$this->checkSettings();
-		
-		//Include, create and set the autoloader
-		
-		//Include the Staple Autoload class always
-		require_once STAPLE_ROOT.'Autoload.class.php';
+		//Include the Staple Config class always
+		require_once STAPLE_ROOT.'Config.class.php';
 		
 		//Check for a custom loader
-		if(array_key_exists('loader', $this->settings['application']))
+		if(Config::getValue('application', 'loader') != '')
 		{
-			if(class_exists($this->settings['application']['loader']))
+		    $loader = Config::getValue('application', 'loader');
+		    
+		    //Create Temporary loader if the class does not exist.
+			if(!class_exists($loader))
 			{
-				$loader = new $this->settings['application']['loader']();
-				if($loader instanceof Autoload)
-				{
-					$this->loader = $loader;
-					spl_autoload_register(array($this->loader, 'load'));
-				}
+			    require_once STAPLE_ROOT.'Autoload.class.php';
+			    $tmpLoader = new Autoload();
+			    $tmpLoader->load($loader);
+			}
+			
+			//Instantiate custom loader
+			$loader = new $loader();
+			if($loader instanceof Autoload)
+			{
+				$this->loader = $loader;
 			}
 		}
 		
 		//If no other loader is found or set, use the Staple_Autoload class
 		if(!($this->loader instanceof Autoload))
 		{
+		    require_once STAPLE_ROOT.'Autoload.class.php';
 			$this->loader = new Autoload();
-			spl_autoload_register(array($this->loader, 'load'));
 		}
+		
+		//Register the Autoload class
+		spl_autoload_register(array($this->loader, 'load'));
 			
 		// Setup Error Handlers
 		$this->setErrorHander(new Error());
 		
-		//Start Output buffering
-		ob_start();
+		//Create a session based on site config
+		if(Config::getValue('application', 'session_autostart') == 1 
+		    || Config::getValue('auth', 'enabled') == 1)
+		{
+			session_start();
+		}
 		
-		//Create a session
-		session_start();
-		if($this->settings['errors']['devmode'] == 1)
+		//Turn on the timer 
+		if(Config::getValue('errors', 'enable_timer') == 1)
 		{
 			Dev::StartTimer();
 		}
@@ -207,10 +212,9 @@ class Main
 	 */
 	public function __destruct()
 	{
-		$this->processFooter();
 		$_SESSION['Staple']['Controllers'] = self::$controllers;		//Store the controllers in the session
 		$_SESSION['Staple']['Main']['Referrer'] = self::$route;			//Store the last executed route
-		ob_end_flush();
+		//ob_end_flush();
 		/*if(Staple_Config::getValue('errors','devmode') == 1) //@todo use "register_shutdown_function" to accomplish this.
 		{
 			echo '<!-- Execution Time: '.Staple_Dev::StopTimer()." -->\n";
@@ -258,6 +262,9 @@ class Main
 		}
 	}
 	
+	/**
+	 * @deprecated
+	 */
 	public static function getReferrer()
 	{
 		return self::$referrer;
@@ -298,96 +305,18 @@ class Main
 	public function run($directive = NULL)
 	{
 		//Create and enable site-wide authorization.
-		if(array_key_exists('enabled', $this->settings['auth']))
-			if($this->settings['auth']['enabled'] == 1)
-				$this->auth = Auth::get();
-		
-		//Create and connect to the database.
-		if(array_key_exists('autoconnect', $this->settings['db']))
-			if($this->settings['db']['autoconnect'] == 1)
-				$this->db = DB::get();
+		if(Config::getValue('auth', 'enabled') == 1)
+			$this->auth = Auth::get();
 		
 		//Load the controllers from the session.
-		if(array_key_exists('Staple', $_SESSION))
-			if(array_key_exists('Controllers', $_SESSION['Staple']))
+		if(Config::getValue('application', 'session_autostart') == 1
+				|| Config::getValue('auth', 'enabled') == 1)
+			if(isset($_SESSION['Staple']['Controllers']))
 				if(is_array($_SESSION['Staple']['Controllers']))
 					self::$controllers = $_SESSION['Staple']['Controllers'];
-					
-		//Load the referring route from the session.
-		if(array_key_exists('Staple', $_SESSION))
-			if(array_key_exists('Main', $_SESSION['Staple']))
-				if(array_key_exists('Referrer',$_SESSION['Staple']['Main']))
-					self::$referrer = $_SESSION['Staple']['Main']['Referrer'];
-		
-		//Processes Initialization Directives
-		if(isset($directive))
-		{
-			switch($directive)
-			{
-				case self::DONT_THROW_LOADER_ERRORS:
-					$this->loader->setThrowOnFailure(false);
-					break;
-			}
-		}		
 		
 		//Run the route through the router.
 		$this->route();
-	}
-	
-	/**
-	 * Draws the header of the site, if found.
-	 * @deprecated
-	 */
-	public function processHeader($force = false)
-	{
-		
-		//Create the site header if used. 
-		if(array_key_exists('header', $this->settings['page']))
-		{
-			if($this->settings['page']['header'] != '')
-			{
-				$headerFile = $this->settings['page']['header'];
-				if(file_exists($headerFile))
-				{
-					if(!($this->headersent) || $force === true)
-					{
-						include $headerFile;
-						$this->headersent = true;
-					}
-				}
-				else
-				{
-					throw new Exception('Invalid Header Location', Error::APPLICATION_ERROR);
-				}
-			}
-		}
-	}
-	
-	/**
-	 * Draws the footer of the site, if found.
-	 * @deprecated
-	 */
-	public function processFooter()
-	{
-		if(array_key_exists('footer', $this->settings['page']))
-		{
-			if($this->settings['page']['footer'] != '')
-			{
-				$footerFile = $this->settings['page']['footer'];
-				if(file_exists($footerFile))
-				{
-					if(!($this->footersent))
-					{
-						include $footerFile;
-						$this->footersent = true;
-					}
-				}
-				else
-				{
-					throw new Exception('Invalid Footer Location', Error::APPLICATION_ERROR);
-				}
-			}
-		}
 	}
 	
 	/**
@@ -398,7 +327,7 @@ class Main
 	 * @throws Exception
 	 */
 	public function route($route = NULL)
-	{		
+	{
 		//First determine which routing information to use
 		if(!is_null($route))								//Use the supplied Route
 		{
@@ -407,6 +336,19 @@ class Main
 		elseif(array_key_exists('PATH_INFO', $_SERVER))		//Use the URI route
 		{
 			self::$route = $_SERVER['PATH_INFO']; 
+			self::$route = urldecode(self::$route);			//URL decode any special characters
+			if(strpos(self::$route, '?') !== false)
+			{
+				self::$route = substr(self::$route, 0, strpos(self::$route, '?'));
+			}
+			if(strlen(self::$route) == 0 || self::$route == '/')
+			{
+				self::$route = 'index/index';
+			}
+		}
+		elseif(array_key_exists('REQUEST_URI', $_SERVER))		//Use the URI route
+		{
+			self::$route = $_SERVER['REQUEST_URI'];
 			self::$route = urldecode(self::$route);			//URL decode any special characters
 			if(strpos(self::$route, '?') !== false)
 			{
@@ -581,20 +523,12 @@ class Main
 		$actionMethod->invokeArgs(self::$controllers[$controller], $params);
 		//call_user_func_array(array(self::$controllers[$controller],$action), $params);
 		
-		//Grab the buffer contents from the controller and post it after the header.
-		$buffer = ob_get_contents();
-		ob_clean();
-		
-		//Process the header
-		$this->processHeader();
-		
 		if(self::$controllers[$controller]->layout instanceof Layout)
 		{
-			self::$controllers[$controller]->layout->build($buffer);
+			self::$controllers[$controller]->layout->build();
 		}
 		else
 		{
-			echo $buffer;
 			self::$controllers[$controller]->view->build();
 		}
 	}
@@ -618,41 +552,11 @@ class Main
 		//run the script
 		require $route;
 		
-		//Grab the buffer contents from the controller and post it after the header.
-		$buffer = ob_get_contents();
-		ob_clean();
-		
-		//Process the Header
-		$this->processHeader();
-		
 		if($layout->getName() != '')
 		{
 			//Build the Layout
-			$layout->build($buffer);
+			$layout->build();
 		}
-		else
-		{
-			//Echo the Buffer
-			echo $buffer;
-		}
-	}
-	
-	/**
-	 * The purpose of this function is to dispatch an action/view and return the results in a string.
-	 * Any errors that occur will return a boolean false.
-	 * @return string | boolean
-	 */
-	public function pocketDispatch(Route $route)
-	{
-		//@todo complete the function
-	}
-	
-	/**
-	 * @todo This function not implemented yet
-	 */
-	protected function checkSettings()
-	{
-		//Check the settings array
 	}
 	
 	/**
@@ -703,11 +607,6 @@ class Main
 		{
 			self::$controllers[$class_name] = $controller;
 		}
-	}
-	public function excludeHeaderFooter()
-	{
-		$this->headersent = true;
-		$this->footersent = true;
 	}
 	/**
 	 * @return the $loader

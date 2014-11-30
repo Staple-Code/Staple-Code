@@ -41,9 +41,9 @@ class Image
 	 * @var array
 	 */
 	protected static $mimes = array(
-						'jpg'=>MIME_JPG,
-						'gif'=>MIME_GIF,
-						'png'=>MIME_PNG
+						'jpg'=>self::MIME_JPG,
+						'gif'=>self::MIME_GIF,
+						'png'=>self::MIME_PNG
 						);
 
 	/**
@@ -106,6 +106,7 @@ class Image
 		{
 			if(file_exists($source))
 			{
+				$this->setSource($source);
 				$this->setImageSettings();
 				$this->createImage();
 			}
@@ -116,15 +117,7 @@ class Image
 		}
 	}
 	
-	/**
-	 * Returns an array of the supported MIME types for this extension.
-	 * @return array
-	 */
-	public static function getMimeTypes()
-	{
-		return self::$mimes;
-	}
-	
+
 	/**
 	 * Encapsulates creation of the object using the factory pattern.
 	 * @param string $source
@@ -141,6 +134,197 @@ class Image
 		{
 			throw new Exception('Error creating image object', Error::APPLICATION_ERROR);
 		}
+	}
+	
+	/**
+	 * Creates an image object from an upload key name.
+	 * @param string $uploadKeyName
+	 * @return Staple_Image
+	 */
+	public function CreateFromUpload($uploadKeyName)
+	{
+		if(isset($_FILES[$uploadKeyName]))
+		{
+			return self::Create($_FILES[$uploadKeyName]['tmp_name']);
+		}
+	}
+
+	/**
+	 *
+	 * @return the resource
+	 */
+	public function getImage()
+	{
+		return $this->image;
+	}
+
+	/**
+	 * Set the image resource
+	 * @param resource $image
+	 */
+	protected function setImage($image)
+	{
+		//Destroy any previous image to save memory.
+		if(isset($this->image))
+		{
+			imagedestroy($this->image);
+		}
+		
+		//Check that the supplied variable contains a resource.
+		if(is_resource($image))
+		{
+			$this->image = $image;
+		}
+		
+		//Return $this
+		return $this;
+	}
+
+	/**
+	 *
+	 * @return string
+	 */
+	public function getSource()
+	{
+		return $this->source;
+	}
+
+	/**
+	 *
+	 * @return the string
+	 */
+	public function getDestination()
+	{
+		return $this->destination;
+	}
+
+	/**
+	 *
+	 * @param string $destination
+	 */
+	public function setDestination($destination)
+	{
+		$this->destination = (string)$destination;
+		return $this;
+	}
+
+	/**
+	 *
+	 * @return the int
+	 */
+	public function getHeight()
+	{
+		return $this->height;
+	}
+
+	/**
+	 *
+	 * @param int $height
+	 */
+	public function setHeight($height)
+	{
+		$this->height = (int)$height;
+		return $this;
+	}
+
+	/**
+	 *
+	 * @return the int
+	 */
+	public function getWidth()
+	{
+		return $this->width;
+	}
+
+	/**
+	 *
+	 * @param int $width
+	 */
+	public function setWidth($width)
+	{
+		$this->width = (int)$width;
+		return $this;
+	}
+
+	/**
+	 *
+	 * @return the string
+	 */
+	public function getMime()
+	{
+		return $this->mime;
+	}
+
+	/**
+	 *
+	 * @return int
+	 */
+	public function getQuality()
+	{
+		return $this->quality;
+	}
+
+	/**
+	 *
+	 * @param int $quality
+	 */
+	public function setQuality($quality)
+	{
+		$this->quality = (int)$quality;
+		return $this;
+	}
+
+	/**
+	 *
+	 * @return bool
+	 */
+	public function getPreserve()
+	{
+		return $this->preserve;
+	}
+
+	/**
+	 *
+	 * @param bool $preserve
+	 */
+	public function setPreserve($preserve)
+	{
+		$this->preserve = (bool)$preserve;
+		return $this;
+	}
+	
+	
+	/**
+	 * Returns an array of the supported MIME types for this extension.
+	 * @return array
+	 */
+	public static function getMimeTypes()
+	{
+		return self::$mimes;
+	}
+	
+	/**
+	 * Return the extension that matches the MIME type of the current file.
+	 * @throws Exception
+	 * @return string
+	 */
+	public function getImageExtension()
+	{
+		switch($this->mime)
+		{
+			case self::MIME_JPG :
+				$ext = 'jpg';
+				break;
+			case self::MIME_GIF :
+				$ext = 'gif';
+				break;
+			case self::MIME_PNG :
+				$ext = 'png';
+				break;
+			default:
+				throw new Exception('Invalid image type.',Error::APPLICATION_ERROR);
+		}
+		return $ext;
 	}
 	
 	/**
@@ -161,85 +345,188 @@ class Image
 			case self::MIME_PNG :
 				$img = imagecreatefrompng($this->source);
 				break;
+			default:
+				throw new Exception('Invalid image type.',Error::APPLICATION_ERROR);
 		}
 		if($img !== false)
 		{
-			$this->image = $img;
+			$this->setImage($img);
 		}
 		else
 		{
-			throw new Exception('Invalid Image Type',Error::APPLICATION_ERROR);
+			throw new Exception('An error occurred while creating the image resource.',Error::APPLICATION_ERROR);
 		}
 	}
 	
-	public function Resize(array $dims)
+	/**
+	 * Sets preserve aspect to true and resizes the image to fit within the box specified.
+	 * @param int $width
+	 * @param int $height
+	 */
+	public function fitInBox($width, $height)
 	{
-		$dims = array_values($dims);
+		$this->setPreserve(true);
+		return $this->resize($width,$height);
+	}
+	
+	/**
+	 * Resize an image to the specified width and height in pixels.
+	 * @param int $width
+	 * @param int $height
+	 * @throws Exception
+	 * @return boolean
+	 */
+	public function resize($width, $height)
+	{
+		$width = (int)$width;
+		$height = (int)$height;
 		
 		if($this->width >= $this->height)
 		{
-			$newwidth = $dims[0];
-			$newheight = round($this->height/($this->width/$dims[0]));
+			$height = round($this->height / ($this->width / $width));
 		}
 		else
 		{
-			$newheight = $dims[1];
-			$newwidth = round($this->width/($this->height/$dims[1]));
+			$width = round($this->width / ($this->height / $height));
 		}
 		
 		if(!isset($this->image))
 		{
 			$this->image = $this->createImage();
 		}
-		$newimage = imagecreatetruecolor($newwidth, $newheight);
-		imagecopyresampled ($newimage, $this->image, 0, 0, 0, 0, $newwidth, $newheight, $this->width, $this->height);
+		$newimage = imagecreatetruecolor($width, $height);
+		$success = imagecopyresampled($newimage, $this->image, 0, 0, 0, 0, $width, $height, $this->width, $this->height);
+		
+		if($success === true)
+		{
+			$this->setHeight($height);
+			$this->setWidth($width);
+			$this->setImage($newimage);
+			return true;
+		}
+		else
+		{
+			throw new Exception('Failed to resize the image. An error occurred while resizing.', Error::APPLICATION_ERROR);
+		}
+	}
+	
+	/**
+	 * @todo incomplete function
+	 */
+	public function addWatermark()
+	{
 		if($this->settings['image']['watermark']['enable'] === true)
 		{
 			if($this->settings['image']['watermark'][$size] === true)
 			{
 				list($water_width, $water_height) = getImageSize($this->fileroot.$this->settings['image']['watermarkFile']);
 				$watermark = imagecreatefrompng($this->fileroot.$this->settings['image']['watermarkFile']);
-				imagecopyresampled ($newimage, $watermark, 0, 0, 0, 0, $newwidth, $newheight, $water_width, $water_height);
+				imagecopyresampled ($newimage, $watermark, 0, 0, 0, 0, $width, $height, $water_width, $water_height);
 			}
 		}
-		imagedestroy($this->image);
-		
-		
-		//echo "File Created: ".dirname($filename)."/".$size."/".basename($filename);
 	}
 	
-	public function Save($dest = NULL, $type = NULL)
+	/**
+	 * This function will convert the current image to the specified type.
+	 * @todo complete this function
+	 * @param string $mime
+	 */
+	public function convertToType($mime)
 	{
+		switch($mime)
+		{
+			case self::MIME_JPG :
+				$img = imagecreatefromjpeg($this->source);
+				break;
+			case self::MIME_GIF :
+				$img = imagecreatefromgif($this->source);
+				break;
+			case self::MIME_PNG :
+				$img = imagecreatefrompng($this->source);
+				break;
+			default:
+					throw new Exception('Invalid image type.',Error::APPLICATION_ERROR);
+		}
+	}
+	
+	/**
+	 * Save the image resource to a destination.
+	 * @param string $dest
+	 * @param string $type
+	 * @throws Exception
+	 * @return boolean
+	 */
+	public function save($dest = NULL, $type = NULL)
+	{
+		//Set a destination if included in the method call
 		if(isset($dest))
 		{
-			$this->destination = $dest;
+			$this->setDestination($dest);
 		}
-		if(isset($this->destination))
+		
+		//Check that a destination has been set.
+		if(!isset($this->destination))
 		{
 			throw new Exception('No destination.', Error::APPLICATION_ERROR);
 		}
 		else
 		{
+			//Check that the root directory exists, if not create it.
 			if(!file_exists(dirname($this->destination)))
 			{
 				self::createDir(dirname($this->destination));
 			}
-			imagejpeg($this->image, $this->destination, $this->quality);
+			
+			//Save the image to the destination with the correct type.
+			$success = false;
+			switch($this->getMime())
+			{
+				case self::MIME_JPG:
+					$success = imagejpeg($this->getImage(), $this->getDestination(), $this->getQuality());
+					break;
+				case self::MIME_GIF:
+					$success = imagegif($this->getImage(), $this->getDestination());
+					break;
+				case self::MIME_PNG:
+					$success = imagepng($this->getImage(), $this->getDestination(), $this->getQuality());
+					break;
+			}
+			if($success === true)
+			{
+				return true;
+			}
+			else
+			{
+				throw new Exception('Failed to save image.', Error::APPLICATION_ERROR);
+			}
 		}
 	}
 	
+	/**
+	 * Create a directory to store an image inside.
+	 * @param string $dir
+	 * @throws Exception
+	 * @return boolean
+	 */
 	protected static function createDir($dir)
 	{
-		if(!file_exists(dirname($dir)))
+		if(mkdir($dir, NULL, true))
 		{
-			self::createDir($dir);
+			return true;
 		}
-		mkdir($dir);
+		else
+		{
+			throw new Exception('Unable to create directory: '.$dir);
+		}
 	}
 	
+	/**
+	 * Set the initial image settings.
+	 * @throws Exception
+	 */
 	protected function setImageSettings()
 	{
-		if(($size = getimagesize($this->source)) !== false)
+		if(($size = getimagesize($this->getSource())) !== false)
 		{
 			$this->width = $size[0];
 			$this->height = $size[1];
@@ -271,5 +558,3 @@ class Image
 		return $this;
 	}
 }
-
-?>
