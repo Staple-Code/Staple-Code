@@ -24,6 +24,11 @@ namespace Staple;
 
 use \Exception;
 
+/**
+* Added to include Registry once so Config class will load with out autoloader being started.
+*/
+require_once STAPLE_ROOT.'Registry.class.php';
+
 class Config extends Registry
 {
 	protected static $read = false;

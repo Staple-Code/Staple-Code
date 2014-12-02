@@ -246,7 +246,7 @@ class Autoload
 			{
 				if($this->throwOnFailure === true)
 				{
-					throw new Exception("Class Not Found".$class_name,Error::LOADER_ERROR);
+					throw new Exception("Class Not Found ".$class_name,Error::LOADER_ERROR);
 				}
 			}
 		}

@@ -134,8 +134,11 @@ class Error implements SplSubject
 		//Get the Front Controller
 		$main = Main::get();
 		
-		//Process the Header
-		$main->processHeader(true);
+		/**
+		* Process the Header
+		* Method has been Removed. 
+		*/
+		//$main->processHeader(true);
 		 
 		//Echo the error message
 		echo "<p>".$ex->getMessage()." Code: ".$ex->getCode()."</p>";
