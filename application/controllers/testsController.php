@@ -25,14 +25,15 @@ class B extends A
 		return 7;
 	}
 }
-		
-class testsController extends Staple_Controller
+
+class testsController extends Controller
 {
 	/* (non-PHPdoc)
 	 * @see Staple_Controller::index()
 	 */
 	public function index()
 	{
+		$form = new Form();
 		
 	}
 

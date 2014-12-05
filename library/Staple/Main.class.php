@@ -300,6 +300,9 @@ class Main
 	 */
 	public function run($directive = NULL)
 	{
+		//Create Class Aliases
+		Alias::generate();
+		
 		//Create and enable site-wide authorization.
 		if(Config::getValue('auth', 'enabled') == 1)
 			$this->auth = Auth::get();
