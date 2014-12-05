@@ -1,6 +1,6 @@
 <?php
 
-require_once ('library/Staple/Form/Element.class.php');
+require_once ('library/Staple/Form/FieldElement.class.php');
 
 /** 
  * @author Ironpilot

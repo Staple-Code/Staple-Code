@@ -163,12 +163,8 @@ class Main
 		// Setup Error Handlers
 		$this->setErrorHander(new Error());
 		
-		//Create a session based on site config
-		if(Config::getValue('application', 'session_autostart') == 1 
-		    || Config::getValue('auth', 'enabled') == 1)
-		{
-			session_start();
-		}
+		//Create a session
+		session_start();
 		
 		//Turn on the timer 
 		if(Config::getValue('errors', 'enable_timer') == 1)

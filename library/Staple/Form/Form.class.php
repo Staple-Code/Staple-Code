@@ -813,6 +813,10 @@ JS;
 		return $buf;
 	}
 	
+	/**
+	 * @deprecated
+	 * @return string
+	 */
 	public function title()
 	{
 		return $this->title;

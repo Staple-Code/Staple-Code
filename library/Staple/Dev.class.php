@@ -34,7 +34,7 @@ class Dev
 	 */
 	public static function Dump()
 	{
-		if(class_exists('Staple_Config'))
+		if(class_exists('\Staple\Config'))
 		{
 			if(Config::getValue('errors', 'devmode') == 1)
 			{
