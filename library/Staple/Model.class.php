@@ -25,16 +25,40 @@ namespace Staple;
 
 use \Exception;
 
-abstract class Model
+abstract class Model implements \JsonSerializable, \ArrayAccess, \Iterator, \Traversable
 {
+	/**
+	 * Primary Key Column Name. Use a string for a single primary key column, an array for a composite key.
+	 * @var string | array
+	 */
+	protected $_primaryKey = 'id';
+	/**
+	 * The table name of the model if different from the object name.
+	 * @var string
+	 */
+	protected $_table;
+	/**
+	 * Dynamic Properties of the model.
+	 * @var array
+	 */
+	protected $_properties = array();
+	/**
+	 * A database connection object that the model uses
+	 * @var DB
+	 */
 	protected $_modelDB;
 	/**
 	 * 
 	 * @param array $options
 	 */
-	function __construct(array $options = array())
+	public function __construct($options)
 	{
-		if (count($options) > 0)
+		if(!isset($this->_table))
+		{
+			$this->_table = str_replace('Model', '', __CLASS__);
+		}
+		
+		if (is_array($options))
 		{
             $this->_options($options);
         }
@@ -72,13 +96,30 @@ abstract class Model
         }
         return $this->$method();
     }
+    
+    /**
+     * Dynamically call properties without having to create getters and setters.
+     */
+    public function __call()
+    {
+    	//@todo incomplete function 
+    }
+    
+    /**
+     * Convert the model to JSON when performing a string conversion
+     * @return string
+     */
+    public function __toString()
+    {
+    	//@todo incomplete function
+    }
  
     /**
      * 
      * Sets model properties supplied via an associative array.
      * @param array $options
      */
-    public function _options(array $options)
+    public function _options($options)
     {
         foreach ($options as $key=>$value)
         {
@@ -95,6 +136,96 @@ abstract class Model
         }
         return $this;
     }
+	/**
+	 * 
+	 */
+	public function jsonSerialize()
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-PHPdoc)
+	 * @see Iterator::current()
+	 */
+	public function current()
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-PHPdoc)
+	 * @see Iterator::key()
+	 */
+	public function key()
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-PHPdoc)
+	 * @see Iterator::next()
+	 */
+	public function next()
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-PHPdoc)
+	 * @see Iterator::rewind()
+	 */
+	public function rewind()
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-PHPdoc)
+	 * @see Iterator::valid()
+	 */
+	public function valid()
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-PHPdoc)
+	 * @see ArrayAccess::offsetExists()
+	 */
+	public function offsetExists($offset)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-PHPdoc)
+	 * @see ArrayAccess::offsetGet()
+	 */
+	public function offsetGet($offset)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-PHPdoc)
+	 * @see ArrayAccess::offsetSet()
+	 */
+	public function offsetSet($offset, $value)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-PHPdoc)
+	 * @see ArrayAccess::offsetUnset()
+	 */
+	public function offsetUnset($offset)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
 	/**
 	 * @return Staple_DB $_modelDB
 	 */
@@ -119,6 +250,48 @@ abstract class Model
 		return $this;
 	}
 
+	/**
+	 * Save the model to the database
+	 * @return boolean
+	 */
+	public function save()
+	{
+		return false;
+	}
+	
+	/**
+	 * Return an instance of the model from the primary key.
+	 * @param int $id
+	 */
+	public static function get($id)
+	{
+		
+	}
+
+	public static function getAll()
+	{
+		
+	}
+	
+	public static function getWhereEqual($column, $value)
+	{
+		
+	}
+	
+	public static function getWhereNull($column)
+	{
+		
+	}
+	
+	public static function getWhereIn($column, array $values)
+	{
+		
+	}
+	
+	public static function getWhereStatement($statement)
+	{
+		
+	}
 }
 
 ?>
