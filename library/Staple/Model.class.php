@@ -74,11 +74,16 @@ abstract class Model implements \JsonSerializable, \ArrayAccess, \Iterator, \Tra
 	public function __set($name, $value)
     {
         $method = 'set' . ucfirst($name);
-        if (!method_exists($this, $method))
+        if (method_exists($this, $method))
         {
-            throw new Exception('Model does not contain specified property');
+            //Use the setter built onto the object
+            $this->$method($value);
         }
-        $this->$method($value);
+        else
+        {
+            //Set the property dynamically
+            $this->_properties[$name] = $value;
+        }
     }
  
     /**
@@ -90,11 +95,38 @@ abstract class Model implements \JsonSerializable, \ArrayAccess, \Iterator, \Tra
     public function __get($name)
     {
         $method = 'get' . ucfirst($name);
-        if (!method_exists($this, $method)) 
+        if (method_exists($this, $method))
         {
-            throw new Exception('Model does not contain specified property');
+            return $this->$method();
         }
-        return $this->$method();
+        elseif(array_key_exists($name,$this->_properties))
+        {
+            return $this->_properties[$name];
+        }
+        else
+        {
+            throw new Exception('Property does not exist on this model.');
+        }
+    }
+
+    /**
+     * Return the set status of the dynamic model properties
+     * @param $name
+     * @return bool
+     */
+    public function __isset($name)
+    {
+        return isset($this->_properties[$name]);
+    }
+
+    /**
+     * Unset a dynamic property of the model
+     * @param $name
+     */
+    public function __unset($name)
+    {
+        if(isset($this->_properties[$name]))
+            unset($this->_properties[$name]);
     }
     
     /**
@@ -111,7 +143,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess, \Iterator, \Tra
      */
     public function __toString()
     {
-    	//@todo incomplete function
+    	return json_decode($this);
     }
  
     /**
@@ -227,7 +259,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess, \Iterator, \Tra
 	}
 
 	/**
-	 * @return Staple_DB $_modelDB
+	 * @return DB $_modelDB
 	 */
 	public function getModelDB()
 	{
@@ -242,7 +274,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess, \Iterator, \Tra
 	}
 
 	/**
-	 * @param Staple_DB $_modelDB
+	 * @param DB $_modelDB
 	 */
 	public function setModelDB(DB $_modelDB)
 	{
