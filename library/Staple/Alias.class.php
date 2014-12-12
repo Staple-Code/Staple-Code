@@ -5,10 +5,9 @@ class Alias
 {
 	public static function generate()
 	{
-		class_alias('\\Staple\\Controller','\\Controller');
-		class_alias('\\Staple\\Form\\Form','Form');
-		class_alias('\\Staple\\Dev','Dev');
-		class_alias('\\Staple\\Model','Model');
+		class_alias('\\Staple\\Main','Main');
+		class_alias('\\Staple\\Autoload','Autoload');
+		class_alias('\\Staple\\Alias','Alias');
 	}
 }
 

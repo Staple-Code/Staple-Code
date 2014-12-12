@@ -31,13 +31,10 @@ class Autoload
 	const CONTROLLER_SUFFIX = 'Controller';
 	const FORM_SUFFIX = 'Form';
 	const MODEL_SUFFIX = 'Model';
-	const STAPLE_PREFIX = 'Staple_';
-	const STAPLE_TRAIT_PREFIX = 'Staple_Trait';
 	const PHP_FILE_EXTENSION = '.php';
 	const CLASS_FILE_EXTENSION = '.class.php';
 	const TRAIT_FILE_EXTENSION = '.trait.php';
 	const VIEW_FILE_EXTENSION = '.phtml';
-	const TRAIT_FOLDER = 'Traits';
 	
 	/**
 	 * Controller Class Suffix Value
@@ -114,28 +111,21 @@ class Autoload
 	}
 	
 	/**
-	 * Function alias for the loadClass() method
-	 * @param string $class_name
-	 */
-	public function load($class_name)
-	{
-		return $this->loadClass($class_name);
-	}
-	
-	/**
 	 * Load a class into the application
 	 * @param string $class_name
 	 * @throws Exception
 	 */
-	public function loadClass($class_name)
+	public function load($class_name)
 	{
-	    //Split the class into it's namespace components.
+		//$class_name = 'Controller';
+		//$class_name = 'indexController';
+		//Split the class into it's namespace components.
 	    $namespace = explode('\\',$class_name);
 	    
 	    //Set the final class name
 	    $className = $namespace[count($namespace)-1];
 	    
-	    if($namespace[0] == static::STAPLE_NAMESPACE)       //Look for STAPLE Namespace
+	    /*if($namespace[0] == static::STAPLE_NAMESPACE)       //Look for STAPLE Namespace
 	    {
 	        //Path for classes
 	        $path = LIBRARY_ROOT;
@@ -168,75 +158,57 @@ class Autoload
             {
                 throw new Exception('Error Loading Framework: '.$class_name, 501);
             }
-	    }
-		elseif(substr($class_name,strlen($class_name)-strlen($this->getControllerSuffix()),strlen($this->getControllerSuffix())) == $this->getControllerSuffix())			//Look for Controllers
+	    }*/
+		if(substr($class_name,strlen($class_name)-strlen($this->getControllerSuffix()),strlen($this->getControllerSuffix())) == $this->getControllerSuffix() 
+			&& strlen($class_name) != strlen($this->getControllerSuffix()))			//Look for Controllers
 		{
-			$include = CONTROLLER_ROOT.$class_name.static::PHP_FILE_EXTENSION;
+			$this->loadController($class_name);
+		}
+		elseif(substr($class_name,strlen($class_name)-strlen($this->getModelSuffix()),strlen($this->getModelSuffix())) == $this->getModelSuffix()
+			&& strlen($class_name) != strlen($this->getModelSuffix()))					//Look for Models
+		{
+			$this->loadModel($class_name);
+		}
+		elseif(substr($class_name,strlen($class_name)-strlen($this->getFormSuffix()),strlen($this->getFormSuffix())) == $this->getFormSuffix()
+			&& strlen($class_name) != strlen($this->getFormSuffix()))					//Look for Forms
+		{
+			$this->loadForm($class_name);
+		}
+		else 
+		{
+			//Path for classes
+			$path = LIBRARY_ROOT;
+			for($i = 0; $i < count($namespace)-1; $i++)
+			{
+				$path .= $namespace[$i].DIRECTORY_SEPARATOR;
+			}
+			
+			//Sub namespace switches
+			if(array_key_exists(1, $namespace))
+			{
+				switch($namespace[1])
+				{
+					case 'Traits':
+						$extension = static::TRAIT_FILE_EXTENSION;
+						break;
+					default:
+						$extension = static::CLASS_FILE_EXTENSION;
+						break;
+				}
+			}
+			
+			//Location
+			$include = $path.$className.$extension;
 			if(file_exists($include))
-			{ 
+			{
 				require_once $include;
 			}
 			else
 			{
-				if($this->throwOnFailure === true)
-				{
-					throw new Exception('Page Not Found',Error::PAGE_NOT_FOUND);
-				}
+				throw new Exception('Error Loading Framework: '.$class_name, 501);
 			}
 		}
-		elseif(substr($class_name,strlen($class_name)-strlen($this->getModelSuffix()),strlen($this->getModelSuffix())) == $this->getModelSuffix())					//Look for Models
-		{
-			$include = MODEL_ROOT.$class_name.static::PHP_FILE_EXTENSION;
-			if(file_exists($include))
-			{ 
-				require_once $include;
-			}
-			else
-			{
-				if($this->throwOnFailure === true)
-				{
-					throw new Exception('Model Not Found',Error::LOADER_ERROR);
-				}
-			}
-		}
-		elseif(substr($class_name,strlen($class_name)-4,4) == "Form")					//Look for Forms
-		{
-			$include = FORMS_ROOT.$class_name.static::PHP_FILE_EXTENSION;
-			if(file_exists($include))
-			{
-				require_once $include;
-			}
-			else
-			{
-				if($this->throwOnFailure === true)
-				{
-					throw new Exception('Form Not Found',Error::LOADER_ERROR);
-				}
-			}
-		}
-		/*elseif(substr($class_name,0,5) == 'Zend_' && file_exists(LIBRARY_ROOT.'Zend/Loader.php'))		//Look for Zend Classes
-		{
-			//Add Library Root to Include Path
-			if(strpos(get_include_path(), LIBRARY_ROOT) === false)
-			{
-				set_include_path(get_include_path().PATH_SEPARATOR.LIBRARY_ROOT);
-			}
-			try{
-				require_once LIBRARY_ROOT . 'Zend/Loader.php';
-				if(class_exists('Zend_Loader'))
-				{
-					Zend_Loader::loadClass($class_name);
-				}
-			}
-			catch(Exception $e)
-			{
-				if($this->throwOnFailure === true)
-				{
-					throw new Exception('Zend Loader Not Found',Staple_Error::LOADER_ERROR);
-				}
-			}
-		}*/
-		else																							//Look for other elements
+		/*else																							//Look for other elements
 		{
 			if(file_exists(ELEMENTS_ROOT.$class_name.static::PHP_FILE_EXTENSION))
 			{
@@ -248,6 +220,69 @@ class Autoload
 				{
 					throw new Exception("Class Not Found ".$class_name,Error::LOADER_ERROR);
 				}
+			}
+		}*/
+	}
+	
+	/**
+	 * Load a custom controller into the application
+	 * @param string $class_name
+	 * @throws Exception
+	 */
+	protected function loadController($class_name)
+	{
+		$include = CONTROLLER_ROOT.$class_name.static::PHP_FILE_EXTENSION;
+		if(file_exists($include))
+		{
+			require_once $include;
+		}
+		else
+		{
+			if($this->throwOnFailure === true)
+			{
+				throw new Exception('Page Not Found',Error::PAGE_NOT_FOUND);
+			}
+		}
+	}
+	
+	/**
+	 * Load a custom model in the application
+	 * @param string $class_name
+	 * @throws Exception
+	 */
+	protected function loadModel($class_name)
+	{
+		$include = MODEL_ROOT.$class_name.static::PHP_FILE_EXTENSION;
+		if(file_exists($include))
+		{
+			require_once $include;
+		}
+		else
+		{
+			if($this->throwOnFailure === true)
+			{
+				throw new Exception('Model Not Found',Error::LOADER_ERROR);
+			}
+		}
+	}
+	
+	/**
+	 * Load a custom form into the application
+	 * @param string $class_name
+	 * @throws Exception
+	 */
+	protected function loadForm($class_name)
+	{
+		$include = FORMS_ROOT.$class_name.static::PHP_FILE_EXTENSION;
+		if(file_exists($include))
+		{
+			require_once $include;
+		}
+		else
+		{
+			if($this->throwOnFailure === true)
+			{
+				throw new Exception('Form Not Found',Error::LOADER_ERROR);
 			}
 		}
 	}
@@ -546,6 +581,4 @@ class Autoload
 		$this->viewSearchDirectories = $viewSearchDirectories;
 		return $this;
 	}
-
-	
 }

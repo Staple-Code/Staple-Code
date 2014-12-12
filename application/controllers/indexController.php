@@ -19,7 +19,7 @@ use Staple\DB;
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class indexController extends \Staple\Controller
+class indexController extends Controller
 {
 	public function _start()
 	{

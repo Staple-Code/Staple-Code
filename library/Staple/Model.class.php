@@ -25,7 +25,7 @@ namespace Staple;
 
 use \Exception;
 
-abstract class Model implements \JsonSerializable, \ArrayAccess, \Iterator, \Traversable
+abstract class Model implements \JsonSerializable, \ArrayAccess, \Iterator
 {
 	/**
 	 * Primary Key Column Name. Use a string for a single primary key column, an array for a composite key.
@@ -132,7 +132,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess, \Iterator, \Tra
     /**
      * Dynamically call properties without having to create getters and setters.
      */
-    public function __call()
+    public function __call($name , array $arguments)
     {
     	//@todo incomplete function 
     }
@@ -143,7 +143,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess, \Iterator, \Tra
      */
     public function __toString()
     {
-    	return json_decode($this);
+    	return json_encode($this);
     }
  
     /**
@@ -288,6 +288,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess, \Iterator, \Tra
 	 */
 	public function save()
 	{
+		//@todo incomplete function
 		return false;
 	}
 	
@@ -297,32 +298,32 @@ abstract class Model implements \JsonSerializable, \ArrayAccess, \Iterator, \Tra
 	 */
 	public static function get($id)
 	{
-		
+		//@todo incomplete function
 	}
 
 	public static function getAll()
 	{
-		
+		//@todo incomplete function
 	}
 	
 	public static function getWhereEqual($column, $value)
 	{
-		
+		//@todo incomplete function
 	}
 	
 	public static function getWhereNull($column)
 	{
-		
+		//@todo incomplete function
 	}
 	
 	public static function getWhereIn($column, array $values)
 	{
-		
+		//@todo incomplete function
 	}
 	
 	public static function getWhereStatement($statement)
 	{
-		
+		//@todo incomplete function
 	}
 }
 
