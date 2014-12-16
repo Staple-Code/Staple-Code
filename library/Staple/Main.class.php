@@ -29,78 +29,63 @@ use \Exception, \ReflectionMethod;
 
 class Main
 {
-	const DONT_THROW_LOADER_ERRORS = 504;
-	const DEFAULT_AUTOLOAD_CLASS = 'Staple_Autoload';
 	/**
 	 * 
 	 * The instance property holds the singleton instance for Staple_Main
-	 * @var Staple_Main
+	 * @var Main
 	 */
 	protected static $instance;
 	
 	/**
-	 * 
-	 * Settings array
-	 * @var array
+	 * Holds the current route object
+	 * @var Route
 	 */
-	//protected $settings = array();
-	
-	/**
-	 * 
-	 * Holds a reference to the database object
-	 * @var Staple_DB
-	 */
-	protected $db;
-	
-	/**
-	 * 
-	 * Holds the current route
-	 * @var string
-	 */
-	protected static $route;
-	
-	/**
-	 * Holds the route executed on the last page call.
-	 * @var string
-	 */
-	protected static $referrer;
+	protected $route;
 	
 	/**
 	 * Holds references to the current instantiated controllers
-	 * @var array of Staple_Controller
+	 * @var array[Controller]
 	 */
-	protected static $controllers = array();
+	protected $controllers = array();
 	
-	/**
-	 * Holds a reference to the Staple_Auth class
-	 * @var Staple_Auth
-	 */
-	private $auth;
 	/**
 	 * The autoloader class instance
-	 * @var Staple_Autoload
+	 * @var Autoload
 	 */
 	protected $loader;
+	
 	/**
 	 * Instance of the error handler object
-	 * @var Staple_Error
+	 * @var Error
 	 */
 	protected $errorHander;
-	/**
-	 * 
-	 * Private constructor insures that the application is instantiated as a Singleton
-	 */
-	
 	
 	/**
-	 * 
+	 * Private constructor insures that the application is instantiated as a Singleton.
 	 * Application constructor. This function creates a new Staple application. It defines the constants: CONFIG_ROOT, LAYOUT_ROOT,
 	 * FORMS_ROOT, MODEL_ROOT, CONTROLLER_ROOT, VIEW_ROOT, and SCRIPT_ROOT. All of these constants exist as folders inside of the
-	 * PROGRAM_ROOT directory. The constructor loads and checks configuration, sets up the autoloader, sets custom error handlers,
-	 * starts output buffering and begins a session.
+	 * PROGRAM_ROOT directory. The constructor loads and checks configuration, sets up the autoloader, sets custom error handlers
+	 * and begins a session.
 	 */
 	private function __construct()
 	{
+		//Application Constants, if not already defined
+		defined('FOLDER_ROOT')
+			|| define('FOLDER_ROOT', realpath(dirname(__FILE__) . '/../'));
+		
+		defined('LIBRARY_ROOT')
+			|| define('LIBRARY_ROOT', FOLDER_ROOT . '/library/');
+		
+		defined('SITE_ROOT')
+			|| define('SITE_ROOT', FOLDER_ROOT . '/public/');
+		
+		defined('PROGRAM_ROOT')
+			|| define('PROGRAM_ROOT', FOLDER_ROOT . '/application/');
+		
+		defined('ELEMENTS_ROOT')
+			|| define('ELEMENTS_ROOT', FOLDER_ROOT . '/elements/');
+		
+		
 		//Setup STAPLE Constants
 		defined('CONFIG_ROOT')
 	    	|| define('CONFIG_ROOT', PROGRAM_ROOT . 'config/');
@@ -126,8 +111,15 @@ class Main
 		defined('STAPLE_ROOT')
 			|| define('STAPLE_ROOT',LIBRARY_ROOT . 'Staple/');
 		
-		//Include the Staple Config class always
+		//Include the Staple Config and Alias class always
+		require_once STAPLE_ROOT.'Alias.class.php';
 		require_once STAPLE_ROOT.'Config.class.php';
+		
+		//Alias the primary classes
+		Alias::load('Alias', false);
+		Alias::load('Config', false);
+		Alias::load('Main', false);
+		Alias::load('Registry', false);
 		
 		//Check for a custom loader
 		if(Config::getValue('application', 'loader') != '')
@@ -174,8 +166,8 @@ class Main
 	}
 	
 	/**
-	 *
-	 * @return Staple_Error $errorHander
+	 * Get the error handler for the application.
+	 * @return Error $errorHander
 	 */
 	public function getErrorHander()
 	{
@@ -184,7 +176,7 @@ class Main
 	
 	/**
 	 *
-	 * @param Staple_Error $errorHander        	
+	 * @param Error $errorHander        	
 	 */
 	public function setErrorHander(Error $errorHander)
 	{
@@ -203,19 +195,11 @@ class Main
 	}
 
 	/**
-	 * The application destructor renders the footer of the website and flushes the 
-	 * output buffer.
+	 * The application destructor stored controllers in the session to preserve their state
 	 */
 	public function __destruct()
 	{
-		$_SESSION['Staple']['Controllers'] = self::$controllers;		//Store the controllers in the session
-		$_SESSION['Staple']['Main']['Referrer'] = self::$route;			//Store the last executed route
-		//ob_end_flush();
-		/*if(Staple_Config::getValue('errors','devmode') == 1) //@todo use "register_shutdown_function" to accomplish this.
-		{
-			echo '<!-- Execution Time: '.Staple_Dev::StopTimer()." -->\n";
-			echo '<!-- Memory Usage: '.number_format(memory_get_peak_usage(true)).' bytes -->';
-		}*/
+		$_SESSION['Staple']['Controllers'] = $this->controllers;		//Store the controllers in the session
 	}
 	
 	/**
@@ -232,38 +216,54 @@ class Main
 	}
 	
 	/**
-	 * Returns the current route.
-	 * @return $route
+	 * Get or set a controller on the Main object
+	 * @param Controller | string $class
+	 * @return Controller | NULL
 	 */
-	public static function getRoute()
+	public static function controller($class)
 	{
-		return self::$route;
-	}
-	
-	public static function getRouteAction()
-	{
-		$route = explode('/', self::$route);
-		if(count($route) == 0)
+		if($class instanceof Controller)
 		{
-			return 'index/index';
+			return Main::get()->registerController($class);
 		}
-		elseif(count($route) == 1)
+		elseif(is_string($class))
 		{
-			return $action = $route[0].'/index';
-		}
-		else
-		{
-			$action = $route[0].'/'.$route[1];
-			return $action;
+			return Main::get()->getController($class);
 		}
 	}
 	
 	/**
-	 * @deprecated
+	 * Returns the current route.
+	 * @return $route
 	 */
-	public static function getReferrer()
+	public function getRoute()
 	{
-		return self::$referrer;
+		return $this->route;
+	}
+	
+	/**
+	 * @param \Staple\Route $route
+	 */
+	public function setRoute(Route $route)
+	{
+		$this->route = $route;
+		return $this;
+	}
+
+	/**
+	 * Return the current route action at is executing.
+	 * @return string | NULL
+	 */
+	public function getRouteAction()
+	{
+		if(isset($this->route))
+		{
+			if($this->route instanceof Route)
+			{
+				return $this->route->getAction();
+			}
+		}
+		return NULL;
 	}
 	
 	/**
@@ -272,343 +272,92 @@ class Main
 	 * @param string $class
 	 * @return Staple_Controller | NULL
 	 */
-	public static function getController($class)
+	public function getController($class)
 	{
-		if(array_key_exists($class, self::$controllers))
+		if(isset($this->controllers[$class]))
 		{
-			return self::$controllers[$class];
+			return $this->controllers[$class];
 		}
-		else
-		{
-			/*$controllerClass = $class.'Controller';
-			if(class_exists($controllerClass))
-			{
-				self::$controllers[$class] = new $controllerClass();
-				self::$controllers[$class]->_start();
-				return self::$controllers[$class];
-			}
-			else
-			{*/
-				return NULL;
-			//}
-		}
+		else return NULL;
 	}
 	
 	/**
 	 * 
 	 * Executes the application process.
 	 */
-	public function run($directive = NULL)
+	public function run($route = NULL)
 	{
-		//Create Class Aliases
-		Alias::generate();
-		
-		//Create and enable site-wide authorization.
-		if(Config::getValue('auth', 'enabled') == 1)
-			$this->auth = Auth::get();
+		//Include the boot file.
+		include_once PROGRAM_ROOT.'boot.php';
 		
 		//Load the controllers from the session.
-		if(Config::getValue('application', 'session_autostart') == 1
-				|| Config::getValue('auth', 'enabled') == 1)
-			if(isset($_SESSION['Staple']['Controllers']))
-				if(is_array($_SESSION['Staple']['Controllers']))
-					self::$controllers = $_SESSION['Staple']['Controllers'];
+		if(isset($_SESSION['Staple']['Controllers']))
+			if(is_array($_SESSION['Staple']['Controllers']))
+				$this->controllers = $_SESSION['Staple']['Controllers'];
 		
-		//Run the route through the router.
-		$this->route();
-	}
-	
-	/**
-	 * 
-	 * Main routing function for the application
-	 * @todo Delegate to Staple_Route
-	 * @param string $route
-	 * @throws Exception
-	 */
-	public function route($route = NULL)
-	{
 		//First determine which routing information to use
 		if(!is_null($route))								//Use the supplied Route
 		{
-			self::$route = $route;
-		}
-		elseif(array_key_exists('PATH_INFO', $_SERVER))		//Use the URI route
-		{
-			self::$route = $_SERVER['PATH_INFO']; 
-			self::$route = urldecode(self::$route);			//URL decode any special characters
-			if(strpos(self::$route, '?') !== false)
-			{
-				self::$route = substr(self::$route, 0, strpos(self::$route, '?'));
-			}
-			if(strlen(self::$route) == 0 || self::$route == '/')
-			{
-				self::$route = 'index/index';
-			}
+			$initialRoute = new Route($route);
 		}
 		elseif(array_key_exists('REQUEST_URI', $_SERVER))		//Use the URI route
 		{
-			self::$route = $_SERVER['REQUEST_URI'];
-			self::$route = urldecode(self::$route);			//URL decode any special characters
-			if(strpos(self::$route, '?') !== false)
-			{
-				self::$route = substr(self::$route, 0, strpos(self::$route, '?'));
-			}
-			if(strlen(self::$route) == 0 || self::$route == '/')
-			{
-				self::$route = 'index/index';
-			}
+			$initialRoute = new Route(urldecode($_SERVER['REQUEST_URI']));
+		}
+		elseif(array_key_exists('PATH_INFO', $_SERVER))		//Use the PATH_INFO route
+		{
+			$initialRoute = new Route(urldecode($_SERVER['PATH_INFO']));
 		}
 		else												//Use the default route
 		{
-			self::$route = 'index/index';
+			$initialRoute = new Route('/');
 		}
 		
-		//Run some route cleaning operations.
-		self::$route = str_replace('\\','/',self::$route);			//Convert backslashes to forward slashes 
-		if(substr(self::$route, 0, 1) == '/')						//Remove a starting forward slash
+		//Run the route through the router.
+		$this->setRoute($initialRoute);
+		$this->executeRoute();
+	}
+	
+	/**
+	 * Execute the current route
+	 * @return boolean
+	 */
+	protected function executeRoute()
+	{
+		if($this->route instanceof Route)
 		{
-			self::$route = substr(self::$route, 1, strlen(self::$route)-1);
+			return $this->route->execute();
 		}
-		if(($end = strpos(self::$route,'.')) !== false)				//End routing information on the first "." occurance
-		{
-			self::$route = substr(self::$route, 0, $end);
-		}
-		
-		//echo '<p>Current Route: '.self::$route.'</p>';
-		
-		//Check to see if a script exists with that route.
-		$scriptRoute = SCRIPT_ROOT.self::$route.'.php';
-		if(file_exists($scriptRoute))
-		{
-			//Check for valid path information
-			if(ctype_alnum(str_replace(array('/','_','-'),'',self::$route)))
-			{
-				//Authentication Check
-				if(Config::getValue('auth', 'enabled') != 0)
-				{
-					//Check for an excluded script route
-					$allowedScripts = (array)Config::getValue('auth', 'allowedRoute');
-					if(in_array(self::$route, $allowedScripts) === true)
-					{
-						//Script does not require auth, Dispatch Script
-						$this->dispatchScript($scriptRoute);
-					}
-					else
-					{
-						//Check for a login
-						if($this->auth->isAuthed() === true)
-						{
-							//Valid login found, Dispatch Script
-							$this->dispatchScript($scriptRoute);
-						}
-						else
-						{
-							//No valid login, no Auth
-							$this->auth->noAuth();
-						}
-					}
-				}
-				else
-				{
-					//Auth Disabled, Dispatch Script
-					$this->dispatchScript($scriptRoute);
-				}
-				return true;
-			}
-		}
-		else
-		{
-			//No Script found, routing to controller/action
-			
-			//Split the route into it's component elements.
-			$splitRoute = explode('/',self::$route);
-			
-			//If the route only contains a controller add the index action
-			if(count($splitRoute) == 1)
-			{
-				array_push($splitRoute, 'index');
-			}
-			elseif(count($splitRoute) >= 2)
-			{
-				//Correct for extra ending slash.
-				if(strlen($splitRoute[1]) < 1)
-				{
-					$splitRoute[1] = 'index';
-				}
-				//If the action is numeric, it is not the action. Insert the index action into the route.
-				if(is_numeric($splitRoute[1]))
-				{
-					$shift = array_shift($splitRoute);
-					array_unshift($splitRoute, $shift, 'index');
-				}
-			}
-			$class = Link::methodCase(array_shift($splitRoute));
-			$method = Link::methodCase(array_shift($splitRoute));
-			if(ctype_alnum($class) && ctype_alnum($method))
-			{
-				$dispatchClass = $class.'Controller';
-				$started = false;
-			
-				//Check for the controller existence
-				if(class_exists($dispatchClass))
-				{
-					//Check for the action existence
-					if(method_exists($dispatchClass, $method))
-					{
-						//If the controller has not been created yet, create an instance and store it in the front controller
-						if(!array_key_exists($class, self::$controllers))
-						{
-							self::$controllers[$class] = new $dispatchClass();
-							self::$controllers[$class]->_start();
-							$started = true;
-						}
-						
-						//Verify that an instance of the controller class exists and is of the right type
-						if(self::$controllers[$class] instanceof Controller)
-						{
-							//Check if global Auth is enabled.
-							if(Config::getValue('auth', 'enabled') != 0)
-							{
-								//Check the sub-controller for access to the method
-								if(self::$controllers[$class]->_auth($method) === true)
-								{
-									$this->dispatchController($class, $method, $splitRoute, $started);
-								}
-								else
-								{
-									$this->auth->noAuth();
-								}
-							}
-							else
-							{
-								$this->dispatchController($class, $method, $splitRoute, $started);
-							}
-							return true;
-						}
-					}
-				}
-			}
-		}
-		
-		//If a valid page cannot be found, throw page not found exception
-		throw new Exception('Page Not Found',Error::PAGE_NOT_FOUND);
 	}
 	
 	/**
 	 * 
-	 * Function executes a controller action passing parameters using call_user_func_array().
-	 * It also builds the view for the route.
-	 * 
-	 * @param string $class
-	 * @param string $method
-	 * @param array $params
-	 */
-	protected function dispatchController($controller,$action, array $params, $started = false)
-	{
-		if($started !== true)
-		{
-			//Start up the controller
-			call_user_func(array(self::$controllers[$controller],'_start'));
-		}
-		
-		//Set the view's controller to match the route
-		self::$controllers[$controller]->view->setController($controller);
-		
-		//Set the view's action to match the route
-		self::$controllers[$controller]->view->setView($action);
-		
-		//Call the controller action
-		$actionMethod = new ReflectionMethod(self::$controllers[$controller],$action); 
-		$actionMethod->invokeArgs(self::$controllers[$controller], $params);
-		//call_user_func_array(array(self::$controllers[$controller],$action), $params);
-		
-		if(self::$controllers[$controller]->layout instanceof Layout)
-		{
-			self::$controllers[$controller]->layout->build();
-		}
-		else
-		{
-			self::$controllers[$controller]->view->build();
-		}
-	}
-	
-	/**
-	 * This function runs the dispatch for a given script route.
-	 * 
-	 * @param string $route
-	 */
-	protected function dispatchScript($route)
-	{
-		//Create a blank layout
-		$layout = new Layout();
-		
-		//Find the default Layout
-		$defaultLayout = Config::getValue('layout', 'default');
-		
-		//Setup the default layout
-		if($defaultLayout != '') $layout->setName($defaultLayout);
-		
-		//run the script
-		require $route;
-		
-		if($layout->getName() != '')
-		{
-			//Build the Layout
-			$layout->build();
-		}
-	}
-	
-	/**
-	 * This function has become a helper of the Staple_Link object. Returns a link from 
-	 * the specified link parameters.
-	 * 
-	 * @see Staple_Link::get()
-	 */
-	public function link($route, array $get = array())
-	{
-		return Link::get($route,$get);
-	}
-	
-	/**
-	 * Removed - no more baselinks....
-	 * Returns a urlencoded link relative to the public base of the website.
-	 * @param string $link
-	 */
-	/*public function baseLink($link,$get = NULL)
-	{
-		return htmlentities($this->settings['application']['public_location'].$link.$get);
-	}*/
-	
-	/**
-	 * 
-	 * This function creates an internal redirection within the script itself. It accepts the
+	 * This function creates an internal redirection. It accepts the
 	 * redirect as a routing string. This can be generated using the Staple_Link::get() function.
-	 * 
-	 * @link Staple_Link::get()
 	 * 
 	 * @param mixed $newRoute
 	 */
 	public function redirect($newRoute)
 	{
-		ob_clean();
-		$this->route(Link::get($newRoute));
+		$this->setRoute(Route::make($newRoute));
+		$this->executeRoute();
 		exit(0);
 	}
 	/**
-	 * 
 	 * Registers a controller that was instantiated outside of the Staple_Main class.
-	 * @param Staple_Controller $controller
+	 * @param Controller $controller
 	 */
 	public function registerController(Controller $controller)
 	{
-		$class_name = substr(get_class($controller),strlen(get_class($controller))-10,10);
-		if(!array_key_exists($class_name, self::$controllers))
+		$class_name = substr(get_class($controller),0,strlen(get_class($controller))-10);
+		if(!array_key_exists($class_name, $this->controllers))
 		{
-			self::$controllers[$class_name] = $controller;
+			$this->controllers[$class_name] = $controller;
+			return $controller;
 		}
 	}
 	/**
-	 * @return the $loader
+	 * @return Autoload $loader
 	 */
 	public function getLoader()
 	{
@@ -616,7 +365,7 @@ class Main
 	}
 
 	/**
-	 * @param Staple_Autoload $loader
+	 * @param Autoload $loader
 	 */
 	public function setLoader(Autoload $loader)
 	{

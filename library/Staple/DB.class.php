@@ -38,19 +38,14 @@ use \mysqli, \Exception, \SplObserver, \SplSubject, \SplObjectStorage;
 
 class DB extends mysqli implements SplSubject
 {
+	use Traits\Singleton;
+	
     /**
      * The object observers
      * @var SplObjectStorage
      */
     private $_observers;
     
-	/**
-	 * 
-	 * Holds the singleton instance for the object.
-	 * @var Staple_DB
-	 * @static
-	 */
-	protected static $conn;
 	/**
 	 * 
 	 * Hostname for the database server
@@ -140,6 +135,9 @@ class DB extends mysqli implements SplSubject
 		}
 	}
 	
+	/**
+	 * Upon destruction attempt to close the database connection.
+	 */
 	public function __destruct()
 	{
 		//Close an open connection
@@ -150,18 +148,13 @@ class DB extends mysqli implements SplSubject
 	}
 	
     /**
-     * 
      * Creates and returns the primary database connection.
      * @return Staple_DB
      * @static
      */
 	public static function get(array $conf = array())
 	{
-		if (!isset(self::$conn) || $conf != array()) {
-            $c = __CLASS__;
-            self::$conn = new $c($conf);
-        }
-		return self::$conn;
+		return static::getInstance();
 	}
 	
 	/**

@@ -23,7 +23,7 @@
  */
 namespace Staple;
 
-use \Exception;
+use \Exception, \ReflectionMethod;
 
 class Route
 {
@@ -96,42 +96,113 @@ class Route
 	}
 	
 	/**
-	 * Returns the currently executing route. This is processed direct from the PATH_INFO php variable.
-	 * Returns a Staple_Route object.
-	 * @return Staple_Route
+	 * Execute the route
 	 */
-	public static function GetCurrentRoute()
+	public function execute()
 	{
-		$route = new static();
+		//Route Controller and actions
+		$class = $this->getController();
+		$method = $this->getAction();
 		
-		//First determine which routing information to use
-		if(array_key_exists('PATH_INFO', $_SERVER))		//Use the URI route
+		//The class name for the controller
+		$dispatchClass = $class.'Controller';
+	
+		//Check for the controller existence
+		if(class_exists($dispatchClass))
 		{
-			$routeString = $_SERVER['PATH_INFO'];
-			$routeString = urldecode($routeString);			//URL decode any special characters
-		}
-		else												//Use the default route
-		{
-			$routeString = 'index/index';
+			//Check for the action existence
+			if(method_exists($dispatchClass, $method))
+			{
+				//If the controller has not been created yet, create an instance and store it in the front controller
+				if(($controller = Main::controller($class)) == NULL)
+				{
+					$controller = new $dispatchClass();
+					$controller->_start();
+					
+					//Store the controller object
+					Main::controller($controller);
+				}
+				else
+				{
+					//If the controller already exists in the session just execute the start method again.
+					$controller->_start();
+				}
+				
+				//Verify that an instance of the controller class exists and is of the right type
+				if($controller instanceof Controller)
+				{
+					//Check if global Auth is enabled.
+					if(Config::getValue('auth', 'enabled') != 0)
+					{
+						//Check the sub-controller for access to the method
+						if($controller->_auth($method) === true)
+						{
+							//Everything went well, dispatch the controller.
+							$this->dispatchController();
+						}
+						else
+						{
+							$this->auth->noAuth();
+						}
+					}
+					else
+					{
+						//No authentication needed, dispatch the controller
+						$this->dispatchController();
+					}
+					return true;
+				}
+			}
 		}
 		
-		$route->processStringRoute($routeString);
-		
-		return $route;
+		//If a valid page cannot be found, throw page not found exception
+		throw new Exception('Page Not Found',Error::PAGE_NOT_FOUND);
 	}
 	
 	/**
-	 * Dispatch the route
+	 *
+	 * Function executes a controller action passing parameters using call_user_func_array().
+	 * It also builds the view for the route.
+	 *
+	 * @param string $class
+	 * @param string $method
+	 * @param array $params
 	 */
-	public function Execute()
+	protected function dispatchController()
 	{
-		//@todo incomplete method
+		$controller = Main::controller($this->getController());
+		
+		if($controller instanceof Controller)
+		{
+			//Set the view's controller to match the route
+			$controller->view->setController($this->getController());
+		
+			//Set the view's action to match the route
+			$controller->view->setView($this->getAction());
+		
+			//Call the controller action
+			$actionMethod = new ReflectionMethod($controller,$this->getAction());
+			$actionMethod->invokeArgs($controller, $this->getParams());
+		
+			if($controller->layout instanceof Layout)
+			{
+				$controller->layout->build();
+			}
+			else
+			{
+				$controller->view->build();
+			}
+		}
+		else
+		{
+			throw new Exception('Tried to dispatch to an invalid controller.', Error::APPLICATION_ERROR);
+		}
 	}
 	
 	/**
 	 * Redirect to the route location.
 	 */
-	public function Redirect()
+	public function redirect()
 	{
 		$base = Config::getValue('application', 'public_location');
 		header('Location: '.$base.$this);
@@ -238,8 +309,18 @@ class Route
 		//Set the Controller
 		if(array_key_exists(0, $route))
 		{
-			$this->setController($route[0]);
+			$controller = $route[0];
 			unset($route[0]);
+			//Check route info and convert to method case
+			if(ctype_alnum(str_replace('-', '', $controller)) && ctype_alpha(substr($controller, 0, 1)))
+			{
+				$this->setController(Link::methodCase($controller));
+			}
+			else
+			{
+				//Bad info in the route, error out.
+				throw new Exception('Invalid Route', Error::PAGE_NOT_FOUND);
+			}
 		}
 		else
 		{
@@ -249,8 +330,17 @@ class Route
 		//Set the Action
 		if(array_key_exists(1, $route))
 		{
-			$this->setAction($route[1]);
+			$action = $route[1];
 			unset($route[1]);
+			if(ctype_alnum(str_replace('-', '', $action)) && ctype_alpha(substr($action, 0, 1)))
+			{
+				$this->setAction(Link::methodCase($action));
+			}
+			else
+			{
+				//Bad info in the route, error out.
+				throw new Exception('Invalid Route', Error::PAGE_NOT_FOUND);
+			}
 		}
 		else
 		{
@@ -264,6 +354,11 @@ class Route
 		}
 	}
 	
+	/**
+	 * Process a string-based route
+	 * @param string $route
+	 * @throws Exception
+	 */
 	protected function processStringRoute($route)
 	{
 		//Run some route cleaning operations.
@@ -282,72 +377,58 @@ class Route
 		}
 		
 		//Check to see if a script exists with that route.
-		$scriptRoute = SCRIPT_ROOT.$route.'.php';
-		if(file_exists($scriptRoute))
+		//Split the route into it's component elements.
+		$splitRoute = explode('/',$route);
+		$routeCount = count($splitRoute);
+		
+		//If the route only contains a controller add the index action
+		if($routeCount == 0 || strlen($route) == 0)
 		{
-			//Check for valid path information
-			if(ctype_alnum(str_replace(array('/','_','-'),'',$route)))
+			$splitRoute = array();
+			array_push($splitRoute, 'index');
+			array_push($splitRoute, 'index');
+		}
+		elseif($routeCount == 1)
+		{
+			array_push($splitRoute, 'index');
+		}
+		elseif($routeCount >= 2)
+		{
+			//If the action is numeric, it is not the action. Insert the index action into the route.
+			if(is_numeric($splitRoute[1]))
 			{
-				$this->setScript($route)
-					->setType(self::ROUTE_SCRIPT);
+				$shift = array_shift($splitRoute);
+				array_unshift($splitRoute, $shift, 'index');
 			}
+		}
+		
+		//Check the Controller value and Set a valid value
+		$controller = array_shift($splitRoute);
+		if(ctype_alnum(str_replace('-', '', $controller)) && ctype_alpha(substr($controller, 0, 1)))
+		{
+			$this->setController(Link::methodCase($controller));
 		}
 		else
 		{
-			//No Script found, routing to controller/action
-				
-			//Split the route into it's component elements.
-			$splitRoute = explode('/',$route);
-			$routeCount = count($splitRoute);
-			
-			//If the route only contains a controller add the index action
-			if($routeCount == 0)
-			{
-				array_push($splitRoute, 'index');
-				array_push($splitRoute, 'index');
-			}
-			elseif($routeCount == 1)
-			{
-				array_push($splitRoute, 'index');
-			}
-			elseif($routeCount >= 2)
-			{
-				//If the action is numeric, it is not the action. Insert the index action into the route.
-				if(is_numeric($splitRoute[1]))
-				{
-					$shift = array_shift($splitRoute);
-					array_unshift($splitRoute, $shift, 'index');
-				}
-			}
-			
-			//Check the Controller value and Set a valid value
-			$controller = array_shift($splitRoute);
-			if(ctype_alnum(str_replace('-', '', $controller)) && ctype_alpha(substr($controller, 0, 1)))
-			{
-				$this->setController(Link::methodCase($controller));
-			}
-			else
-			{
-				//Bad info in the route, error out.
-				throw new Exception('Invalid Route', Error::PAGE_NOT_FOUND);
-			}
-			
-			//Check the Action Value and Set a valid value
-			$action = array_shift($splitRoute);
-			if(ctype_alnum(str_replace('-', '', $action)) && ctype_alpha(substr($action, 0, 1)))
-			{
-				$this->setAction(Link::methodCase($action));
-			}
-			else
-			{
-				//Bad info in the route, error out.
-				throw new Exception('Invalid Route', Error::PAGE_NOT_FOUND);
-			}
-			
-			$this
-				->setParams($splitRoute)
-				->setType(self::ROUTE_MVC);
+			//Bad info in the route, error out.
+			throw new Exception('Invalid Route', Error::PAGE_NOT_FOUND);
 		}
+		
+		//Check the Action Value and Set a valid value
+		$action = array_shift($splitRoute);
+		if(ctype_alnum(str_replace('-', '', $action)) && ctype_alpha(substr($action, 0, 1)))
+		{
+			$this->setAction(Link::methodCase($action));
+		}
+		else
+		{
+			//Bad info in the route, error out.
+			throw new Exception('Invalid Route', Error::PAGE_NOT_FOUND);
+		}
+		
+		$this
+			->setParams($splitRoute)
+			->setType(self::ROUTE_MVC);
 	}
 }
 

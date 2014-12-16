@@ -117,50 +117,13 @@ class Autoload
 	 */
 	public function load($class_name)
 	{
-		//$class_name = 'Controller';
-		//$class_name = 'indexController';
-		//Split the class into it's namespace components.
-	    $namespace = explode('\\',$class_name);
-	    
-	    //Set the final class name
-	    $className = $namespace[count($namespace)-1];
-	    
-	    /*if($namespace[0] == static::STAPLE_NAMESPACE)       //Look for STAPLE Namespace
-	    {
-	        //Path for classes
-	        $path = LIBRARY_ROOT;
-            for($i = 0; $i < count($namespace)-1; $i++)
-            {
-                $path .= $namespace[$i].DIRECTORY_SEPARATOR;
-            }
-            
-            //Sub namespace switches
-            if(array_key_exists(1, $namespace))
-            {
-	            switch($namespace[1])
-	            {
-	            	case 'Traits':
-	            	    $extension = static::TRAIT_FILE_EXTENSION;
-	            	    break;
-	            	default:
-	            	    $extension = static::CLASS_FILE_EXTENSION;
-	            	    break;
-	            }
-            }
-            
-            //Location
-            $include = $path.$className.$extension;
-            if(file_exists($include))
-            {
-                require_once $include;
-            }
-            else
-            {
-                throw new Exception('Error Loading Framework: '.$class_name, 501);
-            }
-	    }*/
-		if(substr($class_name,strlen($class_name)-strlen($this->getControllerSuffix()),strlen($this->getControllerSuffix())) == $this->getControllerSuffix() 
-			&& strlen($class_name) != strlen($this->getControllerSuffix()))			//Look for Controllers
+		//Check for an aliased classname
+    	if(!is_null($aliasedClass = Alias::checkAlias($class_name)))					//Look for aliased classes
+    	{
+    		return $this->loadLibraryClass($aliasedClass);
+    	}
+		elseif(substr($class_name,strlen($class_name)-strlen($this->getControllerSuffix()),strlen($this->getControllerSuffix())) == $this->getControllerSuffix() 
+			&& strlen($class_name) != strlen($this->getControllerSuffix()))				//Look for Controllers
 		{
 			$this->loadController($class_name);
 		}
@@ -174,43 +137,22 @@ class Autoload
 		{
 			$this->loadForm($class_name);
 		}
-		else 
+		else																			//Look for other elements
 		{
-			//Path for classes
-			$path = LIBRARY_ROOT;
-			for($i = 0; $i < count($namespace)-1; $i++)
-			{
-				$path .= $namespace[$i].DIRECTORY_SEPARATOR;
-			}
+			//Correct for a leading \ character
+			if(substr($class_name, 0,1) == '\\') $class_name = substr($class_name, 1);
 			
-			//Sub namespace switches
-			if(array_key_exists(1, $namespace))
-			{
-				switch($namespace[1])
-				{
-					case 'Traits':
-						$extension = static::TRAIT_FILE_EXTENSION;
-						break;
-					default:
-						$extension = static::CLASS_FILE_EXTENSION;
-						break;
-				}
-			}
+			//Split the class into it's namespace components.
+			$namespace = explode('\\',$class_name);
+				
+			//Set the final class name
+			$className = $namespace[count($namespace)-1];
 			
-			//Location
-			$include = $path.$className.$extension;
-			if(file_exists($include))
+			if($namespace[0] == static::STAPLE_NAMESPACE)
 			{
-				require_once $include;
+				$this->loadLibraryClass($class_name);
 			}
-			else
-			{
-				throw new Exception('Error Loading Framework: '.$class_name, 501);
-			}
-		}
-		/*else																							//Look for other elements
-		{
-			if(file_exists(ELEMENTS_ROOT.$class_name.static::PHP_FILE_EXTENSION))
+			elseif(file_exists(ELEMENTS_ROOT.$class_name.static::PHP_FILE_EXTENSION))
 			{
 				require_once ELEMENTS_ROOT.$class_name.static::PHP_FILE_EXTENSION;
 			}
@@ -221,7 +163,67 @@ class Autoload
 					throw new Exception("Class Not Found ".$class_name,Error::LOADER_ERROR);
 				}
 			}
-		}*/
+		}
+	}
+	
+	/**
+	 * Loads a class from the library folder.
+	 * @param string $class_name
+	 * @throws Exception
+	 * @return boolean
+	 */
+	protected function loadLibraryClass($class_name)
+	{
+		//Correct for a leading \ character
+		if(substr($class_name, 0,1) == '\\') $class_name = substr($class_name, 1);
+		
+		//Split the class into it's namespace components.
+		$namespace = explode('\\',$class_name);
+		
+		//Set the final class name
+		$className = $namespace[count($namespace)-1];
+		
+		//Path for classes
+		$path = LIBRARY_ROOT;
+		for($i = 0; $i < count($namespace)-1; $i++)
+		{
+			$path .= $namespace[$i].DIRECTORY_SEPARATOR;
+		}
+			
+		//Sub namespace switches
+		if(array_key_exists(1, $namespace))
+		{
+			switch($namespace[1])
+			{
+				case 'Traits':
+					$extension = static::TRAIT_FILE_EXTENSION;
+					break;
+				default:
+					$extension = static::CLASS_FILE_EXTENSION;
+					break;
+			}
+		}
+			
+		//Location
+		$include = $path.$className.$extension;
+		if(file_exists($include))
+		{
+			//Require the class into the project
+			require_once $include;
+			
+			//Alias the newly loaded class
+			Alias::load($className, false);
+			
+			//Return true on success
+			return true;
+		}
+		else
+		{
+			//Throw exception when we can't load the class
+			throw new Exception('Error Loading Library Class: '.$class_name, 501);
+		}
+		
+		return false;
 	}
 	
 	/**

@@ -5,6 +5,7 @@
  * 
  * @author Ironpilot
  * @copyright Copywrite (c) 2011, STAPLE CODE
+ * @deprecated
  * 
  * This file is part of the STAPLE Framework.
  * 
