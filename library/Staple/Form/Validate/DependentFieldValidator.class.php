@@ -1,6 +1,6 @@
 <?php
 /** 
- * Returns only the Base Name of a path.
+ * @todo not complete yet.
  * 
  * @author Ironpilot
  * @copyright Copywrite (c) 2011, STAPLE CODE
@@ -20,28 +20,33 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Staple\Form\Filter;
+namespace Staple\Form\Validate;
 
-use \Staple\Form\FieldFilter;
+use \Staple\Form\FieldValidator;
+use \Staple\Form\FieldElement;
 
-class FilterBaseName extends FieldFilter
+class DependentFieldValidator extends FieldValidator
 {
+	protected $fieldref;
+	protected $requiredval;
+	
+	public function __construct(FieldElement $field, $value)
+	{
+	
+	}
+
 	/**
 	 * 
-	 * @see Staple_Form_Filter::filter()
+	 * @param  mixed $data
+ 
+	 * @return  bool
+	  
+	 * @see Staple_Form_Validator::check()
 	 */
-	public function filter($text)
+	public function check($data)
 	{
-		return basename($text);
+	
 	}
-	/* (non-PHPdoc)
-	 * @see Staple_Form_Filter::getName()
-	 */
-	public function getName()
-	{
-		return 'basename';
-	}
-
 }
 
 ?>

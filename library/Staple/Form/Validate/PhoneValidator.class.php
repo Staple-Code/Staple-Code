@@ -1,5 +1,7 @@
 <?php
 /** 
+ * Validates a Phone Number format.
+ * 
  * @author Ironpilot
  * @copyright Copywrite (c) 2011, STAPLE CODE
  * 
@@ -23,10 +25,10 @@ namespace Staple\Form\Validate;
 use \Staple\Form\FieldValidator;
 use \Staple\Form\FieldElement;
 
-class Alnum extends FieldValidator
+class PhoneValidator extends FieldValidator
 {
-	const DEFAULT_ERROR = 'Data is not alphanumeric';
-	const REGEX = '/^[A-Za-z0-9]+$/';
+	const DEFAULT_ERROR = 'Phone Number is invalid.';
+	const REGEX = '/^(\d{0,4})?[\.\-\/ ]?\(?(\d{3})\)?[\.\-\/ ]?(\d{3})[\.\-\/ ]?(\d{4})$/';
 
 	/**
 	 * 
@@ -38,21 +40,17 @@ class Alnum extends FieldValidator
 	 */
 	public function check($data)
 	{
-		if(ctype_alnum($data))
+		if(preg_match(self::REGEX, $data))
 		{
 			return true;
 		}
 		else
 		{
-			$this->addError(self::DEFAULT_ERROR);
+			$this->addError();
+			return false;
 		}
-		return false;
 	}
 	
-	/**
-	 * (non-PHPdoc)
-	 * @see Staple_Form_Validator::clientJQuery()
-	 */
 	public function clientJQuery($fieldType, FieldElement $field)
 	{
 		switch ($fieldType)
@@ -73,7 +71,7 @@ class Alnum extends FieldValidator
 				$valstring = $fieldid;
 		}
 		
-		$script = "\t//Alphanumeric Validator for ".addslashes($field->getLabel())."\n";
+		$script = "\t//Phone Validator for ".addslashes($field->getLabel())."\n";
 		$script .= "\tif(!(".self::REGEX.".test($('$valstring').val())))\n\t{\n";
 		$script .= "\t\terrors.push('".addslashes($field->getLabel()).": \\n{$this->clientJSError()}\\n');\n";
 		$script .= "\t\t$('$fieldid').addClass('form_error');\n";

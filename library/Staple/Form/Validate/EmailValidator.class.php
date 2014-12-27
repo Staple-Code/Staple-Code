@@ -23,7 +23,7 @@ namespace Staple\Form\Validate;
 use \Staple\Form\FieldValidator;
 use \Staple\Form\FieldElement;
 
-class Email extends FieldValidator
+class EmailValidator extends FieldValidator
 {
 	const DEFAULT_ERROR = 'Email address is not valid.';
 	const REGEX = '/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,7})+$/';

@@ -1,6 +1,6 @@
 <?php
 /** 
- * Validates that the supplied value is within an array of valid values.
+ * Validates a numeric value is between the min and the max.
  * 
  * @author Ironpilot
  * @copyright Copywrite (c) 2011, STAPLE CODE
@@ -25,50 +25,80 @@ namespace Staple\Form\Validate;
 use \Staple\Form\FieldValidator;
 use \Staple\Form\FieldElement;
 
-class InArray extends FieldValidator
+class BetweenValidator extends FieldValidator
 {
-	const DEFAULT_ERROR = 'Supplied data not in accepted list of values.';
+	const DEFAULT_ERROR = 'Field is not between minimum and maximum values.';
+	protected $min = 0;
+	protected $max;
+	
 	/**
-	 * Valid array values.
-	 * @var array
+	 * Mathematical between function. Requires a maximum value and a minimum value.
+	 * Comparison occurs with integer math.
+	 * 
+	 * @param int $max
+	 * @param int $min
 	 */
-	protected $arrayvalues = array();
-
-	/**
-	 * Supply an array to the constructor to define valid options.
-	 * @param array $values
-	 */
-	function __construct(array $values = array(), $usermsg = NULL)
+	public function __construct($limit1, $limit2, $usermsg = NULL)
 	{
-		$this->arrayvalues = $values;
+		$this->min = (int)$limit1;
+		if(isset($limit2))
+		{
+			if($limit2 >= $limit1)
+			{
+				$this->max = (int)$limit2;
+			}
+			else 
+			{
+				$this->min = (int)$limit2;
+				$this->max = (int)$limit1;
+			}
+		}
 		parent::__construct($usermsg);
 	}
 	
 	/**
-	 * Add a new value to the valid array list.
-	 * @param mixed $value
+	 * @return the $min
 	 */
-	public function addValue($value)
+	public function getMin()
 	{
-		if(is_array($value))
-		{
-			$this->arrayvalues = array_merge($this->arrayvalues,$value);
-		}
-		else
-		{
-			$this->arrayvalues[] = $value;
-		}
+		return $this->min;
 	}
 
 	/**
-	 * Check that the supplied data exists as a value in the array;
+	 * @return the $max
+	 */
+	public function getMax()
+	{
+		return $this->max;
+	}
+
+	/**
+	 * @param int $min
+	 */
+	public function setMin($min)
+	{
+		$this->min = $min;
+		return $this;
+	}
+
+	/**
+	 * @param int $max
+	 */
+	public function setMax($max)
+	{
+		$this->max = $max;
+		return $this;
+	}
+
+	/**
+	 * Check for Data Length Validity.
 	 * @param mixed $data
-	 * @return bool
-	 * @see Staple_Form_Validator::check()
+	 * @return boolean
 	 */
 	public function check($data)
 	{
-		if(in_array($data, $this->arrayvalues) === true)
+		$data = (int)$data;
+		if($data <= $this->max && $data >= $this->min)
 		{
 			return true;
 		}
@@ -80,6 +110,7 @@ class InArray extends FieldValidator
 	}
 	
 	/**
+	 * (non-PHPdoc)
 	 * @see Staple_Form_Validator::clientJQuery()
 	 */
 	public function clientJQuery($fieldType, FieldElement $field)
@@ -102,34 +133,17 @@ class InArray extends FieldValidator
 				$valstring = $fieldid;
 		}
 		
-		$script = "\t//Selection Validator for ".addslashes($field->getLabel())."\n";
-		$script .= "\tif(-1 == $.inArray($('$valstring').val(),[";
-		foreach($this->arrayvalues as $value)
-		{
-			$script .= "'$value',";
-		}
-		$script = substr($script, 0,strlen($script)-1);
-		$script .= "]))\n\t{\n";
-		
+		$script = "\t//Between Validator for ".addslashes($field->getLabel())."\n";
+		$script .= "\tif($('$valstring').val() > {$this->getMax()} || $('$valstring').val() < {$this->getMin()})\n";
+		$script .= "\t{\n";
 		$script .= "\t\terrors.push('".addslashes($field->getLabel()).": \\n{$this->clientJSError()}\\n');\n";
 		$script .= "\t\t$('$fieldid').addClass('form_error');\n";
 		$script .= "\t}\n";
 		$script .= "\telse {\n";
 		$script .= "\t\t$('$fieldid').removeClass('form_error');\n";
 		$script .= "\t}\n";
-		
 		return $script;
 	}
-
-	/**
-	 * @see Staple_Form_Validator::clientJS()
-	 */
-	public function clientJS($fieldType, FieldElement $field)
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
 }
 
 ?>

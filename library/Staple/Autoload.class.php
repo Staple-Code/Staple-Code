@@ -24,6 +24,7 @@
 namespace Staple;
 
 use \Exception;
+use Staple\Exception\PageNotFoundException;
 
 class Autoload
 {
@@ -242,7 +243,7 @@ class Autoload
 		{
 			if($this->throwOnFailure === true)
 			{
-				throw new Exception('Page Not Found',Error::PAGE_NOT_FOUND);
+				throw new PageNotFoundException('Page Not Found',Error::PAGE_NOT_FOUND);
 			}
 		}
 	}

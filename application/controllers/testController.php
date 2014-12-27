@@ -26,7 +26,7 @@ class B extends A
 	}
 }
 
-class testsController extends Controller
+class testController extends Controller
 {
 	/* (non-PHPdoc)
 	 * @see Staple_Controller::index()
@@ -37,24 +37,29 @@ class testsController extends Controller
 		
 	}
 
-	public function forms()
+	public function form()
 	{
-		$form = new Staple_Form('testform');
-		$form->setAction('/tests/forms')
+		$form = new Form('testform');
+		$form->setAction('/test/form')
 			->setMethod("GET")
-			->addField(Staple_Form_TextElement::Create('fname','First Name')->addValidator(new Staple_Form_Validate_Length(10,5)))
-			->addField(new Staple_Form_TextElement('lname','Last Name'))
+			->addField(TextElement::Create('fname','First Name')->addValidator(new LengthValidator(10,5)))
+			->addField(new TextElement('lname','Last Name'))
 			
-			->addField(Staple_Form_TextareaElement::Create('bio','Your Biography')->setRows(5)->setCols(40))
+			->addField(TextareaElement::Create('bio','Your Biography')
+					->setRows(5)
+					->setCols(40)
+					->addValidator(new LengthValidator(5,5000)))
 			->addField(
-				Staple_Form_SelectElement::Create('birthyear','Year of Birth')
+				SelectElement::Create('birthyear','Year of Birth')
 					->addOptionsArray(array('','1994','1995','1996','1997','1998','1999','2000'),true)
+					->addValidator(new InArrayValidator(array('','1994','1995','1996','1997','1998','1999','2000')))
 				)
-			->addField(Staple_Form_RadioGroup::Create('spouse','I need to add a spouse:')
+			->addField(RadioGroup::Create('spouse','I need to add a spouse:')
 					->addButtonsArray(array('Yes','No'))
 					->setValue(1)
+					->addValidator(new EqualValidator('Yes'))
 				)
-			->addField(new Staple_Form_SubmitElement('send','Send Query'));
+			->addField(new SubmitElement('send','Send Query'));
 		
 		if($form->wasSubmitted())
 		{
@@ -76,7 +81,7 @@ class testsController extends Controller
 		echo 'Caught.';
 	}
 	
-	public function layouts()
+	public function layout()
 	{
 		
 	}

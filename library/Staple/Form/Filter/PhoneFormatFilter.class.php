@@ -1,5 +1,8 @@
 <?php
 /** 
+ * Formats the Phone Number to a correct format.
+ * @todo fix the formatting errors in this function
+ * 
  * @author Ironpilot
  * @copyright Copywrite (c) 2011, STAPLE CODE
  * 
@@ -17,58 +20,38 @@
  * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
- * 
  */
-class tutorialController extends Controller
+namespace Staple\Form\Filter;
+
+use \Staple\Form\FieldFilter;
+
+class PhoneFormatFilter extends FieldFilter
 {
-	public function _start()
+	const REGEX = '/^(\d{0,4})?[\.\-\/ ]?\(?(\d{3})\)?[\.\-\/ ]?(\d{3})[\.\-\/ ]?(\d{4})$/';
+	/**
+	 * 
+	 * @see Staple_Form_Filter::filter()
+	 */
+	public function filter($text)
 	{
-		$this->_openAll();
+		if(preg_match(self::REGEX, $text, $matches))
+		{
+			return trim("$matches[1] ({$matches[2]}) {$matches[3]}-{$matches[4]}");
+		}
+		else
+		{
+			return '';
+		}
 	}
-	
-	public function index() 
+	/**
+	 * 
+	 * @see Staple_Form_Filter::getName()
+	 */
+	public function getName()
 	{
-		//Tutorial Introduction
+		return 'phonefilter';
 	}
-	
-	public function gettingstarted()
-	{
-		
-	}
-	
-	public function setup()
-	{
-		
-	}
-	
-	public function config()
-	{
-		//Working with the config file.
-	}
-	
-	public function controllers()
-	{
-		
-	}
-	
-	public function actions()
-	{
-		
-	}
-	
-	public function db()
-	{
-		
-	}
-	
-	public function auth()
-	{
-		
-	}
-	
-	public function forms()
-	{
-		
-	}
+
 }
+
 ?>

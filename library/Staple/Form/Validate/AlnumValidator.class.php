@@ -1,7 +1,5 @@
 <?php
 /** 
- * Validate a floating point number.
- * 
  * @author Ironpilot
  * @copyright Copywrite (c) 2011, STAPLE CODE
  * 
@@ -25,9 +23,10 @@ namespace Staple\Form\Validate;
 use \Staple\Form\FieldValidator;
 use \Staple\Form\FieldElement;
 
-class Float extends FieldValidator
+class AlnumValidator extends FieldValidator
 {
-	const DEFAULT_ERROR = 'Field value must be a floating point number.';
+	const DEFAULT_ERROR = 'Data is not alphanumeric';
+	const REGEX = '/^[A-Za-z0-9]+$/';
 
 	/**
 	 * 
@@ -39,7 +38,7 @@ class Float extends FieldValidator
 	 */
 	public function check($data)
 	{
-		if(ctype_digit(str_replace(array('.','-'), '', $data)) === true)
+		if(ctype_alnum($data))
 		{
 			return true;
 		}
@@ -74,15 +73,15 @@ class Float extends FieldValidator
 				$valstring = $fieldid;
 		}
 		
-		$script = "\t//Float Validator for ".addslashes($field->getLabel())."\n";
-		$script .= "\tif(!(/^(\\-)?[0-9]+.?([0-9]+)?$/.test($('$valstring').val())))\n";
-		$script .= "\t{\n";
+		$script = "\t//Alphanumeric Validator for ".addslashes($field->getLabel())."\n";
+		$script .= "\tif(!(".self::REGEX.".test($('$valstring').val())))\n\t{\n";
 		$script .= "\t\terrors.push('".addslashes($field->getLabel()).": \\n{$this->clientJSError()}\\n');\n";
 		$script .= "\t\t$('$fieldid').addClass('form_error');\n";
 		$script .= "\t}\n";
 		$script .= "\telse {\n";
 		$script .= "\t\t$('$fieldid').removeClass('form_error');\n";
 		$script .= "\t}\n";
+		
 		return $script;
 	}
 }

@@ -1,6 +1,6 @@
 <?php
 /** 
- * Validate that a field is equal to a value.
+ * Validates the length of a form field.
  * 
  * @author Ironpilot
  * @copyright Copywrite (c) 2011, STAPLE CODE
@@ -22,54 +22,110 @@
  */
 namespace Staple\Form\Validate;
 
-use \Staple\Form\FieldValidator;
-use \Staple\Form\FieldElement;
+use Staple\Form\FieldElement;
+use Staple\Form\FieldValidator;
 
-class Equal extends FieldValidator
+class LengthValidator extends FieldValidator
 {
-	const DEFAULT_ERROR = 'Data is not equal';
-	protected $strict;
-	protected $equal;
+	const DEFAULT_ERROR = 'Field does not meet length requirements.';
+	const MIN_LENGTH_ERROR = 'Minimum Length Not Met';
+	const MAX_LENGTH_ERROR = 'Maximum Length Exceeded';
+	protected $min = 0;
+	protected $max;
 	
-	public function __construct($equal, $strict = false, $usermsg = NULL)
+	/**
+	 * Accepts a maximum length to validate against. Also accepts an optional minimum length.
+	 * Whenever PHP starts supporting method overloading, the variables will be reversed in
+	 * order to make more logical sense.
+	 * 
+	 * @param int $limit1
+	 * @param int #limit2
+	 * @param string $usermsg
+	 */
+	public function __construct($limit1, $limit2 = NULL, $usermsg = NULL)
 	{
-		$this->equal = $equal;
-		$this->strict = (bool)$strict;
+		$this->min = (int)$limit1;
+		if(isset($limit2))
+		{
+			if($limit2 >= $limit1)
+			{
+				$this->max = (int)$limit2;
+			}
+			else 
+			{
+				$this->min = (int)$limit2;
+				$this->max = (int)$limit1;
+			}
+		}
 		parent::__construct($usermsg);
+	}
+	
+	/**
+	 * @return int $min
+	 */
+	public function getMin()
+	{
+		return $this->min;
 	}
 
 	/**
-	 * 
-	 * @param  mixed $data
- 
-	 * @return  bool
-	  
-	 * @see Staple_Form_Validator::check()
+	 * @return int $max
+	 */
+	public function getMax()
+	{
+		return $this->max;
+	}
+
+	/**
+	 * @param int $min
+	 * @return $this
+	 */
+	public function setMin($min)
+	{
+		$this->min = $min;
+		return $this;
+	}
+
+	/**
+	 * @param int $max
+	 * @return $this
+	 */
+	public function setMax($max)
+	{
+		$this->max = $max;
+		return $this;
+	}
+
+	/**
+	 * Check for Data Length Validity.
+	 * @param mixed $data
+	 * @return boolean
 	 */
 	public function check($data)
 	{
-		if($this->strict === true)
+		$data = (string)$data;
+		if(strlen($data) >= $this->min)
 		{
-			if($this->equal === $data)
+			if(isset($this->max) && strlen($data) <= $this->max)
 			{
 				return true;
 			}
-			else
+			elseif(!isset($this->max))
 			{
-				$this->addError();
+				return true;
+			}
+			else 
+			{
+				$this->addError(self::MAX_LENGTH_ERROR);
 			}
 		}
 		else
 		{
-			if($this->equal == $data)
-			{
-				return true;
-			}
-			else
-			{
-				$this->addError();
-			}
+			$this->addError(self::MIN_LENGTH_ERROR);
 		}
+		
+		//Additionally Add the default error message.
+		$this->addError();
 		return false;
 	}
 	
@@ -97,15 +153,15 @@ class Equal extends FieldValidator
 				$valstring = $fieldid;
 		}
 		
-		$script = "\t//Equal Validator for ".addslashes($field->getLabel())."\n";
-		$script .= "\tif(!($('$valstring').val() == '".addslashes($this->equal)."'))\n\t{\n";
+		$script = "\t//Length Validator for ".addslashes($field->getLabel())."\n";
+		$script .= "\tif($('$valstring').val().length > {$this->getMax()} || $('$valstring').val().length < {$this->getMin()})\n";
+		$script .= "\t{\n";
 		$script .= "\t\terrors.push('".addslashes($field->getLabel()).": \\n{$this->clientJSError()}\\n');\n";
 		$script .= "\t\t$('$fieldid').addClass('form_error');\n";
 		$script .= "\t}\n";
 		$script .= "\telse {\n";
 		$script .= "\t\t$('$fieldid').removeClass('form_error');\n";
 		$script .= "\t}\n";
-		
 		return $script;
 	}
 }

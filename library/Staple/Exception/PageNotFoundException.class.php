@@ -1,6 +1,6 @@
 <?php
 /**
- * Converts a string to a DateTime Object.
+ * An exception class to handle page not found errors.
  *
  * @author Ironpilot
  * @copyright Copywrite (c) 2011, STAPLE CODE
@@ -20,37 +20,11 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Staple\Form\Filter;
 
-use \Staple\Form\FieldFilter;
-use \DateTime;
-use \Exception;
+namespace Staple\Exception;
 
-class ToDateTime extends FieldFilter
+
+class PageNotFoundException extends \Exception
 {
-	/* (non-PHPdoc)
-	 * @see Staple_Form_Filter::filter()
-	 */
-	public function filter($text)
-	{
-		try {
-			return new DateTime($text);
-		}
-		catch (Exception $e)
-		{
-			return new DateTime();
-		}
-	}
 
-	/* (non-PHPdoc)
-	 * @see Staple_Form_Filter::getName()
-	 */
-	public function getName()
-	{
-		return 'datetime';
-	}
-
-
-}
-
-?>
+} 

@@ -1,6 +1,6 @@
 <?php
 /** 
- * @todo not complete yet.
+ * Strips any HTML tags from a form field.
  * 
  * @author Ironpilot
  * @copyright Copywrite (c) 2011, STAPLE CODE
@@ -20,33 +20,29 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Staple\Form\Validate;
+namespace Staple\Form\Filter;
 
-use \Staple\Form\FieldValidator;
-use \Staple\Form\FieldElement;
+use \Staple\Form\FieldFilter;
 
-class DependentField extends FieldValidator
+class TagsFilter extends FieldFilter
 {
-	protected $fieldref;
-	protected $requiredval;
-	
-	public function __construct(FieldElement $field, $value)
-	{
-	
-	}
-
 	/**
 	 * 
-	 * @param  mixed $data
- 
-	 * @return  bool
-	  
-	 * @see Staple_Form_Validator::check()
+	 * @see Staple_Form_Filter::filter()
 	 */
-	public function check($data)
+	public function filter($text)
 	{
-	
+		return strip_tags($text);
 	}
+	/**
+	 * 
+	 * @see Staple_Form_Filter::getName()
+	 */
+	public function getName()
+	{
+		return 'tags';
+	}
+
 }
 
 ?>

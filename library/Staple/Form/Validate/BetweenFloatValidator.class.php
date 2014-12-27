@@ -1,6 +1,6 @@
 <?php
 /** 
- * Validates the length of a form field.
+ * Validates a numeric value is between the min and the max.
  * 
  * @author Ironpilot
  * @copyright Copywrite (c) 2011, STAPLE CODE
@@ -20,35 +20,45 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Form_Validate_Length extends Staple_Form_Validator
+namespace Staple\Form\Validate;
+
+use \Staple\Form\FieldValidator;
+use \Staple\Form\FieldElement;
+
+class BetweenFloatValidator extends FieldValidator
 {
-	const DEFAULT_ERROR = 'Field does not meet length requirements.';
-	const MIN_LENGTH_ERROR = 'Minimum Length Not Met';
-	const MAX_LENGTH_ERROR = 'Maximum Length Exceeded';
+	const DEFAULT_ERROR = 'Field is not between minimum and maximum values.';
+	/**
+	 * Minimum Value
+	 * @var float
+	 */
 	protected $min = 0;
+	/**
+	 * Maximum Value
+	 * @var float
+	 */
 	protected $max;
 	
 	/**
-	 * Accepts a maximum length to validate against. Also accepts an optional minimum length.
-	 * Whenever PHP starts supporting method overloading, the variables will be reversed in
-	 * order to make more logical sense.
+	 * Mathematical between function. Requires a maximum value and a minimum value.
+	 * Comparison occurs with float math.
 	 * 
-	 * @param int $max
-	 * @param int $min
+	 * @param float $max
+	 * @param float $min
 	 */
-	public function __construct($limit1, $limit2 = NULL, $usermsg = NULL)
+	public function __construct($limit1, $limit2, $usermsg = NULL)
 	{
-		$this->min = (int)$limit1;
+		$this->min = (float)$limit1;
 		if(isset($limit2))
 		{
 			if($limit2 >= $limit1)
 			{
-				$this->max = (int)$limit2;
+				$this->max = (float)$limit2;
 			}
 			else 
 			{
-				$this->min = (int)$limit2;
-				$this->max = (int)$limit1;
+				$this->min = (float)$limit2;
+				$this->max = (float)$limit1;
 			}
 		}
 		parent::__construct($usermsg);
@@ -95,29 +105,15 @@ class Staple_Form_Validate_Length extends Staple_Form_Validator
 	 */
 	public function check($data)
 	{
-		$data = (string)$data;
-		if(strlen($data) >= $this->min)
+		$data = (float)$data;
+		if($data <= ($this->max+0.0625) && $data >= $this->min)			//+0.06256 Binary Float fix
 		{
-			if(isset($this->max) && strlen($data) <= $this->max)
-			{
-				return true;
-			}
-			elseif(!isset($this->max))
-			{
-				return true;
-			}
-			else 
-			{
-				$this->addError(self::MAX_LENGTH_ERROR);
-			}
+			return true;
 		}
 		else
 		{
-			$this->addError(self::MIN_LENGTH_ERROR);
+			$this->addError();
 		}
-		
-		//Additionally Add the default error message.
-		$this->addError();
 		return false;
 	}
 	
@@ -125,7 +121,7 @@ class Staple_Form_Validate_Length extends Staple_Form_Validator
 	 * (non-PHPdoc)
 	 * @see Staple_Form_Validator::clientJQuery()
 	 */
-	public function clientJQuery($fieldType, Staple_Form_Element $field)
+	public function clientJQuery($fieldType, FieldElement $field)
 	{
 		switch ($fieldType)
 		{
@@ -145,8 +141,8 @@ class Staple_Form_Validate_Length extends Staple_Form_Validator
 				$valstring = $fieldid;
 		}
 		
-		$script = "\t//Length Validator for ".addslashes($field->getLabel())."\n";
-		$script .= "\tif($('$valstring').val().length > {$this->getMax()} || $('$valstring').val().length < {$this->getMin()})\n";
+		$script = "\t//BetweenFloat Validator for ".addslashes($field->getLabel())."\n";
+		$script .= "\tif($('$valstring').val() > {$this->getMax()} || $('$valstring').val() < {$this->getMin()})\n";
 		$script .= "\t{\n";
 		$script .= "\t\terrors.push('".addslashes($field->getLabel()).": \\n{$this->clientJSError()}\\n');\n";
 		$script .= "\t\t$('$fieldid').addClass('form_error');\n";

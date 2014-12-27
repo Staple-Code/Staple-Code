@@ -1,4 +1,25 @@
 <?php
+/**
+ * Abstract base class for form element validators
+ *
+ * @author Ironpilot
+ * @copyright Copywrite (c) 2011, STAPLE CODE
+ *
+ * This file is part of the STAPLE Framework.
+ *
+ * The STAPLE Framework is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your option)
+ * any later version.
+ *
+ * The STAPLE Framework is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
+ */
 namespace Staple\Form;
 
 use Staple;
@@ -71,10 +92,11 @@ abstract class FieldValidator
 		$this->error = array();
 		return $this;
 	}
-	
+
 	/**
 	 * Adds a custom error or adds the default error to the errors array.
 	 * @param string $err
+	 * @return $this
 	 */
 	public function addError($err = NULL)
 	{
@@ -93,7 +115,7 @@ abstract class FieldValidator
 		return $this;
 	}
 	/**
-	 * @return the $usermsg
+	 * @return string $usermsg
 	 */
 	public function getErrorsAsString()
 	{
@@ -136,9 +158,9 @@ abstract class FieldValidator
 	/**
 	 * Function for client side form checking. Must be overridden in the child class.
 	 * @param string $fieldType
-	 * @param Staple_Form_Element $field
+	 * @param FieldElement $field
 	 */
-	public function clientJS($fieldType, Staple_Form_Element $field)
+	public function clientJS($fieldType, FieldElement $field)
 	{
 		return '';
 	}
@@ -146,9 +168,9 @@ abstract class FieldValidator
 	/**
 	 * Function for client side form checking. Must be overridden in the child class. This one is specific to JQuery.
 	 * @param string $fieldType
-	 * @param Staple_Form_Element $field
+	 * @param FieldElement $field
 	 */
-	public function clientJQuery($fieldType, Staple_Form_Element $field)
+	public function clientJQuery($fieldType, FieldElement $field)
 	{
 		return '';
 	}

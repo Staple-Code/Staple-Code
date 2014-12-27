@@ -1,7 +1,6 @@
 <?php
 /** 
- * Formats the Phone Number to a correct format.
- * @todo fix the formatting errors in this function
+ * Converts a string to uppercase.
  * 
  * @author Ironpilot
  * @copyright Copywrite (c) 2011, STAPLE CODE
@@ -25,23 +24,15 @@ namespace Staple\Form\Filter;
 
 use \Staple\Form\FieldFilter;
 
-class PhoneFormat extends FieldFilter
+class ToUpperFilter extends FieldFilter
 {
-	const REGEX = '/^(\d{0,4})?[\.\-\/ ]?\(?(\d{3})\)?[\.\-\/ ]?(\d{3})[\.\-\/ ]?(\d{4})$/';
 	/**
 	 * 
 	 * @see Staple_Form_Filter::filter()
 	 */
 	public function filter($text)
 	{
-		if(preg_match(self::REGEX, $text, $matches))
-		{
-			return trim("$matches[1] ({$matches[2]}) {$matches[3]}-{$matches[4]}");
-		}
-		else
-		{
-			return '';
-		}
+		return strtoupper($text);
 	}
 	/**
 	 * 
@@ -49,7 +40,7 @@ class PhoneFormat extends FieldFilter
 	 */
 	public function getName()
 	{
-		return 'phonefilter';
+		return 'toupper';
 	}
 
 }

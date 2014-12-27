@@ -1,6 +1,6 @@
 <?php
 /** 
- * Converts a string to uppercase.
+ * Converts a string to lowercase.
  * 
  * @author Ironpilot
  * @copyright Copywrite (c) 2011, STAPLE CODE
@@ -24,23 +24,24 @@ namespace Staple\Form\Filter;
 
 use \Staple\Form\FieldFilter;
 
-class ToUpper extends FieldFilter
+class ToLowerFilter extends FieldFilter
 {
+
 	/**
 	 * 
-	 * @see Staple_Form_Filter::filter()
+	 * @see FieldFilter::filter()
 	 */
 	public function filter($text)
 	{
-		return strtoupper($text);
+		return strtolower($text);
 	}
 	/**
 	 * 
-	 * @see Staple_Form_Filter::getName()
+	 * @see FieldFilter::getName()
 	 */
 	public function getName()
 	{
-		return 'toupper';
+		return 'tolower';
 	}
 
 }

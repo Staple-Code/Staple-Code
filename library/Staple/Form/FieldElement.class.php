@@ -221,7 +221,7 @@ abstract class FieldElement
 	 * @param array $attrib
 	 * @return Staple_Form_Element
 	 */
-	public static function Create($name, $label = NULL, $id = NULL, array $attrib = array())
+	public static function create($name, $label = NULL, $id = NULL, array $attrib = array())
 	{
 		return new static($name, $label, $id, $attrib);
 	}

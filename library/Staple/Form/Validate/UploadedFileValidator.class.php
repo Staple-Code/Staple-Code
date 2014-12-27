@@ -26,7 +26,7 @@ namespace Staple\Form\Validate;
 use \Staple\Form\FieldValidator;
 use \finfo;
 
-class UploadedFile extends FieldValidator
+class UploadedFileValidator extends FieldValidator
 {
 	const DEFAULT_ERROR = 'File is not valid';
 	

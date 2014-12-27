@@ -28,21 +28,21 @@ class indexController extends Controller
 	
 	public function index()
 	{
-		$db = new DB();
+		return View::create('index');
 	}
 	
 	public function documentation()
 	{
-		
+		return View::create('documentation');
 	}
 	
 	public function about()
 	{
-		
+		return View::create('about');
 	}
 	
 	public function license()
 	{
-		
+		return View::create('license');
 	}
 }

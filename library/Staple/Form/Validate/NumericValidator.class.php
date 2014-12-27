@@ -1,6 +1,6 @@
 <?php
 /** 
- * Validates a numeric value is between the min and the max.
+ * Validates the contents of a field are numeric.
  * 
  * @author Ironpilot
  * @copyright Copywrite (c) 2011, STAPLE CODE
@@ -25,86 +25,27 @@ namespace Staple\Form\Validate;
 use \Staple\Form\FieldValidator;
 use \Staple\Form\FieldElement;
 
-class Between extends FieldValidator
+class NumericValidator extends FieldValidator
 {
-	const DEFAULT_ERROR = 'Field is not between minimum and maximum values.';
-	protected $min = 0;
-	protected $max;
-	
+	const DEFAULT_ERROR = 'Field value must be numeric.';
+
 	/**
-	 * Mathematical between function. Requires a maximum value and a minimum value.
-	 * Comparison occurs with integer math.
 	 * 
-	 * @param int $max
-	 * @param int $min
-	 */
-	public function __construct($limit1, $limit2, $usermsg = NULL)
-	{
-		$this->min = (int)$limit1;
-		if(isset($limit2))
-		{
-			if($limit2 >= $limit1)
-			{
-				$this->max = (int)$limit2;
-			}
-			else 
-			{
-				$this->min = (int)$limit2;
-				$this->max = (int)$limit1;
-			}
-		}
-		parent::__construct($usermsg);
-	}
-	
-	/**
-	 * @return the $min
-	 */
-	public function getMin()
-	{
-		return $this->min;
-	}
-
-	/**
-	 * @return the $max
-	 */
-	public function getMax()
-	{
-		return $this->max;
-	}
-
-	/**
-	 * @param int $min
-	 */
-	public function setMin($min)
-	{
-		$this->min = $min;
-		return $this;
-	}
-
-	/**
-	 * @param int $max
-	 */
-	public function setMax($max)
-	{
-		$this->max = $max;
-		return $this;
-	}
-
-	/**
-	 * Check for Data Length Validity.
-	 * @param mixed $data
-	 * @return boolean
+	 * @param  mixed $data
+ 
+	 * @return  bool
+	  
+	 * @see Staple_Form_Validator::check()
 	 */
 	public function check($data)
 	{
-		$data = (int)$data;
-		if($data <= $this->max && $data >= $this->min)
+		if(ctype_digit((string)$data) === true)
 		{
 			return true;
 		}
 		else
 		{
-			$this->addError();
+			$this->addError(self::DEFAULT_ERROR);
 		}
 		return false;
 	}
@@ -133,8 +74,8 @@ class Between extends FieldValidator
 				$valstring = $fieldid;
 		}
 		
-		$script = "\t//Between Validator for ".addslashes($field->getLabel())."\n";
-		$script .= "\tif($('$valstring').val() > {$this->getMax()} || $('$valstring').val() < {$this->getMin()})\n";
+		$script = "\t//Numeric Validator for ".addslashes($field->getLabel())."\n";
+		$script .= "\tif(!(/^[0-9]+$/.test($('$valstring').val())))\n";
 		$script .= "\t{\n";
 		$script .= "\t\terrors.push('".addslashes($field->getLabel()).": \\n{$this->clientJSError()}\\n');\n";
 		$script .= "\t\t$('$fieldid').addClass('form_error');\n";

@@ -23,7 +23,7 @@
  */
 namespace Staple;
 
-use \SplObjectStorage, \SplSubject, \SplObserver, \ErrorException, \Exception;
+use \SplObjectStorage, \SplSubject, \SplObserver, \ErrorException, \Exception, \Staple\Exception\PageNotFoundException;
 
 class Error implements SplSubject
 {
@@ -53,7 +53,7 @@ class Error implements SplSubject
 	 * The last exception that was thrown by the system.
 	 * @var Exception
 	 */
-	private $lastException;
+	private static $lastException;
 	
 	/**
 	 * The default constructor.
@@ -88,7 +88,7 @@ class Error implements SplSubject
 	 */
 	public function getLastException()
 	{
-		return $this->lastException;
+		return self::$lastException;
 	}
 
 	/**
@@ -96,7 +96,7 @@ class Error implements SplSubject
 	 */
 	private function setLastException(Exception $lastException)
 	{
-		$this->lastException = $lastException;
+		self::$lastException = $lastException;
 		return $this;
 	}
 
@@ -133,13 +133,19 @@ class Error implements SplSubject
 		
 		//Get the Front Controller
 		$main = Main::get();
-		
-		/**
-		* Process the Header
-		* Method has been Removed. 
-		*/
-		//$main->processHeader(true);
-		 
+
+		//Set the HTTP response code
+		if($ex instanceof PageNotFoundException)
+		{
+			http_response_code(404);
+		}
+		else
+		{
+			http_response_code(500);
+		}
+
+		ob_start();
+
 		//Echo the error message
 		echo "<p>".$ex->getMessage()." Code: ".$ex->getCode()."</p>";
 		
@@ -158,17 +164,20 @@ class Error implements SplSubject
 				echo "</pre>";
 			}
 		}
+
+		$buffer = ob_get_contents();
+		ob_end_clean();
 		
 		//If the site uses layout, build the default layout and put the error message inside.
 		if(Layout::layoutExists(Config::getValue('layout', 'default')))
 		{
-		    //Grab the current buffer contents to add to the layout
-			$buffer = ob_get_contents();
-			ob_clean();
-			
 			//Create the layout object and build the layout
 			$layout = new Layout(Config::getValue('layout', 'default'));
 			$layout->build($buffer);
+		}
+		else
+		{
+			echo $buffer;
 		}
 	}
 	

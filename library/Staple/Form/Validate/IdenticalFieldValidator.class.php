@@ -1,7 +1,5 @@
 <?php
 /** 
- * Validates a Phone Number format.
- * 
  * @author Ironpilot
  * @copyright Copywrite (c) 2011, STAPLE CODE
  * 
@@ -25,10 +23,26 @@ namespace Staple\Form\Validate;
 use \Staple\Form\FieldValidator;
 use \Staple\Form\FieldElement;
 
-class Phone extends FieldValidator
+class IdenticalFieldValidator extends FieldValidator
 {
-	const DEFAULT_ERROR = 'Phone Number is invalid.';
-	const REGEX = '/^(\d{0,4})?[\.\-\/ ]?\(?(\d{3})\)?[\.\-\/ ]?(\d{3})[\.\-\/ ]?(\d{4})$/';
+	const DEFAULT_ERROR = 'Data is not equal';
+	
+	protected $strict = false;
+	/**
+	 * The form element to validate against.
+	 * @var Staple_Form_Element
+	 */
+	protected $field;
+	
+	public function __construct(FieldElement $field = NULL, $strict = false, $usermsg = NULL)
+	{
+		if(isset($field))
+		{
+			$this->setField($field);
+		}
+		$this->strict = (bool)$strict;
+		parent::__construct($usermsg);
+	}
 
 	/**
 	 * 
@@ -40,17 +54,69 @@ class Phone extends FieldValidator
 	 */
 	public function check($data)
 	{
-		if(preg_match(self::REGEX, $data))
+		if($this->strict === true)
 		{
-			return true;
+			if($this->field->getValue() === $data)
+			{
+				return true;
+			}
+			else
+			{
+				$this->addError();
+			}
 		}
 		else
 		{
-			$this->addError();
-			return false;
+			if($this->field->getValue() == $data)
+			{
+				return true;
+			}
+			else
+			{
+				$this->addError();
+			}
 		}
+		return false;
 	}
 	
+	/**
+	 * @return the $strict
+	 */
+	public function getStrict()
+	{
+		return $this->strict;
+	}
+
+	/**
+	 * @return Staple_Form_Element $field
+	 */
+	public function getField()
+	{
+		return $this->field;
+	}
+
+	/**
+	 * @param boolean $strict
+	 */
+	public function setStrict($strict)
+	{
+		$this->strict = (bool)$strict;
+		return $this;
+	}
+
+	/**
+	 * @param Staple_Form_Element $field
+	 */
+	public function setField(FieldElement $field)
+	{
+		$this->field = $field;
+		return $this;
+	}
+
+	/**
+	 * (non-PHPdoc)
+	 * @see Staple_Form_Validator::clientJQuery()
+	 */
 	public function clientJQuery($fieldType, FieldElement $field)
 	{
 		switch ($fieldType)
@@ -71,8 +137,23 @@ class Phone extends FieldValidator
 				$valstring = $fieldid;
 		}
 		
-		$script = "\t//Phone Validator for ".addslashes($field->getLabel())."\n";
-		$script .= "\tif(!(".self::REGEX.".test($('$valstring').val())))\n\t{\n";
+		switch (get_class($this->field))
+		{
+			case 'Staple_Form_SelectElement':
+				$identstring = "#{$field->getId()} option:selected";
+				break;
+			case 'Staple_Form_RadioGroup':
+				$identstring = "input:radio[name={$field->getName()}]:checked";
+				break;
+			case 'Staple_Form_CheckboxElement':
+				return '';
+				break;
+			default:
+				$identstring = $fieldid;
+		}
+		
+		$script = "\t//Identical Validator for ".addslashes($field->getLabel())."\n";
+		$script .= "\tif(!($('$valstring').val() == $('$identstring').val()))\n\t{\n";
 		$script .= "\t\terrors.push('".addslashes($field->getLabel()).": \\n{$this->clientJSError()}\\n');\n";
 		$script .= "\t\t$('$fieldid').addClass('form_error');\n";
 		$script .= "\t}\n";

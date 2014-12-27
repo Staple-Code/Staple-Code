@@ -52,7 +52,13 @@ class View
 	 * @var string
 	 */
 	protected $controller;
-	
+
+	public function __construct($view = NULL, $controller = NULL)
+	{
+		if(isset($view)) $this->setView($view);
+		if(isset($controller)) $this->setController($controller);
+	}
+
 	/**
 	 * Overloaded __set allows for dynamic addition of properties.
 	 * @param string | int $key
@@ -112,13 +118,17 @@ class View
 		}
 		
 	}
-	
+
 	/**
-	 * This function allows you to disable the rendering of the view from the controller.
+	 * Create a new view object and return the instance.
+	 * @param string $view
+	 * @param string $controller
+	 * @return View
 	 */
-	public function noRender()
+	public static function create($view = NULL,$controller = NULL)
 	{
-		$this->_render = false;
+		$inst = new static($view,$controller);
+		return $inst;
 	}
 	
 	/**
@@ -170,6 +180,17 @@ class View
 	public function hasController()
 	{
 		return isset($this->controller);
+	}
+
+	/**
+	 * Add data to the view data store for accessibility within the view.
+	 * @param string $key
+	 * @param mixed $value
+	 */
+	public function addData($key,$value)
+	{
+		$this->_store[$key] = $value;
+		return $this;
 	}
 	
 	/**

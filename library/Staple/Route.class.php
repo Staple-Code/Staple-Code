@@ -23,7 +23,9 @@
  */
 namespace Staple;
 
-use \Exception, \ReflectionMethod;
+use \ReflectionMethod;
+use Staple\Exception\PageNotFoundException;
+use Staple\Exception\RoutingException;
 
 class Route
 {
@@ -156,7 +158,7 @@ class Route
 		}
 		
 		//If a valid page cannot be found, throw page not found exception
-		throw new Exception('Page Not Found',Error::PAGE_NOT_FOUND);
+		throw new PageNotFoundException('Page Not Found',Error::PAGE_NOT_FOUND);
 	}
 	
 	/**
@@ -182,20 +184,74 @@ class Route
 		
 			//Call the controller action
 			$actionMethod = new ReflectionMethod($controller,$this->getAction());
-			$actionMethod->invokeArgs($controller, $this->getParams());
-		
-			if($controller->layout instanceof Layout)
+			$return = $actionMethod->invokeArgs($controller, $this->getParams());
+
+			if($return instanceof View)		//Check for a returned View object
 			{
-				$controller->layout->build();
+				//If the view does not have a controller name set, set it to the currently executing controller.
+				if($return->hasController() == false)
+				{
+					$loader = Main::get()->getLoader();
+					$conString = get_class($controller);
+
+					$return->setController(substr($conString,0,strlen($conString)-strlen($loader::CONTROLLER_SUFFIX)));
+				}
+
+				//Check for a controller layout and build it.
+				if($controller->layout instanceof Layout)
+				{
+					$controller->layout->build(NULL,$return);
+				}
+				else
+				{
+					$return->build();
+				}
+			}
+			elseif ($return instanceof Json)	//Check for a Json object to be coverted and echoed.
+			{
+				echo json_encode($return);
+			}
+			elseif (is_object($return))		//Check for another object type
+			{
+				//If the object is stringable, covert it to a string and output it.
+				$class = new ReflectionClass($return);
+				if ($class->implementsInterface('JsonSerializable'))
+				{
+					echo json_encode($return);
+				}
+				//If the object is stringable, covert to a string and output it.
+				elseif((!is_array($return)) &&
+					((!is_object($return) && settype($return, 'string') !== false) ||
+					(is_object($return) && method_exists($return, '__toString'))))
+				{
+					echo (string)$return;
+				}
+				//If nothing else works, echo the object through the dump method.
+				else
+				{
+					Dev::Dump($return);
+				}
+			}
+			elseif(is_string($return))		//If the return value was simply a string, echo it out.
+			{
+				echo $return;
 			}
 			else
 			{
-				$controller->view->build();
+				//Fall back to previous functionality by rendering views and layouts.
+				if($controller->layout instanceof Layout)
+				{
+					$controller->layout->build();
+				}
+				else
+				{
+					$controller->view->build();
+				}
 			}
 		}
 		else
 		{
-			throw new Exception('Tried to dispatch to an invalid controller.', Error::APPLICATION_ERROR);
+			throw new RoutingException('Tried to dispatch to an invalid controller.', Error::APPLICATION_ERROR);
 		}
 	}
 	
@@ -319,7 +375,7 @@ class Route
 			else
 			{
 				//Bad info in the route, error out.
-				throw new Exception('Invalid Route', Error::PAGE_NOT_FOUND);
+				throw new RoutingException('Invalid Route', Error::PAGE_NOT_FOUND);
 			}
 		}
 		else
@@ -339,7 +395,7 @@ class Route
 			else
 			{
 				//Bad info in the route, error out.
-				throw new Exception('Invalid Route', Error::PAGE_NOT_FOUND);
+				throw new RoutingException('Invalid Route', Error::PAGE_NOT_FOUND);
 			}
 		}
 		else
@@ -370,8 +426,10 @@ class Route
 		//Remove trailing forward slash
 		if(substr($route, (strlen($route)-1), 1) == '/') $route = substr($route, 0, strlen($route)-1);
 		
-		//End routing information on the first "." occurance
-		if(($end = strpos($route,'.')) !== false)
+		//End routing information on the first . ? or # occurance
+		if(($end = strpos($route,'.')) !== false
+			|| ($end = strpos($route,'?')) !== false
+			|| ($end = strpos($route,'#')) !== false)
 		{
 			$route = substr($route, 0, $end);
 		}
@@ -411,7 +469,7 @@ class Route
 		else
 		{
 			//Bad info in the route, error out.
-			throw new Exception('Invalid Route', Error::PAGE_NOT_FOUND);
+			throw new RoutingException('Invalid Route', Error::PAGE_NOT_FOUND);
 		}
 		
 		//Check the Action Value and Set a valid value
@@ -423,7 +481,7 @@ class Route
 		else
 		{
 			//Bad info in the route, error out.
-			throw new Exception('Invalid Route', Error::PAGE_NOT_FOUND);
+			throw new RoutingException('Invalid Route', Error::PAGE_NOT_FOUND);
 		}
 		
 		$this

@@ -28,13 +28,13 @@ use \Exception;
 class Layout
 {
 	use \Staple\Traits\Helpers;
-	
+
 	const DOC_HTML4_TRANS = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">';
 	const DOC_HTML4_STRICT = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">';
 	const DOC_HTML5 = '<!DOCTYPE HTML>';
 	const DOC_XHTML_TRANS = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">';
 	const DOC_XHTML_STRICT = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">';
-	
+
 	/**
 	 * The name/filename of the layout.
 	 * @var string
@@ -61,15 +61,15 @@ class Layout
 	 */
 	protected $metas = array();
 	/**
-	 * The view object
-	 * @var Staple_View
-	 */
-	protected $view;
-	/**
-	 * The buffered script output from the controller.
+	 * Text buffer data.
 	 * @var string
 	 */
 	protected $buffer;
+	/**
+	 * The view object
+	 * @var View
+	 */
+	protected $view;
 	/**
 	 * The page title.
 	 * @var string
@@ -77,7 +77,7 @@ class Layout
 	public $title;
 	/**
 	 * Stores the DocType for the layout
-	 * @var unknown_type
+	 * @var string
 	 */
 	public $doctype;
 	/**
@@ -92,7 +92,7 @@ class Layout
 		{
 			$this->setName($name);
 		}
-		
+
 		switch($doctype)
 		{
 			case 'html4_trans':
@@ -109,12 +109,12 @@ class Layout
 			case 'xhtml_strict':
 				$this->doctype = self::DOC_XHTML_STRICT;
 				break;
-			default: 
+			default:
 				$this->doctype = self::DOC_HTML5;
 		}
-		
+
 		$settings = Config::get('layout');
-		
+
 		if(is_array($settings))
 		{
 			//Add the default title to the layout
@@ -122,7 +122,7 @@ class Layout
 			{
 				$this->setTitle($settings['title']);
 			}
-			
+
 			//Add the default scripts to the layout
 			if(array_key_exists('scripts', $settings))
 			{
@@ -138,7 +138,7 @@ class Layout
 					$this->addScript($settings['scripts']);
 				}
 			}
-			
+
 			//Add the default styles to the layout
 			if(array_key_exists('styles', $settings))
 			{
@@ -154,7 +154,7 @@ class Layout
 					$this->layout->addStylesheet($settings['styles']);
 				}
 			}
-			
+
 			//Add the default metas to the layout
 			if(array_key_exists('meta_description', $settings))
 			{
@@ -166,7 +166,7 @@ class Layout
 			}
 		}
 	}
-	
+
 	/**
 	 * Overloaded __set allows for dynamic addition of properties.
 	 * @param string | int $key
@@ -176,7 +176,7 @@ class Layout
 	{
 		$this->_store[$key] = $value;
 	}
-	
+
 	/**
 	 * Retrieves a stored property.
 	 * @param string | int $key
@@ -192,12 +192,12 @@ class Layout
 			return NULL;
 		}
 	}
-	
+
 	public function __sleep()
 	{
 		return array('name','scripts','styles','metas','view','title','doctype');
 	}
-	
+
 	public function addScript($script,$keepProtocol = false)
 	{
 		if($keepProtocol != true)
@@ -210,7 +210,7 @@ class Layout
 		}
 		return $this;
 	}
-	
+
 	public function removeScript($script)
 	{
 		if(($key = array_search($script, $this->scripts)) !== false)
@@ -219,7 +219,7 @@ class Layout
 		}
 		return $this;
 	}
-	
+
 	public function addScriptBlock($script)
 	{
 		if(!in_array($script, $this->scriptBlocks))
@@ -228,7 +228,7 @@ class Layout
 		}
 		return $this;
 	}
-	
+
 	public function addStylesheet($style, $media = 'all')
 	{
 		if(array_key_exists($media, $this->styles))
@@ -251,7 +251,7 @@ class Layout
 		}
 		return $this;
 	}
-	
+
 	public function removeStylesheet($style, $media)
 	{
 		if(array_key_exists($media, $this->styles))
@@ -266,7 +266,7 @@ class Layout
 		}
 		return $this;
 	}
-	
+
 	public function addMeta($name, $content)
 	{
 		if(!(array_key_exists($name, $this->metas)))
@@ -275,7 +275,7 @@ class Layout
 		}
 		return $this;
 	}
-	
+
 	public function removeMeta($name)
 	{
 		if(array_key_exists($name, $this->metas))
@@ -284,7 +284,7 @@ class Layout
 		}
 		return $this;
 	}
-	
+
 	/**
 	 * @return the $metas
 	 */
@@ -301,7 +301,8 @@ class Layout
 	}
 
 	/**
-	 * @param field_type $metas
+	 * @param string $name
+	 * @param string $content
 	 */
 	public function setMetas($name,$content)
 	{
@@ -309,14 +310,36 @@ class Layout
 		return $this;
 	}
 
+	/**
+	 * Get the buffer data
+	 * @return string
+	 */
+	public function getBuffer()
+	{
+		return $this->buffer;
+	}
+
+	/**
+	 * Set the buffer data.
+	 * @param string $buffer
+	 */
+	public function setBuffer($buffer)
+	{
+		$this->buffer = $buffer;
+	}
+
+	/**
+	 * @param View $view
+	 * @return $this
+	 */
 	public function setView(View $view)
 	{
 		$this->view = $view;
 		return $this;
 	}
-	
+
 	/**
-	 * @return the $title
+	 * @return string $title
 	 */
 	public function getTitle()
 	{
@@ -333,7 +356,7 @@ class Layout
 	}
 
 	/**
-	 * @return the $name
+	 * @return string $name
 	 */
 	public function getName()
 	{
@@ -357,7 +380,12 @@ class Layout
 		}
 		return $this;
 	}
-	
+
+	/**
+	 * Return a boolean to signify whether the layout file requested actually exists.
+	 * @param $layoutName
+	 * @return bool
+	 */
 	public static function layoutExists($layoutName)
 	{
 		if(ctype_alnum(str_replace('_','',$layoutName)))
@@ -367,17 +395,19 @@ class Layout
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
-	
+
 	/*---------------------------------------Builder Fuctions---------------------------------------*/
-	
+	/**
+	 * Build the doctype tag.
+	 */
 	public function doctype()
 	{
 		echo $this->doctype."\r\n";
 	}
-	
+
 	/**
 	 * Prints the stylesheets to the document
 	 */
@@ -399,7 +429,10 @@ class Layout
 			}
 		}
 	}
-	
+
+	/**
+	 * Build the script tags.
+	 */
 	public function scripts()
 	{
 		$secure = Request::isSecure();
@@ -422,7 +455,10 @@ class Layout
 			echo "\n-->\n</script>\n";
 		}
 	}
-	
+
+	/**
+	 * Build the meta tags.
+	 */
 	public function metas()
 	{
 		foreach($this->metas as $name=>$content)
@@ -438,27 +474,41 @@ class Layout
 			}
 		}
 	}
-	
+
+	/**
+	 * Build the View object into PHP output.
+	 */
 	public function content()
 	{
+		//Build the buffer
 		if(isset($this->buffer))
 		{
 			echo $this->buffer;
 		}
+
+		//Build the view
 		if($this->view instanceof View)
 		{
 			$this->view->build();
 		}
 	}
-	
-	public function build($buffer = NULL)
+
+	/**
+	 * Build the layout into PHP output.
+	 * @param View $view
+	 * @throws Exception
+	 */
+	public function build($buffer = NULL, View $view = NULL)
 	{
 		if(isset($this->name))
 		{
-			if(isset($buffer))
-			{
-				$this->buffer = $buffer;
-			}
+			//Set the buffer data
+			if(isset($buffer)) $this->setBuffer($buffer);
+
+			//Set the view if supplied. Views are still optional
+			if(isset($view)) $this->setView($view);
+
+			//Load and render the layout file.
 			$layout = Main::get()->getLoader()->loadLayout($this->name);
 			include $layout;
 		}
@@ -468,5 +518,3 @@ class Layout
 		}
 	}
 }
-
-?>

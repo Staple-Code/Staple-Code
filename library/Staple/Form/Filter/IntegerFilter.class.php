@@ -24,7 +24,7 @@ namespace Staple\Form\Filter;
 
 use \Staple\Form\FieldFilter;
 
-class Integer extends FieldFilter
+class IntegerFilter extends FieldFilter
 {
 	/**
 	 * 

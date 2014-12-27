@@ -1,6 +1,6 @@
 <?php
 /** 
- * Strips any HTML tags from a form field.
+ * Returns only the Base Name of a path.
  * 
  * @author Ironpilot
  * @copyright Copywrite (c) 2011, STAPLE CODE
@@ -24,7 +24,7 @@ namespace Staple\Form\Filter;
 
 use \Staple\Form\FieldFilter;
 
-class Tags extends FieldFilter
+class BaseNameFilter extends FieldFilter
 {
 	/**
 	 * 
@@ -32,15 +32,14 @@ class Tags extends FieldFilter
 	 */
 	public function filter($text)
 	{
-		return strip_tags($text);
+		return basename($text);
 	}
-	/**
-	 * 
+	/* (non-PHPdoc)
 	 * @see Staple_Form_Filter::getName()
 	 */
 	public function getName()
 	{
-		return 'tags';
+		return 'basename';
 	}
 
 }

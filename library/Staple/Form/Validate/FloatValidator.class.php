@@ -1,6 +1,6 @@
 <?php
 /** 
- * Validates that a field does not equal a value.
+ * Validate a floating point number.
  * 
  * @author Ironpilot
  * @copyright Copywrite (c) 2011, STAPLE CODE
@@ -25,16 +25,9 @@ namespace Staple\Form\Validate;
 use \Staple\Form\FieldValidator;
 use \Staple\Form\FieldElement;
 
-class NotEqual extends FieldValidator
+class FloatValidator extends FieldValidator
 {
-	const DEFAULT_ERROR = 'Data matches an excluded value.';
-	protected $equal;
-	
-	public function __construct($equal, $usermsg = NULL)
-	{
-		$this->equal = $equal;
-		parent::__construct($usermsg);
-	}
+	const DEFAULT_ERROR = 'Field value must be a floating point number.';
 
 	/**
 	 * 
@@ -46,13 +39,13 @@ class NotEqual extends FieldValidator
 	 */
 	public function check($data)
 	{
-		if($this->equal != $data)
+		if(ctype_digit(str_replace(array('.','-'), '', $data)) === true)
 		{
 			return true;
 		}
 		else
 		{
-			$this->addError();
+			$this->addError(self::DEFAULT_ERROR);
 		}
 		return false;
 	}
@@ -81,15 +74,15 @@ class NotEqual extends FieldValidator
 				$valstring = $fieldid;
 		}
 		
-		$script = "\t//NotEqual Validator for ".addslashes($field->getLabel())."\n";
-		$script .= "\tif($('$valstring').val() == '".addslashes($this->equal)."')\n\t{\n";
+		$script = "\t//Float Validator for ".addslashes($field->getLabel())."\n";
+		$script .= "\tif(!(/^(\\-)?[0-9]+.?([0-9]+)?$/.test($('$valstring').val())))\n";
+		$script .= "\t{\n";
 		$script .= "\t\terrors.push('".addslashes($field->getLabel()).": \\n{$this->clientJSError()}\\n');\n";
 		$script .= "\t\t$('$fieldid').addClass('form_error');\n";
 		$script .= "\t}\n";
 		$script .= "\telse {\n";
 		$script .= "\t\t$('$fieldid').removeClass('form_error');\n";
 		$script .= "\t}\n";
-		
 		return $script;
 	}
 }

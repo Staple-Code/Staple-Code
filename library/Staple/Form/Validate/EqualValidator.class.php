@@ -1,6 +1,6 @@
 <?php
 /** 
- * Validates a numeric value is between the min and the max.
+ * Validate that a field is equal to a value.
  * 
  * @author Ironpilot
  * @copyright Copywrite (c) 2011, STAPLE CODE
@@ -25,94 +25,50 @@ namespace Staple\Form\Validate;
 use \Staple\Form\FieldValidator;
 use \Staple\Form\FieldElement;
 
-class BetweenFloat extends FieldValidator
+class EqualValidator extends FieldValidator
 {
-	const DEFAULT_ERROR = 'Field is not between minimum and maximum values.';
-	/**
-	 * Minimum Value
-	 * @var float
-	 */
-	protected $min = 0;
-	/**
-	 * Maximum Value
-	 * @var float
-	 */
-	protected $max;
+	const DEFAULT_ERROR = 'Data is not equal';
+	protected $strict;
+	protected $equal;
 	
-	/**
-	 * Mathematical between function. Requires a maximum value and a minimum value.
-	 * Comparison occurs with float math.
-	 * 
-	 * @param float $max
-	 * @param float $min
-	 */
-	public function __construct($limit1, $limit2, $usermsg = NULL)
+	public function __construct($equal, $strict = false, $usermsg = NULL)
 	{
-		$this->min = (float)$limit1;
-		if(isset($limit2))
-		{
-			if($limit2 >= $limit1)
-			{
-				$this->max = (float)$limit2;
-			}
-			else 
-			{
-				$this->min = (float)$limit2;
-				$this->max = (float)$limit1;
-			}
-		}
+		$this->equal = $equal;
+		$this->strict = (bool)$strict;
 		parent::__construct($usermsg);
 	}
-	
-	/**
-	 * @return the $min
-	 */
-	public function getMin()
-	{
-		return $this->min;
-	}
 
 	/**
-	 * @return the $max
-	 */
-	public function getMax()
-	{
-		return $this->max;
-	}
-
-	/**
-	 * @param int $min
-	 */
-	public function setMin($min)
-	{
-		$this->min = $min;
-		return $this;
-	}
-
-	/**
-	 * @param int $max
-	 */
-	public function setMax($max)
-	{
-		$this->max = $max;
-		return $this;
-	}
-
-	/**
-	 * Check for Data Length Validity.
-	 * @param mixed $data
-	 * @return boolean
+	 * 
+	 * @param  mixed $data
+ 
+	 * @return  bool
+	  
+	 * @see Staple_Form_Validator::check()
 	 */
 	public function check($data)
 	{
-		$data = (float)$data;
-		if($data <= ($this->max+0.0625) && $data >= $this->min)			//+0.06256 Binary Float fix
+		if($this->strict === true)
 		{
-			return true;
+			if($this->equal === $data)
+			{
+				return true;
+			}
+			else
+			{
+				$this->addError();
+			}
 		}
 		else
 		{
-			$this->addError();
+			if($this->equal == $data)
+			{
+				return true;
+			}
+			else
+			{
+				$this->addError();
+			}
 		}
 		return false;
 	}
@@ -141,15 +97,15 @@ class BetweenFloat extends FieldValidator
 				$valstring = $fieldid;
 		}
 		
-		$script = "\t//BetweenFloat Validator for ".addslashes($field->getLabel())."\n";
-		$script .= "\tif($('$valstring').val() > {$this->getMax()} || $('$valstring').val() < {$this->getMin()})\n";
-		$script .= "\t{\n";
+		$script = "\t//Equal Validator for ".addslashes($field->getLabel())."\n";
+		$script .= "\tif(!($('$valstring').val() == '".addslashes($this->equal)."'))\n\t{\n";
 		$script .= "\t\terrors.push('".addslashes($field->getLabel()).": \\n{$this->clientJSError()}\\n');\n";
 		$script .= "\t\t$('$fieldid').addClass('form_error');\n";
 		$script .= "\t}\n";
 		$script .= "\telse {\n";
 		$script .= "\t\t$('$fieldid').removeClass('form_error');\n";
 		$script .= "\t}\n";
+		
 		return $script;
 	}
 }

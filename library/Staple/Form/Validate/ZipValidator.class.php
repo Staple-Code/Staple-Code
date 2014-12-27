@@ -1,7 +1,5 @@
 <?php
 /** 
- * Validate a Date field.
- * 
  * @author Ironpilot
  * @copyright Copywrite (c) 2011, STAPLE CODE
  * 
@@ -25,20 +23,22 @@ namespace Staple\Form\Validate;
 use \Staple\Form\FieldValidator;
 use \Staple\Form\FieldElement;
 
-class Date extends FieldValidator
+class ZipValidator extends FieldValidator
 {
-	const REGEX = '/^(((0?[13578]|1[02])[\- \/\.](0?[1-9]|[12][0-9]|3[01]))|(0?2[\- \/\.](0?[1-9]|[12][0-9]))|((0?[469]|11)[\- \/\.](0?[1-9]|[12][0-9]|3[0])))[\- \/\.]((19|20)\d\d)$/';
-	
-	const DEFAULT_ERROR = 'Field must be a valid date.';
+	const DEFAULT_ERROR = 'Zip Code is invalid.';
+	const REGEX = '/^\d{5}([\-]\d{4})?$/';
 
 	/**
+	 * 
 	 * @param  mixed $data
+ 
 	 * @return  bool
+	  
 	 * @see Staple_Form_Validator::check()
 	 */
 	public function check($data)
 	{
-		if(preg_match(self::REGEX, $data, $this->matches))
+		if(preg_match(self::REGEX, $data))
 		{
 			return true;
 		}
@@ -49,10 +49,6 @@ class Date extends FieldValidator
 		}
 	}
 	
-	/**
-	 * (non-PHPdoc)
-	 * @see Staple_Form_Validator::clientJQuery()
-	 */
 	public function clientJQuery($fieldType, FieldElement $field)
 	{
 		switch ($fieldType)
@@ -73,7 +69,7 @@ class Date extends FieldValidator
 				$valstring = $fieldid;
 		}
 		
-		$script = "\t//Date Validator for ".addslashes($field->getLabel())."\n";
+		$script = "\t//Zip Code Validator for ".addslashes($field->getLabel())."\n";
 		$script .= "\tif(!(".self::REGEX.".test($('$valstring').val())))\n\t{\n";
 		$script .= "\t\terrors.push('".addslashes($field->getLabel()).": \\n{$this->clientJSError()}\\n');\n";
 		$script .= "\t\t$('$fieldid').addClass('form_error');\n";
