@@ -4,6 +4,7 @@ namespace Staple;
 class Alias
 {
 	protected static $class_map = array(
+		//Primary Staple Object Aliases
 		'ActiveDirectory'				=>	'\\Staple\\ActiveDirectory',
 		'ActiveDirectoryAuthAdapter'	=>	'\\Staple\\ActiveDirectoryAuthAdapter',
 		'Alias'							=>	'\\Staple\\Alias',
@@ -33,6 +34,7 @@ class Alias
 		'Util'							=>	'\\Staple\\Util',
 		'View'							=>	'\\Staple\\View',
 
+		//Form Class Aliases
 		'ButtonElement'					=>	'\\Staple\\Form\\ButtonElement',
 		'CheckboxElement'				=>	'\\Staple\\Form\\CheckboxElement',
 		'CheckboxGroup'					=>	'\\Staple\\Form\\CheckboxGroup',
@@ -49,6 +51,7 @@ class Alias
 		'TextareaElement'				=>	'\\Staple\\Form\\TextareaElement',
 		'TextElement'					=>	'\\Staple\\Form\TextElement',
 
+		//Validator Class Aliases
 		'AlnumValidator'				=>	'\\Staple\\Form\\Validate\AlnumValidator',
 		'BetweenFloatValidator'			=>	'\\Staple\\Form\\Validate\BetweenFloatValidator',
 		'BetweenValidator'				=>	'\\Staple\\Form\\Validate\BetweenValidator',
@@ -66,7 +69,38 @@ class Alias
 		'UploadedFileValidator'			=>	'\\Staple\\Form\\Validate\UploadedFileValidator',
 		'ZipValidator'					=>	'\\Staple\\Form\\Validate\ZipValidator',
 
+		//Exception Class Aliases
 		'PageNotFoundException'			=>	'\\Staple\Exception\PageNotFoundException',
+
+		//Legacy Class Names
+		'Staple_Auth'					=>	'\\Staple\\Auth',
+		'Staple_Autoload'				=>	'\\Staple\\Autoload',
+		'Staple_Config'					=>	'\\Staple\\Config',
+		'Staple_AD'						=>	'\\Staple\\ActiveDirectory',
+		'Staple_ADAuthAdapter'			=>	'\\Staple\\ActiveDirectoryAuthAdapter',
+		'Staple_AuthAdapter'			=>	'\\Staple\\AuthAdapter',
+		'Staple_AuthController'			=>	'\\Staple\\AuthContoller',
+		'Staple_Controller'				=>	'\\Staple\\Controller',
+		'Staple_DB'						=>	'\\Staple\\DB',
+		'Staple_DBAuthAdapter'			=>	'\\Staple\\DBAuthAdapter',
+		'Staple_Dev'					=>	'\\Staple\\Dev',
+		'Staple_Encrypt'				=>	'\\Staple\\Encrypt',
+		'Staple_Error'					=>	'\\Staple\\Error',
+		'Staple_Form'					=>	'\\Staple\\Form\\Form',
+		'Staple_Image'					=>	'\\Staple\\Image',
+		'Staple_Layout'					=>	'\\Staple\\Layout',
+		'Staple_Link'					=>	'\\Staple\\Link',
+		'Staple_Mail'					=>	'\\Staple\\Mail',
+		'Staple_Main'					=>	'\\Staple\\Main',
+		'Staple_Model'					=>	'\\Staple\\Model',
+		'Staple_Pager'					=>	'\\Staple\\Pager',
+		'Staple_Registry'				=>	'\\Staple\\Registry',
+		'Staple_Request'				=>	'\\Staple\\Request',
+		'Staple_Route'					=>	'\\Staple\\Route',
+		'Staple_Script'					=>	'\\Staple\\Script',
+		'Staple_Util'					=>	'\\Staple\\Util',
+		'Staple_View'					=>	'\\Staple\\View',
+
 	);
 	
 	/**
