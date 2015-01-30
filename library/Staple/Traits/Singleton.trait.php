@@ -22,17 +22,28 @@
  */
 namespace Staple\Traits;
 
+use \Exception;
+
 trait Singleton
 {
 	private static $inst;
 	
 	public static function getInstance()
 	{
-		if (!isset(static::$conn)) 
+		if (!isset(static::$inst)) 
 		{
-			static::$conn = new static();
+			static::$inst = new static();
 		}
 		return static::$inst;
+	}
+	
+	/**
+	 * Disallow cloning on singleton objects
+	 * @throws Exception
+	 */
+	public function __clone()
+	{
+		throw new Exception('Clone is not allowed.');
 	}
 }
 

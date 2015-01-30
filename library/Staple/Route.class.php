@@ -79,7 +79,7 @@ class Route
 	 */
 	public function __toString()
 	{
-		//Website Base
+		//Website Base - don't remember why this was here
 		//$link = Staple_Config::getValue('application', 'public_location');
 		
 		//Add Controller
@@ -152,6 +152,8 @@ class Route
 						//No authentication needed, dispatch the controller
 						$this->dispatchController();
 					}
+					
+					//Return true so that we don't hit the exception.
 					return true;
 				}
 			}
@@ -162,7 +164,6 @@ class Route
 	}
 	
 	/**
-	 *
 	 * Function executes a controller action passing parameters using call_user_func_array().
 	 * It also builds the view for the route.
 	 *

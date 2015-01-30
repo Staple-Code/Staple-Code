@@ -119,7 +119,6 @@ class Main
 		Alias::load('Alias', false);
 		Alias::load('Config', false);
 		Alias::load('Main', false);
-		Alias::load('Registry', false);
 		
 		//Check for a custom loader
 		if(Config::getValue('application', 'loader') != '')

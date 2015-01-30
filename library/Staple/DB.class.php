@@ -13,7 +13,7 @@
  * connection. If you use the set functions, you will have to manually connect to the database 
  * by calling the connect function or constructor for this object.
  * 
- * @todo add a database reconnection function for when the username, host, pw, or db changes.
+ * @deprecated
  * @author Ironpilot
  * @copyright Copywrite (c) 2011, STAPLE CODE
  * 

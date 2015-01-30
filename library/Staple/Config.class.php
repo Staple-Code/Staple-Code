@@ -25,18 +25,42 @@ namespace Staple;
 use \Exception;
 
 /**
-* Added to include Registry once so Config class will load with out autoloader being started.
+* Added to include Singleton Trait once so Config class will load with out autoloader being started.
 */
-require_once STAPLE_ROOT.'Registry.class.php';
+require_once STAPLE_ROOT.'Traits\Singleton.trait.php';
 
-class Config extends Registry
+class Config
 {
-	protected static $read = false;
+	use \Staple\Traits\Singleton;
+	
+	/**
+	 * Variable to specify whether the config has already been read from the filesystem.
+	 * @var boolean
+	 */
+	protected $read = false;
+	
+	/**
+	 * The name of the configset to load.
+	 * @var string
+	 */
+	protected $configSet = 'application';
+	
+	/**
+	 * The configuation set store.
+	 * @var array
+	 */
+	protected $store = array();
 	
 	/**
 	 * Disable construction of this object.
 	 */
-	private function __construct(){}
+	public function __construct($configName = NULL)
+	{
+		$this->read = false;
+		if(isset($configName))
+			$this->setConfigSet($configName);
+		$this->read();
+	}
 	
 	/**
 	 * Get a config set by header.
@@ -44,17 +68,19 @@ class Config extends Registry
 	 */
 	public function __get($name)
 	{
-		if(!self::$read)
+		if(!$this->$read)
 		{
-			self::read();
+			$this->read();
 		}
-		if(array_key_exists($name, self::$store))
+		
+		//Check for the existance of 
+		if(array_key_exists($name, $this->store))
 		{
-			return self::$store[$name];
+			return $this->store[$name];
 		}
 		else
 		{
-			return array();
+			throw new Exception('Configuation value does not exist in the current scope.');
 		}
 	}
 	
@@ -74,17 +100,23 @@ class Config extends Registry
 	 */
 	public static function get($name)
 	{
-		if(!self::$read)
+		//Get the config instance
+		$inst = static::getInstance();
+		
+		//Check that the config file has been read.
+		if(!$inst->read)
 		{
-			self::read();
+			$inst->read();
 		}
-		if(array_key_exists($name, self::$store))
+		
+		//Look for the requested key in the data store.
+		if(array_key_exists($name, $inst->store))
 		{
-			return self::$store[$name];
+			return $inst->store[$name];
 		}
 		else
 		{
-			return array();
+			throw new Exception('Configuation value does not exist in the current scope.');
 		}
 	}
 	
@@ -94,7 +126,7 @@ class Config extends Registry
 	 */
 	public static function getAll()
 	{
-		return self::$store;
+		return static::getInstance()->store;
 	}
 	
 	/**
@@ -102,38 +134,36 @@ class Config extends Registry
 	 * 
 	 * @param string $set
 	 * @param string $key
+	 * @throws \Exception
 	 * @return mixed
 	 */
 	public static function getValue($set,$key)
 	{
-		if(!self::$read)
+		//Get the config instance
+		$inst = static::getInstance();
+		
+		//Check that the config file has been read.
+		if(!$inst->read)
 		{
-			self::read();
+			$inst->read();
 		}
-		if(array_key_exists($set, self::$store))
+		
+		//Look for the requested key in the data store.
+		if(array_key_exists($set, $inst->store))
 		{
-			if(array_key_exists($key, self::$store[$set]))
+			if(array_key_exists($key, $inst->store[$set]))
 			{
-				return self::$store[$set][$key];
+				return $inst->store[$set][$key];
 			}
 			else
 			{
-				return NULL;
+				throw new Exception('Configuation value does not exist in the current scope.');
 			}
 		}
 		else
 		{
-			return NULL;
+			throw new Exception('Configuation value does not exist in the current scope.');
 		}
-	}
-	
-	/**
-	 * Setting config values during runtime are not allowed.
-	 * @throws Exception
-	 */
-	public static function set($name,$value,$storeInSession = false)
-	{
-		throw new Exception('Config changes are not allowed at execution', Error::APPLICATION_ERROR);
 	}
 	
 	/**
@@ -144,7 +174,7 @@ class Config extends Registry
 	 * @param mixed $value
 	 * @return bool
 	 */
-	public static function setValue($set,$key,$value)
+	/*public static function setValue($set,$key,$value)
 	{
 		if(!self::$read)
 		{
@@ -159,22 +189,42 @@ class Config extends Registry
 			}
 		}
 		return false;
-	}
-	
+	}*/
 	
 	/**
 	 * Read and store the application.ini config file.
 	 */
-	private static function read()
+	private function read()
 	{
-		if(defined('CONFIG_ROOT'))
+		if($this->read == false)
 		{
-			$settings = array();
-			if(file_exists(CONFIG_ROOT.'application.ini'))
+			if(defined('CONFIG_ROOT'))
 			{
-				self::$store = parse_ini_file(CONFIG_ROOT.'application.ini',true);
+				$settings = array();
+				if(file_exists(CONFIG_ROOT.$this->getConfigSet().'.ini'))
+				{
+					$this->store = parse_ini_file(CONFIG_ROOT.$this->getConfigSet().'.ini',true);
+				}
 			}
+			$this->read = true;
 		}
-		self::$read = true;
 	}
+	
+	/**
+	 * @return the $configSet
+	 */
+	public function getConfigSet()
+	{
+		return $this->configSet;
+	}
+
+	/**
+	 * @param string $configSet
+	 */
+	public function setConfigSet($configSet)
+	{
+		$this->configSet = $configSet;
+		return $this;
+	}
+
 }
