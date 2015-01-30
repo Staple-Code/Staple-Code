@@ -418,6 +418,19 @@ class Staple_Main
 				self::$route = 'index/index';
 			}
 		}
+		elseif(array_key_exists('REQUEST_URI', $_SERVER))		//Use the URL route
+		{
+			self::$route = $_SERVER['REQUEST_URI']; 
+			self::$route = urldecode(self::$route);			//URL decode any special characters
+			if(strpos(self::$route, '?') !== false)
+			{
+				self::$route = substr(self::$route, 0, strpos(self::$route, '?'));
+			}
+			if(strlen(self::$route) == 0 || self::$route == '/')
+			{
+				self::$route = 'index/index';
+			}
+		}
 		else												//Use the default route
 		{
 			self::$route = 'index/index';

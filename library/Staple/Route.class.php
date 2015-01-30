@@ -106,6 +106,11 @@ class Staple_Route
 			$routeString = $_SERVER['PATH_INFO'];
 			$routeString = urldecode($routeString);			//URL decode any special characters
 		}
+		elseif(array_key_exists('REQUEST_URI', $_SERVER))		//Use the URI route
+		{
+			$routeString = $_SERVER['REQUEST_URI'];
+			$routeString = urldecode($routeString);			//URL decode any special characters
+		}
 		else												//Use the default route
 		{
 			$routeString = 'index/index';
