@@ -35,6 +35,8 @@
  */
 namespace Staple;
 
+use \Exception;
+
 class ActiveDirectory
 {
 	/**
@@ -190,7 +192,7 @@ class ActiveDirectory
 	 */
 	protected function __construct()
 	{
-		$settings = Staple_Config::get('ActiveDirectory');
+		$settings = Config::get('ActiveDirectory');
 		
 		$this->host = $settings['host'];
 		$this->username = $settings['username'];
@@ -297,7 +299,7 @@ class ActiveDirectory
 		{
 			if(!array_key_exists($value, $config))
 			{
-				throw new Exception('Staple_AD configuration error.',Staple_Error::DB_ERROR);
+				throw new Exception('Staple_AD configuration error.',Error::DB_ERROR);
 			}
 		}
 		return true;
@@ -345,7 +347,7 @@ class ActiveDirectory
 	{
 		try
 		{
-			if(ldap_bind($this->LDAPConn, Staple_AD::usrlogin($uname), $pword))
+			if(ldap_bind($this->LDAPConn, self::usrlogin($uname), $pword))
 			{
 				$this->mgmtbind();
 				return TRUE;
