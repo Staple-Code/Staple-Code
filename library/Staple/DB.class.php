@@ -82,7 +82,7 @@ class DB extends mysqli implements SplSubject
 	 * Stores the last executed SQL Statement
 	 * @var string
 	 */
-	public static $last_query;
+	public $last_query;
 	
 	/**
 	 * Storage for Named Database Connections
