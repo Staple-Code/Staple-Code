@@ -149,7 +149,7 @@ class DB extends mysqli implements SplSubject
 	
     /**
      * Creates and returns the primary database connection.
-     * @return Staple_DB
+     * @return DB
      * @static
      */
 	public static function get(array $conf = array())
@@ -159,7 +159,7 @@ class DB extends mysqli implements SplSubject
 	
 	/**
 	 * Creates and/or returns a named database connection.
-	 * @return Staple_DB
+	 * @return DB
 	 * @static
 	 */
 	public static function getNamedConnection($name)
@@ -226,7 +226,7 @@ class DB extends mysqli implements SplSubject
 		 */
 		if($this->connected === true)
 		{
-			self::$last_query = $query;
+			$this->last_query = $query;
 			return parent::query($query,$resultmode);
 		}
 		else
@@ -236,7 +236,7 @@ class DB extends mysqli implements SplSubject
 	}
 	
 	/**
-	 * @return the $host
+	 * @return string $host
 	 */
 	public function getHost()
 	{
@@ -253,7 +253,7 @@ class DB extends mysqli implements SplSubject
 	}
 
 	/**
-	 * @return the $username
+	 * @return string $username
 	 */
 	public function getUsername()
 	{
@@ -270,7 +270,7 @@ class DB extends mysqli implements SplSubject
 	}
 
 	/**
-	 * @return the $db
+	 * @return string $db
 	 */
 	public function getDb()
 	{
@@ -297,7 +297,7 @@ class DB extends mysqli implements SplSubject
 	}
 	
 	/**
-	 * @return the $connected
+	 * @return bool $connected
 	 */
 	public function getConnected()
 	{
@@ -314,11 +314,11 @@ class DB extends mysqli implements SplSubject
 	}
 
 	/**
-	 * @return the $last_query
+	 * @return string $last_query
 	 */
 	public function getLastQuery()
 	{
-		return self::$last_query;
+		return $this->last_query;
 	}
 
 	/**
@@ -326,7 +326,7 @@ class DB extends mysqli implements SplSubject
 	 */
 	protected function setLastQuery($last_query)
 	{
-		self::$last_query = $last_query;
+		$this->last_query = $last_query;
 	}
 	
 	/**

@@ -37,11 +37,11 @@ class Alias
 		//Legacy Class Names
 		'Staple_Auth'					=>	'\\Staple\\Auth',
 		'Staple_Autoload'				=>	'\\Staple\\Autoload',
-		'Staple_Config'					=>	'\\Staple\\Config',
 		'Staple_AD'						=>	'\\Staple\\ActiveDirectory',
 		'Staple_ADAuthAdapter'			=>	'\\Staple\\ActiveDirectoryAuthAdapter',
 		'Staple_AuthAdapter'			=>	'\\Staple\\AuthAdapter',
-		'Staple_AuthController'			=>	'\\Staple\\AuthContoller',
+		'Staple_AuthController'			=>	'\\Staple\\AuthController',
+		'Staple_Config'					=>	'\\Staple\\Config',
 		'Staple_Controller'				=>	'\\Staple\\Controller',
 		'Staple_DB'						=>	'\\Staple\\DB',
 		'Staple_DBAuthAdapter'			=>	'\\Staple\\DBAuthAdapter',
@@ -177,6 +177,10 @@ class Alias
 		'PageNotFoundException'			=>	'\\Staple\\Exception\\PageNotFoundException',
 		'RoutingException'				=>	'\\Staple\\Exception\\RoutingException',
 
+		//Trait Aliases
+		'Helpers'						=>	'\\Staple\\Traits\\Helpers',
+		'Singleton'						=>	'\\Staple\\Traits\\Singleton',
+
 	);
 	
 	/**
@@ -226,7 +230,7 @@ class Alias
 		$class = static::checkAlias($alias);
 		if(!is_null($class))
 		{
-			return class_alias($class,$alias, $autoload);
+			return class_alias($class, $alias, $autoload);
 		}
 		else
 		{
