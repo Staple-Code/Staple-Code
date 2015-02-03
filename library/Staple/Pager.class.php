@@ -401,7 +401,7 @@ class Pager
 		//Set a default link action location if none is submitted.
 		if($action == NULL)
 		{
-			$action = Main::getRoute();
+			$action = Main::get()->getRoute();
 		}
 		$buffer = "<div class=\"staple_pager\">\n<div class=\"staple_pager_pages\">\nPage: ";
 		$pages = $this->getPages();

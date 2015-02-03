@@ -371,7 +371,7 @@ abstract class Controller
 	 */
 	protected function _link($link,array $get = array())
 	{
-		return Link::get($link,$get);
+		return $this->link($link,$get);
 	}
 	
 	/**
@@ -379,8 +379,8 @@ abstract class Controller
 	 * @param string $estring
 	 * @param boolean $strip
 	 */
-	public static function _escape($estring, $strip = false)
+	public function _escape($estring, $strip = false)
 	{
-		return View::escape($estring,$strip);
+		return $this->escape($estring,$strip);
 	}
 }

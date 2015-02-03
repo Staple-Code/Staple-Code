@@ -22,6 +22,8 @@
  */
 namespace Staple\Log;
 
+use \SplSubject;
+
 abstract class Log implements \SplObserver
 {
 	private $encryptLog = false;
@@ -35,7 +37,7 @@ abstract class Log implements \SplObserver
 		
 	}
 	
-	function update($subject)
+	function update(SplSubject $subject)
 	{
 		return $this->Log($subject);
 	}

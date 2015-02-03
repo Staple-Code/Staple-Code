@@ -96,7 +96,17 @@ class Route
 		
 		return $link;
 	}
-	
+
+	/**
+	 * Create and return an instance of the object.
+	 * @param string $link
+	 * @return static
+	 */
+	public static function make($link = NULL)
+	{
+		return new static($link);
+	}
+
 	/**
 	 * Execute the route
 	 */
