@@ -152,14 +152,14 @@ class Alias
 		//Query Builder Classes
 		'QueryCondition'				=>	'\\Staple\\Query\\Condition',
 		'QueryDataSet'					=>	'\\Staple\\Query\\DataSet',
-		'DeleteQuery'					=>	'\\Staple\\Query\\Delete',
-		'InsertQuery'					=>	'\\Staple\\Query\\Insert',
-		'InsertMultipleQuery'			=>	'\\Staple\\Query\\InsertMultiple',
+		'Delete'						=>	'\\Staple\\Query\\Delete',
+		'Insert'						=>	'\\Staple\\Query\\Insert',
+		'InsertMultiple'				=>	'\\Staple\\Query\\InsertMultiple',
 		'QueryJoin'						=>	'\\Staple\\Query\\Join',
 		'Query'							=>	'\\Staple\\Query\\Query',
-		'SelectQuery'					=>	'\\Staple\\Query\\Select',
-		'UnionQuery'					=>	'\\Staple\\Query\\Union',
-		'UpdateQuery'					=>	'\\Staple\\Query\\Update',
+		'Select'						=>	'\\Staple\\Query\\Select',
+		'Union'							=>	'\\Staple\\Query\\Union',
+		'Update'						=>	'\\Staple\\Query\\Update',
 
 		//Legacy Query Builder Classes
 		'Staple_Query_Condition'				=>	'\\Staple\\Query\\Condition',

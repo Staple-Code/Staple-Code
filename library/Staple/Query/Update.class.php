@@ -56,7 +56,15 @@ class Update extends Query
 	 * @var int
 	 */
 	protected $limitOffset;
-	
+
+	/**
+	 * @param string $table
+	 * @param array $data
+	 * @param DB $db
+	 * @param array | string $order
+	 * @param Pager | int $limit
+	 * @throws Exception
+	 */
 	public function __construct($table = NULL, array $data = NULL, $db = NULL, $order = NULL, $limit = NULL)
 	{
 		$this->data = new DataSet();
