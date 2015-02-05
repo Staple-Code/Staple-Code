@@ -37,11 +37,11 @@ class Alias
 		//Legacy Class Names
 		'Staple_Auth'					=>	'\\Staple\\Auth',
 		'Staple_Autoload'				=>	'\\Staple\\Autoload',
-		'Staple_Config'					=>	'\\Staple\\Config',
 		'Staple_AD'						=>	'\\Staple\\ActiveDirectory',
 		'Staple_ADAuthAdapter'			=>	'\\Staple\\ActiveDirectoryAuthAdapter',
 		'Staple_AuthAdapter'			=>	'\\Staple\\AuthAdapter',
-		'Staple_AuthController'			=>	'\\Staple\\AuthContoller',
+		'Staple_AuthController'			=>	'\\Staple\\AuthController',
+		'Staple_Config'					=>	'\\Staple\\Config',
 		'Staple_Controller'				=>	'\\Staple\\Controller',
 		'Staple_DB'						=>	'\\Staple\\DB',
 		'Staple_DBAuthAdapter'			=>	'\\Staple\\DBAuthAdapter',
@@ -152,14 +152,14 @@ class Alias
 		//Query Builder Classes
 		'QueryCondition'				=>	'\\Staple\\Query\\Condition',
 		'QueryDataSet'					=>	'\\Staple\\Query\\DataSet',
-		'DeleteQuery'					=>	'\\Staple\\Query\\Delete',
-		'InsertQuery'					=>	'\\Staple\\Query\\Insert',
-		'InsertMultipleQuery'			=>	'\\Staple\\Query\\InsertMultiple',
+		'Delete'						=>	'\\Staple\\Query\\Delete',
+		'Insert'						=>	'\\Staple\\Query\\Insert',
+		'InsertMultiple'				=>	'\\Staple\\Query\\InsertMultiple',
 		'QueryJoin'						=>	'\\Staple\\Query\\Join',
 		'Query'							=>	'\\Staple\\Query\\Query',
-		'SelectQuery'					=>	'\\Staple\\Query\\Select',
-		'UnionQuery'					=>	'\\Staple\\Query\\Union',
-		'UpdateQuery'					=>	'\\Staple\\Query\\Update',
+		'Select'						=>	'\\Staple\\Query\\Select',
+		'Union'							=>	'\\Staple\\Query\\Union',
+		'Update'						=>	'\\Staple\\Query\\Update',
 
 		//Legacy Query Builder Classes
 		'Staple_Query_Condition'				=>	'\\Staple\\Query\\Condition',
@@ -176,6 +176,10 @@ class Alias
 		//Exception Class Aliases
 		'PageNotFoundException'			=>	'\\Staple\\Exception\\PageNotFoundException',
 		'RoutingException'				=>	'\\Staple\\Exception\\RoutingException',
+
+		//Trait Aliases
+		'Helpers'						=>	'\\Staple\\Traits\\Helpers',
+		'Singleton'						=>	'\\Staple\\Traits\\Singleton',
 
 	);
 	
@@ -226,7 +230,7 @@ class Alias
 		$class = static::checkAlias($alias);
 		if(!is_null($class))
 		{
-			return class_alias($class,$alias, $autoload);
+			return class_alias($class, $alias, $autoload);
 		}
 		else
 		{

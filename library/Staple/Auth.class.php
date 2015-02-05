@@ -272,7 +272,7 @@ class Auth
 	{
 		$conString = $this->_settings['controller'];
 		$class = substr($conString, 0, strlen($conString)-10);
-		$authCon = Main::getController($class);
+		$authCon = Main::get()->getController($class);
 		if(!($authCon instanceof AuthController))
 		{
 			$authCon = new $conString();
@@ -293,7 +293,7 @@ class Auth
 			
 			//Call the controller action, Send the route requested to the action
 			//@todo Add option to customize the controller action
-			call_user_func_array(array($authCon,'index'), array(Main::getRoute()));
+			call_user_func_array(array($authCon,'index'), array(Main::get()->getRoute()));
 			
 			//Grab the buffer contents from the controller and post it after the header.
 			$buffer = ob_get_contents();

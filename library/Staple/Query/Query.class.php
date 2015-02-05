@@ -30,6 +30,7 @@ use \Staple\Error;
 use \Staple\DB;
 use \mysqli;
 use \DateTime;
+use Staple\Pager;
 
 abstract class Query
 {
@@ -137,7 +138,7 @@ abstract class Query
 	 * Executes the query and returns the result.
 	 * @return mysqli_result | bool
 	 */
-	public function Execute()
+	public function execute()
 	{
 		if($this->db instanceof mysqli)
 		{
@@ -294,6 +295,90 @@ abstract class Query
 		{
 			return "'".$db->real_escape_string((string)$inValue)."'";
 		}
+	}
+
+	/*-----------------------------------------------FACTORY METHODS-----------------------------------------------*/
+
+	/**
+	 * Construct and return an instance of the child object.
+	 *
+	 * @param string $table
+	 * @return Query
+	 */
+	public static function table($table)
+	{
+		return new static($table);
+	}
+
+	/**
+	 * Construct a Select query object and return it.
+	 *
+	 * @param string $table
+	 * @param array $columns
+	 * @param DB $db
+	 * @param array | string $order
+	 * @param Pager | int $limit
+	 * @return Select
+	 */
+	public static function select($table = NULL, array $columns = NULL, $db = NULL, $order = NULL, $limit = NULL)
+	{
+		return new Select($table, $columns, $db, $order, $limit);
+	}
+
+	/**
+	 * Construct and return an Insert query object.
+	 *
+	 * @param string $table
+	 * @param array $data
+	 * @param DB $db
+	 * @param string $priority
+	 * @return Insert
+	 */
+	public static function insert($table = NULL, $data = NULL, $db = NULL, $priority = NULL)
+	{
+		return new Insert($table, $data, $db, $priority);
+	}
+
+	/**
+	 * Construct and return an Update query object.
+	 *
+	 * @param string $table
+	 * @param array $data
+	 * @param DB $db
+	 * @param array | string $order
+	 * @param Pager | int $limit
+	 * @return Update
+	 */
+	public static function update($table = NULL, array $data = NULL, $db = NULL, $order = NULL, $limit = NULL)
+	{
+		return new Update($table, $data, $db, $order, $limit);
+	}
+
+	/**
+	 * Construct and return a Delete query object.
+	 *
+	 * @param string $table
+	 * @param mysqli $db
+	 */
+	public static function delete($table = NULL, mysqli $db = NULL)
+	{
+		return new Delete($table, $db);
+	}
+
+	/**
+	 * Construct and return a Union query object
+	 *
+	 * @param array $queries
+	 * @param mysqli $db
+	 */
+	public static function union(array $queries = array(), mysqli $db = NULL)
+	{
+		return new Union($queries, $db);
+	}
+
+	public static function raw($statment)
+	{
+		//@todo this function should just accept SQL and execute it in place returning the result.
 	}
 }
 

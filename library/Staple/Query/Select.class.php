@@ -81,7 +81,15 @@ class Select extends Query
 	 * @var array[Staple_Query_Join]
 	 */
 	protected $joins = array();
-	
+
+	/**
+	 * @param string $table
+	 * @param array $columns
+	 * @param DB $db
+	 * @param array | string $order
+	 * @param Pager | int $limit
+	 * @throws Exception
+	 */
 	public function __construct($table = NULL, array $columns = NULL, $db = NULL, $order = NULL, $limit = NULL)
 	{
 		parent::__construct(NULL, $db);

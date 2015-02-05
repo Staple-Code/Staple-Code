@@ -41,7 +41,12 @@ class Delete extends Query
 	 * @var array[Staple_Query_Join]
 	 */
 	protected $joins = array();
-	
+
+	/**
+	 * @param string $table
+	 * @param mysqli $db
+	 * @throws \Exception
+	 */
 	public function __construct($table = NULL, mysqli $db = NULL)
 	{
 		parent::__construct($table, $db);

@@ -33,26 +33,26 @@ class AdvancedAuthAdapter
 	 * fail.
 	 * @return bool
 	 */
-	public function getAuth($credentials);
+	public function getAuth($credentials){}
 	/**
 	 * 
 	 * This function must be implemented to return a numeric level of access. This level is
 	 * used to determine feature access based on account type.
 	 * @return int
 	 */
-	public function getAccess($route);
+	public function getAccess($route){}
 	
 	/**
 	 * Returns the userid from the adapater
 	 * @return string
 	 */
-	public function getUserId();
+	public function getUserId(){}
 	
-	public function noAccess();
+	public function noAccess(){}
 	
-	public function doLogin();
+	public function doLogin(){}
 	
-	public function afterLogin();
+	public function afterLogin(){}
 }
 
 ?>

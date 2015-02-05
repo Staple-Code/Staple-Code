@@ -69,7 +69,14 @@ class Insert
 	 * @var array[string]
 	 */
 	protected $updateColumns = array();
-	
+
+	/**
+	 * @param string $table
+	 * @param array $data
+	 * @param DB $db
+	 * @param string $priority
+	 * @throws Exception
+	 */
 	public function __construct($table = NULL, $data = NULL, $db = NULL, $priority = NULL)
 	{
 		$this->data = new DataSet();

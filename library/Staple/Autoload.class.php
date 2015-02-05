@@ -121,22 +121,22 @@ class Autoload
 		//Check for an aliased classname
     	if(!is_null($aliasedClass = Alias::checkAlias($class_name)))					//Look for aliased classes
     	{
-    		return $this->loadLibraryClass($aliasedClass);
+    		return $this->loadLibraryClass($aliasedClass, $class_name);
     	}
 		elseif(substr($class_name,strlen($class_name)-strlen($this->getControllerSuffix()),strlen($this->getControllerSuffix())) == $this->getControllerSuffix() 
 			&& strlen($class_name) != strlen($this->getControllerSuffix()))				//Look for Controllers
 		{
-			$this->loadController($class_name);
+			return $this->loadController($class_name);
 		}
 		elseif(substr($class_name,strlen($class_name)-strlen($this->getModelSuffix()),strlen($this->getModelSuffix())) == $this->getModelSuffix()
 			&& strlen($class_name) != strlen($this->getModelSuffix()))					//Look for Models
 		{
-			$this->loadModel($class_name);
+			return $this->loadModel($class_name);
 		}
 		elseif(substr($class_name,strlen($class_name)-strlen($this->getFormSuffix()),strlen($this->getFormSuffix())) == $this->getFormSuffix()
 			&& strlen($class_name) != strlen($this->getFormSuffix()))					//Look for Forms
 		{
-			$this->loadForm($class_name);
+			return $this->loadForm($class_name);
 		}
 		else																			//Look for other elements
 		{
@@ -151,7 +151,7 @@ class Autoload
 			
 			if($namespace[0] == static::STAPLE_NAMESPACE)
 			{
-				$this->loadLibraryClass($class_name);
+				return $this->loadLibraryClass($className);
 			}
 			elseif(file_exists(ELEMENTS_ROOT.$class_name.static::PHP_FILE_EXTENSION))
 			{
@@ -161,10 +161,12 @@ class Autoload
 			{
 				if($this->throwOnFailure === true)
 				{
-					throw new Exception("Class Not Found ".$class_name,Error::LOADER_ERROR);
+					throw new Exception("Class Not Found: ".$class_name,Error::LOADER_ERROR);
 				}
 			}
 		}
+
+		return true;
 	}
 	
 	/**
@@ -173,7 +175,7 @@ class Autoload
 	 * @throws Exception
 	 * @return boolean
 	 */
-	protected function loadLibraryClass($class_name)
+	protected function loadLibraryClass($class_name, $alias = NULL)
 	{
 		//Correct for a leading \ character
 		if(substr($class_name, 0,1) == '\\') $class_name = substr($class_name, 1);
@@ -204,6 +206,10 @@ class Autoload
 					break;
 			}
 		}
+		else
+		{
+			$extension = static::CLASS_FILE_EXTENSION;
+		}
 			
 		//Location
 		$include = $path.$className.$extension;
@@ -213,7 +219,7 @@ class Autoload
 			require_once $include;
 			
 			//Alias the newly loaded class
-			Alias::load($className, false);
+			Alias::load((isset($alias) ? $alias : $className), false);
 			
 			//Return true on success
 			return true;
@@ -223,8 +229,6 @@ class Autoload
 			//Throw exception when we can't load the class
 			throw new Exception('Error Loading Library Class: '.$class_name, 501);
 		}
-		
-		return false;
 	}
 	
 	/**
@@ -246,6 +250,8 @@ class Autoload
 				throw new PageNotFoundException('Page Not Found',Error::PAGE_NOT_FOUND);
 			}
 		}
+
+		return true;
 	}
 	
 	/**
@@ -267,6 +273,8 @@ class Autoload
 				throw new Exception('Model Not Found',Error::LOADER_ERROR);
 			}
 		}
+
+		return true;
 	}
 	
 	/**
@@ -288,6 +296,8 @@ class Autoload
 				throw new Exception('Form Not Found',Error::LOADER_ERROR);
 			}
 		}
+
+		return true;
 	}
 	
 	/**
@@ -315,6 +325,8 @@ class Autoload
 		{
 			throw new Exception('Failed to load the view.', Error::LOADER_ERROR);
 		}
+
+		return true;
 	}
 	
 	/**
@@ -343,7 +355,7 @@ class Autoload
 	
 	/**
 	 * Return the value of $throwOnFailure
-	 * @return the $throwOnFailure
+	 * @return bool $throwOnFailure
 	 */
 	public function getThrowOnFailure()
 	{
@@ -360,7 +372,7 @@ class Autoload
 		return $this;
 	}
 	/**
-	 * @return the $controllerSuffix
+	 * @return string $controllerSuffix
 	 */
 	public function getControllerSuffix()
 	{
@@ -368,7 +380,7 @@ class Autoload
 	}
 
 	/**
-	 * @return the $formSuffix
+	 * @return string $formSuffix
 	 */
 	public function getFormSuffix()
 	{
@@ -376,7 +388,7 @@ class Autoload
 	}
 
 	/**
-	 * @return the $modelSuffix
+	 * @return string $modelSuffix
 	 */
 	public function getModelSuffix()
 	{
@@ -501,7 +513,7 @@ class Autoload
 		return $this;
 	}
 	/**
-	 * @return the $controllerSearchDirectories
+	 * @return array[string] $controllerSearchDirectories
 	 */
 	public function getControllerSearchDirectories()
 	{
@@ -509,7 +521,7 @@ class Autoload
 	}
 
 	/**
-	 * @return the $formSearchDirectories
+	 * @return array[string] $formSearchDirectories
 	 */
 	public function getFormSearchDirectories()
 	{
@@ -517,7 +529,7 @@ class Autoload
 	}
 
 	/**
-	 * @return the $modelSearchDirectories
+	 * @return array[string] $modelSearchDirectories
 	 */
 	public function getModelSearchDirectories()
 	{
@@ -525,7 +537,7 @@ class Autoload
 	}
 
 	/**
-	 * @return the $viewSearchDirectories
+	 * @return array[string] $viewSearchDirectories
 	 */
 	public function getViewSearchDirectories()
 	{
@@ -533,7 +545,7 @@ class Autoload
 	}
 
 	/**
-	 * @return the $layoutSearchDirectories
+	 * @return array[string] $layoutSearchDirectories
 	 */
 	public function getLayoutSearchDirectories()
 	{
