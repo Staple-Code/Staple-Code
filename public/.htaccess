@@ -7,5 +7,5 @@ RewriteCond %{DOCUMENT_ROOT}/%{REQUEST_FILENAME} !-d
 
 
 #Rewrite Rule - Will not append info to index.php. Upadated for use with GoDaddy as well. 
-RewriteRule ^(.[a-zA-Z0-9\/-]*)$ index.php/$1 [PT,QSA,L]
+RewriteRule ^(.[a-zA-Z0-9\/-]*)$ /index.php/$1 [PT,QSA,L]
 
