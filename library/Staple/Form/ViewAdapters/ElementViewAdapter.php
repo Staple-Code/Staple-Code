@@ -29,4 +29,23 @@ abstract class ElementViewAdapter
 {
 	abstract function textElement();
 
+	abstract function textareaElement();
+
+	abstract function submitElement();
+
+	abstract function selectElement();
+
+	abstract function radiogroupElement();
+
+	abstract function passwordElement();
+
+	abstract function imageElement();
+
+	abstract function hiddenElement();
+
+	abstract function fileElement();
+
+	abstract function checkboxgroupElement();
+
+	abstract function checkboxElement();
 }

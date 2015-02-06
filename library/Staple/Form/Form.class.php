@@ -312,7 +312,7 @@ class Form
 			{
 				$obj->setValue($data[$fieldname]);
 			}
-			elseif($obj instanceof CheckboxGroup)
+			elseif($obj instanceof CheckboxGroupElement)
 			{
 				$boxes = $obj->getBoxes();
 				foreach($boxes as $chk)

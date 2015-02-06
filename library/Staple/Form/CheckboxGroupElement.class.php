@@ -20,7 +20,7 @@
  */
 namespace Staple\Form;
 
-class CheckboxGroup extends FieldElement
+class CheckboxGroupElement extends FieldElement
 {
 	/**
 	 * An array that holds the Checkbox elements.

@@ -25,7 +25,7 @@ namespace Staple\Form;
 use \Staple\Error;
 use \Exception;
 
-class RadioGroup extends FieldElement
+class RadioElement extends FieldElement
 {
 	const SORT_VALUES = 1;
 	const SORT_LABELS_ALPHA = 2;
