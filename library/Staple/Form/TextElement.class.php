@@ -102,6 +102,10 @@ class TextElement extends FieldElement
 		return '	<input type="text" id="'.$this->escape($this->id).'" name="'.$this->escape($this->name).'" value="'.$this->escape($this->value).'"'.$size.$max.$this->getAttribString().'>'."\n";
 	}
 
+	/*
+	 * @todo add method to add custom field view
+	 */
+
 	/**
 	 * Build the form field.
 	 * @see Staple_Form_Element::build()

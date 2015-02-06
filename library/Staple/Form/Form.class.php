@@ -170,7 +170,11 @@ class Form
 				}
 			}
 		}
-		
+
+		/**
+		 * @Todo Add Check for Adapter in .ini
+		 */
+
 		//Repopulate data from the session -- I might add this.....
 		//if($this->wasSubmitted())
 		//{
