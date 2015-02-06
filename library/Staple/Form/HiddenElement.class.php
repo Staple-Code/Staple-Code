@@ -73,7 +73,7 @@ class HiddenElement extends FieldElement
 		return '';
 	}
 
-	public function build()
+	public function build($fieldView = NULL)
 	{
 		$buf = '';
 		$view = FORMS_ROOT.'/fields/HiddenElement.phtml';

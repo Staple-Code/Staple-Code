@@ -166,7 +166,7 @@ class CheckboxGroup extends FieldElement
 	 * 
 	 * @see Staple_Form_Element::build()
 	 */
-	public function build()
+	public function build($fieldView = NULL)
 	{
 		$buf = '';
 		$view = FORMS_ROOT.'/fields/CheckboxGroup.phtml';

@@ -99,7 +99,7 @@ class CheckboxElement extends FieldElement
 		return '	<label for="'.$this->escape($this->id).'"'.$this->getClassString().'>'.$this->label.'</label>';
 	}
 
-	public function build()
+	public function build($fieldView = NULL)
 	{
 		$buf = '';
 		$view = FORMS_ROOT.'/fields/CheckboxElement.phtml';

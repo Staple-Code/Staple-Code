@@ -123,7 +123,7 @@ class PasswordElement extends FieldElement
 	 * @see Staple_Form_Element::build()
 	 * @return string
 	 */
-	public function build()
+	public function build($fieldView = NULL)
 	{
 		$buf = '';
 		$view = FORMS_ROOT.'/fields/TextElement.phtml';

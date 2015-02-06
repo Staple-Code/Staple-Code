@@ -62,7 +62,7 @@ class TextareaElement extends FieldElement
 		return '	<label for="'.$this->escape($this->id).'"'.$this->getClassString().'>'.$this->label."</label>\n";
 	}
 
-	public function build()
+	public function build($fieldView = NULL)
 	{
 		$buf = '';
 		$view = FORMS_ROOT.'/fields/TextareaElement.phtml';

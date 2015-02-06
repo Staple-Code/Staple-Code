@@ -28,6 +28,7 @@ use \Exception;
 use \Staple\Error;
 use \Staple\Config;
 use \Staple\Encrypt;
+use Staple\Form\View\ElementViewAdapter;
 
 class Form
 {
@@ -118,6 +119,13 @@ class Form
 	 * @var string
 	 */
 	protected $layout;
+
+	/**
+	 * This holds the ElementViewAdapter object.
+	 * @var ElementViewAdapter
+	 */
+	protected $elementViewAdapter;
+
 	/**
 	 * Dynamic datastore.
 	 * @var array
@@ -725,6 +733,22 @@ JS;
 	{
 		$this->layout = $layout;
 		return $this;
+	}
+
+	/**
+	 * @return ElementViewAdapter
+	 */
+	public function getElementViewAdapter()
+	{
+		return $this->elementViewAdapter;
+	}
+
+	/**
+	 * @param ElementViewAdapter $elementViewAdapter
+	 */
+	public function setElementViewAdapter(ElementViewAdapter $elementViewAdapter)
+	{
+		$this->elementViewAdapter = $elementViewAdapter;
 	}
 
 	/**

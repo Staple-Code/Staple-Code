@@ -96,6 +96,12 @@ abstract class FieldElement
 	 * @var array
 	 */
 	protected $errors = array();
+
+	/**
+	 *
+	 * @var FormViewAdapter
+	 */
+	protected $viewAdapter;
 	
 	/**
 	 * Form field constructor. Requires a name, has an optional label, id and attribute array.
@@ -687,5 +693,5 @@ abstract class FieldElement
 	/**
 	 * Build the field using a layout, or with the default build.
 	 */
-	abstract public function build();
+	abstract public function build($fieldView = NULL);
 }

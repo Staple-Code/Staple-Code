@@ -107,16 +107,21 @@ class TextElement extends FieldElement
 	 * @see Staple_Form_Element::build()
 	 * @return string
 	 */
-	public function build()
+	public function build($fieldView = NULL)
 	{
 		$buf = '';
 		$view = FORMS_ROOT.'/fields/TextElement.phtml';
 		if(file_exists($view))
 		{
+			//@todo use the custom view
 			ob_start();
 			include $view;
 			$buf = ob_get_contents();
 			ob_end_clean();
+		}
+		elseif(isset($this->viewAdapter))
+		{
+			//@todo utilize the viewAdapter
 		}
 		else
 		{
