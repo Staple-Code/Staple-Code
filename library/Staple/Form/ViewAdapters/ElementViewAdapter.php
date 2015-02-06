@@ -13,4 +13,5 @@ namespace Staple\Form\View;
 abstract class ElementViewAdapter
 {
 	abstract function textElement();
+
 }
