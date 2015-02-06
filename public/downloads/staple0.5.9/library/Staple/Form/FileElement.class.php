@@ -3,7 +3,7 @@
  * Creates a file field to be added to the form. Class is incomplete.
  * 
  * @author Ironpilot
- * @copyright Copywrite (c) 2011, STAPLE CODE
+ * @copyright Copyright (c) 2011, STAPLE CODE
  * 
  * This file is part of the STAPLE Framework.
  * 

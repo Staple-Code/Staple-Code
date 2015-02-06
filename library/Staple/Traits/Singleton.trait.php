@@ -3,7 +3,7 @@
  * A trait to implement the singleton pattern.
  * 
  * @author Ironpilot
- * @copyright Copywrite (c) 2011, STAPLE CODE
+ * @copyright Copyright (c) 2011, STAPLE CODE
  *
  * This file is part of the STAPLE Framework.
  *

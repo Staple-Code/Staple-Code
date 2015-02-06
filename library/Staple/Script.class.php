@@ -4,7 +4,7 @@
  * This class is designed to include canned scripts into a website.
  * 
  * @author Ironpilot
- * @copyright Copywrite (c) 2011, STAPLE CODE
+ * @copyright Copyright (c) 2011, STAPLE CODE
  * @deprecated
  * 
  * This file is part of the STAPLE Framework.
