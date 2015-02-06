@@ -5,7 +5,7 @@
  * Right now the class only supports the MySQL database.
  * 
  * @author Ironpilot
- * @copyright Copywrite (c) 2011, STAPLE CODE
+ * @copyright Copyright (c) 2011, STAPLE CODE
  * 
  * This file is part of the STAPLE Framework.
  * 
@@ -376,7 +376,11 @@ abstract class Query
 		return new Union($queries, $db);
 	}
 
-	public static function raw($statment)
+	/**
+	 * Execute a raw SQL statement
+	 * @param $statement
+	 */
+	public static function raw($statement)
 	{
 		//@todo this function should just accept SQL and execute it in place returning the result.
 	}

@@ -12,7 +12,7 @@
  * rolefield - (optional) This field specifies the database table that holds the access level. If no field is provided or it is null, 1 will be returned.
  * 
  * @author Ironpilot
- * @copyright Copywrite (c) 2011, STAPLE CODE
+ * @copyright Copyright (c) 2011, STAPLE CODE
  * 
  * This file is part of the STAPLE Framework.
  * 

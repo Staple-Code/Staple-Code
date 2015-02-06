@@ -6,7 +6,7 @@
  * in the form. Filters are processed in the order that they are added to a form field.
  * 
  * @author Ironpilot
- * @copyright Copywrite (c) 2011, STAPLE CODE
+ * @copyright Copyright (c) 2011, STAPLE CODE
  * 
  * This file is part of the STAPLE Framework.
  * 
