@@ -105,7 +105,7 @@ class Alias
 		//Legacy Form Classes
 		'Staple_Form_ButtonElement'		=>	'\\Staple\\Form\\ButtonElement',
 		'Staple_Form_CheckboxElement'	=>	'\\Staple\\Form\\CheckboxElement',
-		'Staple_Form_CheckboxGroup'		=>	'\\Staple\\Form\\CheckboxGroupElement';,
+		'Staple_Form_CheckboxGroup'		=>	'\\Staple\\Form\\CheckboxGroupElement',
 		'Staple_Form_Element'			=>	'\\Staple\\Form\\FieldElement',
 		'Staple_Form_Filter'			=>	'\\Staple\\Form\\FieldFilter',
 		'Staple_Form_Validator'			=>	'\\Staple\\Form\\FieldValidator',
