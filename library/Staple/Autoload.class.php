@@ -145,13 +145,10 @@ class Autoload
 			
 			//Split the class into it's namespace components.
 			$namespace = explode('\\',$class_name);
-				
-			//Set the final class name
-			$className = $namespace[count($namespace)-1];
 			
 			if($namespace[0] == static::STAPLE_NAMESPACE)
 			{
-				return $this->loadLibraryClass($className);
+				return $this->loadLibraryClass($class_name);
 			}
 			elseif(file_exists(ELEMENTS_ROOT.$class_name.static::PHP_FILE_EXTENSION))
 			{
@@ -210,7 +207,7 @@ class Autoload
 		{
 			$extension = static::CLASS_FILE_EXTENSION;
 		}
-			
+
 		//Location
 		$include = $path.$className.$extension;
 		if(file_exists($include))
