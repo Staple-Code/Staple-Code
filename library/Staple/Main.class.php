@@ -283,6 +283,7 @@ class Main
 	/**
 	 * 
 	 * Executes the application process.
+	 * @param Route | string $route
 	 */
 	public function run($route = NULL)
 	{
