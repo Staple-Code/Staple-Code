@@ -225,7 +225,7 @@ abstract class FieldElement
 	 * @param string $label
 	 * @param string $id
 	 * @param array $attrib
-	 * @return Staple_Form_Element
+	 * @return $this
 	 */
 	public static function create($name, $label = NULL, $id = NULL, array $attrib = array())
 	{
@@ -238,7 +238,7 @@ abstract class FieldElement
 	
 	/**
 	 * Adds a field filter to the form field.
-	 * @param Staple_Form_Filter $filter
+	 * @param FieldFilter $filter
 	 * @return $this
 	 */
 	public function addFilter(FieldFilter $filter)
@@ -249,7 +249,7 @@ abstract class FieldElement
 	
 	/**
 	 * Adds a field validator to the form field.
-	 * @param Staple_Form_Validator $validator
+	 * @param FieldValidator $validator
 	 * @return $this
 	 */
 	public function addValidator(FieldValidator $validator)
@@ -271,7 +271,7 @@ abstract class FieldElement
 	 * Sets the field to be required to be completed to be valid. The optional parameter also allows you
 	 * to set required to false using this function.
 	 * @param bool $bool
-	 * @return Staple_Form_Element
+	 * @return $this
 	 */
 	public function setRequired($bool = true)
 	{
@@ -285,7 +285,7 @@ abstract class FieldElement
 	
 	/**
 	 * Sets the field to not be required.
-	 * @return Staple_Form_Element
+	 * @return $this
 	 */
 	public function setNotRequired()
 	{
@@ -414,7 +414,7 @@ abstract class FieldElement
 	/**
 	 * Sets the name.
 	 * @param string $insert
-	 * @return Staple_Form_Element
+	 * @return $this
 	 */
 	public function setName($insert)
 	{
@@ -461,7 +461,7 @@ abstract class FieldElement
 	 * Sets the field value, if field is not read only.
 	 * @param string $insert
 	 * @throws Exception
-	 * @return Staple_Form_Element
+	 * @return $this
 	 */
 	public function setValue($insert)
 	{
@@ -531,7 +531,7 @@ abstract class FieldElement
 	
 	/**
 	 * Sets $readOnly to true
-	 * @return Staple_Form_Element
+	 * @return $this
 	 */
 	public function setReadOnly()
 	{
@@ -581,14 +581,29 @@ abstract class FieldElement
 	
 	/**
 	 * Add a CSS class to the Element
+	 * The $onlyTags parameter allows a user to specify the tag only be applied to a specific HTML tag within the element.
 	 * @param string $class
-	 * @return Staple_Form_Element
+	 * @param array $onlyTags - Not implemented yet
+	 * @return $this
 	 */
-	public function addClass($class)
+	public function addClass($class, array $onlyTags = array())
 	{
-		if(in_array($class, $this->classes) === false)
+		if(count($onlyTags) > 0)
 		{
-			$this->classes[] = $class;
+			foreach($onlyTags as $tag)
+			{
+				if(in_array($class, $this->classes[$tag]) === false)
+				{
+					$this->classes[$tag] = $class;
+				}
+			}
+		}
+		else
+		{
+			if (in_array($class, $this->classes) === false)
+			{
+				$this->classes[] = $class;
+			}
 		}
 		return $this;
 	}
@@ -596,7 +611,7 @@ abstract class FieldElement
 	/**
 	 * Remove a class from the Element
 	 * @param string $class
-	 * @return Staple_Form_Element
+	 * @return $this
 	 */
 	public function removeClass($class)
 	{
@@ -609,22 +624,35 @@ abstract class FieldElement
 	
 	/**
 	 * Returns the classes array as a string
+	 * @param string $tag
 	 * @return string
 	 */
-	public function getClassString()
+	public function getClassString($tag = NULL)
 	{
 		if(count($this->classes) >= 1)
 		{
-			$ctemp = ' class="';
-			foreach($this->classes as $class)
+			$classTemp = ' class="';
+			foreach ($this->classes as $key=>$class)
 			{
-				$ctemp .= $this->escape($class).' ';
+				if(is_string($class))
+				{
+					$classTemp .= $this->escape($class) . ' ';
+				}
+				elseif($tag != NULL && $key == $tag)		//Check for classes that apply only to this tag.
+				{
+					foreach($class as $subClass)
+					{
+						//Apply tag only classes
+						$classTemp .= $this->escape($subClass);
+					}
+				}
 			}
-			$ctemp = substr($ctemp, 0, strlen($ctemp)-1).'"';
-			return $ctemp;
+			$classTemp = substr($classTemp, 0, strlen($classTemp) - 1) . '"';
+			return $classTemp;
 		}
 		else
 		{
+			//Return null string when there are no classes to apply.
 			return '';
 		}
 	}
@@ -637,12 +665,22 @@ abstract class FieldElement
 	{
 		return $this->classes;
 	}
+
+	/**
+	 * Returns the CSS classes applied to the field
+	 * @return array[string]
+	 */
+	public function getClasses()
+	{
+		return $this->classes;
+	}
 	
 	/**
 	 * Returns all the attributes formatted as and HTML string.
+	 * @param string $tag
 	 * @return string
 	 */
-	public function getAttribString()
+	public function getAttribString($tag = NULL)
 	{
 		$attribs = '';
 		if($this->isDisabled())
@@ -653,7 +691,7 @@ abstract class FieldElement
 		{
 			$attribs .= ' readOnly';
 		}
-		$attribs .= $this->getClassString();
+		$attribs .= $this->getClassString($tag);
 		foreach($this->attrib as $key=>$value)
 		{
 			$attribs .= ' '.$this->escape($key).'="'.$this->escape($value).'"';
