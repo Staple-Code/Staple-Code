@@ -39,7 +39,7 @@ class TextElement extends FieldElement
 	protected $max;
 	
 	/**
-	 * @return the $size
+	 * @return int $size
 	 */
 	public function getSize()
 	{
@@ -47,7 +47,7 @@ class TextElement extends FieldElement
 	}
 
 	/**
-	 * @return the $max
+	 * @return int $max
 	 */
 	public function getMax()
 	{
@@ -79,7 +79,7 @@ class TextElement extends FieldElement
 	 */
 	public function label()
 	{
-		return '	<label for="'.$this->escape($this->id).'"'.$this->getClassString().'>'.$this->label."</label>\n";
+		return '	<label for="'.$this->escape($this->id).'"'.$this->getClassString('label').'>'.$this->label."</label>\n";
 	}
 
 	/**
@@ -99,7 +99,7 @@ class TextElement extends FieldElement
 		{
 			$max = ' maxlength="'.((int)$this->max).'"';
 		}
-		return '	<input type="text" id="'.$this->escape($this->id).'" name="'.$this->escape($this->name).'" value="'.$this->escape($this->value).'"'.$size.$max.$this->getAttribString().'>'."\n";
+		return '	<input type="text" id="'.$this->escape($this->id).'" name="'.$this->escape($this->name).'" value="'.$this->escape($this->value).'"'.$size.$max.$this->getAttribString('input').'>'."\n";
 	}
 
 	/*
@@ -131,7 +131,7 @@ class TextElement extends FieldElement
 		{
 			$this->addClass('form_element');
 			$this->addClass('element_text');
-			$classes = $this->getClassString();
+			$classes = $this->getClassString('div');
 			$buf .= "<div$classes id=\"".$this->escape($this->id)."_element\">\n";
 			$buf .= $this->label();
 			$buf .= $this->field();

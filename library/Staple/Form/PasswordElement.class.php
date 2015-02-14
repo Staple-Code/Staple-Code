@@ -45,7 +45,7 @@ class PasswordElement extends FieldElement
 		return $this;
 	}
 	/**
-	 * @return the $size
+	 * @return int $size
 	 */
 	public function getSize()
 	{
@@ -53,7 +53,7 @@ class PasswordElement extends FieldElement
 	}
 
 	/**
-	 * @return the $max
+	 * @return int $max
 	 */
 	public function getMax()
 	{
@@ -90,7 +90,7 @@ class PasswordElement extends FieldElement
 	 */
 	public function label()
 	{
-		return '	<label for="'.$this->escape($this->id).'"'.$this->getClassString().'>'.$this->label."</label>\n";
+		return '	<label for="'.$this->escape($this->id).'"'.$this->getClassString('label').'>'.$this->label."</label>\n";
 	}
 
 	/**
@@ -115,7 +115,7 @@ class PasswordElement extends FieldElement
 		{
 			$value = $this->value;
 		}
-		return '	<input type="password" id="'.$this->escape($this->id).'" name="'.$this->escape($this->name).'" value="'.$this->escape($value).'"'.$size.$max.$this->getAttribString().'>'."\n";
+		return '	<input type="password" id="'.$this->escape($this->id).'" name="'.$this->escape($this->name).'" value="'.$this->escape($value).'"'.$size.$max.$this->getAttribString('input').'>'."\n";
 	}
 
 	/**
@@ -138,7 +138,7 @@ class PasswordElement extends FieldElement
 		{
 			$this->addClass('form_element');
 			$this->addClass('element_password');
-			$classes = $this->getClassString();
+			$classes = $this->getClassString('div');
 			$buf .= "<div$classes id=\"".$this->escape($this->id)."_element\">\n";
 			$buf .= $this->label();
 			$buf .= $this->field();

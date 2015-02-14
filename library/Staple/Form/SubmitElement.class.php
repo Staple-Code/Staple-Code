@@ -37,7 +37,7 @@ class SubmitElement extends FieldElement
 	 */
 	public function field()
 	{
-		return '	<input type="submit" id="'.$this->escape($this->id).'" name="'.$this->escape($this->name).'" value="'.$this->escape($this->value).'"'.$this->getAttribString().">\n";
+		return '	<input type="submit" id="'.$this->escape($this->id).'" name="'.$this->escape($this->name).'" value="'.$this->escape($this->value).'"'.$this->getAttribString('input').">\n";
 	}
 
 	/* (non-PHPdoc)
@@ -45,7 +45,7 @@ class SubmitElement extends FieldElement
 	 */
 	public function label()
 	{
-		return "	<label for=\"".$this->escape($this->id)."\"".$this->getClassString().">".$this->label."</label>\n";
+		return "	<label for=\"".$this->escape($this->id)."\"".$this->getClassString('label').">".$this->label."</label>\n";
 	}
 
 	public function build($fieldView = NULL)
@@ -63,7 +63,7 @@ class SubmitElement extends FieldElement
 		{
 			$this->addClass('form_element');
 			$this->addClass('element_submit');
-			$classes = $this->getClassString();
+			$classes = $this->getClassString('div');
 			$buf .= "<div$classes id=\"".$this->escape($this->id)."_element\">\n";
 			if(isset($this->label))
 			{

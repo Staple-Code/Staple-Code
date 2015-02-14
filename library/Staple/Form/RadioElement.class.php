@@ -40,7 +40,7 @@ class RadioElement extends FieldElement
 	protected $buttons = array();
 	/**
 	 * Boolean whether or not any button has been checked. Corrects for a "0" value radio box.
-	 * @var unknown_type
+	 * @var boolean
 	 */
 	protected $checked = false;
 	
@@ -115,7 +115,7 @@ class RadioElement extends FieldElement
 	/**
 	 * Removes a button by its value.
 	 * @param mixed $value
-	 * @return Staple_Form_RadioGroup
+	 * @return $this
 	 */
 	public function removeButtonByValue($value)
 	{
@@ -184,7 +184,7 @@ class RadioElement extends FieldElement
 				$check = ' checked';
 			}
 			$buf .= "	<div class=\"form_radio\" id=\"".$this->escape($this->id)."_".$this->escape($value)."_div\">\n";
-			$buf .= "		<input type=\"radio\" name=\"".$this->escape($this->name)."\" id=\"".$this->escape($this->id)."_".$this->escape($value)."\" value=\"".$this->escape($value)."\"$check".$this->getAttribString().">\n";
+			$buf .= "		<input type=\"radio\" name=\"".$this->escape($this->name)."\" id=\"".$this->escape($this->id)."_".$this->escape($value)."\" value=\"".$this->escape($value)."\"$check".$this->getAttribString('input').">\n";
 			$buf .= "		<label for=\"".$this->escape($this->id)."_".$this->escape($value)."\">".$this->escape($label)."</label>\n";
 			$buf .= "	</div>\n";
 		}
@@ -196,7 +196,7 @@ class RadioElement extends FieldElement
 	 */
 	public function label()
 	{
-		return '	<label'.$this->getClassString().'>'.$this->label."</label>\n";
+		return '	<label'.$this->getClassString('label').'>'.$this->label."</label>\n";
 	}
 
 	/**
@@ -219,7 +219,7 @@ class RadioElement extends FieldElement
 		{
 			$this->addClass('form_element');
 			$this->addClass('element_radiogroup');
-			$classes = $this->getClassString();
+			$classes = $this->getClassString('div');
 			$buf .= "<div$classes id=\"".$this->escape($this->id)."_element\">\n";
 			$buf .= $this->label();
 			$buf .= $this->field();

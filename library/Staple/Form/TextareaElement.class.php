@@ -51,7 +51,7 @@ class TextareaElement extends FieldElement
 	 */
 	public function field()
 	{
-		return '	<textarea rows="'.$this->rows.'" cols="'.$this->cols.'" id="'.$this->escape($this->id).'" name="'.$this->escape($this->name).'"'.$this->getAttribString().'>'.$this->escape($this->value)."</textarea>\n";
+		return '	<textarea rows="'.$this->rows.'" cols="'.$this->cols.'" id="'.$this->escape($this->id).'" name="'.$this->escape($this->name).'"'.$this->getAttribString('textarea').'>'.$this->escape($this->value)."</textarea>\n";
 	}
 
 	/* (non-PHPdoc)
@@ -59,7 +59,7 @@ class TextareaElement extends FieldElement
 	 */
 	public function label()
 	{
-		return '	<label for="'.$this->escape($this->id).'"'.$this->getClassString().'>'.$this->label."</label>\n";
+		return '	<label for="'.$this->escape($this->id).'"'.$this->getClassString('label').'>'.$this->label."</label>\n";
 	}
 
 	public function build($fieldView = NULL)
@@ -77,7 +77,7 @@ class TextareaElement extends FieldElement
 		{
 			$this->addClass('form_element');
 			$this->addClass('element_textarea');
-			$classes = $this->getClassString();
+			$classes = $this->getClassString('div');
 			$buf .= "<div$classes id=\"".$this->escape($this->id)."_element\">\n";
 			$buf .= $this->label();
 			$buf .= $this->field();
