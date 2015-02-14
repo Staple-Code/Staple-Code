@@ -588,20 +588,26 @@ abstract class FieldElement
 	 */
 	public function addClass($class, array $onlyTags = array())
 	{
+		//Check if this new class will be tag specific
 		if(count($onlyTags) > 0)
 		{
+			//Loop through each tag in the $onlyTags array
 			foreach($onlyTags as $tag)
 			{
+				//Check if the class already exists.
 				if(in_array($class, $this->classes[$tag]) === false)
 				{
-					$this->classes[$tag] = $class;
+					//Add the class to its own array for the tag.
+					$this->classes[$tag][] = $class;
 				}
 			}
 		}
 		else
 		{
+			//Check that the class does not exist in the global array.
 			if (in_array($class, $this->classes) === false)
 			{
+				//Add the class string to the main class array as a numeric key.
 				$this->classes[] = $class;
 			}
 		}
@@ -609,13 +615,24 @@ abstract class FieldElement
 	}
 	
 	/**
-	 * Remove a class from the Element
+	 * Remove a class from the Element, specify the optional param to remove a tag specific class
 	 * @param string $class
+	 * @param string $tag
 	 * @return $this
 	 */
-	public function removeClass($class)
+	public function removeClass($class,$tag = NULL)
 	{
-		if(($key = array_search($class, $this->classes)) !== false)
+		if($tag != null)
+		{
+			if(isset($this->classes[$tag]))
+			{
+				if(($key = array_search($class, $this->classes[$tag])) !== false)
+				{
+					unset($this->classes[$tag][$key]);
+				}
+			}
+		}
+		elseif(($key = array_search($class, $this->classes)) !== false)
 		{
 			unset($this->classes[$key]);
 		}
