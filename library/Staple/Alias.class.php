@@ -155,6 +155,26 @@ class Alias
 		'Staple_Form_Validate_UploadedFile'		=>	'\\Staple\\Form\\Validate\UploadedFileValidator',
 		'Staple_Form_Validate_Zip'				=>	'\\Staple\\Form\\Validate\ZipValidator',
 
+		//Filter Class Aliases
+		'BaseNameFilter'				=>	'\\Staple\\Form\\Filter\BaseNameFilter',
+		'IntegerFilter'					=>	'\\Staple\\Form\\Filter\IntegerFilter',
+		'PhoneFormatFilter'				=>	'\\Staple\\Form\\Filter\PhoneFormatFilter',
+		'TagsFilter'					=>	'\\Staple\\Form\\Filter\TagsFilter',
+		'ToDateTimeFilter'				=>	'\\Staple\\Form\\Filter\ToDateTimeFilter',
+		'ToLowerFilter'					=>	'\\Staple\\Form\\Filter\ToLowerFilter',
+		'ToUpperFilter'					=>	'\\Staple\\Form\\Filter\ToUpperFilter',
+		'TrimFilter'					=>	'\\Staple\\Form\\Filter\TrimFilter',
+
+		//Legacy Validator Class Aliases
+		'Staple_Form_Filter_BaseName'		=>	'\\Staple\\Form\\Filter\BaseNameFilter',
+		'Staple_Form_Filter_Integer'		=>	'\\Staple\\Form\\Filter\IntegerFilter',
+		'Staple_Form_Filter_PhoneFormat'	=>	'\\Staple\\Form\\Filter\PhoneFormatFilter',
+		'Staple_Form_Filter_Tags'			=>	'\\Staple\\Form\\Filter\TagsFilter',
+		'Staple_Form_Filter_ToDateTime'		=>	'\\Staple\\Form\\Filter\ToDateTimeFilter',
+		'Staple_Form_Filter_ToLower'		=>	'\\Staple\\Form\\Filter\ToLowerFilter',
+		'Staple_Form_Filter_ToUpper'		=>	'\\Staple\\Form\\Filter\ToUpperFilter',
+		'Staple_Form_Filter_Trim'			=>	'\\Staple\\Form\\Filter\TrimFilter',
+
 		//Data Class Aliases
 		'DoubleLinkedList'				=>	'\\Staple\\Data\\DoubleLinkedList',
 		'LinkedList'					=>	'\\Staple\\Data\\LinkedList',

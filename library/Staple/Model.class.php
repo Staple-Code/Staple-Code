@@ -51,7 +51,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess, \Iterator
 	 * 
 	 * @param array $options
 	 */
-	public function __construct($options)
+	public function __construct(array $options = NULL)
 	{
 		if(!isset($this->_table))
 		{

@@ -23,9 +23,21 @@
 
 namespace Staple\Query;
 
-use PDOStatement;
+use \PDOStatement, \PDO;
 
 class Statement extends PDOStatement
 {
+	/**
+	 * Mysqli style associative array fetch style
+	 * @return mixed
+	 */
+	public function fetch_assoc()
+	{
+		return $this->fetch(PDO::FETCH_ASSOC);
+	}
 
+	public function fetch_array()
+	{
+		return $this->fetch(PDO::FETCH_BOTH);
+	}
 }

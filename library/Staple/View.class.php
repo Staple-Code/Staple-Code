@@ -207,7 +207,7 @@ class View
 		{
 			//Load the view from the default loader
 			$view = Main::get()->getLoader()->loadView($this->controller,$this->view);
-			if(strlen($view) >= 1)
+			if(strlen($view) >= 1 && $view !== false)
 			{
 				include $view;
 			}

@@ -31,6 +31,8 @@ use \Staple\DB;
 use \mysqli;
 use \DateTime;
 use Staple\Pager;
+use \PDO;
+use \PDOStatement;
 
 abstract class Query
 {
@@ -147,6 +149,9 @@ abstract class Query
 	 */
 	public function execute(PDO $connection = NULL)
 	{
+		if(isset($connection))
+			$this->setDb($connection);
+
 		if($this->db instanceof PDO)
 		{
 			return $this->db->query($this->build());
@@ -177,7 +182,7 @@ abstract class Query
 	 */
 	public static function connection($namedConnection = NULL)
 	{
-		if($namedConnection != NULL)
+		if($namedConnection == NULL)
 		{
 			$db = Connection::getInstance();
 		}
@@ -211,7 +216,8 @@ abstract class Query
 	
 	/**
 	 * An open ended where statement
-	 * @param string | Staple_Query_Select $statement
+	 * @param string | Select $statement
+	 * @return $this
 	 */
 	public function whereStatement($statement)
 	{
@@ -224,6 +230,7 @@ abstract class Query
 	 * @param string $column
 	 * @param mixed $value
 	 * @param boolean $columnJoin
+	 * @return $this
 	 */
 	public function whereEqual($column, $value, $columnJoin = NULL)
 	{
@@ -255,7 +262,8 @@ abstract class Query
 	/**
 	 * SQL IN Clause
 	 * @param string $column
-	 * @param array | Staple_Query_Select $values
+	 * @param array | Select $values
+	 * @return $this
 	 */
 	public function whereIn($column, $values)
 	{
@@ -268,6 +276,7 @@ abstract class Query
 	 * @param string $column
 	 * @param mixed $start
 	 * @param mixed $end
+	 * @return $this
 	 */
 	public function whereBetween($column, $start, $end)
 	{
@@ -345,7 +354,7 @@ abstract class Query
 	 * @param Pager | int $limit
 	 * @return Select
 	 */
-	public static function select($table = NULL, array $columns = NULL, $db = NULL, $order = NULL, $limit = NULL)
+	public static function select($table = NULL, array $columns = NULL, PDO $db = NULL, $order = NULL, $limit = NULL)
 	{
 		return new Select($table, $columns, $db, $order, $limit);
 	}
