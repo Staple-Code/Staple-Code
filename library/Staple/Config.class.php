@@ -23,6 +23,7 @@
 namespace Staple;
 
 use \Exception;
+use \Staple\Exception\ConfigurationException;
 
 /**
 * Added to include Singleton Trait once so Config class will load with out autoloader being started.
@@ -46,7 +47,7 @@ class Config
 	protected $configSet = 'application';
 	
 	/**
-	 * The configuation set store.
+	 * The configuration set store.
 	 * @var array
 	 */
 	protected $store = array();
@@ -80,7 +81,7 @@ class Config
 		}
 		else
 		{
-			throw new Exception('Configuation value does not exist in the current scope.');
+			throw new ConfigurationException('Configuration value does not exist in the current scope.');
 		}
 	}
 	
@@ -90,7 +91,7 @@ class Config
 	 */
 	public function __set($name,$value)
 	{
-		throw new Exception('Config changes are not allowed at execution',Error::APPLICATION_ERROR);
+		throw new ConfigurationException('Config changes are not allowed at execution',Error::APPLICATION_ERROR);
 	}
 	
 	/**
@@ -116,7 +117,7 @@ class Config
 		}
 		else
 		{
-			throw new Exception('Configuation value does not exist in the current scope.');
+			throw new ConfigurationException('Configuration value does not exist in the current scope.');
 		}
 	}
 	
@@ -134,10 +135,11 @@ class Config
 	 * 
 	 * @param string $set
 	 * @param string $key
-	 * @throws \Exception
+	 * @param boolean $throwOnError
+	 * @throws ConfigurationException
 	 * @return mixed
 	 */
-	public static function getValue($set,$key)
+	public static function getValue($set,$key, $throwOnError = true)
 	{
 		//Get the config instance
 		$inst = static::getInstance();
@@ -157,12 +159,18 @@ class Config
 			}
 			else
 			{
-				throw new Exception('Configuation value does not exist in the current scope.');
+				if($throwOnError)
+					throw new ConfigurationException('Configuration value does not exist in the current scope.');
+				else
+					return null;
 			}
 		}
 		else
 		{
-			throw new Exception('Configuation value does not exist in the current scope.');
+			if($throwOnError)
+				throw new ConfigurationException('Configuration value does not exist in the current scope.');
+			else
+				return null;
 		}
 	}
 	
@@ -200,7 +208,6 @@ class Config
 		{
 			if(defined('CONFIG_ROOT'))
 			{
-				$settings = array();
 				if(file_exists(CONFIG_ROOT.$this->getConfigSet().'.ini'))
 				{
 					$this->store = parse_ini_file(CONFIG_ROOT.$this->getConfigSet().'.ini',true);
@@ -211,7 +218,7 @@ class Config
 	}
 	
 	/**
-	 * @return the $configSet
+	 * @return string $configSet
 	 */
 	public function getConfigSet()
 	{
@@ -220,6 +227,7 @@ class Config
 
 	/**
 	 * @param string $configSet
+	 * @return $this
 	 */
 	public function setConfigSet($configSet)
 	{
