@@ -151,7 +151,7 @@ class Route
 						else
 						{
 							//No Authentication, send us to the login screen.
-							Auth::get()->noAuth();
+							Auth::get()->noAuth($this);
 						}
 					}
 					else
