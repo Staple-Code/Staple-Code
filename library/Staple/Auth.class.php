@@ -283,24 +283,25 @@ class Auth
 		$class = substr($controllerClass, 0, strlen($controllerClass)-10);
 
 		//Setup the action to call
-		$action = is_null(Config::getValue('auth', 'action', false)) ? Config::getValue('auth', 'action', false) : 'index';
+		$action = (strlen(Config::getValue('auth', 'action', false)) > 0) ? Config::getValue('auth', 'action', false) : 'index';
 
 		//Check for the controller existence
-		if(class_exists($class))
+		if(class_exists($controllerClass))
 		{
 			//Check for the action existence
-			if (method_exists($class, $action))
+			if (method_exists($controllerClass, $action))
 			{
-				//Get the controller instance from the front controller
-				$controller = Main::controller($class);
+				//Create and Start the Auth Controller
+				$controller = new $controllerClass();
+				$controller->_start();
+
+				//Register the controller with the front controller
+				Main::controller($controllerClass);
 
 				//If the controller
 				//@todo Add support for AuthProviders here as well
 				if ($controller instanceof AuthController)
 				{
-					//Start the Auth Controller
-					$controller->_start();
-
 					//Set the view's controller to match the route
 					$controller->view->setController($class);
 
@@ -331,10 +332,16 @@ class Auth
 						{
 							$return->build();
 						}
+
+						//The view has been built return true
+						return true;
 					}
 					elseif ($return instanceof Json)    //Check for a Json object to be coverted and echoed.
 					{
 						echo json_encode($return);
+
+						//JSON echoed return true
+						return true;
 					}
 					elseif (is_object($return))        //Check for another object type
 					{
@@ -343,6 +350,9 @@ class Auth
 						if ($class->implementsInterface('JsonSerializable'))
 						{
 							echo json_encode($return);
+
+							//Object successfully converted to JSON
+							return true;
 						}
 						//If the object is stringable, covert to a string and output it.
 						elseif ((!is_array($return)) &&
@@ -350,16 +360,25 @@ class Auth
 								(is_object($return) && method_exists($return, '__toString'))))
 						{
 							echo (string)$return;
+
+							//Object stringified successfully
+							return true;
 						}
 						//If nothing else works, echo the object through the dump method.
 						else
 						{
 							Dev::Dump($return);
+
+							//Object was dumped to the browser
+							return true;
 						}
 					}
 					elseif (is_string($return))        //If the return value was simply a string, echo it out.
 					{
 						echo $return;
+
+						//String sent to the browser
+						return true;
 					}
 					else
 					{
@@ -367,10 +386,14 @@ class Auth
 						if ($controller->layout instanceof Layout)
 						{
 							$controller->layout->build();
-						} else
+						}
+						else
 						{
 							$controller->view->build();
 						}
+
+						//The legacy view has been built return true
+						return true;
 					}
 				}
 				else
