@@ -234,10 +234,13 @@ class Auth
 	/**
 	 * In the event that authorization fails, this method is called by the framework. noAuth() 
 	 * dispatches to the AuthController -> index action.
+	 * This method accepts an optional route parameter that can be sent forward to the auth controller
+	 * which will allow the developer to react to the route that was requested.
+	 * @param Route $attemptedRoute
 	 */
-	public function noAuth()
+	public function noAuth($attemptedRoute = NULL)
 	{
-		$this->dispatchAuthController();
+		$this->dispatchAuthController($attemptedRoute);
 	}
 	
 	/**
@@ -266,9 +269,10 @@ class Auth
 	 * 
 	 * Dispatches to the AuthController -> index action. Throws an Exception if the controller does
 	 * not extend Staple_AuthController.
+	 * @param Route $previousRoute
 	 * @throws Exception
 	 */
-	private function dispatchAuthController()
+	private function dispatchAuthController($previousRoute = NULL)
 	{
 		$conString = $this->_settings['controller'];
 		$class = substr($conString, 0, strlen($conString)-10);
@@ -293,7 +297,7 @@ class Auth
 			
 			//Call the controller action, Send the route requested to the action
 			//@todo Add option to customize the controller action
-			call_user_func_array(array($authCon,'index'), array(Main::get()->getRoute()));
+			call_user_func_array(array($authCon,'index'), array($previousRoute));
 			
 			//Grab the buffer contents from the controller and post it after the header.
 			$buffer = ob_get_contents();
