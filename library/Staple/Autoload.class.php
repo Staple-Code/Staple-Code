@@ -119,9 +119,9 @@ class Autoload
 	public function load($class_name)
 	{
 		//Check for an aliased classname
-    	if(!is_null($aliasedClass = Alias::checkAlias($class_name)))					//Look for aliased classes
+    	if(!is_null($namespacedClass = Alias::checkAlias($class_name)))					//Look for aliased classes
     	{
-    		return $this->loadLibraryClass($aliasedClass, $class_name);
+    		return $this->loadLibraryClass($namespacedClass, $class_name);
     	}
 		elseif(substr($class_name,strlen($class_name)-strlen($this->getControllerSuffix()),strlen($this->getControllerSuffix())) == $this->getControllerSuffix() 
 			&& strlen($class_name) != strlen($this->getControllerSuffix()))				//Look for Controllers
@@ -169,6 +169,7 @@ class Autoload
 	/**
 	 * Loads a class from the library folder.
 	 * @param string $class_name
+	 * @param string $alias
 	 * @throws Exception
 	 * @return boolean
 	 */
@@ -216,7 +217,8 @@ class Autoload
 			require_once $include;
 			
 			//Alias the newly loaded class
-			Alias::load((isset($alias) ? $alias : $className), false);
+			if(isset($alias))
+				Alias::load($alias, false);
 			
 			//Return true on success
 			return true;

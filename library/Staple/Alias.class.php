@@ -206,12 +206,22 @@ class Alias
 	);
 	
 	/**
-	 * Checks for an aliased class in the class map.
+	 * Checks for an aliased class in the class map. Returns the full name of the class
 	 * @param string $alias
 	 * @return string | NULL
 	 */
 	public static function checkAlias($alias)
 	{
+		//Get the namespaces
+		$namespaces = explode('\\',$alias);
+
+		//Check to see if we are in the staple namespace
+		if($namespaces[0] == __NAMESPACE__)
+		{
+			$alias = array_pop($namespaces);
+		}
+
+		//Check for a matching alias in the alias map.
 		if(isset(static::$class_map[$alias]))
 		{
 			return static::$class_map[$alias];
@@ -244,20 +254,26 @@ class Alias
 	/**
 	 * Set the class alias in the application.
 	 * @param string $alias
-	 * @param boolean $load
+	 * @param boolean $autoload
 	 * @return boolean
 	 */
 	public static function load($alias, $autoload = true)
 	{
+		//Check for the class alias
 		$class = static::checkAlias($alias);
+
+		//Check for a Staple Namespace
+		if(substr($class,0,1) == '\\')
+			$class = substr($class,1);
+
+		//Check that we are not trying to double declare a class
+		if($class == $alias)
+			return true;
+
 		if(!is_null($class))
-		{
 			return class_alias($class, $alias, $autoload);
-		}
 		else
-		{
 			return false;
-		}
 	}
 }
 

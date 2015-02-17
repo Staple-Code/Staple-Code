@@ -30,7 +30,7 @@ class Auth
 	/**
 	 * 
 	 * Holds the singleton instance for the Auth class
-	 * @var Staple_Auth
+	 * @var Auth
 	 */
 	private static $instance;
 	
@@ -39,12 +39,12 @@ class Auth
 	 * Holds the user identifier.
 	 * @var int | string
 	 */
-	private $userid = NULL;
+	private $userId = NULL;
 	
 	/**
 	 * 
 	 * Holds a reference to the AuthAdapter object.
-	 * @var Staple_AuthAdapter
+	 * @var AuthAdapter
 	 */
 	private $adapter;
 	
@@ -143,7 +143,7 @@ class Auth
 	 * 
 	 * Gets the singleton instance of the object. Checks the session to see if a current auth
 	 * object already exists. If not a new Auth object is created.
-	 * @return Staple_Auth
+	 * @return Auth
 	 */
 	public static function get()
 	{			
@@ -186,7 +186,7 @@ class Auth
 	 */
 	public function getAuthId()
 	{
-		return $this->userid;
+		return $this->userId;
 	}
 	
 	/**
@@ -216,15 +216,15 @@ class Auth
 		{
 			session_regenerate_id();
 			$this->authed = true;
-			$this->userid = $this->adapter->getUserId();
-			$this->authLevel = $this->adapter->getLevel($this->userid);
+			$this->userId = $this->adapter->getUserId();
+			$this->authLevel = $this->adapter->getLevel($this->userId);
 			$this->message = "Authentication Successful";
 			return true;
 		}
 		else
 		{
 			$this->authed = false;
-			$this->userid = null;
+			$this->userId = null;
 			$this->authLevel = 0;
 			$this->message = "Authentication Failed";
 		}
@@ -246,7 +246,7 @@ class Auth
 	 */
 	public function clearAuth()
 	{
-		$this->userid = NULL;
+		$this->userId = NULL;
 		$this->authed = false;
 		$this->authLevel = 0;
 		$this->message = 'Logged Out';
@@ -298,9 +298,6 @@ class Auth
 			//Grab the buffer contents from the controller and post it after the header.
 			$buffer = ob_get_contents();
 			ob_clean();
-			
-			//Process the header
-			Main::get()->processHeader();
 			
 			if($authCon->layout instanceof Layout)
 			{
