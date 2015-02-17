@@ -24,6 +24,7 @@
 namespace Staple;
 
 use \ReflectionMethod;
+use \ReflectionClass;
 use Staple\Exception\PageNotFoundException;
 use Staple\Exception\RoutingException;
 
@@ -48,11 +49,6 @@ class Route
 	 * @var array[mixed]
 	 */
 	protected $params = array();
-	/**
-	 * The script route string.
-	 * @var string
-	 */
-	protected $script;
 	/**
 	 * Type of route: MVC route or script route.
 	 * @var int
@@ -154,7 +150,8 @@ class Route
 						}
 						else
 						{
-							$this->auth->noAuth();
+							//No Authentication, send us to the login screen.
+							Auth::get()->noAuth();
 						}
 					}
 					else
@@ -277,7 +274,7 @@ class Route
 	}
 	
 	/**
-	 * @return the $controller
+	 * @return string $controller
 	 */
 	public function getController()
 	{
@@ -285,7 +282,7 @@ class Route
 	}
 
 	/**
-	 * @return the $action
+	 * @return string $action
 	 */
 	public function getAction()
 	{
@@ -293,7 +290,7 @@ class Route
 	}
 
 	/**
-	 * @return the $params
+	 * @return array $params
 	 */
 	public function getParams()
 	{
@@ -301,15 +298,7 @@ class Route
 	}
 
 	/**
-	 * @return the $script
-	 */
-	public function getScript()
-	{
-		return $this->script;
-	}
-
-	/**
-	 * @return the $type
+	 * @return int $type
 	 */
 	public function getType()
 	{
@@ -331,17 +320,10 @@ class Route
 		return $this;
 	}
 
-	/**
-	 * @param string $script
-	 */
-	public function setScript($script)
-	{
-		$this->script = (string)$script;
-		return $this;
-	}
 
 	/**
 	 * @param string $controller
+	 * @return $this
 	 */
 	public function setController($controller)
 	{
@@ -351,6 +333,7 @@ class Route
 
 	/**
 	 * @param string $action
+	 * @return $this
 	 */
 	public function setAction($action)
 	{
@@ -360,6 +343,7 @@ class Route
 
 	/**
 	 * @param array[mixed] $params
+	 * @return $this
 	 */
 	public function setParams(array $params)
 	{
@@ -370,6 +354,7 @@ class Route
 	/**
 	 * Process an array route
 	 * @param array $route
+	 * @throws RoutingException
 	 */
 	protected function processArrayRoute(array $route)
 	{
@@ -424,7 +409,7 @@ class Route
 	/**
 	 * Process a string-based route
 	 * @param string $route
-	 * @throws Exception
+	 * @throws RoutingException
 	 */
 	protected function processStringRoute($route)
 	{
