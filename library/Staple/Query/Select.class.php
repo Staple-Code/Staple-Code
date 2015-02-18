@@ -546,10 +546,13 @@ class Select extends Query
 			$columns = '';
 			foreach($this->columns as $name=>$col)
 			{
+				//Add commas between columns
 				if(strlen($columns) >= 1)
 				{
-					$columns .= ',';
+					$columns .= ', ';
 				}
+
+				//Wrap sub-selects in parenthesis
 				if($col instanceof Select)
 				{
 					$columns .= '('.$col.')';
@@ -558,9 +561,19 @@ class Select extends Query
 				{
 					$columns .= $col;
 				}
+
+				//Add column aliases where applicable
 				if(is_string($name))
 				{
-					$columns .= " AS `$name`";
+					//Switch the method based on database driver of the current connection
+					switch($this->getDb()->getDriver())
+					{
+						case Connection::DRIVER_MYSQL:
+							$columns .= " AS `$name`";
+							break;
+						default:
+							$columns .= " AS $name";
+					}
 				}
 			}
 		}
@@ -572,10 +585,13 @@ class Select extends Query
 			$tables = '';
 			foreach($this->table as $name=>$tbl)
 			{
+				//Add commas between tables
 				if(strlen($tables) > 1)
 				{
-					$tables .= ',';
+					$tables .= ', ';
 				}
+
+				//Wrap subqueries in parenthesis
 				if($tbl instanceof Query || $tbl instanceof Union)
 				{
 					$tables	= '('.$tbl.')';
@@ -584,9 +600,19 @@ class Select extends Query
 				{
 					$tables .= $tbl;
 				}
+
+				//Add table aliases where applicable
 				if(is_string($name))
 				{
-					$tables .= " AS `$name`";
+					//Switch the method based on database driver of the current connection
+					switch($this->getDb()->getDriver())
+					{
+						case Connection::DRIVER_MYSQL:
+							$tables .= " AS `$name`";
+							break;
+						default:
+							$tables .= " AS `$name`";
+					}
 				}
 			}
 			$stmt .= $tables;

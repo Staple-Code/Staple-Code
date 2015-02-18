@@ -49,6 +49,11 @@ class Connection extends PDO implements SplSubject
 	private static $_observers;
 
 	/**
+	 * The database driver that is being used
+	 * @var string
+	 */
+	protected $driver;
+	/**
 	 *
 	 * Hostname for the database server
 	 * @var string
@@ -73,6 +78,12 @@ class Connection extends PDO implements SplSubject
 	 * @var string
 	 */
 	protected $db;
+
+	/**
+	 * Array of connector options
+	 * @var array
+	 */
+	protected $options = array();
 
 	/**
 	 * Stores log of the previously executed queries
@@ -100,13 +111,24 @@ class Connection extends PDO implements SplSubject
 	 */
 	public function __construct($dsn, $username = NULL, $password = NULL, array $options = array())
 	{
+		self::$_observers = new SplObjectStorage();
+
 		parent::__construct($dsn,$username,$password,$options);
 
 		$this->setAttribute(PDO::ATTR_STATEMENT_CLASS,array('\Staple\Query\Statement'));
+
+		if(isset($username))
+			$this->setUsername($username);
+		if(isset($password))
+			$this->setPassword($password);
+
+		//Set the options property
+		$this->setOptions($options);
 	}
 
 	/**
 	 * @param array $config
+	 * @return static
 	 */
 	protected static function createFromConfig(array $config)
 	{
@@ -139,7 +161,16 @@ class Connection extends PDO implements SplSubject
 		}
 
 		//Call the constructor.
-		return new static($dsn, $config['username'], $config['password'], $options);
+		$inst = new static($dsn, $config['username'], $config['password'], $options);
+
+		//Set the driver to use
+		isset($config['driver']) ? $inst->setDriver($config['driver']) : $inst->setDriver(self::DRIVER_MYSQL);
+
+		//Set the DB Name property
+		if(isset($config['db']))
+			$inst->setDb($config['db']);
+
+		return $inst;
 	}
 
 	protected static function buildDsnFromConfig(array $config)
@@ -178,7 +209,7 @@ class Connection extends PDO implements SplSubject
 					$dsn .= $config['driver'] . ':';
 					break;
 				default:
-					$dsn .= self::DRIVER_SQLSRV . ':';
+					$dsn .= self::DRIVER_MYSQL . ':';
 					$dsn .= 'host=' . $config['host'] . ';';
 					$dsn .= 'dbname=' . $config['db'];
 			}
@@ -231,6 +262,24 @@ class Connection extends PDO implements SplSubject
 	}
 
 	/*-------------------------------------------------Getters and Setters-------------------------------------------------*/
+
+	/**
+	 * @return string
+	 */
+	public function getDriver()
+	{
+		return $this->driver;
+	}
+
+	/**
+	 * @param string $driver
+	 * @return $this
+	 */
+	public function setDriver($driver)
+	{
+		$this->driver = $driver;
+		return $this;
+	}
 
 	/**
 	 * @return string
@@ -293,6 +342,24 @@ class Connection extends PDO implements SplSubject
 	public function setDb($db)
 	{
 		$this->db = $db;
+		return $this;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getOptions()
+	{
+		return $this->options;
+	}
+
+	/**
+	 * @param array $options
+	 * @return $this
+	 */
+	public function setOptions(array $options)
+	{
+		$this->options = $options;
 		return $this;
 	}
 
