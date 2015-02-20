@@ -30,7 +30,7 @@ class CheckboxElement extends FieldElement
 	/**
 	 * 
 	 * Override the default field value
-	 * @var unknown_type
+	 * @var int
 	 */
 	protected $value = 1;
 	
@@ -60,7 +60,7 @@ class CheckboxElement extends FieldElement
 	/**
 	 * Sets the starting value for the checkbox
 	 * @param boolean $val
-	 * @return Staple_Form_CheckboxElement
+	 * @return CheckboxElement
 	 */
 	public function setValue($val)
 	{
@@ -88,7 +88,7 @@ class CheckboxElement extends FieldElement
 		{
 			$checked = ' checked';
 		}
-		return '	<input type="checkbox" id="'.$this->escape($this->id).'" name="'.$this->escape($this->name).'" value="'.$this->escape($this->value).'"'.$checked.$this->getAttribString().'>';
+		return '	<input type="checkbox" id="'.$this->escape($this->id).'" name="'.$this->escape($this->name).'" value="'.$this->escape($this->value).'"'.$checked.$this->getAttribString('input').'>';
 	}
 
 	/* (non-PHPdoc)
@@ -96,7 +96,7 @@ class CheckboxElement extends FieldElement
 	 */
 	public function label()
 	{
-		return '	<label for="'.$this->escape($this->id).'"'.$this->getClassString().'>'.$this->label.'</label>';
+		return '	<label for="'.$this->escape($this->id).'"'.$this->getClassString('label').'>'.$this->label.'</label>';
 	}
 
 	public function build($fieldView = NULL)
@@ -114,7 +114,7 @@ class CheckboxElement extends FieldElement
 		{
 			$this->addClass('form_element');
 			$this->addClass('element_checkbox');
-			$classes = $this->getClassString();
+			$classes = $this->getClassString('div');
 			$buf .= "<div$classes id=\"".$this->escape($this->id)."_element\">\n";
 			$buf .= $this->field();
 			$buf .= $this->label();

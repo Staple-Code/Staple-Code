@@ -91,7 +91,7 @@ class SelectElement extends FieldElement
 	/**
 	 * Sets the value for the select box
 	 * @param boolean $val
-	 * @return Staple_Form_CheckboxElement
+	 * @return $this
 	 */
 	public function setValue($val)
 	{
@@ -231,7 +231,7 @@ class SelectElement extends FieldElement
 		{
 			$buf .= ' multiple="multiple"';
 		}
-		$buf .= $this->getAttribString().">\n";
+		$buf .= $this->getAttribString('select').">\n";
 		foreach($this->options as $value=>$label)
 		{
 			$select = '';
@@ -250,7 +250,7 @@ class SelectElement extends FieldElement
 	 */
 	public function label()
 	{
-		return '	<label for="'.$this->escape($this->id).'"'.$this->getClassString().'>'.$this->label."</label>\n";
+		return '	<label for="'.$this->escape($this->id).'"'.$this->getClassString('label').'>'.$this->label."</label>\n";
 	}
 
 	/**
@@ -273,7 +273,7 @@ class SelectElement extends FieldElement
 		{
 			$this->addClass('form_element');
 			$this->addClass('element_select');
-			$classes = $this->getClassString();
+			$classes = $this->getClassString('div');
 			$buf .= "<div$classes id=\"".$this->escape($this->id)."_element\">\n";
 			$buf .= $this->label();
 			$buf .= $this->field();

@@ -24,7 +24,7 @@ class CheckboxGroupElement extends FieldElement
 {
 	/**
 	 * An array that holds the Checkbox elements.
-	 * @var array[Staple_Form_CheckboxElement]
+	 * @var CheckboxGroupElement[]
 	 */
 	protected $boxes = array();
 	
@@ -102,7 +102,7 @@ class CheckboxGroupElement extends FieldElement
 	
 	/**
 	 * This function requires an associative array composed of the form field names, followed by their values.
-	 * @return Staple_Form_CheckboxGroup
+	 * @return $this
 	 */
 	public function setValue(array $inserts)
 	{
@@ -118,20 +118,20 @@ class CheckboxGroupElement extends FieldElement
 	
 	/**
 	 * Comparison function for sorting by names
-	 * @param Staple_Form_CheckboxElement $a
-	 * @param Staple_Form_CheckboxElement $b
+	 * @param $this $a
+	 * @param $this $b
 	 */
-	private function sortCmpName(Staple_Form_CheckboxElement $a, Staple_Form_CheckboxElement $b)
+	private function sortCmpName(CheckboxElement $a, CheckboxElement $b)
 	{
 		return strcmp($a->getName(), $b->getName());
 	}
 	
 	/**
 	 * Comparison function for sorting by labels
-	 * @param Staple_Form_CheckboxElement $a
-	 * @param Staple_Form_CheckboxElement $b
+	 * @param $this $a
+	 * @param $this $b
 	 */
-	private function sortCmpLabel(Staple_Form_CheckboxElement $a, Staple_Form_CheckboxElement $b)
+	private function sortCmpLabel(CheckboxElement $a, CheckboxElement $b)
 	{
 		return strcmp($a->getLabel(), $b->getLabel());
 	}
@@ -159,7 +159,7 @@ class CheckboxGroupElement extends FieldElement
 	 */
 	public function label()
 	{
-		return "<label".$this->getClassString().">".$this->escape($this->getLabel())."</label>";
+		return "<label".$this->getClassString('label').">".$this->escape($this->getLabel())."</label>";
 	}
 
 	/**
@@ -181,7 +181,7 @@ class CheckboxGroupElement extends FieldElement
 		{
 			$this->addClass('form_element');
 			$this->addClass('element_checkboxgroup');
-			$classes = $this->getClassString();
+			$classes = $this->getClassString('div');
 			$buf .= "<div$classes id=\"".$this->escape($this->id)."_element\">\n";
 			if(isset($this->label))
 			{
