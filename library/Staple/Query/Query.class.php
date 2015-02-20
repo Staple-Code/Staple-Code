@@ -31,6 +31,8 @@ use \Staple\DB;
 use \mysqli;
 use \DateTime;
 use Staple\Pager;
+use \PDO;
+use \PDOStatement;
 
 abstract class Query
 {
@@ -43,7 +45,7 @@ abstract class Query
 	
 	/**
 	 * The database object. A database object is required to properly escape input.
-	 * @var mysqli
+	 * @var PDO
 	 */
 	protected $db;
 	
@@ -54,23 +56,23 @@ abstract class Query
 	protected $where = array();
 	
 	
-	public function __construct($table = NULL, mysqli $db = NULL)
+	public function __construct($table = NULL, PDO $db = NULL)
 	{
-		if($db instanceof mysqli)
+		if($db instanceof PDO)
 		{
 			$this->setDb($db);
 		}
 		else
 		{
 			try {
-				$this->setDb(DB::get());
+				$this->setDb(Connection::get());
 			}
 			catch (Exception $e)
 			{
-				$this->setDb(new mysqli());
+				throw new Exception('Unable to find a database connection.', Error::DB_ERROR, $e);
 			}
 		}
-		if(!($this->db instanceof mysqli))
+		if(!($this->db instanceof PDO))
 		{
 			throw new Exception('Unable to create database object', Error::DB_ERROR);
 		}
@@ -91,7 +93,7 @@ abstract class Query
 	}
 	
 	/**
-	 * @return the $table
+	 * @return Query|string $table
 	 */
 	public function getTable()
 	{
@@ -99,7 +101,7 @@ abstract class Query
 	}
 
 	/**
-	 * @return the $db
+	 * @return PDO $db
 	 */
 	public function getDb()
 	{
@@ -107,8 +109,9 @@ abstract class Query
 	}
 
 	/**
-	 * @param mixed $table
+	 * @param Query|string $table
 	 * @param string $alias
+	 * @return $this
 	 */
 	public function setTable($table,$alias = NULL)
 	{
@@ -124,23 +127,32 @@ abstract class Query
 	}
 
 	/**
-	 * @param mysqli $db
+	 * @param PDO $db
+	 * @return $this
 	 */
-	public function setDb(mysqli $db)
+	public function setDb(PDO $db)
 	{
 		$this->db = $db;
 		return $this;
 	}
 
+	/**
+	 * @return string
+	 */
 	abstract function build();
 	
 	/**
 	 * Executes the query and returns the result.
-	 * @return mysqli_result | bool
+	 * @param PDO $connection - the database connection to execute the quote upon.
+	 * @return PDOStatement | bool
+	 * @throws Exception
 	 */
-	public function execute()
+	public function execute(PDO $connection = NULL)
 	{
-		if($this->db instanceof mysqli)
+		if(isset($connection))
+			$this->setDb($connection);
+
+		if($this->db instanceof PDO)
 		{
 			return $this->db->query($this->build());
 		}
@@ -148,21 +160,39 @@ abstract class Query
 		{
 			try 
 			{
-				$this->db = DB::get();
+				$this->db = Connection::get();
 			}
 			catch (Exception $e)
 			{
 				//@todo try for a default connection if no staple connection
 				throw new Exception('No Database Connection', Error::DB_ERROR);
 			}
-			if($this->db instanceof mysqli)
+			if($this->db instanceof PDO)
 			{
 				return $this->db->query($this->build());
 			}
 		}
 		return false;
 	}
-	
+
+	/**
+	 * This method gets either the default framework connection or a predefined named connection.
+	 * @param string $namedConnection
+	 * @return PDO
+	 */
+	public static function connection($namedConnection = NULL)
+	{
+		if($namedConnection == NULL)
+		{
+			$db = Connection::getInstance();
+		}
+		else
+		{
+			$db = Connection::getNamedConnection($namedConnection);
+		}
+
+		return $db;
+	}
 	
 	/*-----------------------------------------------WHERE CLAUSES-----------------------------------------------*/
 	
@@ -186,7 +216,8 @@ abstract class Query
 	
 	/**
 	 * An open ended where statement
-	 * @param string | Staple_Query_Select $statement
+	 * @param string | Select $statement
+	 * @return $this
 	 */
 	public function whereStatement($statement)
 	{
@@ -199,6 +230,7 @@ abstract class Query
 	 * @param string $column
 	 * @param mixed $value
 	 * @param boolean $columnJoin
+	 * @return $this
 	 */
 	public function whereEqual($column, $value, $columnJoin = NULL)
 	{
@@ -230,7 +262,8 @@ abstract class Query
 	/**
 	 * SQL IN Clause
 	 * @param string $column
-	 * @param array | Staple_Query_Select $values
+	 * @param array | Select $values
+	 * @return $this
 	 */
 	public function whereIn($column, $values)
 	{
@@ -243,6 +276,7 @@ abstract class Query
 	 * @param string $column
 	 * @param mixed $start
 	 * @param mixed $end
+	 * @return $this
 	 */
 	public function whereBetween($column, $start, $end)
 	{
@@ -320,7 +354,7 @@ abstract class Query
 	 * @param Pager | int $limit
 	 * @return Select
 	 */
-	public static function select($table = NULL, array $columns = NULL, $db = NULL, $order = NULL, $limit = NULL)
+	public static function select($table = NULL, array $columns = NULL, PDO $db = NULL, $order = NULL, $limit = NULL)
 	{
 		return new Select($table, $columns, $db, $order, $limit);
 	}

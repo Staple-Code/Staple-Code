@@ -1,8 +1,7 @@
 <?php
 /**
- * A trait to implement the singleton pattern.
- * This does not currently restrict creation of the object through the constructor.
- * 
+ * An extension of the PDOStatement class.
+ *
  * @author Ironpilot
  * @copyright Copyright (c) 2011, STAPLE CODE
  *
@@ -21,31 +20,24 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Staple\Traits;
 
-use \Exception;
+namespace Staple\Query;
 
-trait Singleton
+use \PDOStatement, \PDO;
+
+class Statement extends PDOStatement
 {
-	private static $inst;
-	
-	public static function getInstance()
-	{
-		if (!isset(static::$inst)) 
-		{
-			static::$inst = new static();
-		}
-		return static::$inst;
-	}
-	
 	/**
-	 * Disallow cloning on singleton objects
-	 * @throws Exception
+	 * Mysqli style associative array fetch style
+	 * @return mixed
 	 */
-	public function __clone()
+	public function fetch_assoc()
 	{
-		throw new Exception('Clone is not allowed.');
+		return $this->fetch(PDO::FETCH_ASSOC);
+	}
+
+	public function fetch_array()
+	{
+		return $this->fetch(PDO::FETCH_BOTH);
 	}
 }
-
-?>

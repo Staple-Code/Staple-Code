@@ -304,6 +304,8 @@ class Autoload
 	 * @param string $controller
 	 * @param string $view
 	 * @param bool $required
+	 * @throws Exception
+	 * @return string | bool
 	 */
 	public function loadView($controller,$view,$required = false)
 	{
@@ -325,7 +327,7 @@ class Autoload
 			throw new Exception('Failed to load the view.', Error::LOADER_ERROR);
 		}
 
-		return true;
+		return false;
 	}
 	
 	/**

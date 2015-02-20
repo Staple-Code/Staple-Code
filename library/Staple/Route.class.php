@@ -174,9 +174,7 @@ class Route
 	 * Function executes a controller action passing parameters using call_user_func_array().
 	 * It also builds the view for the route.
 	 *
-	 * @param string $class
-	 * @param string $method
-	 * @param array $params
+	 * @throws RoutingException
 	 */
 	protected function dispatchController()
 	{
@@ -197,12 +195,18 @@ class Route
 			if($return instanceof View)		//Check for a returned View object
 			{
 				//If the view does not have a controller name set, set it to the currently executing controller.
-				if($return->hasController() == false)
+				if(!$return->hasController())
 				{
 					$loader = Main::get()->getLoader();
 					$conString = get_class($controller);
 
 					$return->setController(substr($conString,0,strlen($conString)-strlen($loader::CONTROLLER_SUFFIX)));
+				}
+
+				//If the view doesn't have a view set, use the route's action.
+				if(!$return->hasView())
+				{
+					$return->setView($this->getAction());
 				}
 
 				//Check for a controller layout and build it.
@@ -247,8 +251,27 @@ class Route
 			else
 			{
 				//Fall back to previous functionality by rendering views and layouts.
+
+				//If the view does not have a controller name set, set it to the currently executing controller.
+				if(!$controller->view->hasController())
+				{
+					$loader = Main::get()->getLoader();
+					$conString = get_class($controller);
+
+					$controller->view->setController(substr($conString,0,strlen($conString)-strlen($loader::CONTROLLER_SUFFIX)));
+				}
+
+				//If the view doesn't have a view set, use the route's action.
+				if(!$controller->view->hasView())
+				{
+					$controller->view->setView($this->getAction());
+				}
+
+				//Check for a layout
 				if($controller->layout instanceof Layout)
 				{
+					//Align the controller and layout views. They should already be the same anyway.
+					$controller->layout->setView($controller->view);
 					$controller->layout->build();
 				}
 				else
@@ -307,6 +330,7 @@ class Route
 
 	/**
 	 * @param number $type
+	 * @return $this
 	 */
 	public function setType($type)
 	{
