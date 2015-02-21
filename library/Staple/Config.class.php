@@ -28,7 +28,7 @@ use \Staple\Exception\ConfigurationException;
 /**
 * Added to include Singleton Trait once so Config class will load with out autoloader being started.
 */
-require_once STAPLE_ROOT.'Traits\Singleton.trait.php';
+require_once STAPLE_ROOT.'Traits'.DIRECTORY_SEPARATOR.'Singleton.trait.php';
 
 class Config
 {
