@@ -295,6 +295,15 @@ class Alias
 		else
 			return false;
 	}
+
+	/**
+	 * return the entire class map array
+	 * @return array
+	 */
+	public function getClassMap()
+	{
+		return self::$class_map;
+	}
 }
 
 ?>
