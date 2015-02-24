@@ -192,6 +192,22 @@ class View
 		$this->_store[$key] = $value;
 		return $this;
 	}
+
+	/**
+	 * Add data to the view as an associative array
+	 * @param array $data
+	 * @return bool
+	 */
+	public function data(array $data)
+	{
+		foreach($data as $key=>$value)
+		{
+			if(is_int($key)) throw new Exception('Array keys must be associative.');
+			$this->addData($key,$value);
+		}
+
+		return true;
+	}
 	
 	/**
 	 * 
