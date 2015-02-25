@@ -291,7 +291,8 @@ class Alias
 			return true;
 
 		if(!is_null($class))
-			return class_alias($class, $alias, $autoload);
+			if(!class_exists($alias))
+				return class_alias($class, $alias, $autoload);
 		else
 			return false;
 	}

@@ -11,6 +11,9 @@ defined('SITE_ROOT')
 defined('PROGRAM_ROOT')
 || define('PROGRAM_ROOT', FOLDER_ROOT . '/application/');
 
+defined('TEST_ROOT')
+|| define('TEST_ROOT', FOLDER_ROOT . '/tests/');
+
 defined('ELEMENTS_ROOT')
 || define('ELEMENTS_ROOT', FOLDER_ROOT . '/elements/');
 
@@ -32,7 +35,7 @@ defined('CONTROLLER_ROOT')
 || define('CONTROLLER_ROOT', PROGRAM_ROOT . 'controllers/');
 
 defined('VIEW_ROOT')
-|| define('VIEW_ROOT', PROGRAM_ROOT . 'views/');
+|| define('VIEW_ROOT', TEST_ROOT . 'views/');
 
 defined('SCRIPT_ROOT')
 || define('SCRIPT_ROOT',PROGRAM_ROOT . 'scripts/');
