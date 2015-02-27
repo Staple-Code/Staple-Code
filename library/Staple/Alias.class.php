@@ -223,6 +223,9 @@ class Alias
 		'Helpers'						=>	'\\Staple\\Traits\\Helpers',
 		'Singleton'						=>	'\\Staple\\Traits\\Singleton',
 
+		//Form Element View Adapters
+		'FoundationViewAdapter'			=> '\\Staple\\Form\\ViewAdapters\\FoundationViewAdapter'
+
 	);
 	
 	/**
