@@ -22,10 +22,10 @@
  *
  */
 
-namespace Staple\Form\View;
+namespace Staple\Form\ViewAdapters;
 
 
-class Foundation extends ElementViewAdapter
+class FoundationViewAdapter extends ElementViewAdapter
 {
 	public function textElement()
 	{
