@@ -291,9 +291,19 @@ class Alias
 			return true;
 
 		if(!is_null($class))
-			return class_alias($class, $alias, $autoload);
+			if(!class_exists($alias))
+				return class_alias($class, $alias, $autoload);
 		else
 			return false;
+	}
+
+	/**
+	 * return the entire class map array
+	 * @return array
+	 */
+	public function getClassMap()
+	{
+		return self::$class_map;
 	}
 }
 
