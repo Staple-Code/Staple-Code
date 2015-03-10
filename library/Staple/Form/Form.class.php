@@ -136,7 +136,7 @@ class Form
 	 * @param string $name
 	 * @param string $action
 	 */
-	final public function __construct($name = NULL, $action = NULL)
+	public function __construct($name = NULL, $action = NULL)
 	{
 		$this->_start();
 		if(isset($name))
@@ -150,21 +150,15 @@ class Form
 		if(isset($this->name))
 		{
 			//check that the form was submitted.
-			if(array_key_exists('Staple', $_SESSION))
+			if(isset($_SESSION['Staple']['Forms'][$this->name]))
 			{
-				if(array_key_exists('Forms', $_SESSION['Staple']))
+				if(array_key_exists('ident', $_SESSION['Staple']['Forms'][$this->name]))
 				{
-					if(array_key_exists($this->name, $_SESSION['Staple']['Forms']))
+					if(array_key_exists('ident', $_REQUEST))
 					{
-						if(array_key_exists('ident', $_SESSION['Staple']['Forms'][$this->name]))
+						if($_SESSION['Staple']['Forms'][$this->name]['ident'] == $_REQUEST['ident'])
 						{
-							if(array_key_exists('ident', $_REQUEST))
-							{
-								if($_SESSION['Staple']['Forms'][$this->name]['ident'] == $_REQUEST['ident'])
-								{
-									$this->submitted = true;
-								}
-							}
+							$this->submitted = true;
 						}
 					}
 				}
@@ -276,7 +270,7 @@ class Form
 	 * @param string $method
 	 * @return Staple_Form
 	 */
-	public static function Create($name, $action=NULL, $method="POST")
+	public static function create($name, $action=NULL, $method="POST")
 	{
 		$inst = new self($name,$action);
 		$inst->setMethod($method);
