@@ -8,8 +8,8 @@ defined('LIBRARY_ROOT')
 defined('SITE_ROOT')
 || define('SITE_ROOT', FOLDER_ROOT . '/public/');
 
-defined('PROGRAM_ROOT')
-|| define('PROGRAM_ROOT', FOLDER_ROOT . '/application/');
+defined('APPLICATION_ROOT')
+|| define('APPLICATION_ROOT', FOLDER_ROOT . '/application/');
 
 defined('TEST_ROOT')
 || define('TEST_ROOT', FOLDER_ROOT . '/tests/');
@@ -20,25 +20,25 @@ defined('MODULES_ROOT')
 
 //Setup STAPLE Constants
 defined('CONFIG_ROOT')
-|| define('CONFIG_ROOT', PROGRAM_ROOT . 'config/');
+|| define('CONFIG_ROOT', APPLICATION_ROOT . 'config/');
 
 defined('LAYOUT_ROOT')
-|| define('LAYOUT_ROOT', PROGRAM_ROOT . 'layouts/');
+|| define('LAYOUT_ROOT', APPLICATION_ROOT . 'layouts/');
 
 defined('FORMS_ROOT')
-|| define('FORMS_ROOT', PROGRAM_ROOT . 'forms/');
+|| define('FORMS_ROOT', APPLICATION_ROOT . 'forms/');
 
 defined('MODEL_ROOT')
-|| define('MODEL_ROOT', PROGRAM_ROOT . 'models/');
+|| define('MODEL_ROOT', APPLICATION_ROOT . 'models/');
 
 defined('CONTROLLER_ROOT')
-|| define('CONTROLLER_ROOT', PROGRAM_ROOT . 'controllers/');
+|| define('CONTROLLER_ROOT', APPLICATION_ROOT . 'controllers/');
 
 defined('VIEW_ROOT')
 || define('VIEW_ROOT', TEST_ROOT . 'views/');
 
 defined('SCRIPT_ROOT')
-|| define('SCRIPT_ROOT',PROGRAM_ROOT . 'scripts/');
+|| define('SCRIPT_ROOT',APPLICATION_ROOT . 'scripts/');
 
 defined('STAPLE_ROOT')
 || define('STAPLE_ROOT',LIBRARY_ROOT . 'Staple/');

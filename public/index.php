@@ -8,8 +8,8 @@ defined('LIBRARY_ROOT')
 defined('SITE_ROOT')
     || define('SITE_ROOT', FOLDER_ROOT . '/public/');
 
-defined('PROGRAM_ROOT')
-    || define('PROGRAM_ROOT', FOLDER_ROOT . '/application/');
+defined('APPLICATION_ROOT')
+    || define('APPLICATION_ROOT', FOLDER_ROOT . '/application/');
 
 defined('MODULES_ROOT')
 	|| define('MODULES_ROOT', FOLDER_ROOT . '/modules/');

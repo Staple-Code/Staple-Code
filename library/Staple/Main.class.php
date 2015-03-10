@@ -25,8 +25,6 @@
  */
 namespace Staple;
 
-use \Exception, \ReflectionMethod;
-
 class Main
 {
 	/**
@@ -58,13 +56,13 @@ class Main
 	 * Instance of the error handler object
 	 * @var Error
 	 */
-	protected $errorHander;
+	protected $errorHandler;
 	
 	/**
 	 * Private constructor insures that the application is instantiated as a Singleton.
 	 * Application constructor. This function creates a new Staple application. It defines the constants: CONFIG_ROOT, LAYOUT_ROOT,
 	 * FORMS_ROOT, MODEL_ROOT, CONTROLLER_ROOT, VIEW_ROOT, and SCRIPT_ROOT. All of these constants exist as folders inside of the
-	 * PROGRAM_ROOT directory. The constructor loads and checks configuration, sets up the autoloader, sets custom error handlers
+	 * APPLICATION_ROOT directory. The constructor loads and checks configuration, sets up the autoloader, sets custom error handlers
 	 * and begins a session.
 	 */
 	private function __construct()
@@ -79,34 +77,36 @@ class Main
 		defined('SITE_ROOT')
 			|| define('SITE_ROOT', FOLDER_ROOT . '/public/');
 		
-		defined('PROGRAM_ROOT')
-			|| define('PROGRAM_ROOT', FOLDER_ROOT . '/application/');
+		defined('APPLICATION_ROOT')
+			|| define('APPLICATION_ROOT', FOLDER_ROOT . '/application/');
 		
 		defined('MODULES_ROOT')
 			|| define('MODULES_ROOT', FOLDER_ROOT . '/modules/');
 		
-		
 		//Setup STAPLE Constants
 		defined('CONFIG_ROOT')
-	    	|| define('CONFIG_ROOT', PROGRAM_ROOT . 'config/');
+	    	|| define('CONFIG_ROOT', APPLICATION_ROOT . 'config/');
 
 	    defined('LAYOUT_ROOT')
-			|| define('LAYOUT_ROOT', PROGRAM_ROOT . 'layouts/');
+			|| define('LAYOUT_ROOT', APPLICATION_ROOT . 'layouts/');
 		
 		defined('FORMS_ROOT')
-			|| define('FORMS_ROOT', PROGRAM_ROOT . 'forms/');
-			
+			|| define('FORMS_ROOT', APPLICATION_ROOT . 'forms/');
+
 		defined('MODEL_ROOT')
-			|| define('MODEL_ROOT', PROGRAM_ROOT . 'models/');
-			
+			|| define('MODEL_ROOT', APPLICATION_ROOT . 'models/');
+
 		defined('CONTROLLER_ROOT')
-			|| define('CONTROLLER_ROOT', PROGRAM_ROOT . 'controllers/');
-			
+			|| define('CONTROLLER_ROOT', APPLICATION_ROOT . 'controllers/');
+
+		defined('STATIC_ROOT')
+			|| define('STATIC_ROOT', APPLICATION_ROOT . 'static/');
+
 		defined('VIEW_ROOT')
-			|| define('VIEW_ROOT', PROGRAM_ROOT . 'views/');
-			
+			|| define('VIEW_ROOT', APPLICATION_ROOT . 'views/');
+
 		defined('SCRIPT_ROOT')
-			|| define('SCRIPT_ROOT',PROGRAM_ROOT . 'scripts/');
+			|| define('SCRIPT_ROOT',APPLICATION_ROOT . 'scripts/');
 		
 		defined('STAPLE_ROOT')
 			|| define('STAPLE_ROOT',LIBRARY_ROOT . 'Staple/');
@@ -152,7 +152,7 @@ class Main
 		spl_autoload_register(array($this->loader, 'load'));
 			
 		// Setup Error Handlers
-		$this->setErrorHander(new Error());
+		$this->setErrorHandler(new Error());
 		
 		//Create a session
 		session_start();
@@ -166,24 +166,24 @@ class Main
 	
 	/**
 	 * Get the error handler for the application.
-	 * @return Error $errorHander
+	 * @return Error $errorHandler
 	 */
-	public function getErrorHander()
+	public function getErrorHandler()
 	{
-		return $this->errorHander;
+		return $this->errorHandler;
 	}
 	
 	/**
 	 *
-	 * @param Error $errorHander        	
+	 * @param Error $errorHandler
 	 */
-	public function setErrorHander(Error $errorHander)
+	public function setErrorHandler(Error $errorHandler)
 	{
-		$this->errorHander = $errorHander;
+		$this->errorHandler = $errorHandler;
 		
 		//Set the error handlers
-		set_error_handler(array($this->errorHander,'handleError'), E_USER_ERROR | E_USER_WARNING | E_WARNING);
-		set_exception_handler(array($this->errorHander,'handleException'));
+		set_error_handler(array($this->errorHandler,'handleError'), E_USER_ERROR | E_USER_WARNING | E_WARNING);
+		set_exception_handler(array($this->errorHandler,'handleException'));
 		
 		return $this;
 	}
@@ -229,6 +229,8 @@ class Main
 		{
 			return Main::get()->getController($class);
 		}
+
+		return NULL;
 	}
 	
 	/**
@@ -269,7 +271,7 @@ class Main
 	 * Returns a reference to a controller object
 	 * 
 	 * @param string $class
-	 * @return Staple_Controller | NULL
+	 * @return Controller | NULL
 	 */
 	public function getController($class)
 	{
@@ -288,7 +290,7 @@ class Main
 	public function run($route = NULL)
 	{
 		//Include the boot file.
-		include_once PROGRAM_ROOT.'boot.php';
+		include_once APPLICATION_ROOT.'boot.php';
 		
 		//Load the controllers from the session.
 		if(isset($_SESSION['Staple']['Controllers']))
@@ -328,6 +330,8 @@ class Main
 		{
 			return $this->route->execute();
 		}
+
+		return false;
 	}
 	
 	/**
@@ -346,6 +350,7 @@ class Main
 	/**
 	 * Registers a controller that was instantiated outside of the Staple_Main class.
 	 * @param Controller $controller
+	 * @return Controller
 	 */
 	public function registerController(Controller $controller)
 	{
@@ -353,8 +358,8 @@ class Main
 		if(!array_key_exists($class_name, $this->controllers))
 		{
 			$this->controllers[$class_name] = $controller;
-			return $controller;
 		}
+		return $controller;
 	}
 	/**
 	 * @return Autoload $loader
