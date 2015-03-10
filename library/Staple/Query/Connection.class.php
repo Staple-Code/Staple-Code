@@ -194,7 +194,7 @@ class Connection extends PDO implements SplSubject
 					$dsn .= 'host=' . $config['host'] . ';';
 					$dsn .= 'dbname=' . $config['db'];
 					break;
-				case self::DRIVER_SQLITE :
+				case self::DRIVER_SQLITE:
 				case self::DRIVER_PGSQL:
 				case self::DRIVER_MSSQL:
 				case self::DRIVER_DBLIB:
