@@ -24,6 +24,7 @@ namespace Staple;
 
 use \Exception;
 use \Staple\Exception\ConfigurationException;
+use \stdClass;
 
 /**
 * Added to include Singleton Trait once so Config class will load with out autoloader being started.
@@ -96,10 +97,13 @@ class Config
 	
 	/**
 	 * Get a config set by header.
+	 * @todo this doesn't really work as a static method and needs to be refactored.
 	 * @param string $name
+	 * @param bool $getAsObject
+	 * @throws ConfigurationException
 	 * @return array
 	 */
-	public static function get($name)
+	public static function get($name, $getAsObject = false)
 	{
 		//Get the config instance
 		$inst = static::getInstance();
@@ -113,7 +117,19 @@ class Config
 		//Look for the requested key in the data store.
 		if(array_key_exists($name, $inst->store))
 		{
-			return $inst->store[$name];
+			if($getAsObject === true)
+			{
+				$object = new stdClass();
+				foreach ($inst->store[$name] as $key => $value)
+				{
+					$object->$key = $value;
+				}
+				return $object;
+			}
+			else
+			{
+				return $inst->store[$name];
+			}
 		}
 		else
 		{
