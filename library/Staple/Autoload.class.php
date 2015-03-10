@@ -150,9 +150,9 @@ class Autoload
 			{
 				return $this->loadLibraryClass($class_name);
 			}
-			elseif(file_exists(ELEMENTS_ROOT.$class_name.static::PHP_FILE_EXTENSION))
+			elseif(file_exists(MODULES_ROOT.$class_name.static::PHP_FILE_EXTENSION))
 			{
-				require_once ELEMENTS_ROOT.$class_name.static::PHP_FILE_EXTENSION;
+				require_once MODULES_ROOT.$class_name.static::PHP_FILE_EXTENSION;
 			}
 			else
 			{

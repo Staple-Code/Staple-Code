@@ -14,8 +14,8 @@ defined('PROGRAM_ROOT')
 defined('TEST_ROOT')
 || define('TEST_ROOT', FOLDER_ROOT . '/tests/');
 
-defined('ELEMENTS_ROOT')
-|| define('ELEMENTS_ROOT', FOLDER_ROOT . '/elements/');
+defined('MODULES_ROOT')
+|| define('MODULES_ROOT', FOLDER_ROOT . '/modules/');
 
 
 //Setup STAPLE Constants

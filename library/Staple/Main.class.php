@@ -82,8 +82,8 @@ class Main
 		defined('PROGRAM_ROOT')
 			|| define('PROGRAM_ROOT', FOLDER_ROOT . '/application/');
 		
-		defined('ELEMENTS_ROOT')
-			|| define('ELEMENTS_ROOT', FOLDER_ROOT . '/elements/');
+		defined('MODULES_ROOT')
+			|| define('MODULES_ROOT', FOLDER_ROOT . '/modules/');
 		
 		
 		//Setup STAPLE Constants
