@@ -26,19 +26,25 @@ namespace Staple\Tests;
 
 class EncryptTest extends \PHPUnit_Framework_TestCase
 {
-	//@todo refactor this test
-	public function testEncrypt()
-	{
-		$this->markTestIncomplete();
+	private $key = 'kASMCL^TRB8A<UQwOcgsHDKhgUs[ZtMe';
+	private $salt = 'askdfRIUF';
+	private $pepper = 'orpDjk34';
 
-		$key = 'kASMCL^TRB8A<UQwOcgsHDKhgUs[ZtMe';
-		$salt = 'askdfRIUF';
-		$pepper = 'orpDjk34';
+	public function testAESEncrypt()
+	{
 		$string = 'Blah encrypted string.';
-		echo "<p>String to Encrypt: $string</p>";
-		$encryped = Staple_Encrypt::AES_encrypt($string, $key, $salt, $pepper);
-		echo "<p>Encrypted String: ".htmlentities($encryped)."</p>";
-		$decrypted = Staple_Encrypt::AES_decrypt($encryped, $key, $salt, $pepper);
-		echo "<p>Decrypted String: ".htmlentities($decrypted)."</p>";
+
+		$encrypted = Encrypt::AES_encrypt($string, $this->key, $this->salt, $this->pepper);
+
+		$this->assertEquals('5be2da124b05f90210a061b7553b72c7be235ec7c6aace4c739aa0f8cb602b327d8c0104c0017b37450b8032a47da639',bin2hex($encrypted));
+	}
+
+	public function testAESDecrypt()
+	{
+		$string = '5be2da124b05f90210a061b7553b72c7be235ec7c6aace4c739aa0f8cb602b327d8c0104c0017b37450b8032a47da639';
+
+		$decrypted = Encrypt::AES_decrypt(hex2bin($string), $this->key, $this->salt, $this->pepper);
+
+		$this->assertEquals('Blah encrypted string.',$decrypted);
 	}
 }
