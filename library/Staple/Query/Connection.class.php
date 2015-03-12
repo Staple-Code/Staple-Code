@@ -127,6 +127,33 @@ class Connection extends PDO implements SplSubject
 	}
 
 	/**
+	 * Convert old mysqli properties to PDO method calls.
+	 * @deprecated
+	 * @param $name
+	 * @return null|string
+	 */
+	public function __get($name)
+	{
+		switch($name)
+		{
+			case 'insert_id':
+				return $this->lastInsertId();
+				break;
+			case 'last_query':
+				return $this->getLastQuery();
+				break;
+			case 'error':
+				return $this->errorInfo();
+				break;
+			case 'errno':
+				return $this->errorCode();
+				break;
+			default:
+				return NULL;
+		}
+	}
+
+	/**
 	 * @param array $config
 	 * @return static
 	 */

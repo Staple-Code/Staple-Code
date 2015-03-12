@@ -27,15 +27,36 @@ use \PDOStatement, \PDO;
 
 class Statement extends PDOStatement
 {
+	/*
+	 * Magic method to fake MySQLi property functions
+	 * @deprecated
+	 */
+	public function __get($name)
+	{
+		switch($name)
+		{
+			case 'num_rows':
+				return $this->rowCount();
+				break;
+			default:
+				return NULL;
+		}
+	}
 	/**
 	 * Mysqli style associative array fetch style
 	 * @return mixed
+	 * @deprecated
 	 */
 	public function fetch_assoc()
 	{
 		return $this->fetch(PDO::FETCH_ASSOC);
 	}
 
+	/**
+	 * Mysqli style standard array fetch style
+	 * @return mixed
+	 * @deprecated
+	 */
 	public function fetch_array()
 	{
 		return $this->fetch(PDO::FETCH_BOTH);

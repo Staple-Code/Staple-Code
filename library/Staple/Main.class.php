@@ -174,8 +174,8 @@ class Main
 	}
 	
 	/**
-	 *
 	 * @param Error $errorHandler
+	 * @return Main
 	 */
 	public function setErrorHandler(Error $errorHandler)
 	{
@@ -235,7 +235,7 @@ class Main
 	
 	/**
 	 * Returns the current route.
-	 * @return $route
+	 * @return Route $route
 	 */
 	public function getRoute()
 	{
@@ -244,6 +244,7 @@ class Main
 	
 	/**
 	 * @param \Staple\Route $route
+	 * @return Main
 	 */
 	public function setRoute(Route $route)
 	{
