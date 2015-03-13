@@ -127,6 +127,17 @@ abstract class Query
 	}
 
 	/**
+	 * Alias of setTable()
+	 * @param string | Query $table
+	 * @param string $alias
+	 * @return Query
+	 */
+	public function fromTable($table, $alias = NULL)
+	{
+		return $this->setTable($table,$alias);
+	}
+
+	/**
 	 * @param PDO $db
 	 * @return $this
 	 */
