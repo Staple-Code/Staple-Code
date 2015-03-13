@@ -23,9 +23,9 @@
  */
 namespace Staple\Query;
 
+use \Staple\Exception\QueryException;
 use \Staple\Error;
 use \Staple\Pager;
-use \Exception;
 use \PDO;
 
 class Select extends Query
@@ -89,7 +89,7 @@ class Select extends Query
 	 * @param PDO $db
 	 * @param array | string $order
 	 * @param Pager | int $limit
-	 * @throws Exception
+	 * @throws QueryException
 	 */
 	public function __construct($table = NULL, array $columns = NULL, PDO $db = NULL, $order = NULL, $limit = NULL)
 	{
@@ -188,6 +188,8 @@ class Select extends Query
 	/**
 	 * @param mixed $table
 	 * @param string $alias
+	 * @throws QueryException
+	 * @return $this
 	 */
 	public function setTable($table,$alias = NULL)
 	{
@@ -199,7 +201,7 @@ class Select extends Query
 		{
 			if(!isset($alias))
 			{
-				throw new Exception('Every derived table must have its own alias', Error::DB_ERROR);
+				throw new QueryException('Every derived table must have its own alias', Error::DB_ERROR);
 			}
 			$this->table = array($alias=>$table);
 		}
@@ -499,15 +501,21 @@ class Select extends Query
 		return false;
 	}
 	
-	public function leftJoin($table, $condition)
+	public function leftJoin($table, $condition, $alias = NULL)
 	{
-		$this->addJoin(Join::left($table, $condition));
+		$this->addJoin(Join::left($table, $condition,$alias));
 		return $this;
 	}
 	
-	public function innerJoin($table, $condition)
+	public function innerJoin($table, $condition, $alias = NULL)
 	{
-		$this->addJoin(Join::inner($table, $condition));
+		$this->addJoin(Join::inner($table, $condition,$alias));
+		return $this;
+	}
+
+	public function join($table, $condition, $alias = NULL)
+	{
+		$this->addJoin(Join::inner($table,$condition,$alias));
 		return $this;
 	}
 	

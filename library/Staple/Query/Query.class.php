@@ -25,6 +25,7 @@
  */
 namespace Staple\Query;
 
+use \Staple\Exception\QueryException;
 use \Exception;
 use \Staple\Error;
 use \Staple\DB;
@@ -54,8 +55,12 @@ abstract class Query
 	 * @var array[Staple_Query_Condition]
 	 */
 	protected $where = array();
-	
-	
+
+	/**
+	 * @param string $table
+	 * @param PDO $db
+	 * @throws QueryException
+	 */
 	public function __construct($table = NULL, PDO $db = NULL)
 	{
 		if($db instanceof PDO)
@@ -69,12 +74,12 @@ abstract class Query
 			}
 			catch (Exception $e)
 			{
-				throw new Exception('Unable to find a database connection.', Error::DB_ERROR, $e);
+				throw new QueryException('Unable to find a database connection.', Error::DB_ERROR, $e);
 			}
 		}
 		if(!($this->db instanceof PDO))
 		{
-			throw new Exception('Unable to create database object', Error::DB_ERROR);
+			throw new QueryException('Unable to create database object', Error::DB_ERROR);
 		}
 		
 		//Set Table
@@ -176,7 +181,7 @@ abstract class Query
 			catch (Exception $e)
 			{
 				//@todo try for a default connection if no staple connection
-				throw new Exception('No Database Connection', Error::DB_ERROR);
+				throw new QueryException('No Database Connection', Error::DB_ERROR);
 			}
 			if($this->db instanceof PDO)
 			{
@@ -302,23 +307,23 @@ abstract class Query
 	 * @param mixed $inValue
 	 * @return string
 	 */
-	public static function convertTypes($inValue, DB $db = NULL)
+	public static function convertTypes($inValue, PDO $db = NULL)
 	{
-		if(!($db instanceof mysqli))
+		if(!($db instanceof PDO))
 		{
 			try{
-				$db = DB::get();
+				$db = Connection::get();
 			}
 			catch (Exception $e)
 			{
-				throw new Exception('No Database Connection', Error::DB_ERROR);
+				throw new QueryException('No Database Connection', Error::DB_ERROR);
 			}
 		}
 		
 		//Decided to error on the side of caution and represent floats as strings in SQL statements
 		if(is_string($inValue) || is_float($inValue))
 		{
-			return "'".$db->real_escape_string($inValue)."'";
+			return "'".$db->quote($inValue)."'";
 		}
 		elseif(is_bool($inValue))
 		{
@@ -330,15 +335,16 @@ abstract class Query
 		}
 		elseif(is_array($inValue))
 		{
-			return "'".$db->real_escape_string(implode(" ", $inValue))."'";
+			return "'".$db->quote(implode(" ", $inValue))."'";
 		}
 		elseif($inValue instanceof DateTime)
 		{
-			return "'".$db->real_escape_string($inValue->format('Y-m-d H:i:s'))."'";
+			//@todo add a switch in here for different database types
+			return "'".$db->quote($inValue->format('Y-m-d H:i:s'))."'";
 		}
 		else
 		{
-			return "'".$db->real_escape_string((string)$inValue)."'";
+			return "'".$db->quote((string)$inValue)."'";
 		}
 	}
 

@@ -154,6 +154,28 @@ class Connection extends PDO implements SplSubject
 	}
 
 	/**
+	 * This is provided as backward compatibility with previous MySQLi driver
+	 * @deprecated
+	 * @param $string
+	 * @return string
+	 */
+	public function real_escape_string($string)
+	{
+		return $this->quote($string);
+	}
+
+	/**
+	 * This is provided as backward compatibility with previous MySQLi driver
+	 * @deprecated
+	 * @param $string
+	 * @return string
+	 */
+	public function escape_string($string)
+	{
+		return $this->quote($string);
+	}
+
+	/**
 	 * @param array $config
 	 * @return static
 	 */

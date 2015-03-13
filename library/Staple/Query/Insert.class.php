@@ -22,10 +22,10 @@
  */
 namespace Staple\Query;
 
+use \Staple\Exception\QueryException;
 use \Exception;
-use \mysqli;
+use \PDO;
 use \Staple\Error;
-use \Staple\DB;
 
 class Insert
 {
@@ -35,12 +35,12 @@ class Insert
 	
 	/**
 	 * The database object. A database object is required to properly escape input.
-	 * @var mysqli
+	 * @var PDO
 	 */
 	protected $db;
 	/**
 	 * The data to insert. May be a Select Statement Object or an array of DataSets
-	 * @var Staple_Query_DataSet | Staple_Query_Select
+	 * @var DataSet | Select
 	 */
 	protected $data;
 	/**
@@ -73,33 +73,32 @@ class Insert
 	/**
 	 * @param string $table
 	 * @param array $data
-	 * @param DB $db
+	 * @param PDO $db
 	 * @param string $priority
-	 * @throws Exception
+	 * @throws QueryException
 	 */
 	public function __construct($table = NULL, $data = NULL, $db = NULL, $priority = NULL)
 	{
 		$this->data = new DataSet();
 		
 		//Process Database connection
-		if($db instanceof mysqli)
+		if($db instanceof PDO)
 		{
 			$this->setDb($db);
 		}
 		else
 		{
 			try {
-				$this->setDb(DB::get());
+				$this->setDb(Connection::get());
 			}
-			catch (Exception $e)
+			catch (QueryException $e)
 			{
-				$this->setDb(new mysqli());
+				throw new QueryException('Unable to find a database connection.', Error::DB_ERROR, $e);
 			}
 		}
-		//No DB = Bad
-		if(!($this->db instanceof mysqli))
+		if(!($this->db instanceof PDO))
 		{
-			throw new Exception('Unable to create database object', Error::DB_ERROR);
+			throw new QueryException('Unable to create database object', Error::DB_ERROR);
 		}
 		
 		//Set Table
@@ -192,11 +191,12 @@ class Insert
 	
 	/**
 	 * Executes the query.
-	 * @return mysqli_result | bool
+	 * @throws QueryException
+	 * @return Statement | bool
 	 */
 	public function Execute()
 	{
-		if($this->db instanceof mysqli)
+		if($this->db instanceof PDO)
 		{
 			return $this->db->query($this->build());
 		}
@@ -204,14 +204,14 @@ class Insert
 		{
 			try 
 			{
-				$this->db = DB::get();
+				$this->setDb(Connection::get());
 			}
 			catch (Exception $e)
 			{
 				//@todo try for a default connection if no staple connection
-				throw new Exception('No Database Connection', Error::DB_ERROR);
+				throw new QueryException('No Database Connection', Error::DB_ERROR);
 			}
-			if($this->db instanceof mysqli)
+			if($this->db instanceof PDO)
 			{
 				return $this->db->query($this->build());
 			}
@@ -223,13 +223,14 @@ class Insert
 	/**
 	 * Adds or replaces data in the insert dataset.
 	 * @param array $data
-	 * @throws Exception
+	 * @throws QueryException
+	 * @return $this
 	 */	
 	public function addData(array $data)
 	{
 		if($this->data instanceof Select)
 		{
-			throw new Exception('Cannot add data to an INSERT ... SELECT statement.', Error::DB_ERROR);
+			throw new QueryException('Cannot add data to an INSERT ... SELECT statement.', Error::DB_ERROR);
 		}
 		$this->data->addData($data);
 		return $this;
@@ -239,8 +240,9 @@ class Insert
 	 * Adds or replaces a specific column value. Alias is set Data Column
 	 * @param string $column
 	 * @param mixed $data
-	 * @throws Exception
+	 * @throws QueryException
 	 * @see self::setDataColumn
+	 * @return $this
 	 */
 	public function addDataColumn($column, $data)
 	{
@@ -260,7 +262,7 @@ class Insert
 	//----------------------------------------------GETTERS AND SETTERS----------------------------------------------
 	
 	/**
-	 * @return the $db
+	 * @return PDO $db
 	 */
 	public function getDb()
 	{
@@ -268,7 +270,7 @@ class Insert
 	}
 	
 	/**
-	 * @return the $data
+	 * @return DataSet | Select $data
 	 */
 	public function getData()
 	{
@@ -276,7 +278,7 @@ class Insert
 	}
 	
 	/**
-	 * @return the $priority
+	 * @return string $priority
 	 */
 	public function getPriority()
 	{
@@ -284,7 +286,7 @@ class Insert
 	}
 
 	/**
-	 * @return the $ignore
+	 * @return bool $ignore
 	 */
 	public function getIgnore()
 	{
@@ -292,7 +294,7 @@ class Insert
 	}
 
 	/**
-	 * @return the $table
+	 * @return Query | Union | string $table
 	 */
 	public function getTable()
 	{
@@ -300,7 +302,7 @@ class Insert
 	}
 
 	/**
-	 * @return the $updateOnDuplicate
+	 * @return bool $updateOnDuplicate
 	 */
 	public function getUpdateOnDuplicate()
 	{
@@ -308,7 +310,7 @@ class Insert
 	}
 
 	/**
-	 * @return the $updateColumns
+	 * @return array $updateColumns
 	 */
 	public function getUpdateColumns()
 	{
@@ -316,9 +318,10 @@ class Insert
 	}
 	
 	/**
-	 * @param mysqli $db
+	 * @param PDO $db
+	 * @return $this
 	 */
-	public function setDb(mysqli $db)
+	public function setDb(PDO $db)
 	{
 		$this->db = $db;
 		return $this;
@@ -326,7 +329,9 @@ class Insert
 	
 	/**
 	 * Sets the $data
-	 * @param Staple_Query_Select | Staple_Query_DataSet | array $data
+	 * @param Select | DataSet | array $data
+	 * @throws QueryException
+	 * @return $this
 	 */
 	public function setData($data)
 	{
@@ -340,7 +345,7 @@ class Insert
 		}
 		else
 		{
-			throw new Exception('Data must be an instance of Staple_Query_DataSet, an instance of Staple_Query_Select or an array', Error::APPLICATION_ERROR);
+			throw new QueryException('Data must be an instance of Staple_Query_DataSet, an instance of Staple_Query_Select or an array', Error::APPLICATION_ERROR);
 		}
 		return $this;
 	}
@@ -350,13 +355,14 @@ class Insert
 	 * @param string $column
 	 * @param mixed $data
 	 * @param bool $literal
-	 * @throws Exception
+	 * @throws QueryException
+	 * @return $this
 	 */
 	public function setDataColumn($column,$data,$literal = false)
 	{
 		if($this->data instanceof Select)
 		{
-			throw new Exception('Cannot add data to an INSERT ... SELECT statement.', Error::DB_ERROR);
+			throw new QueryException('Cannot add data to an INSERT ... SELECT statement.', Error::DB_ERROR);
 		}
 		if($literal === true)
 		{
@@ -381,6 +387,7 @@ class Insert
 				break;
 			case self::HIGH:
 				$this->priority = self::HIGH;
+				break;
 			case self::LOW:
 				$this->priority = self::LOW;
 				break;
@@ -435,6 +442,14 @@ class Insert
 		return $this;
 	}
 
+	/**
+	 * Returns the last ID inserted into the database.
+	 * @return string
+	 */
+	public function getInsertId()
+	{
+		return $this->getDb()->lastInsertId();
+	}
 }
 
 ?>

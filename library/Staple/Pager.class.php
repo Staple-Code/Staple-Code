@@ -92,6 +92,7 @@ class Pager
 	}
 	/**
 	 * Returns the displayPaging() function.
+	 * @return string
 	 */
 	public function __toString()
 	{
@@ -171,7 +172,7 @@ class Pager
 	
 	//---------------------------------------------Getters and Setters---------------------------------------------
 	/**
-	 * @return the $total
+	 * @return int $total
 	 */
 	public function getTotal()
 	{
@@ -180,6 +181,7 @@ class Pager
 
 	/**
 	 * @param int $total
+	 * @return $this
 	 */
 	public function setTotal($total)
 	{
@@ -201,7 +203,7 @@ class Pager
 	}
 	
 	/**
-	 * @return the $page
+	 * @return int $page
 	 */
 	public function getPage()
 	{
@@ -210,6 +212,7 @@ class Pager
 
 	/**
 	 * @param int $page
+	 * @return $this
 	 */
 	public function setPage($page)
 	{
@@ -229,7 +232,7 @@ class Pager
 	}
 
 	/**
-	 * @return the $itemsPerPage
+	 * @return int $itemsPerPage
 	 */
 	public function getItemsPerPage()
 	{
@@ -238,6 +241,7 @@ class Pager
 
 	/**
 	 * @param int $itemsPerPage
+	 * @return $this
 	 */
 	public function setItemsPerPage($itemsPerPage)
 	{
@@ -263,6 +267,7 @@ class Pager
 
 	/**
 	 * @param boolean $displayItemAmountSelector
+	 * @return $this
 	 */
 	public function setDisplayItemAmountSelector($displayItemAmountSelector)
 	{
@@ -272,6 +277,7 @@ class Pager
 
 	/**
 	 * @param array[int]  $itemAmountSelections
+	 * @return $this
 	 */
 	public function setItemAmountSelections(array $itemAmountSelections)
 	{
@@ -288,7 +294,7 @@ class Pager
 	/**
 	 * Add a single entry to the selection list.
 	 * @param int $amount
-	 * @return Staple_Pager
+	 * @return $this
 	 */
 	public function addItemAmountSelection($amount)
 	{
@@ -298,7 +304,7 @@ class Pager
 	}
 
 	/**
-	 * @return the $pagesBeforeCurrent
+	 * @return int $pagesBeforeCurrent
 	 */
 	public function getPagesBeforeCurrent()
 	{
@@ -306,7 +312,7 @@ class Pager
 	}
 
 	/**
-	 * @return the $pagesAfterCurrent
+	 * @return int $pagesAfterCurrent
 	 */
 	public function getPagesAfterCurrent()
 	{
@@ -315,6 +321,7 @@ class Pager
 
 	/**
 	 * @param int $pagesBeforeCurrent
+	 * @return $this
 	 */
 	public function setPagesBeforeCurrent($pagesBeforeCurrent)
 	{
@@ -324,6 +331,7 @@ class Pager
 
 	/**
 	 * @param int $pagesAfterCurrent
+	 * @return $this
 	 */
 	public function setPagesAfterCurrent($pagesAfterCurrent)
 	{
@@ -334,6 +342,7 @@ class Pager
 	/**
 	 * Sets the $pagesBeforeCurrent and $pagesAfterCurrent to the same value.
 	 * @param int $pages
+	 * @return $this
 	 */
 	public function setPageBuffer($pages)
 	{
@@ -346,7 +355,7 @@ class Pager
 	 * This function allows the user to add additional variables to the GET string of the page links.
 	 * The array should be associative with it formated such that variabelName=>value.
 	 * @param array $vars
-	 * @return Staple_Pager
+	 * @return Pager
 	 */
 	public function setVariables(array $vars)
 	{
@@ -361,6 +370,7 @@ class Pager
 	 * Add a single variable to the page GET string
 	 * @param string $varname
 	 * @param string $value
+	 * @return $this
 	 */
 	public function addVariable($varname,$value)
 	{
@@ -370,6 +380,7 @@ class Pager
 	/**
 	 * Remove a single variable from the GET string.
 	 * @param string $varname
+	 * @return bool
 	 */
 	public function removeVariable($varname)
 	{
@@ -388,6 +399,7 @@ class Pager
 	 * This function is a temporary fix until the changes are completed to Staple_Route.
 	 * @param string $action
 	 * @deprecated
+	 * @return string
 	 */
 	public function displayPaging($action = NULL)
 	{

@@ -22,10 +22,10 @@
  */
 namespace Staple\Query;
 
+use \Staple\Exception\QueryException;
 use \Exception;
-use \mysqli;
+use \PDO;
 use \Staple\Error;
-use \Staple\DB;
 
 class InsertMultiple extends Insert
 {
@@ -44,31 +44,30 @@ class InsertMultiple extends Insert
 	 * Query to insert multiple rows
 	 * @param string $table
 	 * @param array $columns
-	 * @param mysqli $db
-	 * @param unknown_type $priority
-	 * @throws Exception
+	 * @param PDO $db
+	 * @param string $priority
+	 * @throws QueryException
 	 */
-	public function __construct($table = NULL, array $columns = NULL, $db = NULL, $priority = NULL)
-	{	
+	public function __construct($table = NULL, array $columns = NULL, PDO $db = NULL, $priority = NULL)
+	{
 		//Process Database connection
-		if($db instanceof mysqli)
+		if($db instanceof PDO)
 		{
 			$this->setDb($db);
 		}
 		else
 		{
 			try {
-				$this->setDb(DB::get());
+				$this->setDb(Connection::get());
 			}
 			catch (Exception $e)
 			{
-				$this->setDb(new mysqli());
+				throw new QueryException('Unable to find a database connection.', Error::DB_ERROR, $e);
 			}
 		}
-		//No DB = Bad
-		if(!($this->db instanceof mysqli))
+		if(!($this->db instanceof PDO))
 		{
-			throw new Exception('Unable to create database object', Error::DB_ERROR);
+			throw new QueryException('Unable to create database object', Error::DB_ERROR);
 		}
 		
 		//Set Table
@@ -149,14 +148,16 @@ class InsertMultiple extends Insert
 	}
 	
 	/**
-	 * Adds a dataset to the object
-	 * @param Staple_Query_DataSet $row
+	 * Adds a data set to the object
+	 * @param DataSet $row
+	 * @throws QueryException
+	 * @return $this
 	 */
 	public function addRow(DataSet $row)
 	{
 		if(count($row->getColumns()) != count($this->columns))
 		{
-			throw new Exception('DataSet row count does not match the count for this object');
+			throw new QueryException('DataSet row count does not match the count for this object');
 		}
 		else
 		{
@@ -168,7 +169,7 @@ class InsertMultiple extends Insert
 	//------------------------------------------------GETTERS AND SETTERS------------------------------------------------//
 	
 	/**
-	 * @return the $columns
+	 * @return array $columns
 	 */
 	public function getColumns()
 	{
@@ -176,6 +177,7 @@ class InsertMultiple extends Insert
 	}
 	/**
 	 * @param array[string] $columns
+	 * @return $this
 	 */
 	public function setColumns(array $columns)
 	{
@@ -185,8 +187,9 @@ class InsertMultiple extends Insert
 	
 	/**
 	 * Overides the original setter to verify that the dataset is inserted with proper specifications. 
-	 * @param array[Staple_Query_DataSet] $data
-	 * @return Staple_Query_InsertMultiple
+	 * @param array[DataSet] $data
+	 * @throws QueryException
+	 * @return $this
 	 */
 	public function setData(array $data)
 	{
@@ -195,7 +198,7 @@ class InsertMultiple extends Insert
 		{
 			if(!($row instanceof DataSet))
 			{
-				throw new Exception('To set the data for this object, the submission must be an array of Staple_Query_DataSet objects.', Error::APPLICATION_ERROR);
+				throw new QueryException('To set the data for this object, the submission must be an array of Staple_Query_DataSet objects.', Error::APPLICATION_ERROR);
 			}
 		}
 		$this->data = $data;
