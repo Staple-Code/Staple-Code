@@ -23,35 +23,34 @@
  */
 namespace Staple;
 
-class Util
+class Utility
 {
 	const STATES_LONG = 1;
 	const STATES_SHORT = 2;
 	const STATES_BOTH = 3;
+
+	public static $stateAbbreviations = array('AL','AK','AZ','AR','CA','CO','CT','DE','DC','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN',
+'MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV',
+'WI','WY');
+
+	public static $stateNames = array('Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','District of Columbia','Florida',
+'Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts',
+'Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico',
+'New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina',
+'South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin','Wyoming');
 	
-	public static function StatesArray($type = self::STATES_BOTH)
+	public static function statesArray($type = self::STATES_BOTH)
 	{
-		$short = array('AL','AK','AZ','AR','CA','CO','CT','DE','DC','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN',
-				'MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV',
-				'WI','WY');
-		
-		$long = array('Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','District of Columbia','Florida',
-				'Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts',
-				'Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico',
-				'New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina',
-				'South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin','Wyoming');
-		
 		switch($type)
 		{
 			case self::STATES_LONG:
-				return $long;
+				return self::$stateNames;
 				break;
 			case self::STATES_SHORT:
-				sort($short);
-				return $short;
+				return self::$stateAbbreviations;
 				break;
 			default:
-				return array_combine($short, $long);
+				return array_combine(self::$stateAbbreviations, self::$stateNames);
 		}
 	}
 	
@@ -59,7 +58,7 @@ class Util
 	 * Grabs and returns only the first word of the sentence. Sometimes that's all you need.
 	 * @param string $sentence
 	 */
-	public static function FirstWord($sentence)
+	public static function firstWord($sentence)
 	{
 		return substr($sentence, 0, strpos($sentence, ' '));
 	}
@@ -70,7 +69,7 @@ class Util
 	 * @param int $limit
 	 * @return string
 	 */
-	public static function WordLimit($sentence, $limit)
+	public static function wordLimit($sentence, $limit)
 	{
 		$words = explode(' ', trim($sentence));
 		$phrase = '';
@@ -88,10 +87,9 @@ class Util
 	/**
 	 * A simple function that is useful for counting the number of words in a string.
 	 * @param string $sentence
-	 * @param int $limit
 	 * @return int
 	 */
-	public static function WordCount($sentence)
+	public static function wordCount($sentence)
 	{
 		return count(explode(' ', trim($sentence)));
 	}
@@ -100,8 +98,9 @@ class Util
 	 * Multi-dimensional recursive array search function.
 	 * @param mixed $needle
 	 * @param array $haystack
+	 * @return array | bool
 	 */
-	public static function ArraySearch($needle, array $haystack)
+	public static function arraySearch($needle, array $haystack)
 	{
 		foreach($haystack as $key=>$value)
 		{
@@ -121,6 +120,21 @@ class Util
 			}
 		}
 		return false;
+	}
+
+	public static function snakeCase($string)
+	{
+		//@todo implement this method
+	}
+
+	public static function pluralize($word)
+	{
+		//@todo implement this method
+	}
+
+	public static function singularize($word)
+	{
+		//@todo implement this method
 	}
 }
 

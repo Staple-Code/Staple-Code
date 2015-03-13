@@ -53,10 +53,11 @@ abstract class Model implements \JsonSerializable, \ArrayAccess, \Iterator
 	 */
 	public function __construct(array $options = NULL)
 	{
-		if(!isset($this->_table))
-		{
+		//@todo add a pluralization/snake_case conversion here
+		if(substr(__CLASS__,strlen(__CLASS__)-5,strlen(__CLASS__)) == 'Model')
 			$this->_table = str_replace('Model', '', __CLASS__);
-		}
+		else
+			$this->_table = __CLASS__;
 		
 		if (is_array($options))
 		{

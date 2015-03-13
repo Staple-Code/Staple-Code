@@ -134,6 +134,7 @@ class View
 	/**
 	 * Sets the view string
 	 * @param string $view
+	 * @return $this
 	 */
 	public function setView($view)
 	{
@@ -159,6 +160,7 @@ class View
 	/**
 	 * Sets the controller string
 	 * @param string $controller
+	 * @return $this
 	 */
 	public function setController($controller)
 	{
@@ -186,6 +188,7 @@ class View
 	 * Add data to the view data store for accessibility within the view.
 	 * @param string $key
 	 * @param mixed $value
+	 * @return $this
 	 */
 	public function addData($key,$value)
 	{
@@ -196,6 +199,7 @@ class View
 	/**
 	 * Add data to the view as an associative array
 	 * @param array $data
+	 * @throws Exception
 	 * @return bool
 	 */
 	public function data(array $data)
@@ -210,12 +214,9 @@ class View
 	}
 	
 	/**
-	 * 
 	 * This function renders the view. If accepts a string representing the controller and
 	 * a string representing the requested action. With this information the correct view
 	 * is selected and rendered.
-	 * @param string $class
-	 * @param string $view
 	 */
 	public function build()
 	{

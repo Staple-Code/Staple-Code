@@ -169,7 +169,7 @@ class Request
 		$to = (string)$route;
 		if($get != array())
 		{
-			$to .= '?'.Link::getArraytoString($get);
+			$to .= '?'.Link::getArrayToString($get);
 		}
 		header('Location: '.$to);
 		exit(0);

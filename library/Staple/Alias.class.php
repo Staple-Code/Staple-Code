@@ -53,7 +53,7 @@ class Alias
 		'Request'						=>	'\\Staple\\Request',
 		'Route'							=>	'\\Staple\\Route',
 		'Script'						=>	'\\Staple\\Script',
-		'Util'							=>	'\\Staple\\Util',
+		'Utility'						=>	'\\Staple\\Utility',
 		'View'							=>	'\\Staple\\View',
 
 		//Legacy Class Names
@@ -82,7 +82,7 @@ class Alias
 		'Staple_Request'				=>	'\\Staple\\Request',
 		'Staple_Route'					=>	'\\Staple\\Route',
 		'Staple_Script'					=>	'\\Staple\\Script',
-		'Staple_Util'					=>	'\\Staple\\Util',
+		'Staple_Util'					=>	'\\Staple\\Utility',
 		'Staple_View'					=>	'\\Staple\\View',
 
 		//Form Class Aliases
@@ -293,8 +293,9 @@ class Alias
 		if(!is_null($class))
 			if(!class_exists($alias))
 				return class_alias($class, $alias, $autoload);
-		else
-			return false;
+
+		//Return false otherwise
+		return false;
 	}
 
 	/**
