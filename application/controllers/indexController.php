@@ -30,19 +30,4 @@ class indexController extends Controller
 	{
 		return View::create('index');
 	}
-	
-	public function documentation()
-	{
-		return View::create('documentation');
-	}
-	
-	public function about()
-	{
-		return View::create('about');
-	}
-	
-	public function license()
-	{
-		return View::create('license');
-	}
 }
