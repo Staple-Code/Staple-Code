@@ -38,7 +38,7 @@ trait Helpers
 		}
 		elseif($strip === true)
 		{
-			$estring = htmlentities(strip_tags($estring));
+			return htmlentities(strip_tags($str));
 		}
 		else
 		{
