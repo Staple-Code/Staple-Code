@@ -276,9 +276,26 @@ class Utility
 		return false;
 	}
 
+	/**
+	 * Returns the snake_case variant of the string. The assumption is that the conversion is from a string
+	 * with camelCase or PascalCase words.
+	 * @param $string
+	 * @return string
+	 */
 	public static function snakeCase($string)
 	{
-		//@todo implement this method
+		//Search for uppercase letters and replace them
+		return trim(
+			preg_replace_callback(
+				'/[A-Z]/',
+				function($matches)
+				{
+					return '_'.strtolower($matches[0]);
+				},
+				trim($string)
+			),
+			"_\t\n\r\0\x0B"
+		);
 	}
 
 	/**

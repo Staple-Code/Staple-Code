@@ -54,11 +54,12 @@ abstract class Model implements \JsonSerializable, \ArrayAccess, \Iterator
 	public function __construct(array $options = NULL)
 	{
 		//@todo add a pluralization/snake_case conversion here
-		if(substr(__CLASS__,strlen(__CLASS__)-5,strlen(__CLASS__)) == 'Model')
-			$this->_table = str_replace('Model', '', __CLASS__);
-		else
-			$this->_table = __CLASS__;
-		
+		if(!isset($this->_table))
+		{
+			$this->_setupTableName();
+		}
+
+		//Check for the options variable.
 		if (is_array($options))
 		{
             $this->_options($options);
@@ -169,6 +170,48 @@ abstract class Model implements \JsonSerializable, \ArrayAccess, \Iterator
         }
         return $this;
     }
+
+	/**
+	 * Sets the table name based on the name of the model class
+	 */
+	protected function _setupTableName()
+	{
+		//Get the class name of this object
+		$class = get_class($this);
+
+		//Explode out the namespace tree
+		$namespaceTree = explode('\\',$class);
+
+		//Snake_case the object name
+		$name = Utility::snakeCase(array_pop($namespaceTree));
+
+		//Split and find the final word in the class name
+		$words = explode('_',$name);
+		$finalWord = array_pop($words);
+
+		//Check that the final word is not "model"
+		if($finalWord == 'model')
+			$finalWord = array_pop($words);
+
+		//pluralize the final word
+		$plural = Utility::pluralize($finalWord);
+
+		//Push it back into the array
+		array_push($words,$plural);
+
+		//Collapse and set the table name
+		$this->_table = implode('_',$words);
+	}
+
+	/**
+	 * Get the current table name that this model is attached to.
+	 * @return string
+	 */
+	public function _getTable()
+	{
+		return $this->_table;
+	}
+
 	/**
 	 * 
 	 */
