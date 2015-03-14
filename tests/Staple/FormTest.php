@@ -23,6 +23,15 @@
 
 namespace Staple\Tests;
 
+use Staple\Form\Form;
+use Staple\Form\RadioElement;
+use Staple\Form\SelectElement;
+use Staple\Form\SubmitElement;
+use Staple\Form\TextareaElement;
+use Staple\Form\TextElement;
+use Staple\Form\Validate\EqualValidator;
+use Staple\Form\Validate\InArrayValidator;
+use Staple\Form\Validate\LengthValidator;
 
 class FormTest extends \PHPUnit_Framework_TestCase
 {

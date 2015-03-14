@@ -1,6 +1,6 @@
 <?php
 /**
- * Unit Tests for \Staple\Form\Filter\PhoneFormatFilter object
+ * Unit Tests for \Staple\Query\Insert object
  *
  * @author Ironpilot
  * @copyright Copyright (c) 2011, STAPLE CODE
@@ -24,22 +24,43 @@
 namespace Staple\Tests;
 
 
-class PhoneFormatFilterTest extends \PHPUnit_Framework_TestCase
+use Staple\Dev;
+use Staple\Query\Insert;
+use Staple\Query\Select;
+
+class InsertTest extends \PHPUnit_Framework_TestCase
 {
-	private function getTestObject()
+	//@todo refactor this
+	public function testInsert()
 	{
-		return new PhoneFormatFilter();
-	}
+		//@todo complete this test
+		$this->markTestIncomplete();
 
-	/**
-	 * Test the ability to format a phone number
-	 */
-	public function testPhoneFilter()
-	{
-		$number = '1.123.456.7890';
+		//Setup the database
+		//@todo use a mock here.
 
-		$format = $this->getTestObject();
+		$p = new Select();
+		$p->addColumn('name')
+			->setTable('article_categories')
+			->whereEqual('id', 'articles.cat', true);
 
-		$this->assertEquals('1 (123) 456-7890',$format->filter($number));
+		//Create the Query
+		$q = new Insert();
+		$q
+			->setTable('table')
+			->addData(array('id'=>1,
+				'name'=>'Test',
+				'quickname'=>'test',
+				'summary'=>'This is a test and only a test.',
+				'cat'=>2));
+
+		echo "<p><h3>Query:</h3> ".$q->build()."</p>";
+
+		//Execute the Query
+		//$result = $db->query($q);
+
+		echo "<h3>Object Dump:</h3><h4>Query:</h4>";
+
+		Dev::Dump($q);
 	}
 }

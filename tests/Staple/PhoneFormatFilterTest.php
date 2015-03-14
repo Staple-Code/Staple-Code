@@ -1,6 +1,6 @@
 <?php
 /**
- * Unit Tests for \Staple\Encrypt object
+ * Unit Tests for \Staple\Form\Filter\PhoneFormatFilter object
  *
  * @author Ironpilot
  * @copyright Copyright (c) 2011, STAPLE CODE
@@ -24,27 +24,24 @@
 namespace Staple\Tests;
 
 
-class EncryptTest extends \PHPUnit_Framework_TestCase
+use Staple\Form\Filter\PhoneFormatFilter;
+
+class PhoneFormatFilterTest extends \PHPUnit_Framework_TestCase
 {
-	private $key = 'kASMCL^TRB8A<UQwOcgsHDKhgUs[ZtMe';
-	private $salt = 'askdfRIUF';
-	private $pepper = 'orpDjk34';
-
-	public function testAESEncrypt()
+	private function getTestObject()
 	{
-		$string = 'Blah encrypted string.';
-
-		$encrypted = Encrypt::AES_encrypt($string, $this->key, $this->salt, $this->pepper);
-
-		$this->assertEquals('5be2da124b05f90210a061b7553b72c7be235ec7c6aace4c739aa0f8cb602b327d8c0104c0017b37450b8032a47da639',bin2hex($encrypted));
+		return new PhoneFormatFilter();
 	}
 
-	public function testAESDecrypt()
+	/**
+	 * Test the ability to format a phone number
+	 */
+	public function testPhoneFilter()
 	{
-		$string = '5be2da124b05f90210a061b7553b72c7be235ec7c6aace4c739aa0f8cb602b327d8c0104c0017b37450b8032a47da639';
+		$number = '1.123.456.7890';
 
-		$decrypted = Encrypt::AES_decrypt(hex2bin($string), $this->key, $this->salt, $this->pepper);
+		$format = $this->getTestObject();
 
-		$this->assertEquals('Blah encrypted string.',$decrypted);
+		$this->assertEquals('1 (123) 456-7890',$format->filter($number));
 	}
 }

@@ -24,6 +24,8 @@
 namespace Staple\Tests;
 
 
+use Staple\Link;
+
 class LinkTest extends \PHPUnit_Framework_TestCase
 {
 	public function testLinkCreation()

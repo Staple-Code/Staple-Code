@@ -1,6 +1,6 @@
 <?php
 /**
- * Unit Tests for \Staple\Query\Insert object
+ * Unit Tests for \Staple\Encrypt object
  *
  * @author Ironpilot
  * @copyright Copyright (c) 2011, STAPLE CODE
@@ -24,39 +24,29 @@
 namespace Staple\Tests;
 
 
-class InsertTest extends \PHPUnit_Framework_TestCase
+use Staple\Encrypt;
+
+class EncryptTest extends \PHPUnit_Framework_TestCase
 {
-	//@todo refactor this
-	public function testInsert()
+	private $key = 'kASMCL^TRB8A<UQwOcgsHDKhgUs[ZtMe';
+	private $salt = 'askdfRIUF';
+	private $pepper = 'orpDjk34';
+
+	public function testAESEncrypt()
 	{
-		//@todo complete this test
-		$this->markTestIncomplete();
+		$string = 'Blah encrypted string.';
 
-		//Setup the database
-		//@todo use a mock here.
+		$encrypted = Encrypt::AES_encrypt($string, $this->key, $this->salt, $this->pepper);
 
-		$p = new Select();
-		$p->addColumn('name')
-			->setTable('article_categories')
-			->whereEqual('id', 'articles.cat', true);
+		$this->assertEquals('5be2da124b05f90210a061b7553b72c7be235ec7c6aace4c739aa0f8cb602b327d8c0104c0017b37450b8032a47da639',bin2hex($encrypted));
+	}
 
-		//Create the Query
-		$q = new Insert();
-		$q
-			->setTable('table')
-			->addData(array('id'=>1,
-				'name'=>'Test',
-				'quickname'=>'test',
-				'summary'=>'This is a test and only a test.',
-				'cat'=>2));
+	public function testAESDecrypt()
+	{
+		$string = '5be2da124b05f90210a061b7553b72c7be235ec7c6aace4c739aa0f8cb602b327d8c0104c0017b37450b8032a47da639';
 
-		echo "<p><h3>Query:</h3> ".$q->build()."</p>";
+		$decrypted = Encrypt::AES_decrypt(hex2bin($string), $this->key, $this->salt, $this->pepper);
 
-		//Execute the Query
-		//$result = $db->query($q);
-
-		echo "<h3>Object Dump:</h3><h4>Query:</h4>";
-
-		Staple_Dev::Dump($q);
+		$this->assertEquals('Blah encrypted string.',$decrypted);
 	}
 }

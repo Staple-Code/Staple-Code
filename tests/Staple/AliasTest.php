@@ -25,6 +25,7 @@ namespace Staple\Tests;
 
 
 use Staple\Alias;
+use Staple\Form\Form;
 
 class AliasTest extends \PHPUnit_Framework_TestCase
 {

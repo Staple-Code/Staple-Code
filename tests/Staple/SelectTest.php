@@ -23,6 +23,8 @@
 
 namespace Staple\Tests;
 
+use Staple\Dev;
+use Staple\Query\Select;
 
 class SelectTest extends \PHPUnit_Framework_TestCase
 {
@@ -46,7 +48,7 @@ class SelectTest extends \PHPUnit_Framework_TestCase
 			->whereEqual('id', 'articles.cat', true);
 
 		//Create the Query
-		$q = new Staple_Query_Select();
+		$q = new Select();
 		$q
 			->setTable('articles')
 			->whereIn('articles.id', array(1,2,3,4,5))
@@ -61,7 +63,7 @@ class SelectTest extends \PHPUnit_Framework_TestCase
 
 		echo '<h3>Results:</h3><table border="1" cellspacing="0" cellpadding="5">';
 		$first = true;
-		if($result instanceof mysqli_result)
+		if($result instanceof \mysqli_result)
 		{
 			while($myrow = $result->fetch_assoc())
 			{
@@ -85,6 +87,6 @@ class SelectTest extends \PHPUnit_Framework_TestCase
 		}
 		echo "</table><h3>Object Dump:</h3><h4>Query:</h4>";
 
-		Staple_Dev::Dump($q);
+		Dev::Dump($q);
 	}
 }
