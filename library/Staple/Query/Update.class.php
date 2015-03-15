@@ -71,7 +71,7 @@ class Update extends Query
 		$this->data = new DataSet();
 		if(isset($db))
 		{
-			$this->setDb($db);
+			$this->setConnection($db);
 		}
 		if(isset($table))
 		{

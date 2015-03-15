@@ -72,4 +72,22 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 		$this->assertEquals('product_list_categories',$productListCategoryModel->_getTable());
 		$this->assertEquals('customers',$clientModel->_getTable());
 	}
+
+	/**
+	 * Test the model's ability to create instances of itself.
+	 * @test
+	 */
+	public function testFactory()
+	{
+		$this->assertInstanceOf('Staple\\Tests\\userModel',userModel::make());
+		$this->assertInstanceOf('Staple\\Tests\\clientModel',clientModel::make());
+		$this->assertInstanceOf('Staple\\Tests\\productListCategoryModel',productListCategoryModel::make());
+	}
+
+	public function testFind()
+	{
+		userModel::make()->find(1);
+
+		//$this->assertInstanceOf(,'userModel');
+	}
 }

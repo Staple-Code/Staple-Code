@@ -53,19 +53,19 @@ class InsertMultiple extends Insert
 		//Process Database connection
 		if($db instanceof PDO)
 		{
-			$this->setDb($db);
+			$this->setConnection($db);
 		}
 		else
 		{
 			try {
-				$this->setDb(Connection::get());
+				$this->setConnection(Connection::get());
 			}
 			catch (Exception $e)
 			{
 				throw new QueryException('Unable to find a database connection.', Error::DB_ERROR, $e);
 			}
 		}
-		if(!($this->db instanceof PDO))
+		if(!($this->connection instanceof PDO))
 		{
 			throw new QueryException('Unable to create database object', Error::DB_ERROR);
 		}

@@ -24,9 +24,17 @@
 namespace Staple;
 
 use \Exception;
+use \PDO;
+use Staple\Query\Connection;
+use Staple\Query\Insert;
+use Staple\Query\Query;
+use Staple\Query\Select;
+use Staple\Query\Statement;
+use Staple\Traits\Factory;
 
 abstract class Model implements \JsonSerializable, \ArrayAccess, \Iterator
 {
+	use Factory;
 	/**
 	 * Primary Key Column Name. Use a string for a single primary key column, an array for a composite key.
 	 * @var string | array
@@ -41,29 +49,25 @@ abstract class Model implements \JsonSerializable, \ArrayAccess, \Iterator
 	 * Dynamic Properties of the model.
 	 * @var array
 	 */
-	protected $_properties = array();
+	protected $_data = array();
 	/**
 	 * A database connection object that the model uses
-	 * @var DB
+	 * @var PDO
 	 */
-	protected $_modelDB;
+	protected $_connection;
 	/**
 	 * 
 	 * @param array $options
 	 */
 	public function __construct(array $options = NULL)
 	{
-		//@todo add a pluralization/snake_case conversion here
+		//Setup the table name if not already set.
 		if(!isset($this->_table))
-		{
 			$this->_setupTableName();
-		}
 
 		//Check for the options variable.
 		if (is_array($options))
-		{
-            $this->_options($options);
-        }
+			$this->_options($options);
 	}
 	
 	/**
@@ -84,7 +88,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess, \Iterator
         else
         {
             //Set the property dynamically
-            $this->_properties[$name] = $value;
+            $this->_data[$name] = $value;
         }
     }
  
@@ -101,9 +105,9 @@ abstract class Model implements \JsonSerializable, \ArrayAccess, \Iterator
         {
             return $this->$method();
         }
-        elseif(array_key_exists($name,$this->_properties))
+        elseif(isset($this->_data[$name]))
         {
-            return $this->_properties[$name];
+            return $this->_data[$name];
         }
         else
         {
@@ -118,7 +122,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess, \Iterator
      */
     public function __isset($name)
     {
-        return isset($this->_properties[$name]);
+        return isset($this->_data[$name]);
     }
 
     /**
@@ -127,16 +131,35 @@ abstract class Model implements \JsonSerializable, \ArrayAccess, \Iterator
      */
     public function __unset($name)
     {
-        if(isset($this->_properties[$name]))
-            unset($this->_properties[$name]);
+        if(isset($this->_data[$name]))
+            unset($this->_data[$name]);
     }
     
     /**
      * Dynamically call properties without having to create getters and setters.
+	 * @param string $name
+	 * @param array $arguments
+	 * @throws Exception
+	 * @return mixed
      */
     public function __call($name , array $arguments)
     {
-    	//@todo incomplete function 
+		if(strtolower(substr($name,0,3)) == 'get')
+		{
+			$dataName = Utility::snakeCase(substr($name,3));
+			if(isset($this->_data[$dataName]))
+			{
+				return $this->_data[$dataName];
+			}
+		}
+		elseif(strtolower(substr($name,0,3)) == 'set')
+		{
+			$dataName = Utility::snakeCase(substr($name,3));
+			$this->_data[$dataName] = (string)array_shift($arguments);
+			return $this;
+		}
+
+		throw new Exception(' Call to undefined method '.$name);
     }
     
     /**
@@ -303,26 +326,27 @@ abstract class Model implements \JsonSerializable, \ArrayAccess, \Iterator
 	}
 
 	/**
-	 * @return DB $_modelDB
+	 * @return PDO $_connection
 	 */
-	public function getModelDB()
+	public function getConnection()
 	{
-		if(isset($this->_modelDB))		//Return the specified model connection
+		if(isset($this->_connection))		//Return the specified model connection
 		{
-			return $this->_modelDB;
+			return $this->_connection;
 		}
 		else							//Return the default connection
 		{
-			return DB::get();
+			return Connection::get();
 		}
 	}
 
 	/**
-	 * @param DB $_modelDB
+	 * @param DB $connection
+	 * @return $this
 	 */
-	public function setModelDB(DB $_modelDB)
+	public function setConnection(PDO $connection)
 	{
-		$this->_modelDB = $_modelDB;
+		$this->_connection = $connection;
 		return $this;
 	}
 
@@ -332,40 +356,94 @@ abstract class Model implements \JsonSerializable, \ArrayAccess, \Iterator
 	 */
 	public function save()
 	{
-		//@todo incomplete function
-		return false;
+		//if the primary key has been set use update, otherwise insert.
+		if(isset($this->_data[$this->_primaryKey]))
+		{
+			$query = Query::update($this->_getTable(), $this->_data, $this->getConnection());
+		}
+		else
+		{
+			$query = Query::insert($this->_getTable(), $this->_data, $this->getConnection());
+		}
+
+		//Execute the query and return the result
+		$result = $query->execute();
+
+		//check for a new ID and apply it to the data set.
+		if($query instanceof Insert)
+			$this->_data[$this->_primaryKey] = $query->getInsertId();
+
+		//Return the boolean of success or failure.
+		return $result;
 	}
 	
 	/**
 	 * Return an instance of the model from the primary key.
 	 * @param int $id
+	 * @param PDO $connection
+	 * @return $this | bool
 	 */
-	public static function get($id)
+	public static function find($id,PDO $connection = NULL)
 	{
-		//@todo incomplete function
+		//Make a model instance
+		$model = static::make();
+
+		//Create the query
+		$query = Select::table($model->_getTable())->whereEqual($model->_primaryKey,$id);
+
+		//Change connection if needed
+		if(isset($connection)) $query->setConnection($connection);
+
+		//Execute the query
+		$result = $query->execute();
+		if($result instanceof Statement)
+		{
+			if($result->rowCount() == 1)
+			{
+				//Load the result data
+				$model->_data = $result->fetch(PDO::FETCH_ASSOC);
+				return $model;
+			}
+			elseif($result->rowCount() >= 1)
+			{
+				//If more than one record was returned return the array of results.
+				$models = array();
+				while($row = $result->fetch(PDO::FETCH_ASSOC))
+				{
+					$model = static::make();
+					$model->_data = $row;
+					$models[] = $model;
+				}
+				return $models;
+			}
+			else
+				return false;
+		}
+		else
+			return false;		//Return false on query failure
 	}
 
-	public static function getAll()
+	public static function findAll()
 	{
 		//@todo incomplete function
 	}
 	
-	public static function getWhereEqual($column, $value)
+	public static function findWhereEqual($column, $value)
 	{
 		//@todo incomplete function
 	}
 	
-	public static function getWhereNull($column)
+	public static function findWhereNull($column)
 	{
 		//@todo incomplete function
 	}
 	
-	public static function getWhereIn($column, array $values)
+	public static function findWhereIn($column, array $values)
 	{
 		//@todo incomplete function
 	}
 	
-	public static function getWhereStatement($statement)
+	public static function findWhereStatement($statement)
 	{
 		//@todo incomplete function
 	}

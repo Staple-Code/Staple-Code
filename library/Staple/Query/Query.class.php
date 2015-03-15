@@ -45,10 +45,10 @@ abstract class Query
 	public $table;
 	
 	/**
-	 * The database object. A database object is required to properly escape input.
+	 * The PDO database object. A database object is required to properly escape input.
 	 * @var PDO
 	 */
-	protected $db;
+	protected $connection;
 	
 	/**
 	 * An array of Where Clauses. The clauses are additive, using the AND  conjunction.
@@ -65,19 +65,19 @@ abstract class Query
 	{
 		if($db instanceof PDO)
 		{
-			$this->setDb($db);
+			$this->setConnection($db);
 		}
 		else
 		{
 			try {
-				$this->setDb(Connection::get());
+				$this->setConnection(Connection::get());
 			}
 			catch (Exception $e)
 			{
 				throw new QueryException('Unable to find a database connection.', Error::DB_ERROR, $e);
 			}
 		}
-		if(!($this->db instanceof PDO))
+		if(!($this->connection instanceof PDO))
 		{
 			throw new QueryException('Unable to create database object', Error::DB_ERROR);
 		}
@@ -108,9 +108,9 @@ abstract class Query
 	/**
 	 * @return PDO $db
 	 */
-	public function getDb()
+	public function getConnection()
 	{
-		return $this->db;
+		return $this->connection;
 	}
 
 	/**
@@ -143,12 +143,12 @@ abstract class Query
 	}
 
 	/**
-	 * @param PDO $db
+	 * @param PDO $connection
 	 * @return $this
 	 */
-	public function setDb(PDO $db)
+	public function setConnection(PDO $connection)
 	{
-		$this->db = $db;
+		$this->connection = $connection;
 		return $this;
 	}
 
@@ -166,26 +166,26 @@ abstract class Query
 	public function execute(PDO $connection = NULL)
 	{
 		if(isset($connection))
-			$this->setDb($connection);
+			$this->setConnection($connection);
 
-		if($this->db instanceof PDO)
+		if($this->connection instanceof PDO)
 		{
-			return $this->db->query($this->build());
+			return $this->connection->query($this->build());
 		}
 		else
 		{
 			try 
 			{
-				$this->db = Connection::get();
+				$this->connection = Connection::get();
 			}
 			catch (Exception $e)
 			{
 				//@todo try for a default connection if no staple connection
 				throw new QueryException('No Database Connection', Error::DB_ERROR);
 			}
-			if($this->db instanceof PDO)
+			if($this->connection instanceof PDO)
 			{
-				return $this->db->query($this->build());
+				return $this->connection->query($this->build());
 			}
 		}
 		return false;
@@ -305,6 +305,8 @@ abstract class Query
 	/**
 	 * Converts a PHP data type into a compatible MySQL string.
 	 * @param mixed $inValue
+	 * @param PDO $db
+	 * @throws QueryException
 	 * @return string
 	 */
 	public static function convertTypes($inValue, PDO $db = NULL)
@@ -321,9 +323,13 @@ abstract class Query
 		}
 		
 		//Decided to error on the side of caution and represent floats as strings in SQL statements
+		if(is_int($inValue))
+		{
+			return (int)$inValue;
+		}
 		if(is_string($inValue) || is_float($inValue))
 		{
-			return "'".$db->quote($inValue)."'";
+			return $db->quote($inValue);
 		}
 		elseif(is_bool($inValue))
 		{
@@ -335,16 +341,16 @@ abstract class Query
 		}
 		elseif(is_array($inValue))
 		{
-			return "'".$db->quote(implode(" ", $inValue))."'";
+			return $db->quote(implode(" ", $inValue));
 		}
 		elseif($inValue instanceof DateTime)
 		{
 			//@todo add a switch in here for different database types
-			return "'".$db->quote($inValue->format('Y-m-d H:i:s'))."'";
+			return $db->quote($inValue->format('Y-m-d H:i:s'));
 		}
 		else
 		{
-			return "'".$db->quote((string)$inValue)."'";
+			return $db->quote((string)$inValue);
 		}
 	}
 

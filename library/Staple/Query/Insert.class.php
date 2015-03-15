@@ -37,7 +37,7 @@ class Insert
 	 * The database object. A database object is required to properly escape input.
 	 * @var PDO
 	 */
-	protected $db;
+	protected $connection;
 	/**
 	 * The data to insert. May be a Select Statement Object or an array of DataSets
 	 * @var DataSet | Select
@@ -84,19 +84,19 @@ class Insert
 		//Process Database connection
 		if($db instanceof PDO)
 		{
-			$this->setDb($db);
+			$this->setConnection($db);
 		}
 		else
 		{
 			try {
-				$this->setDb(Connection::get());
+				$this->setConnection(Connection::get());
 			}
 			catch (QueryException $e)
 			{
 				throw new QueryException('Unable to find a database connection.', Error::DB_ERROR, $e);
 			}
 		}
-		if(!($this->db instanceof PDO))
+		if(!($this->connection instanceof PDO))
 		{
 			throw new QueryException('Unable to create database object', Error::DB_ERROR);
 		}
@@ -194,26 +194,26 @@ class Insert
 	 * @throws QueryException
 	 * @return Statement | bool
 	 */
-	public function Execute()
+	public function execute()
 	{
-		if($this->db instanceof PDO)
+		if($this->connection instanceof PDO)
 		{
-			return $this->db->query($this->build());
+			return $this->connection->query($this->build());
 		}
 		else
 		{
 			try 
 			{
-				$this->setDb(Connection::get());
+				$this->setConnection(Connection::get());
 			}
 			catch (Exception $e)
 			{
 				//@todo try for a default connection if no staple connection
 				throw new QueryException('No Database Connection', Error::DB_ERROR);
 			}
-			if($this->db instanceof PDO)
+			if($this->connection instanceof PDO)
 			{
-				return $this->db->query($this->build());
+				return $this->connection->query($this->build());
 			}
 		}
 		return false;
@@ -264,9 +264,9 @@ class Insert
 	/**
 	 * @return PDO $db
 	 */
-	public function getDb()
+	public function getConnection()
 	{
-		return $this->db;
+		return $this->connection;
 	}
 	
 	/**
@@ -318,12 +318,12 @@ class Insert
 	}
 	
 	/**
-	 * @param PDO $db
+	 * @param PDO $connection
 	 * @return $this
 	 */
-	public function setDb(PDO $db)
+	public function setConnection(PDO $connection)
 	{
-		$this->db = $db;
+		$this->connection = $connection;
 		return $this;
 	}
 	
@@ -448,7 +448,7 @@ class Insert
 	 */
 	public function getInsertId()
 	{
-		return $this->getDb()->lastInsertId();
+		return $this->getConnection()->lastInsertId();
 	}
 }
 

@@ -200,7 +200,7 @@ class View
 	 * Add data to the view as an associative array
 	 * @param array $data
 	 * @throws Exception
-	 * @return bool
+	 * @return $this
 	 */
 	public function data(array $data)
 	{
@@ -210,7 +210,7 @@ class View
 			$this->addData($key,$value);
 		}
 
-		return true;
+		return $this;
 	}
 	
 	/**

@@ -574,7 +574,7 @@ class Select extends Query
 				if(is_string($name))
 				{
 					//Switch the method based on database driver of the current connection
-					switch($this->getDb()->getDriver())
+					switch($this->getConnection()->getDriver())
 					{
 						case Connection::DRIVER_MYSQL:
 							$columns .= " AS `$name`";
@@ -613,7 +613,7 @@ class Select extends Query
 				if(is_string($name))
 				{
 					//Switch the method based on database driver of the current connection
-					switch($this->getDb()->getDriver())
+					switch($this->getConnection()->getDriver())
 					{
 						case Connection::DRIVER_MYSQL:
 							$tables .= " AS `$name`";
