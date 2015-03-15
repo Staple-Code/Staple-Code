@@ -24,7 +24,13 @@
 namespace Staple\Tests;
 
 
+use Staple\Model;
 use Staple\View;
+
+class viewModel extends Model
+{
+
+}
 
 class ViewTest extends \PHPUnit_Framework_TestCase
 {
@@ -64,8 +70,8 @@ class ViewTest extends \PHPUnit_Framework_TestCase
 	}
 
 	/**
-	 * @covers View->hasController
-	 * @uses View->setController
+	 * Test the hasController method of the View object
+	 * @test
 	 */
 	public function testHasController()
 	{
@@ -81,6 +87,10 @@ class ViewTest extends \PHPUnit_Framework_TestCase
 		$this->assertTrue($view->hasController());
 	}
 
+	/**
+	 * Test the hasView method of the View object
+	 * @test
+	 */
 	public function testHasView()
 	{
 		$view = $this->getTestObject();
@@ -95,6 +105,10 @@ class ViewTest extends \PHPUnit_Framework_TestCase
 		$this->assertTrue($view->hasView());
 	}
 
+	/**
+	 * Test View::create static method
+	 * @test
+	 */
 	public function testCreate()
 	{
 		//Statically create a view
@@ -104,6 +118,10 @@ class ViewTest extends \PHPUnit_Framework_TestCase
 		$this->assertInstanceOf('View',$view);
 	}
 
+	/**
+	 * Test the dynamic getters and setters
+	 * @test
+	 */
 	public function testDynamicSetAndGet()
 	{
 		$view = $this->getTestObject();
@@ -125,6 +143,31 @@ class ViewTest extends \PHPUnit_Framework_TestCase
 		$this->assertEquals($view->testArray, $testArray);
 		$this->assertInstanceOf('stdClass',$view->testObject);
 		$this->assertEquals($view->testObject,$testObject);
+	}
+
+	/**
+	 * Test that a model can be properly bound to a model
+	 * @test
+	 */
+	public function testModelBinding()
+	{
+		//Get objects
+		$view = $this->getTestObject();
+		$model = new viewModel();
+		$model->viewName = 'MyView';
+		$model->controller = 'MyController';
+
+		//Make sure we start with nothing
+		$this->assertNull($view->model());
+
+		//Attach the model to the view, and assert that a view object is returned at the same time
+		$this->assertInstanceOf('Staple\View',$view->model($model));
+
+		//Assert
+		$this->assertInstanceOf('Staple\Tests\viewModel',$view->model());
+		$this->assertInstanceOf('Staple\Tests\viewModel',$view->getViewModel());
+		$this->assertEquals('MyView',$view->model()->viewName);
+		$this->assertEquals('MyController',$view->model()->controller);
 	}
 
 	/*public function testBuild()

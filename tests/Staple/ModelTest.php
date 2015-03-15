@@ -45,7 +45,17 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 {
 	protected function getTestUserModelObject()
 	{
-		return new userModel();
+		//Setup a bunch of data to test with.
+		$user = new userModel();
+		$user->first_name = 'Jenny';
+		$user->last_name = 'McCarthy';
+		$client = $this->getTestClientModelObject();
+		$client->first_name = 'Alyson';
+		$client->last_name = 'Hannigan';
+		$user->client = $client;
+		$user->fibonacci = [0,1,1,2,3,5,8,13,21];
+
+		return $user;
 	}
 
 	protected function getTestProductListCategoryModelObject()
@@ -86,8 +96,76 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
 	public function testFind()
 	{
+		$this->markTestIncomplete();
 		userModel::make()->find(1);
 
 		//$this->assertInstanceOf(,'userModel');
+	}
+
+	public function testArrayGet()
+	{
+		$user = $this->getTestUserModelObject();
+
+		//Check that we can get the data
+		$this->assertEquals('Jenny', $user['first_name']);
+		$this->assertEquals('McCarthy', $user['last_name']);
+		$this->assertEquals('Alyson',$user['client']['first_name']);
+		$this->assertEquals([0,1,1,2,3,5,8,13,21],$user['fibonacci']);
+		$this->assertNull($user['client']['phone']);
+	}
+
+	public function testArraySet()
+	{
+		$user = $this->getTestUserModelObject();
+
+		$user = $this->getTestUserModelObject();
+
+		//Check that we can get the data
+		$this->assertEquals('Jenny', $user['first_name']);
+		$this->assertEquals('McCarthy', $user['last_name']);
+		$this->assertEquals('Alyson',$user['client']['first_name']);
+		$this->assertNull($user['phone']);
+
+		$user['phone'] = '555-555-5555';
+		$user['first_name'] = 'Taylor';
+		$user['last_name'] = 'Swift';
+		$user['client']['last_name'] = 'Stoner';
+
+		//Check that the set worked
+		$this->assertEquals('555-555-5555', $user['phone']);
+		$this->assertEquals('555-555-5555', $user->phone);
+		$this->assertEquals('Taylor', $user['first_name']);
+		$this->assertEquals('Swift', $user['last_name']);
+		$this->assertEquals('Stoner', $user['client']['last_name']);
+	}
+	public function testArrayIsset()
+	{
+		$user = $this->getTestUserModelObject();
+
+		//Test Isset
+		$this->assertFalse(isset($user['phone']));
+		$this->assertTrue(isset($user['first_name']));
+		$this->assertTrue(isset($user['last_name']));
+		$this->assertTrue(isset($user['client']['first_name']));
+		$this->assertFalse(isset($user['client']['phone']));
+	}
+	public function testArrayUnset()
+	{
+		$user = $this->getTestUserModelObject();
+
+		//Test Isset\
+		$this->assertTrue(isset($user['first_name']));
+		$this->assertTrue(isset($user['last_name']));
+		$this->assertTrue(isset($user['client']['first_name']));
+
+
+		//Test Unset
+		unset($user['first_name']);
+		unset($user['last_name']);
+		unset($user['client']['first_name']);
+
+		$this->assertFalse(isset($user['first_name']));
+		$this->assertFalse(isset($user['last_name']));
+		$this->assertFalse(isset($user['client']['first_name']));
 	}
 }

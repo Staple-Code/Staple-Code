@@ -29,6 +29,12 @@ use Staple\Utility;
 class UtilityTest extends \PHPUnit_Framework_TestCase
 {
 	/**
+	 * A sentence to test with.
+	 * @var string
+	 */
+	protected $sentence = 'The quick brown fox jumped over the lazy dog.';
+
+	/**
 	 * Test that the pluralization function works properly
 	 * @test
 	 */
@@ -41,6 +47,12 @@ class UtilityTest extends \PHPUnit_Framework_TestCase
 		{
 			$this->assertEquals($arrayPluralWords[$key], Utility::pluralize($word));
 		}
+
+		//Test caching
+		$this->assertEquals('cabins', Utility::pluralize('cabin'));
+
+		//Test Unchanged
+		$this->assertEquals('cars', Utility::pluralize('cars'));
 	}
 
 	/**
@@ -56,6 +68,12 @@ class UtilityTest extends \PHPUnit_Framework_TestCase
 		{
 			$this->assertEquals($arraySingularWords[$key], Utility::singularize($word));
 		}
+
+		//Test caching
+		$this->assertEquals('bed', Utility::singularize('beds'));
+
+		//Test Unchanged
+		$this->assertEquals('airplane', Utility::singularize('airplane'));
 	}
 
 	/**
@@ -71,5 +89,67 @@ class UtilityTest extends \PHPUnit_Framework_TestCase
 		{
 			$this->assertEquals($snake_case[$key], Utility::snakeCase($word));
 		}
+	}
+
+	/**
+	 * Test the firstWord method
+	 * @test
+	 */
+	public function testFirstWord()
+	{
+		$this->assertEquals('The',Utility::firstWord($this->sentence));
+	}
+
+	/**
+	 * Test the wordLimit method
+	 * @test
+	 */
+	public function testWordLimit()
+	{
+		$this->assertEquals('The quick brown fox',Utility::wordLimit($this->sentence,4));
+		$this->assertEquals('The quick brown fox jumped over the lazy dog.',Utility::wordLimit($this->sentence,27));
+	}
+
+	/**
+	 * Test the wordCount method
+	 * @test
+	 */
+	public function testWordCount()
+	{
+		$this->assertEquals(9,Utility::wordCount($this->sentence));
+	}
+
+	/**
+	 * Test the arraySearch method
+	 * @test
+	 */
+	public function testArraySearch()
+	{
+		$array = [
+			1 => [11,22,33,44,55,66,77],
+			2 => [2,4,6,8,10],
+			3 => [3,9,27,81,243]
+		];
+
+		$this->assertEquals([3,3],Utility::arraySearch(81,$array));
+		$this->assertEquals([2],Utility::arraySearch([2,4,6,8,10],$array));
+		$this->assertFalse(Utility::arraySearch(26,$array));
+	}
+
+	public function testStatesArray()
+	{
+		$statesShort = Utility::statesArray(Utility::STATES_SHORT);
+		$statesLong = Utility::statesArray(Utility::STATES_LONG);
+		$statesDefault = Utility::statesArray(Utility::STATES_BOTH);
+
+		$this->assertArrayHasKey(10,$statesShort);
+		$this->assertEquals('GA',$statesShort[10]);
+
+		$this->assertArrayHasKey(50,$statesLong);
+		$this->assertEquals('Nebraska',$statesLong[27]);
+
+		$this->assertArrayHasKey('PA',$statesDefault);
+		$this->assertEquals('Nebraska',$statesDefault['NE']);
+		$this->assertEquals('Alaska',$statesDefault['AK']);
 	}
 }

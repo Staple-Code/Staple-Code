@@ -32,7 +32,7 @@ use Staple\Query\Select;
 use Staple\Query\Statement;
 use Staple\Traits\Factory;
 
-abstract class Model implements \JsonSerializable, \ArrayAccess, \Iterator
+abstract class Model implements \JsonSerializable, \ArrayAccess
 {
 	use Factory;
 	/**
@@ -245,57 +245,11 @@ abstract class Model implements \JsonSerializable, \ArrayAccess, \Iterator
 	}
 
 	/* (non-PHPdoc)
-	 * @see Iterator::current()
-	 */
-	public function current()
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	/* (non-PHPdoc)
-	 * @see Iterator::key()
-	 */
-	public function key()
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	/* (non-PHPdoc)
-	 * @see Iterator::next()
-	 */
-	public function next()
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	/* (non-PHPdoc)
-	 * @see Iterator::rewind()
-	 */
-	public function rewind()
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	/* (non-PHPdoc)
-	 * @see Iterator::valid()
-	 */
-	public function valid()
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	/* (non-PHPdoc)
 	 * @see ArrayAccess::offsetExists()
 	 */
 	public function offsetExists($offset)
 	{
-		// TODO Auto-generated method stub
-		
+		return isset($this->_data[$offset]);
 	}
 
 	/* (non-PHPdoc)
@@ -303,8 +257,19 @@ abstract class Model implements \JsonSerializable, \ArrayAccess, \Iterator
 	 */
 	public function offsetGet($offset)
 	{
-		// TODO Auto-generated method stub
-		
+		$method = 'get' . ucfirst($offset);
+		if (method_exists($this, $method))
+		{
+			return $this->$method();
+		}
+		elseif(isset($this->_data[$offset]))
+		{
+			return $this->_data[$offset];
+		}
+		else
+		{
+			return NULL;
+		}
 	}
 
 	/* (non-PHPdoc)
@@ -312,8 +277,17 @@ abstract class Model implements \JsonSerializable, \ArrayAccess, \Iterator
 	 */
 	public function offsetSet($offset, $value)
 	{
-		// TODO Auto-generated method stub
-		
+		$method = 'set' . ucfirst($offset);
+		if (method_exists($this, $method))
+		{
+			//Use the setter built onto the object
+			$this->$method($value);
+		}
+		else
+		{
+			//Set the property dynamically
+			$this->_data[$offset] = $value;
+		}
 	}
 
 	/* (non-PHPdoc)
@@ -321,8 +295,8 @@ abstract class Model implements \JsonSerializable, \ArrayAccess, \Iterator
 	 */
 	public function offsetUnset($offset)
 	{
-		// TODO Auto-generated method stub
-		
+		if(isset($this->_data[$offset]))
+			unset($this->_data[$offset]);
 	}
 
 	/**
@@ -341,7 +315,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess, \Iterator
 	}
 
 	/**
-	 * @param DB $connection
+	 * @param PDO $connection
 	 * @return $this
 	 */
 	public function setConnection(PDO $connection)
