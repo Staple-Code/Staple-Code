@@ -28,12 +28,9 @@ namespace Staple\Query;
 use \Staple\Exception\QueryException;
 use \Exception;
 use \Staple\Error;
-use \Staple\DB;
-use \mysqli;
 use \DateTime;
 use Staple\Pager;
 use \PDO;
-use \PDOStatement;
 
 abstract class Query
 {
@@ -160,7 +157,7 @@ abstract class Query
 	/**
 	 * Executes the query and returns the result.
 	 * @param PDO $connection - the database connection to execute the quote upon.
-	 * @return PDOStatement | bool
+	 * @return Statement | bool
 	 * @throws Exception
 	 */
 	public function execute(PDO $connection = NULL)
@@ -372,7 +369,7 @@ abstract class Query
 	 *
 	 * @param string $table
 	 * @param array $columns
-	 * @param DB $db
+	 * @param PDO $db
 	 * @param array | string $order
 	 * @param Pager | int $limit
 	 * @return Select
@@ -387,11 +384,11 @@ abstract class Query
 	 *
 	 * @param string $table
 	 * @param array $data
-	 * @param DB $db
+	 * @param PDO
 	 * @param string $priority
 	 * @return Insert
 	 */
-	public static function insert($table = NULL, $data = NULL, $db = NULL, $priority = NULL)
+	public static function insert($table = NULL, $data = NULL, PDO $db = NULL, $priority = NULL)
 	{
 		return new Insert($table, $data, $db, $priority);
 	}
@@ -401,12 +398,12 @@ abstract class Query
 	 *
 	 * @param string $table
 	 * @param array $data
-	 * @param DB $db
+	 * @param PDO $db
 	 * @param array | string $order
 	 * @param Pager | int $limit
 	 * @return Update
 	 */
-	public static function update($table = NULL, array $data = NULL, $db = NULL, $order = NULL, $limit = NULL)
+	public static function update($table = NULL, array $data = NULL, PDO $db = NULL, $order = NULL, $limit = NULL)
 	{
 		return new Update($table, $data, $db, $order, $limit);
 	}
@@ -415,9 +412,10 @@ abstract class Query
 	 * Construct and return a Delete query object.
 	 *
 	 * @param string $table
-	 * @param mysqli $db
+	 * @param PDO $db
+	 * @return Delete
 	 */
-	public static function delete($table = NULL, mysqli $db = NULL)
+	public static function delete($table = NULL, PDO $db = NULL)
 	{
 		return new Delete($table, $db);
 	}
@@ -426,11 +424,23 @@ abstract class Query
 	 * Construct and return a Union query object
 	 *
 	 * @param array $queries
-	 * @param mysqli $db
+	 * @param PDO $db
+	 * @return Union
 	 */
-	public static function union(array $queries = array(), mysqli $db = NULL)
+	public static function union(array $queries = array(), PDO $db = NULL)
 	{
 		return new Union($queries, $db);
+	}
+
+	/**
+	 * Create and return a Query DataSet object
+	 *
+	 * @param array $data
+	 * @return DataSet
+	 */
+	public static function dataSet(array $data = NULL)
+	{
+		return new DataSet($data);
 	}
 
 	/**
