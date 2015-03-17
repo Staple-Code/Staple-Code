@@ -170,11 +170,9 @@ class Form
 		 */
 		if(Config::getValue('forms','elementViewAdapter') != '')
 		{
-			if(class_exists(Config::getValue('forms','elementViewAdapter')))
-			{
-				$this->setElementViewAdapter(Config::getValue('forms','elementViewAdapter'));
-			}
+			$this->setElementViewAdapter(Config::getValue('forms','elementViewAdapter'));
 		}
+
 
 		//Repopulate data from the session -- I might add this.....
 		//if($this->wasSubmitted())
@@ -759,7 +757,10 @@ JS;
 	 */
 	public function setElementViewAdapter($elementViewAdapter)
 	{
-		$this->elementViewAdapter = new $elementViewAdapter;
+		if(class_exists(Config::getValue('forms','elementViewAdapter')))
+		{
+			$this->elementViewAdapter = new $elementViewAdapter;
+		}
 		return $this;
 	}
 
