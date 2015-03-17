@@ -32,7 +32,7 @@ class Alias
 		'Alias'							=>	'\\Staple\\Alias',
 		'Auth'							=>	'\\Staple\\Auth',
 		'AuthAdapter'					=>	'\\Staple\\AuthAdapter',
-		'AuthController'				=>	'\\Staple\\AuthContoller',
+		'AuthController'				=>	'\\Staple\\AuthController',
 		'Autoload'						=>	'\\Staple\\Autoload',
 		'Config'						=>	'\\Staple\\Config',
 		'Controller'					=>	'\\Staple\\Controller',

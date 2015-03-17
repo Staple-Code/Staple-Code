@@ -261,7 +261,7 @@ class View
 		if($this->_render === true)
 		{
 			//Load the view from the default loader
-			$view = Main::get()->getLoader()->loadView($this->controller,$this->view);
+			$view = Main::get()->getLoader()->loadView($this->_controller,$this->_view);
 			if(strlen($view) >= 1 && $view !== false)
 			{
 				//Initialize the view model, if set
