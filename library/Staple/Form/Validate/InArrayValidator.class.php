@@ -86,15 +86,18 @@ class InArrayValidator extends FieldValidator
 	{
 		switch ($fieldType)
 		{
-			case 'Staple_Form_SelectElement':
+			case 'SelectElement':
+			case 'Staple\Form\SelectElement':
 				$fieldid = "#{$field->getId()}";
 				$valstring = "#{$field->getId()} option:selected";
 				break;
-			case 'Staple_Form_RadioGroup':
+			case 'RadioElement':
+			case 'Staple\Form\RadioElement':
 				$fieldid = "input:radio[name={$field->getName()}]";
 				$valstring = "input:radio[name={$field->getName()}]:checked";
 				break;
-			case 'Staple_Form_CheckboxElement':
+			case 'CheckboxElement':
+			case 'Staple\Form\CheckboxElement':
 				return '';
 				break;
 			default:
