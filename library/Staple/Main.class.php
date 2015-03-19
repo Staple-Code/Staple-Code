@@ -160,7 +160,7 @@ class Main
 		//Turn on the timer 
 		if(Config::getValue('errors', 'enable_timer') == 1)
 		{
-			Dev::StartTimer();
+			Dev::startTimer();
 		}
 	}
 	
