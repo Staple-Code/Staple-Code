@@ -30,6 +30,7 @@ use \stdClass;
 * Added to include Singleton Trait once so Config class will load with out autoloader being started.
 */
 require_once STAPLE_ROOT.'Traits'.DIRECTORY_SEPARATOR.'Singleton.trait.php';
+require_once STAPLE_ROOT.'Exception'.DIRECTORY_SEPARATOR.'ConfigurationException.class.php';
 
 class Config
 {
@@ -67,6 +68,8 @@ class Config
 	/**
 	 * Get a config set by header.
 	 * @param string $name
+	 * @throws ConfigurationException
+	 * @return mixed
 	 */
 	public function __get($name)
 	{
@@ -75,7 +78,7 @@ class Config
 			$this->read();
 		}
 		
-		//Check for the existance of 
+		//Check for the existence of
 		if(array_key_exists($name, $this->store))
 		{
 			return $this->store[$name];
