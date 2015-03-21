@@ -21,7 +21,7 @@
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-class accountController extends Staple_AuthController
+class accountController extends AuthController
 {
 	public function _start()
 	{

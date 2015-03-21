@@ -339,6 +339,14 @@ class Layout
 	}
 
 	/**
+	 * @return View
+	 */
+	public function getView()
+	{
+		return $this->view;
+	}
+
+	/**
 	 * @return string $title
 	 */
 	public function getTitle()

@@ -31,7 +31,7 @@ class FileElement extends FieldElement
 	protected $accept;
 	
 	/**
-	 * @return the $accept
+	 * @return string $accept
 	 */
 	public function getAccept()
 	{
@@ -40,7 +40,7 @@ class FileElement extends FieldElement
 
 	/**
 	 * @param string $accept
-	 * @return Staple_Form_FileElement
+	 * @return $this
 	 */
 	public function setAccept($accept)
 	{
@@ -59,7 +59,7 @@ class FileElement extends FieldElement
 		{
 			$accept = ' accept="'.htmlentities($this->accept).'"';
 		}
-		return '	<input type="file" id="'.$this->escape($this->id).'" name="'.$this->escape($this->name).'" value=""'.$accept.$this->getAttribString().'>'."\n";
+		return '	<input type="file" id="'.$this->escape($this->id).'" name="'.$this->escape($this->name).'" value=""'.$accept.$this->getAttribString('input').'>'."\n";
 	}
 
 	/**
@@ -68,7 +68,7 @@ class FileElement extends FieldElement
 	 */
 	public function label()
 	{
-		return '	<label for="'.$this->escape($this->id).'"'.$this->getClassString().'>'.$this->label."</label>\n";
+		return '	<label for="'.$this->escape($this->id).'"'.$this->getClassString('label').'>'.$this->label."</label>\n";
 	}
 
 	/**
@@ -90,7 +90,7 @@ class FileElement extends FieldElement
 		{
 			$this->addClass('form_element');
 			$this->addClass('element_file');
-			$classes = $this->getClassString();
+			$classes = $this->getClassString('div');
 			$buf .= "<div$classes id=\"".$this->escape($this->id)."_element\">\n";
 			$buf .= $this->label();
 			$buf .= $this->field();

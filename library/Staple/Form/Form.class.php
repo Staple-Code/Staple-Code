@@ -79,8 +79,8 @@ class Form
 	protected $errors = array();
 	
 	/**
-	 * An array of Staple_Form_Element objects, that represent the form fields.
-	 * @var array[Staple_Form_Element]
+	 * An array of FieldElement objects, that represent the form fields.
+	 * @var FieldElement[]
 	 */
 	public $fields = array();
 	
@@ -136,7 +136,7 @@ class Form
 	 * @param string $name
 	 * @param string $action
 	 */
-	final public function __construct($name = NULL, $action = NULL)
+	public function __construct($name = NULL, $action = NULL)
 	{
 		$this->_start();
 		if(isset($name))
@@ -150,21 +150,15 @@ class Form
 		if(isset($this->name))
 		{
 			//check that the form was submitted.
-			if(array_key_exists('Staple', $_SESSION))
+			if(isset($_SESSION['Staple']['Forms'][$this->name]))
 			{
-				if(array_key_exists('Forms', $_SESSION['Staple']))
+				if(array_key_exists('ident', $_SESSION['Staple']['Forms'][$this->name]))
 				{
-					if(array_key_exists($this->name, $_SESSION['Staple']['Forms']))
+					if(array_key_exists('ident', $_REQUEST))
 					{
-						if(array_key_exists('ident', $_SESSION['Staple']['Forms'][$this->name]))
+						if($_SESSION['Staple']['Forms'][$this->name]['ident'] == $_REQUEST['ident'])
 						{
-							if(array_key_exists('ident', $_REQUEST))
-							{
-								if($_SESSION['Staple']['Forms'][$this->name]['ident'] == $_REQUEST['ident'])
-								{
-									$this->submitted = true;
-								}
-							}
+							$this->submitted = true;
 						}
 					}
 				}
@@ -279,9 +273,9 @@ class Form
 	 * @param string $name
 	 * @param string $action
 	 * @param string $method
-	 * @return Staple_Form
+	 * @return Form
 	 */
-	public static function Create($name, $action=NULL, $method="POST")
+	public static function create($name, $action=NULL, $method="POST")
 	{
 		$inst = new self($name,$action);
 		$inst->setMethod($method);
@@ -290,7 +284,8 @@ class Form
 	
 	/**
 	 * Adds a field to the form from an already instantiated form element.
-	 * @param Staple_Form_Element $field
+	 * @param FieldElement $field
+	 * @return $this
 	 */
 	public function addField(FieldElement $field)
 	{
@@ -313,6 +308,7 @@ class Form
 	/**
 	 * Accepts an associative array of fields=>values to apply to the form elements.
 	 * @param array $data
+	 * @return $this
 	 */
 	public function addData(array $data)
 	{
@@ -632,7 +628,7 @@ JS;
 	/**
 	 * Sets the form action location
 	 * @param string $action
-	 * @return Staple_Form
+	 * @return Form
 	 */
 	public function setAction($action)
 	{
@@ -652,7 +648,7 @@ JS;
 	/**
 	 * Sets the method for the form. Only accepts GET and POST. POST is the default.
 	 * @param string $method
-	 * @return Staple_Form
+	 * @return Form
 	 */
 	public function setMethod($method)
 	{
@@ -679,7 +675,7 @@ JS;
 	/**
 	 * Sets the name of the form
 	 * @param string $name
-	 * @return Staple_Form
+	 * @return Form
 	 */
 	public function setName($name)
 	{
@@ -697,7 +693,7 @@ JS;
 	}
 	
 	/**
-	 * @return the $enctype
+	 * @return string $enctype
 	 */
 	public function getEnctype()
 	{

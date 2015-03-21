@@ -46,12 +46,18 @@ class View
 	 * A string containing the name of the view to build.
 	 * @var string
 	 */
-	protected $view;
+	protected $_view;
 	/**
 	 * A string containing the name of the controller under which to look for the view.
 	 * @var string
 	 */
-	protected $controller;
+	protected $_controller;
+
+	/**
+	 * The Model object that is bound to this view.
+	 * @var Model
+	 */
+	protected $_viewModel;
 
 	public function __construct($view = NULL, $controller = NULL)
 	{
@@ -134,10 +140,11 @@ class View
 	/**
 	 * Sets the view string
 	 * @param string $view
+	 * @return $this
 	 */
 	public function setView($view)
 	{
-		$this->view = $view;
+		$this->_view = $view;
 		return $this;
 	}
 	/**
@@ -146,7 +153,7 @@ class View
 	 */
 	public function getView()
 	{
-		return $this->view;
+		return $this->_view;
 	}
 	/**
 	 * Returns isset on the $view parameter
@@ -154,15 +161,16 @@ class View
 	 */
 	public function hasView()
 	{
-		return isset($this->view);
+		return isset($this->_view);
 	}
 	/**
 	 * Sets the controller string
 	 * @param string $controller
+	 * @return $this
 	 */
 	public function setController($controller)
 	{
-		$this->controller = $controller;
+		$this->_controller = $controller;
 		return $this;
 	}
 	/**
@@ -171,7 +179,7 @@ class View
 	 */
 	public function getController()
 	{
-		return $this->controller;
+		return $this->_controller;
 	}
 	/**
 	 * Returns isset on the $controller parameter.
@@ -179,36 +187,88 @@ class View
 	 */
 	public function hasController()
 	{
-		return isset($this->controller);
+		return isset($this->_controller);
+	}
+
+	/**
+	 * @return Model
+	 */
+	public function getViewModel()
+	{
+		return $this->_viewModel;
+	}
+
+	/**
+	 * @param Model $viewModel
+	 */
+	public function setViewModel(Model $viewModel)
+	{
+		$this->_viewModel = $viewModel;
+		return $this;
+	}
+
+	/**
+	 * When a model is provided, the model is bound to the view and the View object is returned.
+	 * With no parameters set, the bound Model object is returned.
+	 * @param Model $model
+	 * @return Model|View|NULL
+	 */
+	public function model(Model $model = NULL)
+	{
+		//Set or get the model depending upon the parameters
+		if(isset($model))
+			return $this->setViewModel($model);
+		else
+			return $this->getViewModel();
 	}
 
 	/**
 	 * Add data to the view data store for accessibility within the view.
 	 * @param string $key
 	 * @param mixed $value
+	 * @return $this
 	 */
 	public function addData($key,$value)
 	{
 		$this->_store[$key] = $value;
 		return $this;
 	}
+
+	/**
+	 * Add data to the view as an associative array
+	 * @param array $data
+	 * @throws Exception
+	 * @return $this
+	 */
+	public function data(array $data)
+	{
+		foreach($data as $key=>$value)
+		{
+			if(is_int($key)) throw new Exception('Array keys must be associative.');
+			$this->addData($key,$value);
+		}
+
+		return $this;
+	}
 	
 	/**
-	 * 
 	 * This function renders the view. If accepts a string representing the controller and
 	 * a string representing the requested action. With this information the correct view
 	 * is selected and rendered.
-	 * @param string $class
-	 * @param string $view
 	 */
 	public function build()
 	{
 		if($this->_render === true)
 		{
 			//Load the view from the default loader
-			$view = Main::get()->getLoader()->loadView($this->controller,$this->view);
-			if(strlen($view) >= 1)
+			$view = Main::get()->getLoader()->loadView($this->_controller,$this->_view);
+			if(strlen($view) >= 1 && $view !== false)
 			{
+				//Initialize the view model, if set
+				if(isset($this->_viewModel))
+					$model = $this->_viewModel;
+
+				//include the view
 				include $view;
 			}
 		}

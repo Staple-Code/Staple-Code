@@ -50,7 +50,7 @@ class ImageElement extends FieldElement
 	 */
 	public function label()
 	{
-		return '	<label for="'.$this->escape($this->id).'"'.$this->getClassString().'>'.$this->label.'</label>';
+		return '	<label for="'.$this->escape($this->id).'"'.$this->getClassString('label').'>'.$this->label.'</label>';
 	}
 
 	public function build($fieldView = NULL)
@@ -68,7 +68,7 @@ class ImageElement extends FieldElement
 		{
 			$this->addClass('form_element');
 			$this->addClass('element_image');
-			$classes = $this->getClassString();
+			$classes = $this->getClassString('div');
 			$buf .= "<div$classes id=\"".$this->escape($this->id)."_element\">\n";
 			if(isset($this->label))
 			{

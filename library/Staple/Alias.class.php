@@ -32,7 +32,7 @@ class Alias
 		'Alias'							=>	'\\Staple\\Alias',
 		'Auth'							=>	'\\Staple\\Auth',
 		'AuthAdapter'					=>	'\\Staple\\AuthAdapter',
-		'AuthController'				=>	'\\Staple\\AuthContoller',
+		'AuthController'				=>	'\\Staple\\AuthController',
 		'Autoload'						=>	'\\Staple\\Autoload',
 		'Config'						=>	'\\Staple\\Config',
 		'Controller'					=>	'\\Staple\\Controller',
@@ -53,7 +53,7 @@ class Alias
 		'Request'						=>	'\\Staple\\Request',
 		'Route'							=>	'\\Staple\\Route',
 		'Script'						=>	'\\Staple\\Script',
-		'Util'							=>	'\\Staple\\Util',
+		'Utility'						=>	'\\Staple\\Utility',
 		'View'							=>	'\\Staple\\View',
 
 		//Legacy Class Names
@@ -82,7 +82,7 @@ class Alias
 		'Staple_Request'				=>	'\\Staple\\Request',
 		'Staple_Route'					=>	'\\Staple\\Route',
 		'Staple_Script'					=>	'\\Staple\\Script',
-		'Staple_Util'					=>	'\\Staple\\Util',
+		'Staple_Util'					=>	'\\Staple\\Utility',
 		'Staple_View'					=>	'\\Staple\\View',
 
 		//Form Class Aliases
@@ -154,6 +154,26 @@ class Alias
 		'Staple_Form_Validate_Regex'			=>	'\\Staple\\Form\\Validate\RegexValidator',
 		'Staple_Form_Validate_UploadedFile'		=>	'\\Staple\\Form\\Validate\UploadedFileValidator',
 		'Staple_Form_Validate_Zip'				=>	'\\Staple\\Form\\Validate\ZipValidator',
+
+		//Filter Class Aliases
+		'BaseNameFilter'				=>	'\\Staple\\Form\\Filter\BaseNameFilter',
+		'IntegerFilter'					=>	'\\Staple\\Form\\Filter\IntegerFilter',
+		'PhoneFormatFilter'				=>	'\\Staple\\Form\\Filter\PhoneFormatFilter',
+		'TagsFilter'					=>	'\\Staple\\Form\\Filter\TagsFilter',
+		'ToDateTimeFilter'				=>	'\\Staple\\Form\\Filter\ToDateTimeFilter',
+		'ToLowerFilter'					=>	'\\Staple\\Form\\Filter\ToLowerFilter',
+		'ToUpperFilter'					=>	'\\Staple\\Form\\Filter\ToUpperFilter',
+		'TrimFilter'					=>	'\\Staple\\Form\\Filter\TrimFilter',
+
+		//Legacy Validator Class Aliases
+		'Staple_Form_Filter_BaseName'		=>	'\\Staple\\Form\\Filter\BaseNameFilter',
+		'Staple_Form_Filter_Integer'		=>	'\\Staple\\Form\\Filter\IntegerFilter',
+		'Staple_Form_Filter_PhoneFormat'	=>	'\\Staple\\Form\\Filter\PhoneFormatFilter',
+		'Staple_Form_Filter_Tags'			=>	'\\Staple\\Form\\Filter\TagsFilter',
+		'Staple_Form_Filter_ToDateTime'		=>	'\\Staple\\Form\\Filter\ToDateTimeFilter',
+		'Staple_Form_Filter_ToLower'		=>	'\\Staple\\Form\\Filter\ToLowerFilter',
+		'Staple_Form_Filter_ToUpper'		=>	'\\Staple\\Form\\Filter\ToUpperFilter',
+		'Staple_Form_Filter_Trim'			=>	'\\Staple\\Form\\Filter\TrimFilter',
 
 		//Data Class Aliases
 		'DoubleLinkedList'				=>	'\\Staple\\Data\\DoubleLinkedList',
@@ -274,9 +294,20 @@ class Alias
 			return true;
 
 		if(!is_null($class))
-			return class_alias($class, $alias, $autoload);
-		else
-			return false;
+			if(!class_exists($alias))
+				return class_alias($class, $alias, $autoload);
+
+		//Return false otherwise
+		return false;
+	}
+
+	/**
+	 * return the entire class map array
+	 * @return array
+	 */
+	public function getClassMap()
+	{
+		return self::$class_map;
 	}
 }
 

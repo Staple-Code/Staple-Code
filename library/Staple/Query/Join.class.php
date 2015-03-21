@@ -39,22 +39,27 @@ class Join
 	 * Left Table
 	 * @var string
 	 */
-	protected $lefttable;
+	protected $leftTable;
 	/**
 	 * Left Join Column(s)
 	 * @var string | array
 	 */
-	protected $leftcolumn;
+	protected $leftColumn;
 	/**
 	 * Right Table - The table that is being added to the left table.
 	 * @var string
 	 */
 	protected $table;
 	/**
+	 * The alias of the joined table
+	 * @var string
+	 */
+	protected $tableAlias;
+	/**
 	 * Right Column(s)
 	 * @var string | array
 	 */
-	protected $rightcolumn;
+	protected $rightColumn;
 	/**
 	 * Join Condition
 	 * @var string
@@ -71,21 +76,22 @@ class Join
 	 * @param string $type
 	 * @param string $table
 	 * @param string $condition
-	 * @param string $lefttable
-	 * @param string $leftcolumn
-	 * @param string $rightcolumn
+	 * @param string $leftTable
+	 * @param string $leftColumn
+	 * @param string $rightColumn
 	 */
-	public function __construct($type = self::INNER, $table = NULL, $condition = NULL, $lefttable = NULL, $leftcolumn = NULL, $rightcolumn = NULL)
+	public function __construct($type = self::INNER, $table = NULL, $condition = NULL, $leftTable = NULL, $leftColumn = NULL, $rightColumn = NULL, $tableAlias = NULL)
 	{
+		//Set the Join Type
 		$this->setType($type);
-		if(isset($table))
-		{
-			$this->setTable($table);
-		}
-		if(isset($condition))
-		{
-			$this->setCondition($condition);
-		}
+
+		//Set Optional Params
+		if(isset($table)) $this->setTable($table);
+		if(isset($condition)) $this->setCondition($condition);
+		if(isset($leftTable)) $this->setLeftTable($leftTable);
+		if(isset($leftColumn)) $this->setLeftColumn($leftColumn);
+		if(isset($rightColumn)) $this->setRightColumn($rightColumn);
+		if(isset($tableAlias)) $this->setTableAlias($tableAlias);
 	}
 	
 	public function __toString()
@@ -94,23 +100,23 @@ class Join
 	}
 	
 	/**
-	 * @return the $lefttable
+	 * @return string $leftTable
 	 */
-	public function getLefttable()
+	public function getLeftTable()
 	{
-		return $this->lefttable;
+		return $this->leftTable;
 	}
 
 	/**
-	 * @return the $leftcolumn
+	 * @return string $leftColumn
 	 */
-	public function getLeftcolumn()
+	public function getLeftColumn()
 	{
-		return $this->leftcolumn;
+		return $this->leftColumn;
 	}
 
 	/**
-	 * @return the $table
+	 * @return string $table
 	 */
 	public function getTable()
 	{
@@ -118,15 +124,15 @@ class Join
 	}
 
 	/**
-	 * @return the $rightcolumn
+	 * @return string $rightColumn
 	 */
-	public function getRightcolumn()
+	public function getRightColumn()
 	{
-		return $this->rightcolumn;
+		return $this->rightColumn;
 	}
 
 	/**
-	 * @return the $condition
+	 * @return string $condition
 	 */
 	public function getCondition()
 	{
@@ -134,7 +140,7 @@ class Join
 	}
 
 	/**
-	 * @return the $type
+	 * @return string $type
 	 */
 	public function getType()
 	{
@@ -142,25 +148,28 @@ class Join
 	}
 
 	/**
-	 * @param string $lefttable
+	 * @param string $leftTable
+	 * @return Join
 	 */
-	public function setLefttable($lefttable)
+	public function setLeftTable($leftTable)
 	{
-		$this->lefttable = $lefttable;
+		$this->leftTable = $leftTable;
 		return $this;
 	}
 
 	/**
-	 * @param string $leftcolumn
+	 * @param string $leftColumn
+	 * @return Join
 	 */
-	public function setLeftcolumn($leftcolumn)
+	public function setLeftColumn($leftColumn)
 	{
-		$this->leftcolumn = $leftcolumn;
+		$this->leftColumn = $leftColumn;
 		return $this;
 	}
 
 	/**
 	 * @param string $table
+	 * @return Join
 	 */
 	public function setTable($table)
 	{
@@ -169,16 +178,18 @@ class Join
 	}
 
 	/**
-	 * @param string $rightcolumn
+	 * @param string $rightColumn
+	 * @return Join
 	 */
-	public function setRightcolumn($rightcolumn)
+	public function setRightColumn($rightColumn)
 	{
-		$this->rightcolumn = $rightcolumn;
+		$this->rightColumn = $rightColumn;
 		return $this;
 	}
 
 	/**
 	 * @param string $condition
+	 * @return Join
 	 */
 	public function setCondition($condition)
 	{
@@ -188,6 +199,7 @@ class Join
 
 	/**
 	 * @param string $type
+	 * @return Join
 	 */
 	public function setType($type)
 	{
@@ -195,28 +207,55 @@ class Join
 		return $this;
 	}
 
+	/**
+	 * @return string
+	 */
+	public function getTableAlias()
+	{
+		return $this->tableAlias;
+	}
+
+	/**
+	 * @param string $tableAlias
+	 * @return Join
+	 */
+	public function setTableAlias($tableAlias)
+	{
+		$this->tableAlias = $tableAlias;
+		return $this;
+	}
+
 	public function build()
 	{
 		$join = $this->getType().' '.$this->table;
+
+		//Add a table alias
+		//@todo refactor this to support other DB Types
+		if(isset($this->tableAlias))
+		{
+			$join .= '`'.$this->tableAlias.'`';
+		}
+
+		//Setup the Join Condition
 		if(isset($this->condition))
 		{
 			$join .= ' ON '.$this->condition;
 		}
-		elseif(isset($this->lefttable) && isset($this->leftcolumn) && isset($this->rightcolumn))
+		elseif(isset($this->leftTable) && isset($this->leftColumn) && isset($this->rightColumn))
 		{
-			$join .= ' ON '.$this->lefttable.'.'.$this->leftcolumn.'='.$this->table.'.'.$this->rightcolumn;
+			$join .= ' ON '.$this->leftTable.'.'.$this->leftColumn.'='.$this->table.'.'.$this->rightColumn;
 		}
 		return $join;
 	}
 	
-	public static function inner($table, $condition)
+	public static function inner($table, $condition, $alias = NULL)
 	{
-		return new static(self::INNER,$table,$condition);
+		return new static(self::INNER,$table,$condition,NULL,NULL,NULL,$alias);
 	}
 	
-	public static function left($table,$condition)
+	public static function left($table,$condition, $alias = NULL)
 	{
-		return new static(self::LEFT,$table,$condition);
+		return new static(self::LEFT,$table,$condition,NULL,NULL,NULL,$alias);
 	}
 }
 

@@ -25,6 +25,7 @@ namespace Staple\Query;
 use \Exception;
 use \Staple\Error;
 use \Staple\Pager;
+use \PDO;
 
 class Update extends Query
 {
@@ -38,7 +39,7 @@ class Update extends Query
 	protected $flags = array();
 	/**
 	 * The data with which to update.
-	 * @var array[string]
+	 * @var DataSet[]
 	 */
 	public $data = array();
 	/**
@@ -48,7 +49,7 @@ class Update extends Query
 	protected $order;
 	/**
 	 * Limit number of rows to return.
-	 * @var int
+	 * @var Pager | int
 	 */
 	protected $limit;
 	/**
@@ -60,17 +61,17 @@ class Update extends Query
 	/**
 	 * @param string $table
 	 * @param array $data
-	 * @param DB $db
+	 * @param PDO $db
 	 * @param array | string $order
 	 * @param Pager | int $limit
 	 * @throws Exception
 	 */
-	public function __construct($table = NULL, array $data = NULL, $db = NULL, $order = NULL, $limit = NULL)
+	public function __construct($table = NULL, array $data = NULL, PDO $db = NULL, $order = NULL, $limit = NULL)
 	{
 		$this->data = new DataSet();
 		if(isset($db))
 		{
-			$this->setDb($db);
+			$this->setConnection($db);
 		}
 		if(isset($table))
 		{
@@ -144,7 +145,7 @@ class Update extends Query
 	//----------------------------------------------GETTERS AND SETTERS----------------------------------------------
 	
 	/**
-	 * @return the $columns
+	 * @return DataSet[] $columns
 	 */
 	public function getData()
 	{
@@ -161,7 +162,7 @@ class Update extends Query
 	}
 
 	/**
-	 * @return the $limit
+	 * @return Pager | int $limit
 	 */
 	public function getLimit()
 	{
@@ -169,7 +170,7 @@ class Update extends Query
 	}
 
 	/**
-	 * @return the $limitOffset
+	 * @return int $limitOffset
 	 */
 	public function getLimitOffset()
 	{
@@ -190,7 +191,7 @@ class Update extends Query
 
 	/**
 	 * @param int $limit
-	 * @return Staple_Query_Select
+	 * @return Select
 	 */
 	public function setLimit($limit)
 	{
@@ -200,7 +201,8 @@ class Update extends Query
 	
 	/**
 	 * Sets the $data
-	 * @param Staple_Query_DataSet
+	 * @param DataSet
+	 * @return $this
 	 */
 	public function setData($data)
 	{
@@ -225,6 +227,7 @@ class Update extends Query
 	 * @param mixed $data
 	 * @param bool $literal
 	 * @throws Exception
+	 * @return $this
 	 */
 	public function setDataColumn($column,$data,$literal = false)
 	{
@@ -250,8 +253,9 @@ class Update extends Query
 	
 	/**
 	 * Sets the limit and the offset in one function.
-	 * @param int | Staple_Pager $limit
+	 * @param int | Pager $limit
 	 * @param int $offset
+	 * @return $this
 	 */
 	public function limit($limit,$offset = NULL)
 	{
@@ -271,7 +275,7 @@ class Update extends Query
 
 	/**
 	 * @param int $limitOffset
-	 * @return Staple_Query_Select
+	 * @return Select
 	 */
 	public function setLimitOffset($limitOffset)
 	{

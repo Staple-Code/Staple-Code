@@ -25,12 +25,12 @@
  */
 namespace Staple\Query;
 
+use \Staple\Exception\QueryException;
 use \Exception;
 use \Staple\Error;
-use \Staple\DB;
-use \mysqli;
 use \DateTime;
 use Staple\Pager;
+use \PDO;
 
 abstract class Query
 {
@@ -42,37 +42,41 @@ abstract class Query
 	public $table;
 	
 	/**
-	 * The database object. A database object is required to properly escape input.
-	 * @var mysqli
+	 * The PDO database object. A database object is required to properly escape input.
+	 * @var PDO
 	 */
-	protected $db;
+	protected $connection;
 	
 	/**
 	 * An array of Where Clauses. The clauses are additive, using the AND  conjunction.
 	 * @var array[Staple_Query_Condition]
 	 */
 	protected $where = array();
-	
-	
-	public function __construct($table = NULL, mysqli $db = NULL)
+
+	/**
+	 * @param string $table
+	 * @param PDO $db
+	 * @throws QueryException
+	 */
+	public function __construct($table = NULL, PDO $db = NULL)
 	{
-		if($db instanceof mysqli)
+		if($db instanceof PDO)
 		{
-			$this->setDb($db);
+			$this->setConnection($db);
 		}
 		else
 		{
 			try {
-				$this->setDb(DB::get());
+				$this->setConnection(Connection::get());
 			}
 			catch (Exception $e)
 			{
-				$this->setDb(new mysqli());
+				throw new QueryException('Unable to find a database connection.', Error::DB_ERROR, $e);
 			}
 		}
-		if(!($this->db instanceof mysqli))
+		if(!($this->connection instanceof PDO))
 		{
-			throw new Exception('Unable to create database object', Error::DB_ERROR);
+			throw new QueryException('Unable to create database object', Error::DB_ERROR);
 		}
 		
 		//Set Table
@@ -91,7 +95,7 @@ abstract class Query
 	}
 	
 	/**
-	 * @return the $table
+	 * @return Query|string $table
 	 */
 	public function getTable()
 	{
@@ -99,16 +103,17 @@ abstract class Query
 	}
 
 	/**
-	 * @return the $db
+	 * @return PDO $db
 	 */
-	public function getDb()
+	public function getConnection()
 	{
-		return $this->db;
+		return $this->connection;
 	}
 
 	/**
-	 * @param mixed $table
+	 * @param Query|string $table
 	 * @param string $alias
+	 * @return $this
 	 */
 	public function setTable($table,$alias = NULL)
 	{
@@ -124,45 +129,83 @@ abstract class Query
 	}
 
 	/**
-	 * @param mysqli $db
+	 * Alias of setTable()
+	 * @param string | Query $table
+	 * @param string $alias
+	 * @return Query
 	 */
-	public function setDb(mysqli $db)
+	public function fromTable($table, $alias = NULL)
 	{
-		$this->db = $db;
+		return $this->setTable($table,$alias);
+	}
+
+	/**
+	 * @param PDO $connection
+	 * @return $this
+	 */
+	public function setConnection(PDO $connection)
+	{
+		$this->connection = $connection;
 		return $this;
 	}
 
+	/**
+	 * @return string
+	 */
 	abstract function build();
 	
 	/**
 	 * Executes the query and returns the result.
-	 * @return mysqli_result | bool
+	 * @param PDO $connection - the database connection to execute the quote upon.
+	 * @return Statement | bool
+	 * @throws Exception
 	 */
-	public function execute()
+	public function execute(PDO $connection = NULL)
 	{
-		if($this->db instanceof mysqli)
+		if(isset($connection))
+			$this->setConnection($connection);
+
+		if($this->connection instanceof PDO)
 		{
-			return $this->db->query($this->build());
+			return $this->connection->query($this->build());
 		}
 		else
 		{
 			try 
 			{
-				$this->db = DB::get();
+				$this->connection = Connection::get();
 			}
 			catch (Exception $e)
 			{
 				//@todo try for a default connection if no staple connection
-				throw new Exception('No Database Connection', Error::DB_ERROR);
+				throw new QueryException('No Database Connection', Error::DB_ERROR);
 			}
-			if($this->db instanceof mysqli)
+			if($this->connection instanceof PDO)
 			{
-				return $this->db->query($this->build());
+				return $this->connection->query($this->build());
 			}
 		}
 		return false;
 	}
-	
+
+	/**
+	 * This method gets either the default framework connection or a predefined named connection.
+	 * @param string $namedConnection
+	 * @return PDO
+	 */
+	public static function connection($namedConnection = NULL)
+	{
+		if($namedConnection == NULL)
+		{
+			$db = Connection::getInstance();
+		}
+		else
+		{
+			$db = Connection::getNamedConnection($namedConnection);
+		}
+
+		return $db;
+	}
 	
 	/*-----------------------------------------------WHERE CLAUSES-----------------------------------------------*/
 	
@@ -186,7 +229,8 @@ abstract class Query
 	
 	/**
 	 * An open ended where statement
-	 * @param string | Staple_Query_Select $statement
+	 * @param string | Select $statement
+	 * @return $this
 	 */
 	public function whereStatement($statement)
 	{
@@ -199,6 +243,7 @@ abstract class Query
 	 * @param string $column
 	 * @param mixed $value
 	 * @param boolean $columnJoin
+	 * @return $this
 	 */
 	public function whereEqual($column, $value, $columnJoin = NULL)
 	{
@@ -230,7 +275,8 @@ abstract class Query
 	/**
 	 * SQL IN Clause
 	 * @param string $column
-	 * @param array | Staple_Query_Select $values
+	 * @param array | Select $values
+	 * @return $this
 	 */
 	public function whereIn($column, $values)
 	{
@@ -243,6 +289,7 @@ abstract class Query
 	 * @param string $column
 	 * @param mixed $start
 	 * @param mixed $end
+	 * @return $this
 	 */
 	public function whereBetween($column, $start, $end)
 	{
@@ -255,25 +302,31 @@ abstract class Query
 	/**
 	 * Converts a PHP data type into a compatible MySQL string.
 	 * @param mixed $inValue
+	 * @param PDO $db
+	 * @throws QueryException
 	 * @return string
 	 */
-	public static function convertTypes($inValue, DB $db = NULL)
+	public static function convertTypes($inValue, PDO $db = NULL)
 	{
-		if(!($db instanceof mysqli))
+		if(!($db instanceof PDO))
 		{
 			try{
-				$db = DB::get();
+				$db = Connection::get();
 			}
 			catch (Exception $e)
 			{
-				throw new Exception('No Database Connection', Error::DB_ERROR);
+				throw new QueryException('No Database Connection', Error::DB_ERROR);
 			}
 		}
 		
 		//Decided to error on the side of caution and represent floats as strings in SQL statements
+		if(is_int($inValue))
+		{
+			return (int)$inValue;
+		}
 		if(is_string($inValue) || is_float($inValue))
 		{
-			return "'".$db->real_escape_string($inValue)."'";
+			return $db->quote($inValue);
 		}
 		elseif(is_bool($inValue))
 		{
@@ -285,15 +338,16 @@ abstract class Query
 		}
 		elseif(is_array($inValue))
 		{
-			return "'".$db->real_escape_string(implode(" ", $inValue))."'";
+			return $db->quote(implode(" ", $inValue));
 		}
 		elseif($inValue instanceof DateTime)
 		{
-			return "'".$db->real_escape_string($inValue->format('Y-m-d H:i:s'))."'";
+			//@todo add a switch in here for different database types
+			return $db->quote($inValue->format('Y-m-d H:i:s'));
 		}
 		else
 		{
-			return "'".$db->real_escape_string((string)$inValue)."'";
+			return $db->quote((string)$inValue);
 		}
 	}
 
@@ -315,12 +369,12 @@ abstract class Query
 	 *
 	 * @param string $table
 	 * @param array $columns
-	 * @param DB $db
+	 * @param PDO $db
 	 * @param array | string $order
 	 * @param Pager | int $limit
 	 * @return Select
 	 */
-	public static function select($table = NULL, array $columns = NULL, $db = NULL, $order = NULL, $limit = NULL)
+	public static function select($table = NULL, array $columns = NULL, PDO $db = NULL, $order = NULL, $limit = NULL)
 	{
 		return new Select($table, $columns, $db, $order, $limit);
 	}
@@ -330,11 +384,11 @@ abstract class Query
 	 *
 	 * @param string $table
 	 * @param array $data
-	 * @param DB $db
+	 * @param PDO
 	 * @param string $priority
 	 * @return Insert
 	 */
-	public static function insert($table = NULL, $data = NULL, $db = NULL, $priority = NULL)
+	public static function insert($table = NULL, $data = NULL, PDO $db = NULL, $priority = NULL)
 	{
 		return new Insert($table, $data, $db, $priority);
 	}
@@ -344,12 +398,12 @@ abstract class Query
 	 *
 	 * @param string $table
 	 * @param array $data
-	 * @param DB $db
+	 * @param PDO $db
 	 * @param array | string $order
 	 * @param Pager | int $limit
 	 * @return Update
 	 */
-	public static function update($table = NULL, array $data = NULL, $db = NULL, $order = NULL, $limit = NULL)
+	public static function update($table = NULL, array $data = NULL, PDO $db = NULL, $order = NULL, $limit = NULL)
 	{
 		return new Update($table, $data, $db, $order, $limit);
 	}
@@ -358,9 +412,10 @@ abstract class Query
 	 * Construct and return a Delete query object.
 	 *
 	 * @param string $table
-	 * @param mysqli $db
+	 * @param PDO $db
+	 * @return Delete
 	 */
-	public static function delete($table = NULL, mysqli $db = NULL)
+	public static function delete($table = NULL, PDO $db = NULL)
 	{
 		return new Delete($table, $db);
 	}
@@ -369,11 +424,23 @@ abstract class Query
 	 * Construct and return a Union query object
 	 *
 	 * @param array $queries
-	 * @param mysqli $db
+	 * @param PDO $db
+	 * @return Union
 	 */
-	public static function union(array $queries = array(), mysqli $db = NULL)
+	public static function union(array $queries = array(), PDO $db = NULL)
 	{
 		return new Union($queries, $db);
+	}
+
+	/**
+	 * Create and return a Query DataSet object
+	 *
+	 * @param array $data
+	 * @return DataSet
+	 */
+	public static function dataSet(array $data = NULL)
+	{
+		return new DataSet($data);
 	}
 
 	/**

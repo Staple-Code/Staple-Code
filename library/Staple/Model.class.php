@@ -24,9 +24,17 @@
 namespace Staple;
 
 use \Exception;
+use \PDO;
+use Staple\Query\Connection;
+use Staple\Query\Insert;
+use Staple\Query\Query;
+use Staple\Query\Select;
+use Staple\Query\Statement;
+use Staple\Traits\Factory;
 
-abstract class Model implements \JsonSerializable, \ArrayAccess, \Iterator
+abstract class Model implements \JsonSerializable, \ArrayAccess
 {
+	use Factory;
 	/**
 	 * Primary Key Column Name. Use a string for a single primary key column, an array for a composite key.
 	 * @var string | array
@@ -41,27 +49,25 @@ abstract class Model implements \JsonSerializable, \ArrayAccess, \Iterator
 	 * Dynamic Properties of the model.
 	 * @var array
 	 */
-	protected $_properties = array();
+	protected $_data = array();
 	/**
 	 * A database connection object that the model uses
-	 * @var DB
+	 * @var PDO
 	 */
-	protected $_modelDB;
+	protected $_connection;
 	/**
 	 * 
 	 * @param array $options
 	 */
-	public function __construct($options)
+	public function __construct(array $options = NULL)
 	{
+		//Setup the table name if not already set.
 		if(!isset($this->_table))
-		{
-			$this->_table = str_replace('Model', '', __CLASS__);
-		}
-		
+			$this->_setupTableName();
+
+		//Check for the options variable.
 		if (is_array($options))
-		{
-            $this->_options($options);
-        }
+			$this->_options($options);
 	}
 	
 	/**
@@ -82,7 +88,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess, \Iterator
         else
         {
             //Set the property dynamically
-            $this->_properties[$name] = $value;
+            $this->_data[$name] = $value;
         }
     }
  
@@ -99,9 +105,9 @@ abstract class Model implements \JsonSerializable, \ArrayAccess, \Iterator
         {
             return $this->$method();
         }
-        elseif(array_key_exists($name,$this->_properties))
+        elseif(isset($this->_data[$name]))
         {
-            return $this->_properties[$name];
+            return $this->_data[$name];
         }
         else
         {
@@ -116,7 +122,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess, \Iterator
      */
     public function __isset($name)
     {
-        return isset($this->_properties[$name]);
+        return isset($this->_data[$name]);
     }
 
     /**
@@ -125,16 +131,35 @@ abstract class Model implements \JsonSerializable, \ArrayAccess, \Iterator
      */
     public function __unset($name)
     {
-        if(isset($this->_properties[$name]))
-            unset($this->_properties[$name]);
+        if(isset($this->_data[$name]))
+            unset($this->_data[$name]);
     }
     
     /**
      * Dynamically call properties without having to create getters and setters.
+	 * @param string $name
+	 * @param array $arguments
+	 * @throws Exception
+	 * @return mixed
      */
     public function __call($name , array $arguments)
     {
-    	//@todo incomplete function 
+		if(strtolower(substr($name,0,3)) == 'get')
+		{
+			$dataName = Utility::snakeCase(substr($name,3));
+			if(isset($this->_data[$dataName]))
+			{
+				return $this->_data[$dataName];
+			}
+		}
+		elseif(strtolower(substr($name,0,3)) == 'set')
+		{
+			$dataName = Utility::snakeCase(substr($name,3));
+			$this->_data[$dataName] = (string)array_shift($arguments);
+			return $this;
+		}
+
+		throw new Exception(' Call to undefined method '.$name);
     }
     
     /**
@@ -168,6 +193,48 @@ abstract class Model implements \JsonSerializable, \ArrayAccess, \Iterator
         }
         return $this;
     }
+
+	/**
+	 * Sets the table name based on the name of the model class
+	 */
+	protected function _setupTableName()
+	{
+		//Get the class name of this object
+		$class = get_class($this);
+
+		//Explode out the namespace tree
+		$namespaceTree = explode('\\',$class);
+
+		//Snake_case the object name
+		$name = Utility::snakeCase(array_pop($namespaceTree));
+
+		//Split and find the final word in the class name
+		$words = explode('_',$name);
+		$finalWord = array_pop($words);
+
+		//Check that the final word is not "model"
+		if($finalWord == 'model')
+			$finalWord = array_pop($words);
+
+		//pluralize the final word
+		$plural = Utility::pluralize($finalWord);
+
+		//Push it back into the array
+		array_push($words,$plural);
+
+		//Collapse and set the table name
+		$this->_table = implode('_',$words);
+	}
+
+	/**
+	 * Get the current table name that this model is attached to.
+	 * @return string
+	 */
+	public function _getTable()
+	{
+		return $this->_table;
+	}
+
 	/**
 	 * 
 	 */
@@ -178,57 +245,11 @@ abstract class Model implements \JsonSerializable, \ArrayAccess, \Iterator
 	}
 
 	/* (non-PHPdoc)
-	 * @see Iterator::current()
-	 */
-	public function current()
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	/* (non-PHPdoc)
-	 * @see Iterator::key()
-	 */
-	public function key()
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	/* (non-PHPdoc)
-	 * @see Iterator::next()
-	 */
-	public function next()
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	/* (non-PHPdoc)
-	 * @see Iterator::rewind()
-	 */
-	public function rewind()
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	/* (non-PHPdoc)
-	 * @see Iterator::valid()
-	 */
-	public function valid()
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	/* (non-PHPdoc)
 	 * @see ArrayAccess::offsetExists()
 	 */
 	public function offsetExists($offset)
 	{
-		// TODO Auto-generated method stub
-		
+		return isset($this->_data[$offset]);
 	}
 
 	/* (non-PHPdoc)
@@ -236,8 +257,19 @@ abstract class Model implements \JsonSerializable, \ArrayAccess, \Iterator
 	 */
 	public function offsetGet($offset)
 	{
-		// TODO Auto-generated method stub
-		
+		$method = 'get' . ucfirst($offset);
+		if (method_exists($this, $method))
+		{
+			return $this->$method();
+		}
+		elseif(isset($this->_data[$offset]))
+		{
+			return $this->_data[$offset];
+		}
+		else
+		{
+			return NULL;
+		}
 	}
 
 	/* (non-PHPdoc)
@@ -245,8 +277,17 @@ abstract class Model implements \JsonSerializable, \ArrayAccess, \Iterator
 	 */
 	public function offsetSet($offset, $value)
 	{
-		// TODO Auto-generated method stub
-		
+		$method = 'set' . ucfirst($offset);
+		if (method_exists($this, $method))
+		{
+			//Use the setter built onto the object
+			$this->$method($value);
+		}
+		else
+		{
+			//Set the property dynamically
+			$this->_data[$offset] = $value;
+		}
 	}
 
 	/* (non-PHPdoc)
@@ -254,31 +295,32 @@ abstract class Model implements \JsonSerializable, \ArrayAccess, \Iterator
 	 */
 	public function offsetUnset($offset)
 	{
-		// TODO Auto-generated method stub
-		
+		if(isset($this->_data[$offset]))
+			unset($this->_data[$offset]);
 	}
 
 	/**
-	 * @return DB $_modelDB
+	 * @return PDO $_connection
 	 */
-	public function getModelDB()
+	public function getConnection()
 	{
-		if(isset($this->_modelDB))		//Return the specified model connection
+		if(isset($this->_connection))		//Return the specified model connection
 		{
-			return $this->_modelDB;
+			return $this->_connection;
 		}
 		else							//Return the default connection
 		{
-			return DB::get();
+			return Connection::get();
 		}
 	}
 
 	/**
-	 * @param DB $_modelDB
+	 * @param PDO $connection
+	 * @return $this
 	 */
-	public function setModelDB(DB $_modelDB)
+	public function setConnection(PDO $connection)
 	{
-		$this->_modelDB = $_modelDB;
+		$this->_connection = $connection;
 		return $this;
 	}
 
@@ -288,40 +330,94 @@ abstract class Model implements \JsonSerializable, \ArrayAccess, \Iterator
 	 */
 	public function save()
 	{
-		//@todo incomplete function
-		return false;
+		//if the primary key has been set use update, otherwise insert.
+		if(isset($this->_data[$this->_primaryKey]))
+		{
+			$query = Query::update($this->_getTable(), $this->_data, $this->getConnection());
+		}
+		else
+		{
+			$query = Query::insert($this->_getTable(), $this->_data, $this->getConnection());
+		}
+
+		//Execute the query and return the result
+		$result = $query->execute();
+
+		//check for a new ID and apply it to the data set.
+		if($query instanceof Insert)
+			$this->_data[$this->_primaryKey] = $query->getInsertId();
+
+		//Return the boolean of success or failure.
+		return $result;
 	}
 	
 	/**
 	 * Return an instance of the model from the primary key.
 	 * @param int $id
+	 * @param PDO $connection
+	 * @return $this | bool
 	 */
-	public static function get($id)
+	public static function find($id,PDO $connection = NULL)
 	{
-		//@todo incomplete function
+		//Make a model instance
+		$model = static::make();
+
+		//Create the query
+		$query = Select::table($model->_getTable())->whereEqual($model->_primaryKey,$id);
+
+		//Change connection if needed
+		if(isset($connection)) $query->setConnection($connection);
+
+		//Execute the query
+		$result = $query->execute();
+		if($result instanceof Statement)
+		{
+			if($result->rowCount() == 1)
+			{
+				//Load the result data
+				$model->_data = $result->fetch(PDO::FETCH_ASSOC);
+				return $model;
+			}
+			elseif($result->rowCount() >= 1)
+			{
+				//If more than one record was returned return the array of results.
+				$models = array();
+				while($row = $result->fetch(PDO::FETCH_ASSOC))
+				{
+					$model = static::make();
+					$model->_data = $row;
+					$models[] = $model;
+				}
+				return $models;
+			}
+			else
+				return false;
+		}
+		else
+			return false;		//Return false on query failure
 	}
 
-	public static function getAll()
+	public static function findAll()
 	{
 		//@todo incomplete function
 	}
 	
-	public static function getWhereEqual($column, $value)
+	public static function findWhereEqual($column, $value)
 	{
 		//@todo incomplete function
 	}
 	
-	public static function getWhereNull($column)
+	public static function findWhereNull($column)
 	{
 		//@todo incomplete function
 	}
 	
-	public static function getWhereIn($column, array $values)
+	public static function findWhereIn($column, array $values)
 	{
 		//@todo incomplete function
 	}
 	
-	public static function getWhereStatement($statement)
+	public static function findWhereStatement($statement)
 	{
 		//@todo incomplete function
 	}

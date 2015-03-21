@@ -1,6 +1,7 @@
 <?php
 /**
  * A trait to implement the singleton pattern.
+ * This does not currently restrict creation of the object through the constructor.
  * 
  * @author Ironpilot
  * @copyright Copyright (c) 2011, STAPLE CODE

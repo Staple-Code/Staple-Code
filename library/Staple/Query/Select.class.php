@@ -23,9 +23,10 @@
  */
 namespace Staple\Query;
 
+use \Staple\Exception\QueryException;
 use \Staple\Error;
 use \Staple\Pager;
-use \Exception;
+use \PDO;
 
 class Select extends Query
 {
@@ -68,29 +69,29 @@ class Select extends Query
 	protected $limitOffset;
 	/**
 	 * Stores the GROUP BY columns;
-	 * @var unknown_type
+	 * @var array | string
 	 */
 	protected $groupBy;
 	/**
 	 * An array that holds the HAVING clauses
-	 * @var array[Staple_Query_Condition]
+	 * @var Condition[]
 	 */
 	protected $having = array();
 	/**
 	 * Array of Staple_Query_Join objects that represent table joins on the query
-	 * @var array[Staple_Query_Join]
+	 * @var Join[]
 	 */
 	protected $joins = array();
 
 	/**
 	 * @param string $table
 	 * @param array $columns
-	 * @param DB $db
+	 * @param PDO $db
 	 * @param array | string $order
 	 * @param Pager | int $limit
-	 * @throws Exception
+	 * @throws QueryException
 	 */
-	public function __construct($table = NULL, array $columns = NULL, $db = NULL, $order = NULL, $limit = NULL)
+	public function __construct($table = NULL, array $columns = NULL, PDO $db = NULL, $order = NULL, $limit = NULL)
 	{
 		parent::__construct(NULL, $db);
 		
@@ -144,7 +145,7 @@ class Select extends Query
 	}
 
 	/**
-	 * @return the $columns
+	 * @return array $columns
 	 */
 	public function getColumns()
 	{
@@ -152,7 +153,7 @@ class Select extends Query
 	}
 
 	/**
-	 * Returns the order.
+	 * Returns array | string order.
 	 * @return string | array
 	 */
 	public function getOrder()
@@ -161,7 +162,7 @@ class Select extends Query
 	}
 	
 	/**
-	 * @return the $groupBy
+	 * @return array | string $groupBy
 	 */
 	public function getGroupBy()
 	{
@@ -169,7 +170,7 @@ class Select extends Query
 	}
 
 	/**
-	 * @return the $limit
+	 * @return Pager | int $limit
 	 */
 	public function getLimit()
 	{
@@ -177,7 +178,7 @@ class Select extends Query
 	}
 
 	/**
-	 * @return the $limitOffset
+	 * @return int $limitOffset
 	 */
 	public function getLimitOffset()
 	{
@@ -187,6 +188,8 @@ class Select extends Query
 	/**
 	 * @param mixed $table
 	 * @param string $alias
+	 * @throws QueryException
+	 * @return $this
 	 */
 	public function setTable($table,$alias = NULL)
 	{
@@ -198,7 +201,7 @@ class Select extends Query
 		{
 			if(!isset($alias))
 			{
-				throw new Exception('Every derived table must have its own alias', Error::DB_ERROR);
+				throw new QueryException('Every derived table must have its own alias', Error::DB_ERROR);
 			}
 			$this->table = array($alias=>$table);
 		}
@@ -254,7 +257,7 @@ class Select extends Query
 
 	/**
 	 * @param int $limit
-	 * @return Staple_Query_Select
+	 * @return Select
 	 */
 	public function setLimit($limit)
 	{
@@ -264,7 +267,7 @@ class Select extends Query
 	
 	/**
 	 * @param int $limitOffset
-	 * @return Staple_Query_Select
+	 * @return Select
 	 */
 	public function setLimitOffset($limitOffset)
 	{
@@ -274,8 +277,9 @@ class Select extends Query
 
 	/**
 	 * Add to the list of columns. Optional parameter to name a column.
-	 * @param string | Staple_Query_Select $col
+	 * @param string | Select $col
 	 * @param string $name
+	 * @return $this
 	 */
 	public function addColumn($col,$name = NULL)
 	{
@@ -317,7 +321,7 @@ class Select extends Query
 	/**
 	 * An alias of setColumns()
 	 * @param array $cols
-	 * @return Staple_Query_Select
+	 * @return Select
 	 */
 	public function columns(array $cols)
 	{
@@ -373,8 +377,9 @@ class Select extends Query
 	
 	/**
 	 * Sets the limit and the offset in one function.
-	 * @param int | Staple_Pager $limit
+	 * @param int | Pager $limit
 	 * @param int $offset
+	 * @return $this
 	 */
 	public function limit($limit,$offset = NULL)
 	{
@@ -452,7 +457,8 @@ class Select extends Query
 	/*-----------------------------------------------JOIN FUNCTIONS-----------------------------------------------*/
 	/**
 	 * Add a join to the query.
-	 * @param Staple_Query_Join $join
+	 * @param Join $join
+	 * @return $this
 	 */
 	public function addJoin(Join $join)
 	{
@@ -495,15 +501,21 @@ class Select extends Query
 		return false;
 	}
 	
-	public function leftJoin($table, $condition)
+	public function leftJoin($table, $condition, $alias = NULL)
 	{
-		$this->addJoin(Join::left($table, $condition));
+		$this->addJoin(Join::left($table, $condition,$alias));
 		return $this;
 	}
 	
-	public function innerJoin($table, $condition)
+	public function innerJoin($table, $condition, $alias = NULL)
 	{
-		$this->addJoin(Join::inner($table, $condition));
+		$this->addJoin(Join::inner($table, $condition,$alias));
+		return $this;
+	}
+
+	public function join($table, $condition, $alias = NULL)
+	{
+		$this->addJoin(Join::inner($table,$condition,$alias));
 		return $this;
 	}
 	
@@ -542,10 +554,13 @@ class Select extends Query
 			$columns = '';
 			foreach($this->columns as $name=>$col)
 			{
+				//Add commas between columns
 				if(strlen($columns) >= 1)
 				{
-					$columns .= ',';
+					$columns .= ', ';
 				}
+
+				//Wrap sub-selects in parenthesis
 				if($col instanceof Select)
 				{
 					$columns .= '('.$col.')';
@@ -554,9 +569,19 @@ class Select extends Query
 				{
 					$columns .= $col;
 				}
+
+				//Add column aliases where applicable
 				if(is_string($name))
 				{
-					$columns .= " AS `$name`";
+					//Switch the method based on database driver of the current connection
+					switch($this->getConnection()->getDriver())
+					{
+						case Connection::DRIVER_MYSQL:
+							$columns .= " AS `$name`";
+							break;
+						default:
+							$columns .= " AS $name";
+					}
 				}
 			}
 		}
@@ -568,10 +593,13 @@ class Select extends Query
 			$tables = '';
 			foreach($this->table as $name=>$tbl)
 			{
+				//Add commas between tables
 				if(strlen($tables) > 1)
 				{
-					$tables .= ',';
+					$tables .= ', ';
 				}
+
+				//Wrap subqueries in parenthesis
 				if($tbl instanceof Query || $tbl instanceof Union)
 				{
 					$tables	= '('.$tbl.')';
@@ -580,9 +608,19 @@ class Select extends Query
 				{
 					$tables .= $tbl;
 				}
+
+				//Add table aliases where applicable
 				if(is_string($name))
 				{
-					$tables .= " AS `$name`";
+					//Switch the method based on database driver of the current connection
+					switch($this->getConnection()->getDriver())
+					{
+						case Connection::DRIVER_MYSQL:
+							$tables .= " AS `$name`";
+							break;
+						default:
+							$tables .= " AS `$name`";
+					}
 				}
 			}
 			$stmt .= $tables;

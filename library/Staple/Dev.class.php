@@ -32,7 +32,7 @@ class Dev
 	/**
 	 * This function takes multiple arguments and dumps them to the source code.
 	 */
-	public static function Dump()
+	public static function dump()
 	{
 		if(class_exists('\Staple\Config'))
 		{
@@ -64,7 +64,7 @@ class Dev
 	/**
 	 * Starts a script timer.
 	 */
-	public static function StartTimer()
+	public static function startTimer()
 	{
 		self::$timer = microtime(true);
 	}
@@ -72,7 +72,7 @@ class Dev
 	/**
 	 * Stops a previously started timer.
 	 */
-	public static function StopTimer()
+	public static function stopTimer()
 	{
 		return microtime(true) - self::$timer;
 	}

@@ -23,9 +23,9 @@
  */
 namespace Staple\Query;
 
-use \mysqli;
+use \Staple\Exception\QueryException;
+use \PDO;
 use \Staple\Error;
-use \Staple\DB;
 use \Staple\Pager;
 use \Exception;
 
@@ -36,7 +36,7 @@ class Union
 	
 	/**
 	 * The database object. A database object is required to properly escape input.
-	 * @var mysqli
+	 * @var PDO
 	 */
 	protected $db;
 	/**
@@ -56,7 +56,7 @@ class Union
 	protected $order;
 	/**
 	 * Limit number of rows to return.
-	 * @var int
+	 * @var Pager | int
 	 */
 	protected $limit;
 	/**
@@ -68,29 +68,29 @@ class Union
 	/**
 	 * Constructor accepts an array of Staple_Query_Select elements and a database connection.
 	 * @param array $queries
-	 * @param mysqli $db
+	 * @param PDO $db
+	 * @throws QueryException
 	 */
-	public function __construct(array $queries = array(), mysqli $db = NULL)
+	public function __construct(array $queries = array(), PDO $db = NULL)
 	{
 		//Process Database connection
-		if($db instanceof mysqli)
+		if($db instanceof PDO)
 		{
 			$this->setDb($db);
 		}
 		else
 		{
 			try {
-				$this->setDb(DB::get());
+				$this->setDb(Connection::get());
 			}
 			catch (Exception $e)
 			{
-				$this->setDb(new mysqli());
+				throw new QueryException('Unable to find a database connection.', Error::DB_ERROR, $e);
 			}
 		}
-		//No DB = Bad
-		if(!($this->db instanceof mysqli))
+		if(!($this->db instanceof PDO))
 		{
-			throw new Exception('Unable to create database object', Error::DB_ERROR);
+			throw new QueryException('Unable to create database object', Error::DB_ERROR);
 		}
 		
 		foreach($queries as $q)
@@ -112,7 +112,7 @@ class Union
 	}
 	
 	/**
-	 * @return mysqli $db
+	 * @return PDO $db
 	 */
 	public function getDb()
 	{
@@ -136,7 +136,7 @@ class Union
 		return $this->order;
 	}
 	/**
-	 * @return the $limit
+	 * @return Pager | int $limit
 	 */
 	public function getLimit()
 	{
@@ -144,7 +144,7 @@ class Union
 	}
 
 	/**
-	 * @return the $limitOffset
+	 * @return int $limitOffset
 	 */
 	public function getLimitOffset()
 	{
@@ -152,9 +152,10 @@ class Union
 	}
 	
 	/**
-	 * @param mysqli $db
+	 * @param PDO $db
+	 * @return $this
 	 */
-	public function setDb(mysqli $db)
+	public function setDb(PDO $db)
 	{
 		$this->db = $db;
 		return $this;
@@ -163,6 +164,7 @@ class Union
 	/**
 	 * Set the UNION flag.
 	 * @param string $flag
+	 * @return $this
 	 */
 	public function setFlag($flag)
 	{
@@ -178,6 +180,8 @@ class Union
 	
 	/**
 	 * Resets all of the columns in all the currently added queries to the specified column array.
+	 * @param Query[] $columns
+	 * @return $this
 	 */
 	public function setColumns(array $columns)
 	{
@@ -191,6 +195,7 @@ class Union
 	/**
 	 * Set the order.
 	 * @param string | array $order
+	 * @return $this
 	 */
 	public function setOrder($order)
 	{
@@ -200,17 +205,17 @@ class Union
 
 	/**
 	 * @param int $limit
-	 * @return Staple_Query_Select
+	 * @return Select
 	 */
 	public function setLimit($limit)
 	{
-		$this->limit = (int)$limit;
+		$this->limit = $limit;
 		return $this;
 	}
 	
 	/**
 	 * @param int $limitOffset
-	 * @return Staple_Query_Select
+	 * @return Select
 	 */
 	public function setLimitOffset($limitOffset)
 	{
@@ -220,7 +225,8 @@ class Union
 	
 	/**
 	 * Add a query to the UNION
-	 * @param Staple_Query_Select $query
+	 * @param Select $query
+	 * @return $this
 	 */
 	public function addQuery(Select $query)
 	{
@@ -230,7 +236,8 @@ class Union
 	
 	/**
 	 * Remove a query from the UNION
-	 * @param Staple_Query_Select $query
+	 * @param Select $query
+	 * @return $this
 	 */
 	public function removeQuery(Select $query)
 	{
@@ -240,7 +247,11 @@ class Union
 		}
 		return $this;
 	}
-	
+
+	/**
+	 * Build the Query
+	 * @return string
+	 */
 	function build()
 	{
 		$stmt = '';
@@ -303,8 +314,9 @@ class Union
 	
 	/**
 	 * Sets the limit and the offset in one function.
-	 * @param int | Staple_Pager $limit
+	 * @param int | Pager $limit
 	 * @param int $offset
+	 * @return $this
 	 */
 	public function limit($limit,$offset = NULL)
 	{
@@ -324,11 +336,12 @@ class Union
 	
 	/**
 	 * Executes the query.
-	 * @return mysqli_result | bool
+	 * @throws QueryException
+	 * @return Statement | bool
 	 */
-	public function Execute()
+	public function execute()
 	{
-		if($this->db instanceof mysqli)
+		if($this->db instanceof PDO)
 		{
 			return $this->db->query($this->build());
 		}
@@ -336,14 +349,13 @@ class Union
 		{
 			try 
 			{
-				$this->db = DB::get();
+				$this->db = Connection::get();
 			}
 			catch (Exception $e)
 			{
-				//@todo try for a default connection if no staple connection
-				throw new Exception('No Database Connection', Error::DB_ERROR);
+				throw new QueryException('No Database Connection', Error::DB_ERROR);
 			}
-			if($this->db instanceof mysqli)
+			if($this->db instanceof PDO)
 			{
 				return $this->db->query($this->build());
 			}

@@ -150,9 +150,9 @@ class Autoload
 			{
 				return $this->loadLibraryClass($class_name);
 			}
-			elseif(file_exists(ELEMENTS_ROOT.$class_name.static::PHP_FILE_EXTENSION))
+			elseif(file_exists(MODULES_ROOT.$class_name.static::PHP_FILE_EXTENSION))
 			{
-				require_once ELEMENTS_ROOT.$class_name.static::PHP_FILE_EXTENSION;
+				require_once MODULES_ROOT.$class_name.static::PHP_FILE_EXTENSION;
 			}
 			else
 			{
@@ -304,6 +304,8 @@ class Autoload
 	 * @param string $controller
 	 * @param string $view
 	 * @param bool $required
+	 * @throws Exception
+	 * @return string | bool
 	 */
 	public function loadView($controller,$view,$required = false)
 	{
@@ -325,7 +327,7 @@ class Autoload
 			throw new Exception('Failed to load the view.', Error::LOADER_ERROR);
 		}
 
-		return true;
+		return false;
 	}
 	
 	/**

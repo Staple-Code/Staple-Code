@@ -23,7 +23,7 @@
  */
 namespace Staple\Query;
 
-use \mysqli;
+use \PDO;
 
 class Delete extends Query
 {
@@ -38,16 +38,16 @@ class Delete extends Query
 	protected $flags = array();
 	/**
 	 * Array of Staple_Query_Join objects that represent table joins on the query
-	 * @var array[Staple_Query_Join]
+	 * @var Join[]
 	 */
 	protected $joins = array();
 
 	/**
 	 * @param string $table
-	 * @param mysqli $db
+	 * @param PDO $db
 	 * @throws \Exception
 	 */
-	public function __construct($table = NULL, mysqli $db = NULL)
+	public function __construct($table = NULL, PDO $db = NULL)
 	{
 		parent::__construct($table, $db);
 	}

@@ -24,6 +24,7 @@
 namespace Staple\Query;
 
 use \Exception;
+use \Staple\Exception\QueryException;
 
 class Condition
 {
@@ -48,7 +49,7 @@ class Condition
 	protected $operator;
 	/**
 	 * The value of the comparison
-	 * @var string | int | bool
+	 * @var mixed
 	 */
 	protected $value;
 	/**
@@ -89,7 +90,8 @@ class Condition
 	
 	/**
 	 * Sets the where statement.
-	 * @param unknown_type $where
+	 * @param string $where
+	 * @return $this
 	 */
 	public function setWhere($where)
 	{
@@ -144,7 +146,7 @@ class Condition
 	/*-----------------------------------------------GETTERS AND SETTERS-----------------------------------------------*/
 	
 	/**
-	 * @return the $column
+	 * @return string $column
 	 */
 	public function getColumn()
 	{
@@ -152,7 +154,7 @@ class Condition
 	}
 
 	/**
-	 * @return the $operator
+	 * @return string $operator
 	 */
 	public function getOperator()
 	{
@@ -160,7 +162,7 @@ class Condition
 	}
 
 	/**
-	 * @return the $value
+	 * @return mixed $value
 	 */
 	public function getValue()
 	{
@@ -168,7 +170,7 @@ class Condition
 	}
 
 	/**
-	 * @return the $statement
+	 * @return string $statement
 	 */
 	public function getStatement()
 	{
@@ -177,6 +179,7 @@ class Condition
 
 	/**
 	 * @param string $column
+	 * @return $this
 	 */
 	public function setColumn($column)
 	{
@@ -186,6 +189,7 @@ class Condition
 
 	/**
 	 * @param string $operator
+	 * @return $this
 	 */
 	public function setOperator($operator)
 	{
@@ -195,6 +199,7 @@ class Condition
 
 	/**
 	 * @param string $value
+	 * @return $this
 	 */
 	public function setValue($value)
 	{
@@ -204,6 +209,7 @@ class Condition
 
 	/**
 	 * @param string $statement
+	 * @return $this
 	 */
 	public function setStatement($statement)
 	{
@@ -221,6 +227,7 @@ class Condition
 
 	/**
 	 * @param bool $columnJoin
+	 * @return $this
 	 */
 	public function setColumnJoin($columnJoin)
 	{
@@ -230,6 +237,13 @@ class Condition
 	
 	/*-----------------------------------------------CONDITION ENCAPSULATORS-----------------------------------------------*/
 
+	/**
+	 * @param $column
+	 * @param $operator
+	 * @param $value
+	 * @param bool $columnJoin
+	 * @return static
+	 */
 	public static function Get($column, $operator, $value, $columnJoin = NULL)
 	{
 		$obj = new static();
@@ -240,7 +254,11 @@ class Condition
 			$obj->setColumnJoin($columnJoin);
 		return $obj;
 	}
-	
+
+	/**
+	 * @param $statement
+	 * @return static
+	 */
 	public static function Statement($statement)
 	{
 		$class = new static();
@@ -253,7 +271,7 @@ class Condition
 	 * @param string $column
 	 * @param mixed $value
 	 * @param bool $columnJoin
-	 * @return Staple_Query_Condition
+	 * @return Condition
 	 */
 	public static function Equal($column, $value, $columnJoin = NULL)
 	{
@@ -268,7 +286,13 @@ class Condition
 			$obj->setColumnJoin($columnJoin);
 		return $obj;
 	}
-	
+
+	/**
+	 * @param $column
+	 * @param $value
+	 * @param bool $columnJoin
+	 * @return static
+	 */
 	public static function Like($column, $value, $columnJoin = NULL)
 	{
 		$obj = new static();
@@ -279,7 +303,11 @@ class Condition
 			$obj->setColumnJoin($columnJoin);
 		return $obj;
 	}
-	
+
+	/**
+	 * @param $column
+	 * @return static
+	 */
 	public static function Null($column)
 	{
 		$obj = new static();
@@ -288,7 +316,13 @@ class Condition
 			->setValue(NULL);
 		return $obj;
 	}
-	
+
+	/**
+	 * @param $column
+	 * @param $values
+	 * @param bool $columnJoin
+	 * @return static
+	 */
 	public static function In($column, $values, $columnJoin = NULL)
 	{
 		$obj = new static();
@@ -299,7 +333,14 @@ class Condition
 			$obj->setColumnJoin($columnJoin);
 		return $obj;
 	}
-	
+
+	/**
+	 * @param $column
+	 * @param $start
+	 * @param $end
+	 * @return static
+	 * @throws QueryException
+	 */
 	public static function Between($column, $start, $end)
 	{
 		$obj = new static();
