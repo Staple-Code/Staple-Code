@@ -29,16 +29,56 @@ class FoundationViewAdapter extends ElementViewAdapter
 {
 	public function textElement()
 	{
-        $classes = $this->getClassString();
-        $buf = "<div$classes id=\"".$this->escape($this->id)."_element\">\n";
-        $buf .= $this->label();
-        $buf .= $this->field();
-        $buf .= $this->instructions();
-        $buf .= "</div>\n";
 
-        return $buf;
 	}
 
-    //TODO textareaElement
+    public function textareaElement()
+    {
 
+    }
+
+    public function submitElement()
+    {
+
+    }
+
+    public function selectElement()
+    {
+
+    }
+
+    public function radiogroupElement()
+    {
+
+    }
+
+    public function passwordElement()
+    {
+
+    }
+
+    public function imageElement()
+    {
+
+    }
+
+    public function hiddenElement()
+    {
+
+    }
+
+    public function fileElement()
+    {
+
+    }
+
+    public function checkboxgroupElement()
+    {
+
+    }
+
+    public function checkboxElement()
+    {
+
+    }
 }
