@@ -40,6 +40,5 @@ class FoundationViewAdapter extends ElementViewAdapter
 	}
 
     //TODO textareaElement
-    //TODO
 
 }
