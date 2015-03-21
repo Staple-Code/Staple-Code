@@ -29,6 +29,17 @@ class FoundationViewAdapter extends ElementViewAdapter
 {
 	public function textElement()
 	{
-		// TODO: Implement textElement() method.
+        $classes = $this->getClassString();
+        $buf = "<div$classes id=\"".$this->escape($this->id)."_element\">\n";
+        $buf .= $this->label();
+        $buf .= $this->field();
+        $buf .= $this->instructions();
+        $buf .= "</div>\n";
+
+        return $buf;
 	}
+
+    //TODO textareaElement
+    //TODO
+
 }
