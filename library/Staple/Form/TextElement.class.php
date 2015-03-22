@@ -124,7 +124,7 @@ class TextElement extends FieldElement
 		}
 		elseif(isset($this->viewAdapter))
 		{
-			//@todo utilize the viewAdapter
+			$this->viewAdapter->TextElement($this);
 		}
 		else
 		{

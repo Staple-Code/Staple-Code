@@ -24,21 +24,81 @@
 
 namespace Staple\Form\ViewAdapters;
 
+use Staple\Form\TextElement;
+use Staple\Form\TextareaElement;
+use Staple\Form\SubmitElement;
+use Staple\Form\SelectElement;
+use Staple\Form\RadioElement;
+use Staple\Form\PasswordElement;
+use Staple\Form\ImageElement;
+use Staple\Form\HiddenElement;
+use Staple\Form\FileElement;
+use Staple\Form\CheckboxGroupElement;
+use Staple\Form\CheckboxElement;
+use Staple\Form\ButtonElement;
+
 
 class FoundationViewAdapter extends ElementViewAdapter
 {
-	public function textElement()
-	{
-        $classes = $this->getClassString();
-        $buf = "<div$classes id=\"".$this->escape($this->id)."_element\">\n";
-        $buf .= $this->label();
-        $buf .= $this->field();
-        $buf .= $this->instructions();
-        $buf .= "</div>\n";
 
-        return $buf;
-	}
+    public function TextElement(TextElement $field)
+    {
 
-    //TODO textareaElement
+    }
+
+    public function TextareaElement(TextareaElement $field)
+    {
+
+    }
+
+    public function SubmitElement(SubmitElement $field)
+    {
+
+    }
+
+    public function SelectElement(SelectElement $field)
+    {
+
+    }
+
+    public function RadioElement(RadioElement $field)
+    {
+
+    }
+
+    public function PasswordElement(PasswordElement $field)
+    {
+
+    }
+
+    public function ImageElement(ImageElement $field)
+    {
+
+    }
+
+    public function HiddenElement(HiddenElement $field)
+    {
+
+    }
+
+    public function FileElement(FileElement $field)
+    {
+
+    }
+
+    public function CheckboxgroupElement(CheckboxGroupElement $field)
+    {
+
+    }
+
+    public function CheckboxElement(CheckboxElement $field)
+    {
+
+    }
+
+    public function ButtonElement (ButtonElement $field)
+    {
+
+    }
 
 }
