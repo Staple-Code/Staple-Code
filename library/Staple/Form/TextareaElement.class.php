@@ -75,14 +75,14 @@ class TextareaElement extends FieldElement
 		}
         elseif(isset($this->viewAdapter))
         {
-            $this->viewAdapter->TextareaElement($this);
+            $buf = $this->viewAdapter->TextareaElement($this);
         }
 		else
 		{
 			$this->addClass('form_element');
 			$this->addClass('element_textarea');
 			$classes = $this->getClassString('div');
-			$buf .= "<div$classes id=\"".$this->escape($this->id)."_element\">\n";
+			$buf .= "<div $classes id=\"".$this->escape($this->id)."_element\">\n";
 			$buf .= $this->label();
 			$buf .= $this->field();
 			$buf .= $this->instructions();

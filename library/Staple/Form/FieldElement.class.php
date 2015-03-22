@@ -213,16 +213,6 @@ abstract class FieldElement
 		}
 		$this->filters = $filts;
 	}
-
-    /**
-     * Returns a string with all html entities replaced.
-     * @param string $text
-     * @return string
-     */
-	protected function escape($text)
-	{
-		return htmlentities($text);
-	}
 	
 	/**
 	 * A factory function to create form fields.
