@@ -27,6 +27,7 @@ use Staple;
 
 class TextElement extends FieldElement
 {
+
 	/**
 	 * Size of the text field.
 	 * @var int
@@ -124,14 +125,14 @@ class TextElement extends FieldElement
 		}
 		elseif(isset($this->viewAdapter))
 		{
-			$this->viewAdapter->TextElement($this);
+			$buf = $this->viewAdapter->TextElement($this);
 		}
 		else
 		{
 			$this->addClass('form_element');
 			$this->addClass('element_text');
 			$classes = $this->getClassString('div');
-			$buf .= "<div$classes id=\"".$this->escape($this->id)."_element\">\n";
+			$buf .= "<div $classes id=\"".$this->escape($this->id)."_element\">\n";
 			$buf .= $this->label();
 			$buf .= $this->field();
 			$buf .= $this->instructions();
