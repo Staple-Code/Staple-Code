@@ -61,14 +61,14 @@ class SubmitElement extends FieldElement
 		}
         elseif(isset($this->viewAdapter))
         {
-            $this->viewAdapter->SubmitElement($this);
+            $buf = $this->viewAdapter->SubmitElement($this);
         }
 		else 
 		{
 			$this->addClass('form_element');
 			$this->addClass('element_submit');
 			$classes = $this->getClassString('div');
-			$buf .= "<div$classes id=\"".$this->escape($this->id)."_element\">\n";
+			$buf .= "<div $classes id=\"".$this->escape($this->id)."_element\">\n";
 			if(isset($this->label))
 			{
 				$buf .= $this->label(); 
