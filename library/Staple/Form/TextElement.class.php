@@ -27,7 +27,6 @@ use Staple;
 
 class TextElement extends FieldElement
 {
-
 	/**
 	 * Size of the text field.
 	 * @var int
