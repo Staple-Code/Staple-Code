@@ -224,7 +224,9 @@ class Alias
 		'Singleton'						=>	'\\Staple\\Traits\\Singleton',
 
 		//Form Element View Adapters
-		'FoundationViewAdapter'			=> '\\Staple\\Form\\ViewAdapters\\FoundationViewAdapter'
+		'ViewAdapter'                   => '\\Staple\\Form\\ViewAdapters',
+        'FoundationViewAdapter'			=> '\\Staple\\Form\\ViewAdapters\\FoundationViewAdapter',
+
 
 	);
 	
