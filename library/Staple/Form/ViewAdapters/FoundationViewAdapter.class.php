@@ -37,14 +37,18 @@ use Staple\Form\CheckboxGroupElement;
 use Staple\Form\CheckboxElement;
 use Staple\Form\ButtonElement;
 
+
 class FoundationViewAdapter extends ElementViewAdapter
 {
 
     public function TextElement(TextElement $field)
     {
+        $buf = '';
         $classes = $field->getClassString();
 
-        $buf = "\n<div class=\"row\">\n<div class=\"small-12 columns\">\n"; //Label Start
+        $buf .= "<div class=\"$classes row\">\n"; //Row Start
+        $buf .= "<div class=\"small-12 columns\">\n"; //Label Start
+
 
         if(count($field->getErrors()) != 0)
         {
@@ -67,13 +71,14 @@ class FoundationViewAdapter extends ElementViewAdapter
         }
 
         $buf .= "</label>\n";
+
         $buf .= "</div>\n"; //Label End
 
-        if(strlen($field->getInstructions()) >= 1)
+        if($field->getInstructions() >= 1)
         {
             $buf .= "<div class=\"small-12 columns\">\n"; //Instructions Start
             $buf .= $field->getInstructions();
-            $buf .= "</div>"; //Instructions End
+            $buf .= "</div>\n"; //Instructions End
         }
 
         $buf .= "<div class=\"small-12 columns\">\n"; //Field Start
@@ -98,14 +103,19 @@ class FoundationViewAdapter extends ElementViewAdapter
             $buf .= "</small>";
         }
         $buf .= "</div>\n"; //Field End
-        $buf .= "</div>\n"; //Row End
+        $buf .= "</div>\n"; //Row end
+
         return $buf;
     }
 
     public function TextareaElement(TextareaElement $field)
     {
-        $buf = "<div class=\"row\">\n"; //Row Start
+        $buf = '';
+
+        $classes = $field->getClassString();
+        $buf .= "<div class=\"$classes row\">\n"; //Row Start
         $buf .= "<div class=\"small-12 columns\">\n"; //Label Start
+
 
         if(count($field->getErrors()) != 0)
         {
@@ -131,7 +141,7 @@ class FoundationViewAdapter extends ElementViewAdapter
 
         $buf .= "</div>\n"; //Label End
 
-        if(strlen($field->getInstructions()) >= 1)
+        if($field->getInstructions() >= 1)
         {
             $buf .= "<div class=\"small-12 columns\">\n"; //Instructions Start
             $buf .= $field->getInstructions();
@@ -160,13 +170,17 @@ class FoundationViewAdapter extends ElementViewAdapter
             $buf .= "</small>";
         }
         $buf .= "</div>\n"; //Field End
-        $buf .= "</div>\n"; //Row End
+        $buf .= "</div>\n"; //Row end
+
         return $buf;
     }
 
     public function PasswordElement(PasswordElement $field)
     {
-        $buf = "<div class=\"row\">\n"; //Row Start
+        $buf = '';
+        $classes = $field->getClassString();
+
+        $buf .= "<div class=\"$classes row\">\n"; //Row Start
         $buf .= "<div class=\"small-12 columns\">\n"; //Label Start
 
 
@@ -194,7 +208,7 @@ class FoundationViewAdapter extends ElementViewAdapter
 
         $buf .= "</div>\n"; //Label End
 
-        if(strlen($field->getInstructions()) >= 1)
+        if($field->getInstructions() >= 1)
         {
             $buf .= "<div class=\"small-12 columns\">\n"; //Instructions Start
             $buf .= $field->getInstructions();
@@ -230,18 +244,71 @@ class FoundationViewAdapter extends ElementViewAdapter
 
     public function HiddenElement(HiddenElement $field)
     {
-        $buf = "<div class=\"row hide\">\n"; //Row Start
+        $buf = '';
+        $classes = $field->getClassString();
+
+        $buf .= "<div class=\"$classes row\">\n"; //Row Start
+        $buf .= "<div class=\"small-12 columns\">\n"; //Label Start
+
+
+        if(count($field->getErrors()) != 0)
+        {
+            $buf .= "<label for=\"".$this->escape($field->getId())."\" class=\"error\">";
+        }
+        else
+        {
+            $buf .= "<label for=\"".$this->escape($field->getId())."\">";
+        }
+
+        if($field->isRequired() == 1)
+        {
+            $buf .= "<b>";
+            $buf .= $field->getLabel();
+            $buf .= "</b> <small>(<i>Required</i>)</small>";
+        }
+        else
+        {
+            $buf .= $field->getLabel();
+        }
+
+        $buf .= "</label>\n";
+
+        $buf .= "</div>\n"; //Label End
         $buf .= "<div class=\"small-12 columns\">\n"; //Field Start
+        if(count($field->getErrors()) != 0)
+        {
+            $buf .= "<label class=\"error\">";
+        }
+
         $buf .= $field->field();
+
+        if(count($field->getErrors()) != 0)
+        {
+            $buf .= "</label>";
+            $buf .= "<small class=\"error\">";
+            foreach($field->getErrors() as $error)
+            {
+                foreach($error as $message)
+                {
+                    $buf .= "- $message<br>\n";
+                }
+            }
+            $buf .= "</small>";
+        }
         $buf .= "</div>\n"; //Field End
         $buf .= "</div>\n"; //Row end
+
         return $buf;
     }
 
     public function SelectElement(SelectElement $field)
     {
-        $buf = "<div class=\"row\">\n"; //Row Start
+        $buf = '';
+        $classes = $field->getClassString();
+
+        $buf .= "<div class=\"$classes row\">\n"; //Row Start
         $buf .= "<div class=\"small-12 columns\">\n"; //Label Start
+
 
         if(count($field->getErrors()) != 0)
         {
@@ -267,7 +334,7 @@ class FoundationViewAdapter extends ElementViewAdapter
 
         $buf .= "</div>\n"; //Label End
 
-        if(strlen($field->getInstructions()) >= 1)
+        if($field->getInstructions() >= 1)
         {
             $buf .= "<div class=\"small-12 columns\">\n"; //Instructions Start
             $buf .= $field->getInstructions();
@@ -296,15 +363,19 @@ class FoundationViewAdapter extends ElementViewAdapter
             $buf .= "</small>";
         }
         $buf .= "</div>\n"; //Field End
-        $buf .= "</div>\n"; //Row End
+        $buf .= "</div>\n"; //Row end
+
         return $buf;
     }
 
     public function CheckboxElement(CheckboxElement $field)
     {
+        $buf = '';
         $classes = $field->getClassString();
-        $buf = "<div class=\"$classes row\">\n"; //Row Start
+
+        $buf .= "<div class=\"$classes row\">\n"; //Row Start
         $buf .= "<div class=\"small-12 columns\">\n"; //Label Start
+
 
         if(count($field->getErrors()) != 0)
         {
@@ -330,7 +401,7 @@ class FoundationViewAdapter extends ElementViewAdapter
 
         $buf .= "</div>\n"; //Label End
 
-        if(strlen($field->getInstructions()) >= 1)
+        if($field->getInstructions() >= 1)
         {
             $buf .= "<div class=\"small-12 columns\">\n"; //Instructions Start
             $buf .= $field->getInstructions();
@@ -398,7 +469,7 @@ class FoundationViewAdapter extends ElementViewAdapter
 
         $buf .= "</div>\n"; //Label End
 
-        if(strlen($field->getInstructions()) >= 1)
+        if($field->getInstructions() >= 1)
         {
             $buf .= "<div class=\"small-12 columns\">\n"; //Instructions Start
             $buf .= $field->getInstructions();
@@ -466,7 +537,7 @@ class FoundationViewAdapter extends ElementViewAdapter
 
         $buf .= "</div>\n"; //Label End
 
-        if(strlen($field->getInstructions()) >= 1)
+        if($field->getInstructions() >= 1)
         {
             $buf .= "<div class=\"small-12 columns\">\n"; //Instructions Start
             $buf .= $field->getInstructions();
@@ -503,9 +574,10 @@ class FoundationViewAdapter extends ElementViewAdapter
 
     public function FileElement(FileElement $field)
     {
-        $field->addClass('');
+        $buf = '';
+        $classes = $field->getClassString();
 
-        $buf = "<div class=\"row\">\n"; //Row Start
+        $buf .= "<div class=\"$classes row\">\n"; //Row Start
         $buf .= "<div class=\"small-12 columns\">\n"; //Label Start
 
 
@@ -533,7 +605,7 @@ class FoundationViewAdapter extends ElementViewAdapter
 
         $buf .= "</div>\n"; //Label End
 
-        if(strlen($field->getInstructions()) >= 1)
+        if($field->getInstructions() >= 1)
         {
             $buf .= "<div class=\"small-12 columns\">\n"; //Instructions Start
             $buf .= $field->getInstructions();
@@ -570,31 +642,35 @@ class FoundationViewAdapter extends ElementViewAdapter
 
     public function SubmitElement(SubmitElement $field)
     {
-        $field->addClass('button');
-        $buf = '<div class="row">';
-        $buf .= '<div class="small-12 columns">';
+        $buf = '';
+
+        $classes = $field->getClassString();
+        $buf .= '<div class="' .$classes. ' row">\n';
+        $buf .= '<div class="small-12 columns">\n';
         if(isset($this->label))
         {
             $buf .= "<label for=\"".$this->escape($this->id)."\"".$this->getClassString().">".$this->label."</label>\n";
         }
         $buf .= $field->field();
-        $buf .= "</div>"; //End column
-        $buf .= "</div>"; //End Row
+        $buf .= "</div>\n";
+
         return $buf;
     }
 
     public function ButtonElement (ButtonElement $field)
     {
-        $field->addClass('button');
-        $buf = '<div class="row">';
-        $buf .= '<div class="small-12 columns">';
+        $buf = '';
+
+        $classes = $field->getClassString();
+        $buf .= '<div class="' .$classes. ' row">\n';
+        $buf .= '<div class="small-12 columns">\n';
         if(isset($this->label))
         {
-            $buf .= "<label for=\"".$this->escape($this->id)."\"".$this->getClassString().">".$field->label."</label>\n";
+            $buf .= "<label for=\"".$this->escape($this->id)."\"".$this->getClassString().">".$this->label."</label>\n";
         }
         $buf .= $field->field();
-        $buf .= "</div>";
-        $buf .= "</div>";
+        $buf .= "</div>\n";
+
         return $buf;
     }
 
