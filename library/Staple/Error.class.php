@@ -135,7 +135,7 @@ class Error implements SplSubject
 		$main = Main::get();
 
 		//Set the HTTP response code
-		if($ex instanceof PageNotFoundException)
+		if($ex instanceof PageNotFoundException || $ex->getCode() == 404)
 		{
 			http_response_code(404);
 		}
@@ -154,7 +154,7 @@ class Error implements SplSubject
 		{
 			if(($p = $ex->getPrevious()) instanceof Exception)
 			{
-				echo "<p><b>Previous Error:</b> ".$p->getMessage." Code: ".$p->getCode()."</p>";
+				echo "<p><b>Previous Error:</b> ".$p->getMessage()." Code: ".$p->getCode()."</p>";
 			}
 			echo "<pre>".$ex->getTraceAsString()."</pre>";
 			foreach ($ex->getTrace() as $traceln)
