@@ -37,6 +37,7 @@ class InArrayValidator extends FieldValidator
 	/**
 	 * Supply an array to the constructor to define valid options.
 	 * @param array $values
+	 * @param string $usermsg
 	 */
 	function __construct(array $values = array(), $usermsg = NULL)
 	{
