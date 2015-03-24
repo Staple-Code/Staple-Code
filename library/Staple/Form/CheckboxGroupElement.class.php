@@ -37,6 +37,7 @@ class CheckboxGroupElement extends FieldElement
 	/**
 	 * Adds multiple checkboxes to the array of checkboxes; 
 	 * @param array $boxes
+	 * @return $this
 	 */
 	public function addCheckboxArray(array $boxes)
 	{
@@ -52,7 +53,7 @@ class CheckboxGroupElement extends FieldElement
 	
 	/**
 	 * Return all the checkbox objects
-	 * @return array[Staple_Form_CheckboxElement]
+	 * @return CheckboxElement[]
 	 */
 	public function getBoxes()
 	{
