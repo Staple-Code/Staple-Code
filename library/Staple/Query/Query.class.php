@@ -357,7 +357,7 @@ abstract class Query
 	 * Construct and return an instance of the child object.
 	 *
 	 * @param string $table
-	 * @return Query
+	 * @return static
 	 */
 	public static function table($table)
 	{
