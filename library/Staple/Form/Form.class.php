@@ -80,7 +80,7 @@ class Form
 	
 	/**
 	 * An array of FieldElement objects, that represent the form fields.
-	 * @var FieldElement[]|CheckboxElement[]
+	 * @var FieldElement[]|CheckboxElement[]|SelectElement[]|CheckboxGroupElement[]
 	 */
 	public $fields = array();
 	
