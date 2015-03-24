@@ -136,7 +136,7 @@ class PasswordElement extends FieldElement
 		}
         elseif(isset($this->elementViewAdapter))
         {
-            $this->getElementViewAdapter()->PasswordElement($this);
+            $buf = $this->getElementViewAdapter()->PasswordElement($this);
         }
 		else
 		{

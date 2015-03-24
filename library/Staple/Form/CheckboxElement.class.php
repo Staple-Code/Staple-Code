@@ -112,7 +112,7 @@ class CheckboxElement extends FieldElement
 		}
         elseif(isset($this->elementViewAdapter))
         {
-            $this->getElementViewAdapter()->CheckboxElement($this);
+            $buf = $this->getElementViewAdapter()->CheckboxElement($this);
         }
 		else
 		{

@@ -88,7 +88,7 @@ class FileElement extends FieldElement
 		}
         elseif(isset($this->elementViewAdapter))
         {
-            $this->getElementViewAdapter()->FileElement($this);
+            $buf = $this->getElementViewAdapter()->FileElement($this);
         }
 		else
 		{
