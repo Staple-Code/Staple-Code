@@ -544,9 +544,9 @@ abstract class FieldElement
 	 * @param $elementViewAdapter
 	 * @return $this
 	 */
-	public function setElementViewAdapter($elementViewAdapter)
+	public function setElementViewAdapter(ElementViewAdapter $adapter)
 	{
-		$this->elementViewAdapter = $elementViewAdapter;
+		$this->elementViewAdapter = $adapter;
 		return $this;
 	}
 
