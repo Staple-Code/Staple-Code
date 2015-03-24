@@ -66,7 +66,7 @@ class ImageElement extends FieldElement
 		}
         elseif(isset($this->elementViewAdapter))
         {
-            $this->getElementViewAdapter()->ImageElement($this);
+            $buf = $this->getElementViewAdapter()->ImageElement($this);
         }
 		else 
 		{

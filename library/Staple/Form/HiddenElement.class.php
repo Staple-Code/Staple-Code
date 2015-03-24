@@ -86,7 +86,7 @@ class HiddenElement extends FieldElement
 		}
         elseif(isset($this->elementViewAdapter))
         {
-            $this->getElementViewAdapter()->HiddenElement($this);
+            $buf = $this->getElementViewAdapter()->HiddenElement($this);
         }
 		else
 		{
