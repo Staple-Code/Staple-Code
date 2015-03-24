@@ -122,7 +122,7 @@ class Image
 	 * Encapsulates creation of the object using the factory pattern.
 	 * @param string $source
 	 * @throws Exception
-	 * @return Staple_Image
+	 * @return Image
 	 */
 	public static function Create($source = NULL)
 	{
@@ -139,19 +139,19 @@ class Image
 	/**
 	 * Creates an image object from an upload key name.
 	 * @param string $uploadKeyName
-	 * @return Staple_Image
+	 * @return Image
 	 */
-	public function CreateFromUpload($uploadKeyName)
+	public static function CreateFromUpload($uploadKeyName)
 	{
 		if(isset($_FILES[$uploadKeyName]))
-		{
 			return self::Create($_FILES[$uploadKeyName]['tmp_name']);
-		}
+		else
+			return NULL;
 	}
 
 	/**
-	 *
-	 * @return the resource
+	 * Get the image resource
+	 * @return resource resource
 	 */
 	public function getImage()
 	{
@@ -161,6 +161,7 @@ class Image
 	/**
 	 * Set the image resource
 	 * @param resource $image
+	 * @return $this
 	 */
 	protected function setImage($image)
 	{
@@ -181,7 +182,7 @@ class Image
 	}
 
 	/**
-	 *
+	 * Get the source string
 	 * @return string
 	 */
 	public function getSource()
@@ -190,8 +191,8 @@ class Image
 	}
 
 	/**
-	 *
-	 * @return the string
+	 * Get the image destination string
+	 * @return string $destination
 	 */
 	public function getDestination()
 	{
@@ -199,8 +200,9 @@ class Image
 	}
 
 	/**
-	 *
+	 * Set the destination string
 	 * @param string $destination
+	 * @return $this
 	 */
 	public function setDestination($destination)
 	{
@@ -209,8 +211,8 @@ class Image
 	}
 
 	/**
-	 *
-	 * @return the int
+	 * Get the image height
+	 * @return int $height
 	 */
 	public function getHeight()
 	{
@@ -218,8 +220,9 @@ class Image
 	}
 
 	/**
-	 *
+	 * Set the image height
 	 * @param int $height
+	 * @return $this
 	 */
 	public function setHeight($height)
 	{
@@ -228,8 +231,8 @@ class Image
 	}
 
 	/**
-	 *
-	 * @return the int
+	 * Get the image width
+	 * @return int $width
 	 */
 	public function getWidth()
 	{
@@ -237,8 +240,9 @@ class Image
 	}
 
 	/**
-	 *
+	 * Set the width parameter
 	 * @param int $width
+	 * @return $this
 	 */
 	public function setWidth($width)
 	{
@@ -247,8 +251,8 @@ class Image
 	}
 
 	/**
-	 *
-	 * @return the string
+	 * Get the MIME String
+	 * @return string $mime
 	 */
 	public function getMime()
 	{
@@ -256,7 +260,7 @@ class Image
 	}
 
 	/**
-	 *
+	 * Get the quality parameter
 	 * @return int
 	 */
 	public function getQuality()
@@ -265,8 +269,9 @@ class Image
 	}
 
 	/**
-	 *
+	 * Set the quality parameter
 	 * @param int $quality
+	 * @return $this
 	 */
 	public function setQuality($quality)
 	{
@@ -284,8 +289,9 @@ class Image
 	}
 
 	/**
-	 *
+	 * Set the preserve aspect ratio bool
 	 * @param bool $preserve
+	 * @return $this
 	 */
 	public function setPreserve($preserve)
 	{
@@ -333,7 +339,6 @@ class Image
 	 */
 	protected function createImage()
 	{
-		$img = false;
 		switch($this->mime)
 		{
 			case self::MIME_JPG :
@@ -357,11 +362,13 @@ class Image
 			throw new Exception('An error occurred while creating the image resource.',Error::APPLICATION_ERROR);
 		}
 	}
-	
+
 	/**
 	 * Sets preserve aspect to true and resizes the image to fit within the box specified.
 	 * @param int $width
 	 * @param int $height
+	 * @return bool
+	 * @throws Exception
 	 */
 	public function fitInBox($width, $height)
 	{
@@ -392,7 +399,7 @@ class Image
 		
 		if(!isset($this->image))
 		{
-			$this->image = $this->createImage();
+			$this->createImage();
 		}
 		$newimage = imagecreatetruecolor($width, $height);
 		$success = imagecopyresampled($newimage, $this->image, 0, 0, 0, 0, $width, $height, $this->width, $this->height);
@@ -430,6 +437,7 @@ class Image
 	 * This function will convert the current image to the specified type.
 	 * @todo complete this function
 	 * @param string $mime
+	 * @throws Exception
 	 */
 	public function convertToType($mime)
 	{
@@ -452,11 +460,10 @@ class Image
 	/**
 	 * Save the image resource to a destination.
 	 * @param string $dest
-	 * @param string $type
 	 * @throws Exception
 	 * @return boolean
 	 */
-	public function save($dest = NULL, $type = NULL)
+	public function save($dest = NULL)
 	{
 		//Set a destination if included in the method call
 		if(isset($dest))
@@ -549,6 +556,7 @@ class Image
 	 * Sets a new source image to manipulate. This could be useful if an image source
 	 * was not specified on construction.
 	 * @param string $source
+	 * @return $this
 	 */
 	public function setSource($source)
 	{
