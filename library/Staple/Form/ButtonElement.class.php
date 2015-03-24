@@ -62,7 +62,7 @@ class ButtonElement extends FieldElement
 		}
         elseif(isset($this->elementViewAdapter))
         {
-            $this->getElementViewAdapter()->ButtonElement($this);
+            $buf = $this->getElementViewAdapter()->ButtonElement($this);
         }
 		else 
 		{

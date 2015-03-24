@@ -271,7 +271,7 @@ class SelectElement extends FieldElement
 		}
         elseif(isset($this->elementViewAdapter))
         {
-            $this->getElementViewAdapter()->SelectElement($this);
+            $buf = $this->getElementViewAdapter()->SelectElement($this);
         }
 		else
 		{

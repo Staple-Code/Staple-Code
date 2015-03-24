@@ -180,7 +180,7 @@ class CheckboxGroupElement extends FieldElement
 		}
         elseif(isset($this->elementViewAdapter))
         {
-            $this->getElementViewAdapter()->CheckboxGroupElement($this);
+            $buf = $this->getElementViewAdapter()->CheckboxGroupElement($this);
         }
 		else 
 		{
