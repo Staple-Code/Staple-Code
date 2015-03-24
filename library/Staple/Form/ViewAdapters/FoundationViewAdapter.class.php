@@ -43,12 +43,9 @@ class FoundationViewAdapter extends ElementViewAdapter
 
     public function TextElement(TextElement $field)
     {
-        $buf = '';
-        $classes = $field->getClassString();
+        //$classes = $field->getClassString();
 
-        $buf .= "<div class=\"$classes row\">\n"; //Row Start
-        $buf .= "<div class=\"small-12 columns\">\n"; //Label Start
-
+        $buf = "<div class=\"small-12 columns\">\n"; //Label Start
 
         if(count($field->getErrors()) != 0)
         {
@@ -103,7 +100,6 @@ class FoundationViewAdapter extends ElementViewAdapter
             $buf .= "</small>";
         }
         $buf .= "</div>\n"; //Field End
-        $buf .= "</div>\n"; //Row end
 
         return $buf;
     }
@@ -574,10 +570,10 @@ class FoundationViewAdapter extends ElementViewAdapter
 
     public function FileElement(FileElement $field)
     {
-        $buf = '';
+        $field->addClass('button');
         $classes = $field->getClassString();
 
-        $buf .= "<div class=\"$classes row\">\n"; //Row Start
+        $buf = "<div class=\"$classes row\">\n"; //Row Start
         $buf .= "<div class=\"small-12 columns\">\n"; //Label Start
 
 
@@ -642,27 +638,26 @@ class FoundationViewAdapter extends ElementViewAdapter
 
     public function SubmitElement(SubmitElement $field)
     {
-        $buf = '';
-
+        $field->addClass('button');
         $classes = $field->getClassString();
-        $buf .= '<div class="' .$classes. ' row">\n';
-        $buf .= '<div class="small-12 columns">\n';
+        $buf = '<div class="' .$classes. ' row">';
+        $buf .= '<div class="small-12 columns">';
         if(isset($this->label))
         {
             $buf .= "<label for=\"".$this->escape($this->id)."\"".$this->getClassString().">".$this->label."</label>\n";
         }
         $buf .= $field->field();
-        $buf .= "</div>\n";
+        $buf .= "</div>";
 
         return $buf;
     }
 
     public function ButtonElement (ButtonElement $field)
     {
-        $buf = '';
 
+        $field->addClass('button');
         $classes = $field->getClassString();
-        $buf .= '<div class="' .$classes. ' row">\n';
+        $buf = '<div class="' .$classes. ' row">\n';
         $buf .= '<div class="small-12 columns">\n';
         if(isset($this->label))
         {

@@ -1,0 +1,22 @@
+<?php echo $this->doctype; ?>
+<!--[if IE 9]><html class="lt-ie10" lang="en" > <![endif]-->
+<html class="no-js" lang="en" >
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?php echo $this->title; ?></title>
+    <?php $this->styles(); ?>
+    <?php $this->scripts();	?>
+</head>
+<body>
+
+<?php $this->content();?>
+
+<script src="js/vendor/jquery.js"></script>
+<script src="js/foundation.min.js"></script>
+<script>
+    $(document).foundation();
+</script>
+</body>
+</html>
