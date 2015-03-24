@@ -25,6 +25,7 @@ namespace Staple\Form;
 
 use \Staple\Error;
 use \Exception;
+use Staple\Form\ViewAdapters\ElementViewAdapter;
 
 abstract class FieldElement
 {
@@ -98,14 +99,8 @@ abstract class FieldElement
 	protected $errors = array();
 
 	/**
-	 *
-	 * @var FormViewAdapter
-	 */
-	protected $viewAdapter;
-
-	/**
 	 * Contains instance of ElementViewAdapter handed down from Form
-	 * @var
+	 * @var elementViewAdapter
 	 */
 	protected $elementViewAdapter;
 	
@@ -530,9 +525,9 @@ abstract class FieldElement
 	 * @param $elementViewAdapter
 	 * @return $this
 	 */
-	public function setElementViewAdapter($elementViewAdapter)
+	public function setElementViewAdapter(ElementViewAdapter $adapter)
 	{
-		$this->elementViewAdapter = $elementViewAdapter;
+		$this->elementViewAdapter = $adapter;
 		return $this;
 	}
 

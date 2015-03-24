@@ -139,7 +139,17 @@ class Form
 	 */
 	public function __construct($name = NULL, $action = NULL)
 	{
+        /**
+         * Loads selected elementViewAdapter from application.ini and verify given adapter is a class before loading
+         */
+        if(Config::getValue('forms','elementViewAdapter') != '')
+        {
+            $this->setElementViewAdapter(Config::getValue('forms','elementViewAdapter'));
+        }
+
+
 		$this->_start();
+
 		if(isset($name))
 		{
 			$this->name = $name;
@@ -165,15 +175,6 @@ class Form
 				}
 			}
 		}
-
-		/**
-		 * Loads selected elementViewAdapter from application.ini and verify given adapter is a class before loading
-		 */
-		if(Config::getValue('forms','elementViewAdapter') != '')
-		{
-			$this->setElementViewAdapter(Config::getValue('forms','elementViewAdapter'));
-		}
-
 
 		//Repopulate data from the session -- I might add this.....
 		//if($this->wasSubmitted())
@@ -301,7 +302,7 @@ class Form
 			if($newField instanceof FieldElement)
 			{
 				$this->fields[$newField->getName()] = $newField;
-				$this->fields[$newField->getName()]->setElementViewAdapter;
+				$this->fields[$newField->getName()]->setElementViewAdapter($this->getElementViewAdapter());
 			}
 		}
 		return $this;
