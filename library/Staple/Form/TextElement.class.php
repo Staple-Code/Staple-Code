@@ -123,9 +123,9 @@ class TextElement extends FieldElement
 			$buf = ob_get_contents();
 			ob_end_clean();
 		}
-		elseif(isset($this->viewAdapter))
+		elseif(isset($this->elementViewAdapter))
 		{
-			$buf = $this->viewAdapter->TextElement($this);
+			$buf = $this->getElementViewAdapter()->TextElement($this);
 		}
 		else
 		{

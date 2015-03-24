@@ -215,9 +215,9 @@ class RadioElement extends FieldElement
 			$buf = ob_get_contents();
 			ob_end_clean();
 		}
-        elseif(isset($this->viewAdapter))
+        elseif(isset($this->elementViewAdapter))
         {
-            $this->viewAdapter->RadioElement($this);
+            $this->getElementViewAdapter()->RadioElement($this);
         }
 		else
 		{

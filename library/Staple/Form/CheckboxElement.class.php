@@ -110,9 +110,9 @@ class CheckboxElement extends FieldElement
 			$buf = ob_get_contents();
 			ob_end_clean();
 		}
-        elseif(isset($this->viewAdapter))
+        elseif(isset($this->elementViewAdapter))
         {
-            $this->viewAdapter->CheckboxElement($this);
+            $this->getElementViewAdapter()->CheckboxElement($this);
         }
 		else
 		{
