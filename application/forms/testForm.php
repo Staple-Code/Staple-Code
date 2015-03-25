@@ -40,10 +40,10 @@ class testForm extends Form
 
         $text = new TextElement('text','Text Element');
 
-        $textInstructions = new TextElement('textInstruction','Text ELement with Instructions');
+        $textInstructions = new TextElement('textInstruction','Text Element with Instructions');
         $textInstructions->setRequired()
             ->addValidator(new LengthValidator(0,30))
-            ->addInstructions('Here is the instructions for this element.');
+            ->addInstructions('Here are the instructions for this element.');
 
         $requiredText = new TextElement('requiredText','Required Text Element');
         $requiredText->setRequired()
