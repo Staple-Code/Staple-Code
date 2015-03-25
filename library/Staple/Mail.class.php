@@ -88,7 +88,9 @@ class Mail
 	 * @var array
 	 */
 	protected $callbacks = array();
-	
+	/**
+	 * @var string
+	 */
 	protected $lastEmailStatus;
 	
 	/**
@@ -175,11 +177,11 @@ class Mail
 	 * @param string $from
 	 * @param array $cc
 	 * @param array $bcc
-	 * @return Staple_Mail
+	 * @return $this
 	 */
 	public static function Create($to = NULL, $from = NULL, array $cc = array(), array $bcc = array())
 	{
-		return new self($to, $from, $cc);
+		return new self($to, $from, $cc, $bcc);
 	}
 	
 	/**
@@ -390,7 +392,7 @@ class Mail
 	/**
 	 * Add a single email address to the To list.
 	 * @param string $to
-	 * @return Staple_Mail
+	 * @return $this
 	 */
 	public function addTo($to)
 	{
@@ -407,7 +409,7 @@ class Mail
 	/**
 	 * Add a single email address to the CC list.
 	 * @param string $to
-	 * @return Staple_Mail
+	 * @return $this
 	 */
 	public function addCc($to)
 	{
@@ -421,7 +423,7 @@ class Mail
 	/**
 	 * Add a single email address to the BCC list.
 	 * @param string $to
-	 * @return Staple_Mail
+	 * @return $this
 	 */
 	public function addBcc($to)
 	{
@@ -442,7 +444,7 @@ class Mail
 
 	/**
 	 * @param array $to
-	 * @return Staple_Mail
+	 * @return $this
 	 */
 	public function setTo(array $to)
 	{
@@ -458,7 +460,7 @@ class Mail
 	}
 
 	/**
-	 * @return the $cc
+	 * @return array $cc
 	 */
 	public function getCc()
 	{
@@ -467,7 +469,7 @@ class Mail
 
 	/**
 	 * @param array $cc
-	 * @return Staple_Mail
+	 * @return $this
 	 */
 	public function setCc(array $cc)
 	{
@@ -483,7 +485,7 @@ class Mail
 	}
 
 	/**
-	 * @return the $from
+	 * @return string $from
 	 */
 	public function getFrom()
 	{
@@ -492,7 +494,7 @@ class Mail
 
 	/**
 	 * @param string $from
-	 * @return Staple_Mail
+	 * @return $this
 	 */
 	public function setFrom($from)
 	{
@@ -504,7 +506,7 @@ class Mail
 	}
 
 	/**
-	 * @return the $replyto
+	 * @return string $replyto
 	 */
 	public function getReplyto()
 	{
@@ -513,7 +515,7 @@ class Mail
 
 	/**
 	 * @param string $replyto
-	 * @return Staple_Mail
+	 * @return $this
 	 */
 	public function setReplyto($replyto)
 	{
@@ -525,7 +527,7 @@ class Mail
 	}
 
 	/**
-	 * @return the $subject
+	 * @return string $subject
 	 */
 	public function getSubject()
 	{
@@ -534,7 +536,7 @@ class Mail
 
 	/**
 	 * @param string $subject
-	 * @return Staple_Mail
+	 * @return $this
 	 */
 	public function setSubject($subject)
 	{
@@ -543,7 +545,8 @@ class Mail
 	}
 
 	/**
-	 * @return the $body
+	 * @return mixed|string
+	 * @throws Exception
 	 */
 	public function getBody()
 	{
@@ -577,7 +580,7 @@ class Mail
 
 	/**
 	 * @param string $body
-	 * @return Staple_Mail
+	 * @return $this
 	 */
 	public function setBody($body)
 	{
@@ -585,7 +588,7 @@ class Mail
 		return $this;
 	}
 	/**
-	 * @return the $bcc
+	 * @return array $bcc
 	 */
 	public function getBcc()
 	{
@@ -594,7 +597,7 @@ class Mail
 
 	/**
 	 * @param array $bcc
-	 * @return Staple_Mail
+	 * @return $this
 	 */
 	public function setBcc(array $bcc)
 	{
@@ -610,8 +613,8 @@ class Mail
 	
 	/**
 	 * Sets the SMTP server to connect to.
-	 * @param unknown_type $smtp
-	 * @return Staple_Mail
+	 * @param string $smtp
+	 * @return $this
 	 */
 	public function setServer($smtp)
 	{
@@ -620,7 +623,7 @@ class Mail
 	}
 
 	/**
-	 * @return the $lastEmailStatus
+	 * @return string $lastEmailStatus
 	 */
 	public function getLastEmailStatus()
 	{
@@ -628,7 +631,8 @@ class Mail
 	}
 
 	/**
-	 * @param field_type $lastEmailStatus
+	 * @param string $lastEmailStatus
+	 * @return $this
 	 */
 	public function setLastEmailStatus($lastEmailStatus)
 	{
@@ -637,7 +641,7 @@ class Mail
 	}
 
 	/**
-	 * @return the $template
+	 * @return string $template
 	 */
 	public function getTemplate()
 	{
@@ -646,6 +650,7 @@ class Mail
 
 	/**
 	 * @param string $template
+	 * @return $this
 	 */
 	public function setTemplate($template)
 	{
@@ -662,7 +667,7 @@ class Mail
 
 	/**
 	 * Find out if HTML is enabled for this email.
-	 * @return the $html
+	 * @return string $html
 	 */
 	public function isHtmlEnabled()
 	{
@@ -672,7 +677,7 @@ class Mail
 	/**
 	 * Turn HTML on or off for current message.
 	 * @param boolean $html
-	 * @return Staple_Mail
+	 * @return $this
 	 */
 	public function sendAsHtml($html)
 	{
@@ -761,5 +766,3 @@ class Mail
 		return true;
 	}
 }
-
-?>
