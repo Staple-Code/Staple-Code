@@ -70,7 +70,7 @@ class FoundationViewAdapter extends ElementViewAdapter
         $buf .= "</label>\n";
         $buf .= "</div>\n"; //Label End
 
-        if($field->getInstructions() >= 1)
+        if(strlen($field->getInstructions()) >= 1)
         {
             $buf .= "<div class=\"small-12 columns\">\n"; //Instructions Start
             $buf .= $field->getInstructions();
@@ -132,7 +132,7 @@ class FoundationViewAdapter extends ElementViewAdapter
 
         $buf .= "</div>\n"; //Label End
 
-        if($field->getInstructions() >= 1)
+        if(strlen($field->getInstructions()) >= 1)
         {
             $buf .= "<div class=\"small-12 columns\">\n"; //Instructions Start
             $buf .= $field->getInstructions();
@@ -195,7 +195,7 @@ class FoundationViewAdapter extends ElementViewAdapter
 
         $buf .= "</div>\n"; //Label End
 
-        if($field->getInstructions() >= 1)
+        if(strlen($field->getInstructions()) >= 1)
         {
             $buf .= "<div class=\"small-12 columns\">\n"; //Instructions Start
             $buf .= $field->getInstructions();
@@ -268,7 +268,7 @@ class FoundationViewAdapter extends ElementViewAdapter
 
         $buf .= "</div>\n"; //Label End
 
-        if($field->getInstructions() >= 1)
+        if(strlen($field->getInstructions()) >= 1)
         {
             $buf .= "<div class=\"small-12 columns\">\n"; //Instructions Start
             $buf .= $field->getInstructions();
@@ -331,7 +331,7 @@ class FoundationViewAdapter extends ElementViewAdapter
 
         $buf .= "</div>\n"; //Label End
 
-        if($field->getInstructions() >= 1)
+        if(strlen($field->getInstructions()) >= 1)
         {
             $buf .= "<div class=\"small-12 columns\">\n"; //Instructions Start
             $buf .= $field->getInstructions();
@@ -399,7 +399,7 @@ class FoundationViewAdapter extends ElementViewAdapter
 
         $buf .= "</div>\n"; //Label End
 
-        if($field->getInstructions() >= 1)
+        if(strlen($field->getInstructions()) >= 1)
         {
             $buf .= "<div class=\"small-12 columns\">\n"; //Instructions Start
             $buf .= $field->getInstructions();
@@ -467,7 +467,7 @@ class FoundationViewAdapter extends ElementViewAdapter
 
         $buf .= "</div>\n"; //Label End
 
-        if($field->getInstructions() >= 1)
+        if(strlen($field->getInstructions()) >= 1)
         {
             $buf .= "<div class=\"small-12 columns\">\n"; //Instructions Start
             $buf .= $field->getInstructions();
@@ -535,7 +535,7 @@ class FoundationViewAdapter extends ElementViewAdapter
 
         $buf .= "</div>\n"; //Label End
 
-        if($field->getInstructions() >= 1)
+        if(strlen($field->getInstructions()) >= 1)
         {
             $buf .= "<div class=\"small-12 columns\">\n"; //Instructions Start
             $buf .= $field->getInstructions();
