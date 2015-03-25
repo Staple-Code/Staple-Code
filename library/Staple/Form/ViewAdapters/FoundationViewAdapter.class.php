@@ -24,6 +24,7 @@
 
 namespace Staple\Form\ViewAdapters;
 
+use Staple\Dev;
 use Staple\Form\TextElement;
 use Staple\Form\TextareaElement;
 use Staple\Form\SubmitElement;
@@ -106,12 +107,8 @@ class FoundationViewAdapter extends ElementViewAdapter
 
     public function TextareaElement(TextareaElement $field)
     {
-        $buf = '';
-
         $classes = $field->getClassString();
-        $buf .= "<div class=\"$classes row\">\n"; //Row Start
-        $buf .= "<div class=\"small-12 columns\">\n"; //Label Start
-
+        $buf = "<div class=\"small-12 columns\">\n"; //Label Start
 
         if(count($field->getErrors()) != 0)
         {
@@ -166,7 +163,6 @@ class FoundationViewAdapter extends ElementViewAdapter
             $buf .= "</small>";
         }
         $buf .= "</div>\n"; //Field End
-        $buf .= "</div>\n"; //Row end
 
         return $buf;
     }
