@@ -2,6 +2,7 @@
 use Staple\Form\Form;
 use Staple\Form\PasswordElement;
 use Staple\Form\SubmitElement;
+use Staple\Form\TextareaElement;
 use Staple\Form\TextElement;
 use Staple\Form\Validate\LengthValidator;
 
@@ -34,16 +35,23 @@ class testForm extends Form
 
         $text = new TextElement('text','Text Element');
 
-        $requiredText = new TextElement('requiredText','Required Text Element');
-        $requiredText->setRequired()
+        $requiredField = new TextElement('requiredField','Required Field');
+        $requiredField->setRequired()
             ->addValidator(new LengthValidator('1','30'))
             ->addAttrib('placeholder','30 character limit');
 
         $password = new PasswordElement('password','Password Element');
         $password->setRequired();
 
+        $textarea = new TextareaElement('textarea','Textarea Element');
+        $textarea->addAttrib('style','height:200px;')
+            ->setRequired()
+            ->addValidator(new LengthValidator(0,1000))
+            ->addAttrib('placeholder','1000 character limit')
+            ->setInstructions("Here is the test for the instructions");
+
         $submit = new SubmitElement('submit','Submit Element');
 
-        $this->addField($text, $requiredText, $password, $submit);
+        $this->addField($text, $requiredField, $password, $textarea, $submit);
     }
 }
