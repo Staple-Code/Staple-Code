@@ -40,13 +40,19 @@ class testForm extends Form
 
         $text = new TextElement('text','Text Element');
 
+        $textInstructions = new TextElement('textInstruction','Text ELement with Instructions');
+        $textInstructions->setRequired()
+            ->addValidator(new LengthValidator(0,30))
+            ->addInstructions('Here is the instructions for this element.');
+
         $requiredText = new TextElement('requiredText','Required Text Element');
         $requiredText->setRequired()
             ->addValidator(new LengthValidator('1','30'))
             ->addAttrib('placeholder','30 character limit');
 
         $password = new PasswordElement('password','Password Element');
-        $password->setRequired();
+        $password->setRequired()
+            ->addValidator(new LengthValidator(1,30));
 
         $textarea = new TextareaElement('textarea','Textarea Element');
         $textarea->addAttrib('style','height:200px;');
@@ -88,6 +94,6 @@ class testForm extends Form
 
         $submit = new SubmitElement('submit','Submit Element');
 
-        $this->addField($text, $requiredText, $password, $textarea, $select, $hidden, $checkbox, $checkboxGroup, $radio, $submit);
+        $this->addField($text, $textInstructions, $requiredText, $password, $textarea, $select, $hidden, $checkbox, $checkboxGroup, $radio, $submit);
     }
 }
