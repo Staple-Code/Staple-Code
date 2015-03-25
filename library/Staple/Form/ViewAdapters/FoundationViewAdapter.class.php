@@ -73,7 +73,7 @@ class FoundationViewAdapter extends ElementViewAdapter
         if(strlen($field->getInstructions()) >= 1)
         {
             $buf .= "<div class=\"small-12 columns\">\n"; //Instructions Start
-            $buf .= $field->getInstructions();
+            $buf .= "<em>".$field->getInstructions()."</em>";
             $buf .= "</div>\n"; //Instructions End
         }
 
