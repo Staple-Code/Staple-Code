@@ -300,8 +300,12 @@ class Form
 			if($newField instanceof FieldElement)
 			{
 				$this->fields[$newField->getName()] = $newField;
-				$this->fields[$newField->getName()]->setElementViewAdapter($this->getElementViewAdapter());
+                if(isset($this->elementViewAdapter))
+                {
+                    $this->fields[$newField->getName()]->setElementViewAdapter($this->getElementViewAdapter());
+                }
 			}
+
 		}
 		return $this;
 	}
