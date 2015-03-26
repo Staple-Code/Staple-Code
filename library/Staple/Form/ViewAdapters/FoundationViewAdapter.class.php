@@ -37,7 +37,6 @@ use Staple\Form\CheckboxGroupElement;
 use Staple\Form\CheckboxElement;
 use Staple\Form\ButtonElement;
 
-
 class FoundationViewAdapter extends ElementViewAdapter
 {
 
