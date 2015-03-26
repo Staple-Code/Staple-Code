@@ -42,9 +42,63 @@ class BootstrapViewAdapter extends ElementViewAdapter
 {
     function TextElement(TextElement $field)
     {
-        // TODO: Implement TextElement() method.
-        $test = "test";
-        return $test;
+        $classes = $field->getClassString();
+        $buf = "\n<div class=\"row\">\n<div class=\"col-md-12\">\n"; //Label Start
+
+        if(count($field->getErrors()) != 0)
+        {
+            $buf .= "<div class=\"form-group has-error\">";
+        }
+        else
+        {
+            $buf .= "<div class=\"form-group\">";
+        }
+
+        if($field->isRequired() == 1)
+        {
+            $buf .= "<b>";
+            $buf .= $field->getLabel();
+            $buf .= "</b> <small>(<i>Required</i>)</small>";
+        }
+        else
+        {
+            $buf .= $field->getLabel();
+        }
+
+        $buf .= "</label>\n";
+        $buf .= "</div>\n"; //Label End
+
+        if(strlen($field->getInstructions()) >= 1)
+        {
+            $buf .= "<div class=\"small-12 columns\">\n"; //Instructions Start
+            $buf .= $field->getInstructions();
+            $buf .= "</div>"; //Instructions End
+        }
+
+        $buf .= "<div class=\"small-12 columns\">\n"; //Field Start
+        if(count($field->getErrors()) != 0)
+        {
+            $buf .= "<label class=\"error\">";
+        }
+
+        $buf .= $field->field();
+
+        if(count($field->getErrors()) != 0)
+        {
+            $buf .= "</label>";
+            $buf .= "<small class=\"error\">";
+            foreach($field->getErrors() as $error)
+            {
+                foreach($error as $message)
+                {
+                    $buf .= "- $message<br>\n";
+                }
+            }
+            $buf .= "</small>";
+        }
+        $buf .= "</div>\n"; //Field End
+        $buf .= "</div>\n"; //Row End
+        return $buf;
     }
 
     function TextareaElement(TextareaElement $field)
