@@ -39,7 +39,8 @@ class Form
 	const METHOD_POST = 'POST';
 	const ENC_APP = 'application/x-www-form-urlencoded';
 	const ENC_FILE = 'multipart/form-data';
-	const ENC_TEXT = 'text/plain'; 
+	const ENC_TEXT = 'text/plain';
+
 	/**
 	 * The action (form submittal) location.
 	 * @var string
@@ -132,7 +133,7 @@ class Form
 	 * @var array
 	 */
 	protected $_store = array();
-	
+
 	/**
 	 * @param string $name
 	 * @param string $action
@@ -973,7 +974,7 @@ JS;
 		}
 		return $buf;
 	}
-	
+
 	/**
 	 * Constructs and echos the HTML for the form and all of its elements.
 	 */
