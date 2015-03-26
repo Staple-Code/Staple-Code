@@ -73,8 +73,8 @@ class FoundationViewAdapter extends ElementViewAdapter
         if(strlen($field->getInstructions()) >= 1)
         {
             $buf .= "<div class=\"small-12 columns\">\n"; //Instructions Start
-            $buf .= "<em>".$field->getInstructions()."</em>";
-            $buf .= "</div>\n"; //Instructions End
+            $buf .= $field->getInstructions();
+            $buf .= "</div>"; //Instructions End
         }
 
         $buf .= "<div class=\"small-12 columns\">\n"; //Field Start
@@ -504,10 +504,9 @@ class FoundationViewAdapter extends ElementViewAdapter
 
     public function FileElement(FileElement $field)
     {
-        $field->addClass('button');
-        $classes = $field->getClassString();
+        $field->addClass('');
 
-        $buf = "<div class=\"$classes row\">\n"; //Row Start
+        $buf = "<div class=\"row\">\n"; //Row Start
         $buf .= "<div class=\"small-12 columns\">\n"; //Label Start
 
 
@@ -587,18 +586,16 @@ class FoundationViewAdapter extends ElementViewAdapter
 
     public function ButtonElement (ButtonElement $field)
     {
-
         $field->addClass('button');
-        $classes = $field->getClassString();
-        $buf = '<div class="' .$classes. ' row">\n';
-        $buf .= '<div class="small-12 columns">\n';
+        $buf = '<div class="row">';
+        $buf .= '<div class="small-12 columns">';
         if(isset($this->label))
         {
-            $buf .= "<label for=\"".$this->escape($this->id)."\"".$this->getClassString().">".$this->label."</label>\n";
+            $buf .= "<label for=\"".$this->escape($this->id)."\"".$this->getClassString().">".$field->label."</label>\n";
         }
         $buf .= $field->field();
-        $buf .= "</div>\n";
-
+        $buf .= "</div>";
+        $buf .= "</div>";
         return $buf;
     }
 
