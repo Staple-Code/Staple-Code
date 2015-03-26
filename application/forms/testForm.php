@@ -1,6 +1,8 @@
 <?php
+use Staple\Form\ButtonElement;
 use Staple\Form\CheckboxElement;
 use Staple\Form\CheckboxGroupElement;
+use Staple\Form\FileElement;
 use Staple\Form\Form;
 use Staple\Form\HiddenElement;
 use Staple\Form\PasswordElement;
@@ -39,6 +41,7 @@ class testForm extends Form
             ->setAction($this->link(array('test','index')));
 
         $text = new TextElement('text','Text Element');
+        $text->setRequired();
 
         $textInstructions = new TextElement('textInstruction','Text Element with Instructions');
         $textInstructions->setRequired()
@@ -48,7 +51,8 @@ class testForm extends Form
         $requiredText = new TextElement('requiredText','Required Text Element');
         $requiredText->setRequired()
             ->addValidator(new LengthValidator('1','30'))
-            ->addAttrib('placeholder','30 character limit');
+            ->addAttrib('placeholder','Required Text Element with length validator and placeholder')
+            ->addInstructions('30 character limit');
 
         $password = new PasswordElement('password','Password Element');
         $password->setRequired()
@@ -66,7 +70,8 @@ class testForm extends Form
                 "4"=>"Option 4",
                 "5"=>"Option 5"
             )
-        );
+        )
+        ->addInstructions('Here are the instructions for a select element.');
 
         $hidden = new HiddenElement('hidden','Hidden Element');
 
@@ -92,8 +97,27 @@ class testForm extends Form
             )
         );
 
+        $file = new FileElement('file','File Element');
+        $file->setRequired();
+
+        $button = new ButtonElement('button','Button Element');
+
         $submit = new SubmitElement('submit','Submit Element');
 
-        $this->addField($text, $textInstructions, $requiredText, $password, $textarea, $select, $hidden, $checkbox, $checkboxGroup, $radio, $submit);
+        $this->addField(
+            $text,
+            $textInstructions,
+            $requiredText,
+            $password,
+            $textarea,
+            $select,
+            $hidden,
+            $checkbox,
+            $checkboxGroup,
+            $radio,
+            $file,
+            $button,
+            $submit
+        );
     }
 }
