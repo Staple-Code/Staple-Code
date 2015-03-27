@@ -43,8 +43,6 @@ class BootstrapViewAdapter extends ElementViewAdapter
     function TextElement(TextElement $field)
     {
         // TODO: Implement TextElement() method.
-        $test = "test";
-        return $test;
     }
 
     function TextareaElement(TextareaElement $field)
