@@ -25,7 +25,7 @@ use \Staple\Form\FieldElement;
 
 class AlnumValidator extends FieldValidator
 {
-	const DEFAULT_ERROR = 'Data is not alphanumeric';
+	const DEFAULT_ERROR = 'Data is not alphanumeric.';
 	const REGEX = '/^[A-Za-z0-9]+$/';
 
 	/**
