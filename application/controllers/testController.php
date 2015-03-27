@@ -31,7 +31,9 @@ class testController extends Controller
     public function index()
     {
         $form = new testForm();
+        Dev::dump($form);
 
+        /*
         if($form->wasSubmitted())
         {
             echo "Was submitted<br>";
@@ -51,6 +53,7 @@ class testController extends Controller
         {
             $this->view->form = $form;
         }
+        */
 
     }
 }
