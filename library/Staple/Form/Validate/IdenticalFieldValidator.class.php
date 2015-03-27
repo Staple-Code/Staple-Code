@@ -25,7 +25,7 @@ use \Staple\Form\FieldElement;
 
 class IdenticalFieldValidator extends FieldValidator
 {
-	const DEFAULT_ERROR = 'Data is not equal';
+	const DEFAULT_ERROR = 'Data is not equal.';
 	
 	protected $strict = false;
 	/**
