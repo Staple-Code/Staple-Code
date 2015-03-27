@@ -25,6 +25,7 @@
 
 namespace Staple\Form\ViewAdapters;
 
+use Staple\Dev;
 use Staple\Form\ButtonElement;
 use Staple\Form\CheckboxElement;
 use Staple\Form\CheckboxGroupElement;
@@ -42,62 +43,47 @@ class BootstrapViewAdapter extends ElementViewAdapter
 {
     function TextElement(TextElement $field)
     {
-        $classes = $field->getClassString();
-        $buf = "\n<div class=\"row\">\n<div class=\"col-md-12\">\n"; //Label Start
+        Dev::dump($field);
 
-        if(count($field->getErrors()) != 0)
+        $classes = "";
+
+        if(count($field->getErrors()) > 0)
         {
-            $buf .= "<div class=\"form-group has-error\">";
-        }
-        else
-        {
-            $buf .= "<div class=\"form-group\">";
+            $field->addClass('has-error');
         }
 
-        if($field->isRequired() == 1)
-        {
-            $buf .= "<b>";
-            $buf .= $field->getLabel();
-            $buf .= "</b> <small>(<i>Required</i>)</small>";
-        }
-        else
-        {
-            $buf .= $field->getLabel();
-        }
+        $field->addClass('form-control');
 
+        $buf = "\n<div class=\"form-group\">"; //Start Form-Group
+
+        $buf .= "\n\t<label $classes>";
+        $buf .= $field->getLabel();
+
+        if($field->isRequired())
+        {
+            $buf .= " (Required)";
+        }
         $buf .= "</label>\n";
-        $buf .= "</div>\n"; //Label End
-
-        if(strlen($field->getInstructions()) >= 1)
-        {
-            $buf .= "<div class=\"small-12 columns\">\n"; //Instructions Start
-            $buf .= $field->getInstructions();
-            $buf .= "</div>"; //Instructions End
-        }
-
-        $buf .= "<div class=\"small-12 columns\">\n"; //Field Start
-        if(count($field->getErrors()) != 0)
-        {
-            $buf .= "<label class=\"error\">";
-        }
 
         $buf .= $field->field();
 
-        if(count($field->getErrors()) != 0)
+        if(count($field->getErrors()) > 0)
         {
-            $buf .= "</label>";
-            $buf .= "<small class=\"error\">";
             foreach($field->getErrors() as $error)
             {
+                $buf .= "\n<span class=\"help-block\">";
+                $buf .= "\t\n<ul>";
                 foreach($error as $message)
                 {
-                    $buf .= "- $message<br>\n";
+                    $buf .= "\t\t\n<li>$message</li>";
                 }
+                $buf .= "\t\n</ul>";
+                $buf .= "\n</span>";
             }
-            $buf .= "</small>";
         }
-        $buf .= "</div>\n"; //Field End
-        $buf .= "</div>\n"; //Row End
+
+        $buf .= "</div>"; //End Form-Group
+
         return $buf;
     }
 
@@ -143,7 +129,11 @@ class BootstrapViewAdapter extends ElementViewAdapter
 
     function SubmitElement(SubmitElement $field)
     {
-        // TODO: Implement SubmitElement() method.
+        $field->addClass('btn');
+        $buf = "\n<div class=\"form-group\">"; //Start Form-Group
+        $buf .= $field->field();
+        $buf .= "</div>"; //End Form-Group
+        return $buf;
     }
 
     function ButtonElement(ButtonElement $field)

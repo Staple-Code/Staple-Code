@@ -28,7 +28,7 @@ use \Exception;
 use \Staple\Error;
 use \Staple\Config;
 use \Staple\Encrypt;
-use Staple\Form\ViewAdapters\ElementViewAdapter;
+use \Staple\Form\ViewAdapters\ElementViewAdapter;
 
 class Form
 {
@@ -146,7 +146,6 @@ class Form
         {
             $this->setElementViewAdapter(Config::getValue('forms','elementViewAdapter'));
         }
-
 
 		$this->_start();
 
@@ -760,10 +759,11 @@ JS;
 	 */
 	public function setElementViewAdapter($elementViewAdapter)
 	{
-		if(class_exists(Config::getValue('forms','elementViewAdapter')))
-		{
-			$this->elementViewAdapter = new $elementViewAdapter;
-		}
+        $temp = new $elementViewAdapter();
+        if($temp instanceof ElementViewAdapter)
+        {
+            $this->elementViewAdapter = $temp;
+        }
 		return $this;
 	}
 
