@@ -126,7 +126,6 @@ class testForm extends Form
 
         $submit = new SubmitElement('submit','Submit Element');
 
-        /*
         $this->addField(
             $text,
             $textInstructions,
@@ -142,8 +141,5 @@ class testForm extends Form
             $button,
             $submit
         );
-        */
-
-        $this->addField($text, $submit);
     }
 }
