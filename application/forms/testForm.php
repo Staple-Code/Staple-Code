@@ -42,7 +42,8 @@ class testForm extends Form
             ->setAction($this->link(array('test','index')));
 
         $text = new TextElement('text','Text Element');
-        $text->setRequired();
+        $text->setRequired()
+            ->addValidator(new LengthValidator(1,2));
 
         $textInstructions = new TextElement('textInstruction','Text Element with Instructions');
         $textInstructions->setRequired()
@@ -125,6 +126,7 @@ class testForm extends Form
 
         $submit = new SubmitElement('submit','Submit Element');
 
+        /*
         $this->addField(
             $text,
             $textInstructions,
@@ -140,5 +142,8 @@ class testForm extends Form
             $button,
             $submit
         );
+        */
+
+        $this->addField($text, $submit);
     }
 }

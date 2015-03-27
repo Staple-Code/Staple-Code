@@ -29,7 +29,7 @@ use \Staple\Error;
 use \Staple\Config;
 use \Staple\Encrypt;
 use Staple\Exception\FormBuildException;
-use Staple\Form\ViewAdapters\ElementViewAdapter;
+use \Staple\Form\ViewAdapters\ElementViewAdapter;
 
 class Form
 {
