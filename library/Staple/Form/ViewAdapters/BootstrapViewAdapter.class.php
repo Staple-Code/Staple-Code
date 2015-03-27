@@ -25,7 +25,6 @@
 
 namespace Staple\Form\ViewAdapters;
 
-use Staple\Dev;
 use Staple\Form\ButtonElement;
 use Staple\Form\CheckboxElement;
 use Staple\Form\CheckboxGroupElement;
@@ -43,42 +42,52 @@ class BootstrapViewAdapter extends ElementViewAdapter
 {
     function TextElement(TextElement $field)
     {
-        Dev::dump($field);
-
-        $classes = "";
-
-        if(count($field->getErrors()) > 0)
-        {
-            $field->addClass('has-error');
-        }
-
+        //Add form-control class for optimal element positioning.
         $field->addClass('form-control');
 
-        $buf = "\n<div class=\"form-group\">"; //Start Form-Group
+        //Build field buffer to be returned.
+        if(count($field->getErrors()) > 0)
+        {
+            $buf = "\n<div class=\"form-group has-error\">"; //Start Form-Group
+        }
+        else
+        {
+            $buf = "\n<div class=\"form-group\">"; //Start Form-Group
+        }
 
-        $buf .= "\n\t<label $classes>";
+        //Field Label
+        $buf .= "\n\t<label class=\"control-label\">";
         $buf .= $field->getLabel();
 
+        //Check if field is required
         if($field->isRequired())
         {
-            $buf .= " (Required)";
+            $buf .= " <small>(Required)</small>";
         }
         $buf .= "</label>\n";
 
+        //Add field instructions
+        if(count($field->getInstructions()) > 0)
+        {
+            $buf .= "\n<p class=\"text-muted\">";
+            $buf .= "\n".$field->getInstructions();
+            $buf .= "\n</p>";
+        }
+
+        //Add field to buffer
         $buf .= $field->field();
 
+        //Generate error messages to be displayed below field.
         if(count($field->getErrors()) > 0)
         {
             foreach($field->getErrors() as $error)
             {
-                $buf .= "\n<span class=\"help-block\">";
-                $buf .= "\t\n<ul>";
+                $buf .= "<ul class=\"list-group\">";
                 foreach($error as $message)
                 {
-                    $buf .= "\t\t\n<li>$message</li>";
+                    $buf .= "<li class=\"list-group-item list-group-item-danger\"><span class=\"glyphicon glyphicon-exclamation-sign\"></span> $message</li>";
                 }
-                $buf .= "\t\n</ul>";
-                $buf .= "\n</span>";
+                $buf .= "</ul>";
             }
         }
 
@@ -89,42 +98,396 @@ class BootstrapViewAdapter extends ElementViewAdapter
 
     function TextareaElement(TextareaElement $field)
     {
-        // TODO: Implement TextareaElement() method.
+        //Add form-control class for optimal element positioning.
+        $field->addClass('form-control');
+
+        //Build field buffer to be returned.
+        if(count($field->getErrors()) > 0)
+        {
+            $buf = "\n<div class=\"form-group has-error\">"; //Start Form-Group
+        }
+        else
+        {
+            $buf = "\n<div class=\"form-group\">"; //Start Form-Group
+        }
+
+        //Field Label
+        $buf .= "\n\t<label class=\"control-label\">";
+        $buf .= $field->getLabel();
+
+        //Check if field is required
+        if($field->isRequired())
+        {
+            $buf .= " <small>(Required)</small>";
+        }
+        $buf .= "</label>\n";
+
+        //Add field instructions
+        if(count($field->getInstructions()) > 0)
+        {
+            $buf .= "\n<p class=\"text-muted\">";
+            $buf .= "\n".$field->getInstructions();
+            $buf .= "\n</p>";
+        }
+
+        //Add field to buffer
+        $buf .= $field->field();
+
+        //Generate error messages to be displayed below field.
+        if(count($field->getErrors()) > 0)
+        {
+            foreach($field->getErrors() as $error)
+            {
+                $buf .= "<ul class=\"list-group\">";
+                foreach($error as $message)
+                {
+                    $buf .= "<li class=\"list-group-item list-group-item-danger\"><span class=\"glyphicon glyphicon-exclamation-sign\"></span> $message</li>";
+                }
+                $buf .= "</ul>";
+            }
+        }
+
+        $buf .= "</div>"; //End Form-Group
+
+        return $buf;
     }
 
     function PasswordElement(PasswordElement $field)
     {
-        // TODO: Implement PasswordElement() method.
+        //Add form-control class for optimal element positioning.
+        $field->addClass('form-control');
+
+        //Build field buffer to be returned.
+        if(count($field->getErrors()) > 0)
+        {
+            $buf = "\n<div class=\"form-group has-error\">"; //Start Form-Group
+        }
+        else
+        {
+            $buf = "\n<div class=\"form-group\">"; //Start Form-Group
+        }
+
+        //Field Label
+        $buf .= "\n\t<label class=\"control-label\">";
+        $buf .= $field->getLabel();
+
+        //Check if field is required
+        if($field->isRequired())
+        {
+            $buf .= " <small>(Required)</small>";
+        }
+        $buf .= "</label>\n";
+
+        //Add field instructions
+        if(count($field->getInstructions()) > 0)
+        {
+            $buf .= "\n<p class=\"text-muted\">";
+            $buf .= "\n".$field->getInstructions();
+            $buf .= "\n</p>";
+        }
+
+        //Add field to buffer
+        $buf .= $field->field();
+
+        //Generate error messages to be displayed below field.
+        if(count($field->getErrors()) > 0)
+        {
+            foreach($field->getErrors() as $error)
+            {
+                $buf .= "<ul class=\"list-group\">";
+                foreach($error as $message)
+                {
+                    $buf .= "<li class=\"list-group-item list-group-item-danger\"><span class=\"glyphicon glyphicon-exclamation-sign\"></span> $message</li>";
+                }
+                $buf .= "</ul>";
+            }
+        }
+
+        $buf .= "</div>"; //End Form-Group
+
+        return $buf;
     }
 
     function HiddenElement(HiddenElement $field)
     {
-        // TODO: Implement HiddenElement() method.
+        $field->addClass('form-control');
+        $buf = "\n<div class=\"form-group\">"; //Start Form-Group
+        $buf .= $field->field();
+        $buf .= "\n</div>"; //End Form-Group
+        return $buf;
     }
 
     function SelectElement(SelectElement $field)
     {
-        // TODO: Implement SelectElement() method.
+        //Add form-control class for optimal element positioning.
+        $field->addClass('form-control');
+
+        //Build field buffer to be returned.
+        if(count($field->getErrors()) > 0)
+        {
+            $buf = "\n<div class=\"form-group has-error\">"; //Start Form-Group
+        }
+        else
+        {
+            $buf = "\n<div class=\"form-group\">"; //Start Form-Group
+        }
+
+        //Field Label
+        $buf .= "\n\t<label class=\"control-label\">";
+        $buf .= $field->getLabel();
+
+        //Check if field is required
+        if($field->isRequired())
+        {
+            $buf .= " <small>(Required)</small>";
+        }
+        $buf .= "</label>\n";
+
+        //Add field instructions
+        if(count($field->getInstructions()) > 0)
+        {
+            $buf .= "\n<p class=\"text-muted\">";
+            $buf .= "\n".$field->getInstructions();
+            $buf .= "\n</p>";
+        }
+
+        //Add field to buffer
+        $buf .= $field->field();
+
+        //Generate error messages to be displayed below field.
+        if(count($field->getErrors()) > 0)
+        {
+            foreach($field->getErrors() as $error)
+            {
+                $buf .= "<ul class=\"list-group\">";
+                foreach($error as $message)
+                {
+                    $buf .= "<li class=\"list-group-item list-group-item-danger\"><span class=\"glyphicon glyphicon-exclamation-sign\"></span> $message</li>";
+                }
+                $buf .= "</ul>";
+            }
+        }
+
+        $buf .= "</div>"; //End Form-Group
+
+        return $buf;
     }
 
     function CheckboxgroupElement(CheckboxGroupElement $field)
     {
-        // TODO: Implement CheckboxgroupElement() method.
+        //Add form-control class for optimal element positioning.
+        $field->addClass('form-control');
+
+        //Build field buffer to be returned.
+        if(count($field->getErrors()) > 0)
+        {
+            $buf = "\n<div class=\"form-group has-error\">"; //Start Form-Group
+        }
+        else
+        {
+            $buf = "\n<div class=\"form-group\">"; //Start Form-Group
+        }
+
+        //Field Label
+        $buf .= "\n\t<label class=\"control-label\">";
+        $buf .= $field->getLabel();
+
+        //Check if field is required
+        if($field->isRequired())
+        {
+            $buf .= " <small>(Required)</small>";
+        }
+        $buf .= "</label>\n";
+
+        //Add field instructions
+        if(count($field->getInstructions()) > 0)
+        {
+            $buf .= "\n<p class=\"text-muted\">";
+            $buf .= "\n".$field->getInstructions();
+            $buf .= "\n</p>";
+        }
+
+        //Add field to buffer
+        $buf .= $field->field();
+
+        //Generate error messages to be displayed below field.
+        if(count($field->getErrors()) > 0)
+        {
+            foreach($field->getErrors() as $error)
+            {
+                $buf .= "<ul class=\"list-group\">";
+                foreach($error as $message)
+                {
+                    $buf .= "<li class=\"list-group-item list-group-item-danger\"><span class=\"glyphicon glyphicon-exclamation-sign\"></span> $message</li>";
+                }
+                $buf .= "</ul>";
+            }
+        }
+
+        $buf .= "</div>"; //End Form-Group
+
+        return $buf;
     }
 
     function CheckboxElement(CheckboxElement $field)
     {
-        // TODO: Implement CheckboxElement() method.
+        //Build field buffer to be returned.
+        if(count($field->getErrors()) > 0)
+        {
+            $buf = "\n<div class=\"checkbox has-error\">"; //Start Checkbox
+        }
+        else
+        {
+            $buf = "\n<div class=\"checkbox\">"; //Start Checkbox
+        }
+
+        //Add field instructions
+        if(count($field->getInstructions()) > 0)
+        {
+            $buf .= "\n<p class=\"text-muted\">";
+            $buf .= "\n".$field->getInstructions();
+            $buf .= "\n</p>";
+        }
+
+        //Field Label
+        $buf .= "\n\t<label class=\"control-label\">";
+        //Add field to buffer
+        $buf .= $field->field()."&nbsp;";
+        $buf .= $field->getLabel();
+
+        //Check if field is required
+        if($field->isRequired())
+        {
+            $buf .= " <small>(Required)</small>";
+        }
+        $buf .= "</label>\n";
+
+        //Generate error messages to be displayed below field.
+        if(count($field->getErrors()) > 0)
+        {
+            foreach($field->getErrors() as $error)
+            {
+                $buf .= "<ul class=\"list-group\">";
+                foreach($error as $message)
+                {
+                    $buf .= "<li class=\"list-group-item list-group-item-danger\"><span class=\"glyphicon glyphicon-exclamation-sign\"></span> $message</li>";
+                }
+                $buf .= "</ul>";
+            }
+        }
+
+        $buf .= "</div>"; //End Checkbox
+
+        return $buf;
     }
 
     function RadioElement(RadioElement $field)
     {
-        // TODO: Implement RadioElement() method.
+        //Build field buffer to be returned.
+        if(count($field->getErrors()) > 0)
+        {
+            $buf = "\n<div class=\"form-group has-error\">"; //Start Form-Group
+        }
+        else
+        {
+            $buf = "\n<div class=\"form-group\">"; //Start Form-Group
+        }
+
+        //Field Label
+        $buf .= "\n\t<label class=\"control-label\">";
+        $buf .= $field->getLabel();
+
+        //Check if field is required
+        if($field->isRequired())
+        {
+            $buf .= " <small>(Required)</small>";
+        }
+        $buf .= "</label>\n";
+
+        //Add field instructions
+        if(count($field->getInstructions()) > 0)
+        {
+            $buf .= "\n<p class=\"text-muted\">";
+            $buf .= "\n".$field->getInstructions();
+            $buf .= "\n</p>";
+        }
+
+        //Add field to buffer
+        $buf .= $field->field();
+
+        //Generate error messages to be displayed below field.
+        if(count($field->getErrors()) > 0)
+        {
+            foreach($field->getErrors() as $error)
+            {
+                $buf .= "<ul class=\"list-group\">";
+                foreach($error as $message)
+                {
+                    $buf .= "<li class=\"list-group-item list-group-item-danger\"><span class=\"glyphicon glyphicon-exclamation-sign\"></span> $message</li>";
+                }
+                $buf .= "</ul>";
+            }
+        }
+
+        $buf .= "</div>"; //End Form-Group
+
+        return $buf;
     }
 
     function FileElement(FileElement $field)
     {
-        // TODO: Implement FileElement() method.
+        //Add form-control class for optimal element positioning.
+        $field->addClass('form-control');
+
+        //Build field buffer to be returned.
+        if(count($field->getErrors()) > 0)
+        {
+            $buf = "\n<div class=\"form-group has-error\">"; //Start Form-Group
+        }
+        else
+        {
+            $buf = "\n<div class=\"form-group\">"; //Start Form-Group
+        }
+
+        //Field Label
+        $buf .= "\n\t<label class=\"control-label\">";
+        $buf .= $field->getLabel();
+
+        //Check if field is required
+        if($field->isRequired())
+        {
+            $buf .= " <small>(Required)</small>";
+        }
+        $buf .= "</label>\n";
+
+        //Add field instructions
+        if(count($field->getInstructions()) > 0)
+        {
+            $buf .= "\n<p class=\"text-muted\">";
+            $buf .= "\n".$field->getInstructions();
+            $buf .= "\n</p>";
+        }
+
+        //Add field to buffer
+        $buf .= $field->field();
+
+        //Generate error messages to be displayed below field.
+        if(count($field->getErrors()) > 0)
+        {
+            foreach($field->getErrors() as $error)
+            {
+                $buf .= "<ul class=\"list-group\">";
+                foreach($error as $message)
+                {
+                    $buf .= "<li class=\"list-group-item list-group-item-danger\"><span class=\"glyphicon glyphicon-exclamation-sign\"></span> $message</li>";
+                }
+                $buf .= "</ul>";
+            }
+        }
+
+        $buf .= "</div>"; //End Form-Group
+
+        return $buf;
     }
 
     function SubmitElement(SubmitElement $field)
@@ -138,12 +501,114 @@ class BootstrapViewAdapter extends ElementViewAdapter
 
     function ButtonElement(ButtonElement $field)
     {
-        // TODO: Implement ButtonElement() method.
+        //Add form-control class for optimal element positioning.
+        $field->addClass('btn');
+
+        //Build field buffer to be returned.
+        if(count($field->getErrors()) > 0)
+        {
+            $buf = "\n<div class=\"form-group has-error\">"; //Start Form-Group
+        }
+        else
+        {
+            $buf = "\n<div class=\"form-group\">"; //Start Form-Group
+        }
+
+        //Field Label
+        $buf .= "\n\t<label class=\"control-label\">";
+        $buf .= $field->getLabel();
+
+        //Check if field is required
+        if($field->isRequired())
+        {
+            $buf .= " <small>(Required)</small>";
+        }
+        $buf .= "</label>\n";
+
+        //Add field instructions
+        if(count($field->getInstructions()) > 0)
+        {
+            $buf .= "\n<p class=\"text-muted\">";
+            $buf .= "\n".$field->getInstructions();
+            $buf .= "\n</p>";
+        }
+
+        //Add field to buffer
+        $buf .= $field->field();
+
+        //Generate error messages to be displayed below field.
+        if(count($field->getErrors()) > 0)
+        {
+            foreach($field->getErrors() as $error)
+            {
+                $buf .= "<ul class=\"list-group\">";
+                foreach($error as $message)
+                {
+                    $buf .= "<li class=\"list-group-item list-group-item-danger\"><span class=\"glyphicon glyphicon-exclamation-sign\"></span> $message</li>";
+                }
+                $buf .= "</ul>";
+            }
+        }
+
+        $buf .= "</div>"; //End Form-Group
+
+        return $buf;
     }
 
     function ImageElement(ImageElement $field)
     {
-        // TODO: Implement ImageElement() method.
+        //Add form-control class for optimal element positioning.
+        $field->addClass('form-control');
+
+        //Build field buffer to be returned.
+        if(count($field->getErrors()) > 0)
+        {
+            $buf = "\n<div class=\"form-group has-error\">"; //Start Form-Group
+        }
+        else
+        {
+            $buf = "\n<div class=\"form-group\">"; //Start Form-Group
+        }
+
+        //Field Label
+        $buf .= "\n\t<label class=\"control-label\">";
+        $buf .= $field->getLabel();
+
+        //Check if field is required
+        if($field->isRequired())
+        {
+            $buf .= " <small>(Required)</small>";
+        }
+        $buf .= "</label>\n";
+
+        //Add field instructions
+        if(count($field->getInstructions()) > 0)
+        {
+            $buf .= "\n<p class=\"text-muted\">";
+            $buf .= "\n".$field->getInstructions();
+            $buf .= "\n</p>";
+        }
+
+        //Add field to buffer
+        $buf .= $field->field();
+
+        //Generate error messages to be displayed below field.
+        if(count($field->getErrors()) > 0)
+        {
+            foreach($field->getErrors() as $error)
+            {
+                $buf .= "<ul class=\"list-group\">";
+                foreach($error as $message)
+                {
+                    $buf .= "<li class=\"list-group-item list-group-item-danger\"><span class=\"glyphicon glyphicon-exclamation-sign\"></span> $message</li>";
+                }
+                $buf .= "</ul>";
+            }
+        }
+
+        $buf .= "</div>"; //End Form-Group
+
+        return $buf;
     }
 
 
