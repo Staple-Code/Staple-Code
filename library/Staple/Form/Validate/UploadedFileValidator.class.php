@@ -28,7 +28,7 @@ use \finfo;
 
 class UploadedFileValidator extends FieldValidator
 {
-	const DEFAULT_ERROR = 'File is not valid';
+	const DEFAULT_ERROR = 'File is not valid.';
 	
 	protected $mimeCheck = NULL;
 	
