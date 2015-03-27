@@ -34,9 +34,11 @@ class testController extends Controller
 
         if($form->wasSubmitted())
         {
+            echo "Was submitted<br>";
             $form->addData($_POST);
             if($form->validate())
             {
+                echo "Is valid<br>";
                 $data = $form->exportFormData();
                 Dev::dump($data);
             }

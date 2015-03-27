@@ -148,7 +148,6 @@ class Form
             $this->setElementViewAdapter(Config::getValue('forms','elementViewAdapter'));
         }
 
-
 		$this->_start();
 
 		if(isset($name))
@@ -858,10 +857,11 @@ JS;
 	 */
 	public function setElementViewAdapter($elementViewAdapter)
 	{
-		if(class_exists(Config::getValue('forms','elementViewAdapter')))
-		{
-			$this->elementViewAdapter = new $elementViewAdapter;
-		}
+	        $temp = new $elementViewAdapter();
+	        if($temp instanceof ElementViewAdapter)
+	        {
+	            $this->elementViewAdapter = $temp;
+	        }
 		return $this;
 	}
 
