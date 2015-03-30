@@ -38,12 +38,12 @@ class EncryptTest extends \PHPUnit_Framework_TestCase
 
 		$encrypted = Encrypt::AES_encrypt($string, $this->key, $this->salt, $this->pepper);
 
-		$this->assertEquals('5be2da124b05f90210a061b7553b72c7be235ec7c6aace4c739aa0f8cb602b327d8c0104c0017b37450b8032a47da639',bin2hex($encrypted));
+		$this->assertEquals('132bff3f0fc8e47035b89f246ef030ec541d3774910f183242b7fa475523b5d05ae66c78a2c26fd5bae9e7682d99b513e030f0cf4f7338fe6855d704b9c515a0',bin2hex($encrypted));
 	}
 
 	public function testAESDecrypt()
 	{
-		$string = '5be2da124b05f90210a061b7553b72c7be235ec7c6aace4c739aa0f8cb602b327d8c0104c0017b37450b8032a47da639';
+		$string = '132bff3f0fc8e47035b89f246ef030ec541d3774910f183242b7fa475523b5d05ae66c78a2c26fd5bae9e7682d99b513e030f0cf4f7338fe6855d704b9c515a0';
 
 		$decrypted = Encrypt::AES_decrypt(hex2bin($string), $this->key, $this->salt, $this->pepper);
 
