@@ -274,7 +274,9 @@ class Auth
 	 * Dispatches to the AuthController -> index action. Throws an Exception if the controller does
 	 * not extend Staple_AuthController.
 	 * @param Route $previousRoute
-	 * @throws Exception
+	 * @throws AuthException
+	 * @throws PageNotFoundException
+	 * @return bool
 	 */
 	private function dispatchAuthController($previousRoute = NULL)
 	{
@@ -292,6 +294,7 @@ class Auth
 			if (method_exists($controllerClass, $action))
 			{
 				//Create and Start the Auth Controller
+				/** @var Controller $controller */
 				$controller = new $controllerClass();
 				$controller->_start();
 
