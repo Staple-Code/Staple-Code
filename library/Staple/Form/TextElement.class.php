@@ -134,8 +134,8 @@ class TextElement extends FieldElement
 			$classes = $this->getClassString('div');
 			$buf .= "<div $classes id=\"".$this->escape($this->id)."_element\">\n";
 			$buf .= $this->label();
+            $buf .= $this->instructions();
 			$buf .= $this->field();
-			$buf .= $this->instructions();
 			$buf .= "</div>\n";
 		}
 		return $buf;
