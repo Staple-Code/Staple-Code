@@ -11,6 +11,7 @@ use Staple\Form\SelectElement;
 use Staple\Form\SubmitElement;
 use Staple\Form\TextareaElement;
 use Staple\Form\TextElement;
+use Staple\Form\Validate\InArrayValidator;
 use Staple\Form\Validate\LengthValidator;
 
 /**
@@ -41,7 +42,6 @@ class testForm extends Form
             ->setAction($this->link(array('test','index')));
 
         $text = new TextElement('text','Text Element');
-        $text->setRequired();
 
         $textInstructions = new TextElement('textInstruction','Text Element with Instructions');
         $textInstructions->setRequired()
@@ -59,7 +59,11 @@ class testForm extends Form
             ->addValidator(new LengthValidator(1,30));
 
         $textarea = new TextareaElement('textarea','Textarea Element');
-        $textarea->addAttrib('style','height:200px;');
+        $textarea->setRequired()
+            ->addValidator(new LengthValidator(1,100))
+            ->addAttrib('style','height:200px;')
+            ->addAttrib('placeholder','Placeholder')
+            ->addInstructions('Here are the instructions for this field.');
 
         $select = new SelectElement('select','Select Element');
         $select->addOptionsArray(
@@ -75,7 +79,10 @@ class testForm extends Form
 
         $hidden = new HiddenElement('hidden','Hidden Element');
 
-        $checkbox = new CheckboxElement('1','Single Checkbox Element');
+        $checkbox = new CheckboxElement('single','Single Checkbox Element');
+        $checkbox->setRequired()
+            ->addValidator(new InArrayValidator(array("single")))
+            ->addInstructions('Here are a set of instructions');
 
         $checkboxGroup = new CheckboxGroupElement('checkboxGroup','Checkbox Group Element');
         $checkboxGroup->addCheckboxArray(
@@ -85,17 +92,25 @@ class testForm extends Form
                 new CheckboxElement('4','Four'),
                 new CheckboxElement('5','Five'))
         );
+        $checkboxGroup->setRequired()
+            ->addValidator(new InArrayValidator(array("1","2","3","4","5")))
+            ->addAttrib('placeholder','Placholder')
+            ->addInstructions('Here are the instructions');
 
         $radio = new RadioElement('radio','Radio Element');
         $radio->addButtonsArray(
             array(
-                "1"=>"One",
-                "2"=>"Two",
-                "3"=>"Three",
-                "4"=>"Four",
-                "5"=>"Five"
+                "6"=>"Six",
+                "7"=>"Seven",
+                "8"=>"Eight",
+                "9"=>"Nine",
+                "10"=>"Ten"
             )
-        );
+        )
+        ->setRequired()
+        ->addValidator(new InArrayValidator(array("6","7","8","9","10")))
+        ->addInstructions('Instructions are here')
+        ->addAttrib('placeholder','Placeholder');
 
         $file = new FileElement('file','File Element');
         $file->setRequired();

@@ -1,6 +1,6 @@
 <?php
-use Staple\DB;
-use Staple\Dev;
+use Staple\Controller;
+
 
 /**
  * @author Ironpilot
@@ -31,14 +31,12 @@ class testController extends Controller
     public function index()
     {
         $form = new testForm();
-
         if($form->wasSubmitted())
         {
             $form->addData($_POST);
             if($form->validate())
             {
-                $data = $form->exportFormData();
-                Dev::dump($data);
+                echo "Is valid<br>";
             }
             else
             {
@@ -49,6 +47,5 @@ class testController extends Controller
         {
             $this->view->form = $form;
         }
-
     }
 }
