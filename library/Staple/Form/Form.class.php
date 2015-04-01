@@ -28,7 +28,7 @@ use \Exception;
 use \Staple\Error;
 use \Staple\Config;
 use \Staple\Encrypt;
-use Staple\Form\ViewAdapters\ElementViewAdapter;
+use \Staple\Form\ViewAdapters\ElementViewAdapter;
 
 class Form
 {
@@ -38,7 +38,8 @@ class Form
 	const METHOD_POST = 'POST';
 	const ENC_APP = 'application/x-www-form-urlencoded';
 	const ENC_FILE = 'multipart/form-data';
-	const ENC_TEXT = 'text/plain'; 
+	const ENC_TEXT = 'text/plain';
+
 	/**
 	 * The action (form submittal) location.
 	 * @var string
@@ -131,7 +132,7 @@ class Form
 	 * @var array
 	 */
 	protected $_store = array();
-	
+
 	/**
 	 * @param string $name
 	 * @param string $action
@@ -145,7 +146,6 @@ class Form
         {
             $this->setElementViewAdapter(Config::getValue('forms','elementViewAdapter'));
         }
-
 
 		$this->_start();
 
@@ -759,10 +759,11 @@ JS;
 	 */
 	public function setElementViewAdapter($elementViewAdapter)
 	{
-		if(class_exists(Config::getValue('forms','elementViewAdapter')))
-		{
-			$this->elementViewAdapter = new $elementViewAdapter;
-		}
+        $temp = new $elementViewAdapter();
+        if($temp instanceof ElementViewAdapter)
+        {
+            $this->elementViewAdapter = $temp;
+        }
 		return $this;
 	}
 
@@ -873,7 +874,7 @@ JS;
 		}
 		return $buf;
 	}
-	
+
 	/**
 	 * Constructs and echos the HTML for the form and all of its elements.
 	 */
