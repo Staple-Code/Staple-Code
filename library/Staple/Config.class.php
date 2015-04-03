@@ -200,6 +200,23 @@ class Config
 	}
 
 	/**
+	 * Find a config value or return null if not found.
+	 * @param string $set
+	 * @param string $key
+	 * @return mixed|null
+	 */
+	public static function findOrNull($set,$key)
+	{
+		try{
+			return static::getValue($set,$key);
+		}
+		catch(ConfigurationException $e)
+		{
+			return NULL;
+		}
+	}
+
+	/**
 	 * Returns true or false if a configuration key exists, even if it is null.
 	 * @param $set
 	 * @param null $key

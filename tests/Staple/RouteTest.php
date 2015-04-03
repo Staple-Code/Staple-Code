@@ -27,18 +27,7 @@ use Staple\Controller;
 use Staple\Route;
 use Staple\View;
 
-class testController extends Controller
-{
-	public function index()
-	{
 
-	}
-
-	public function foo()
-	{
-		return View::create();
-	}
-}
 
 class RouteTest extends \PHPUnit_Framework_TestCase
 {
