@@ -160,9 +160,8 @@ class Main
 		//Create a session
 		if(php_sapi_name() != 'cli')
 			session_start();
-		
 		//Turn on the timer 
-		if(Config::getValue('errors', 'enable_timer') == 1)
+		if(Config::findOrNull('errors', 'enable_timer') == 1)
 		{
 			Dev::startTimer();
 		}

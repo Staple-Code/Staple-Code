@@ -34,7 +34,7 @@ require_once STAPLE_ROOT.'Exception'.DIRECTORY_SEPARATOR.'ConfigurationException
 
 class Config
 {
-	use \Staple\Traits\Singleton;
+	use Traits\Singleton;
 	
 	/**
 	 * Variable to specify whether the config has already been read from the filesystem.
@@ -56,6 +56,7 @@ class Config
 	
 	/**
 	 * Disable construction of this object.
+	 * @param string $configName
 	 */
 	public function __construct($configName = NULL)
 	{
@@ -91,11 +92,13 @@ class Config
 	
 	/**
 	 * Setting config values during runtime are not allowed.
-	 * @throws Exception
+	 * @param string $name
+	 * @param string $value
+	 * @throws ConfigurationException
 	 */
 	public function __set($name,$value)
 	{
-		throw new ConfigurationException('Config changes are not allowed at execution',Error::APPLICATION_ERROR);
+		throw new ConfigurationException('Config changes are not allowed at execution.',Error::APPLICATION_ERROR);
 	}
 	
 	/**
@@ -194,6 +197,23 @@ class Config
 	}
 
 	/**
+	 * Find a config value or return null if not found.
+	 * @param string $set
+	 * @param string $key
+	 * @return mixed|null
+	 */
+	public static function findOrNull($set,$key)
+	{
+		try{
+			return static::getValue($set,$key);
+		}
+		catch(ConfigurationException $e)
+		{
+			return NULL;
+		}
+	}
+
+	/**
 	 * Returns true or false if a configuration key exists, even if it is null.
 	 * @param $set
 	 * @param null $key
@@ -252,7 +272,7 @@ class Config
 	/**
 	 * Read and store the application.ini config file.
 	 */
-	private function read()
+	protected function read()
 	{
 		if($this->read == false)
 		{
