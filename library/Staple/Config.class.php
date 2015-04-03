@@ -36,7 +36,7 @@ require_once STAPLE_ROOT.'Exception'.DIRECTORY_SEPARATOR.'ConfigurationException
 
 class Config
 {
-	use \Staple\Traits\Singleton;
+	use Traits\Singleton;
 
 	const DEFAULT_CONFIG_SET = 'application';
 	
@@ -96,11 +96,13 @@ class Config
 	
 	/**
 	 * Setting config values during runtime are not allowed.
-	 * @throws Exception
+	 * @param string $name
+	 * @param string $value
+	 * @throws ConfigurationException
 	 */
 	public function __set($name,$value)
 	{
-		throw new ConfigurationException('Config changes are not allowed at execution',Error::APPLICATION_ERROR);
+		throw new ConfigurationException('Config changes are not allowed at execution.',Error::APPLICATION_ERROR);
 	}
 	
 	/**

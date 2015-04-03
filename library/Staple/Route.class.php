@@ -108,6 +108,11 @@ class Route
 	 */
 	public function execute()
 	{
+		//@todo move this into the controller section when created.
+		//Set Session Handler
+		$sessionHandler = Session::createHandler();
+		session_set_save_handler($sessionHandler, true);
+
 		//Route Controller and actions
 		$class = $this->getController();
 		$method = $this->getAction();

@@ -1,6 +1,6 @@
 <?php
 /**
- * Unit Tests for \Staple\Route object
+ * Test controller to run integration tests with.
  *
  * @author Ironpilot
  * @copyright Copyright (c) 2011, STAPLE CODE
@@ -21,38 +21,18 @@
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Staple\Tests;
-
 use Staple\Controller;
-use Staple\Route;
 use Staple\View;
 
-
-
-class RouteTest extends \PHPUnit_Framework_TestCase
+class TestController extends Controller
 {
-	public function getTestObject($route)
+	public function index()
 	{
-		return new Route($route);
+
 	}
 
-	/**
-	 * Test the factory method
-	 * @test
-	 */
-	public function testMakeObject()
+	public function foo()
 	{
-		$route = Route::make('foo');
-
-		$this->assertInstanceOf('Route', $route);
-		$this->assertEquals('foo',$route->getController());
-		$this->assertEquals('index',$route->getAction());
-	}
-
-	public function testControllerExecuteRouteReturnView()
-	{
-		$route = $this->getTestObject('test/foo');
-
-
+		return View::create();
 	}
 }
