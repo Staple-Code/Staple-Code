@@ -209,7 +209,7 @@ class ViewTest extends \PHPUnit_Framework_TestCase
 		$this->assertEquals('MyController',$view->model()->controller);
 	}
 
-	/*public function testBuild()
+	public function testBuild()
 	{
 		//Get the test object
 		$view = $this->getTestObject();
@@ -225,6 +225,6 @@ class ViewTest extends \PHPUnit_Framework_TestCase
 		ob_end_clean();
 
 		//Assert the results
-		$this->assertEqual('View Build Test', $buffer);
-	}*/
+		$this->assertEquals('View Build Test', $buffer);
+	}
 }

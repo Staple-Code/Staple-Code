@@ -154,11 +154,8 @@ class Main
 		// Setup Error Handlers
 		$this->setErrorHandler(new Error());
 		
-		//Create a session
-		session_start();
-		
 		//Turn on the timer 
-		if(Config::getValue('errors', 'enable_timer') == 1)
+		if(Config::findOrNull('errors', 'enable_timer') == 1)
 		{
 			Dev::startTimer();
 		}

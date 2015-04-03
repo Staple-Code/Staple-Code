@@ -53,6 +53,7 @@ class Alias
 		'Request'						=>	'\\Staple\\Request',
 		'Route'							=>	'\\Staple\\Route',
 		'Script'						=>	'\\Staple\\Script',
+		'Session'						=>	'\\Staple\\Session',
 		'Utility'						=>	'\\Staple\\Utility',
 		'View'							=>	'\\Staple\\View',
 
