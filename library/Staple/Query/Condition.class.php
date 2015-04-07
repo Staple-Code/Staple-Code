@@ -33,9 +33,10 @@ class Condition
 	const GREATER_EQUAL = '>=';
 	const LESS = '<';
 	const LESS_EQUAL = '<=';
-	const NOTEQUAL = '!=';
+	const NOTEQUAL = '<>';
 	const IN = "IN";
 	const IS = "IS";
+	const IS_NOT = "IS NOT";
 	const BETWEEN = "BETWEEN";
 	/**
 	 * The column for the where
@@ -244,8 +245,9 @@ class Condition
 	 * @param bool $columnJoin
 	 * @return static
 	 */
-	public static function Get($column, $operator, $value, $columnJoin = NULL)
+	public static function get($column, $operator, $value, $columnJoin = NULL)
 	{
+		/** @var Condition $obj */
 		$obj = new static();
 		$obj->setColumn($column)
 			->setOperator($operator)
@@ -259,7 +261,7 @@ class Condition
 	 * @param $statement
 	 * @return static
 	 */
-	public static function Statement($statement)
+	public static function statement($statement)
 	{
 		$class = new static();
 		$class->setStatement($statement);
@@ -273,8 +275,9 @@ class Condition
 	 * @param bool $columnJoin
 	 * @return Condition
 	 */
-	public static function Equal($column, $value, $columnJoin = NULL)
+	public static function equal($column, $value, $columnJoin = NULL)
 	{
+		/** @var Condition $obj */
 		$obj = new static();
 		$obj->setColumn($column)
 			->setValue($value);
@@ -288,13 +291,36 @@ class Condition
 	}
 
 	/**
+	 * Setup a SQL WHERE clause where a column is not equal to a value.
+	 * @param string $column
+	 * @param mixed $value
+	 * @param bool $columnJoin
+	 * @return Condition
+	 */
+	public static function notEqual($column, $value, $columnJoin = NULL)
+	{
+		/** @var Condition $obj */
+		$obj = new static();
+		$obj->setColumn($column)
+			->setValue($value);
+
+		//Check for NULLS
+		is_null($value) ? $obj->setOperator(self::IS_NOT) :	$obj->setOperator(self::NOTEQUAL);
+
+		if(isset($columnJoin))
+			$obj->setColumnJoin($columnJoin);
+		return $obj;
+	}
+
+	/**
 	 * @param $column
 	 * @param $value
 	 * @param bool $columnJoin
 	 * @return static
 	 */
-	public static function Like($column, $value, $columnJoin = NULL)
+	public static function like($column, $value, $columnJoin = NULL)
 	{
+		/** @var Condition $obj */
 		$obj = new static();
 		$obj->setColumn($column)
 			->setOperator('LIKE')
@@ -308,8 +334,9 @@ class Condition
 	 * @param $column
 	 * @return static
 	 */
-	public static function Null($column)
+	public static function null($column)
 	{
+		/** @var Condition $obj */
 		$obj = new static();
 		$obj->setColumn($column)
 			->setOperator('IS')
@@ -323,8 +350,9 @@ class Condition
 	 * @param bool $columnJoin
 	 * @return static
 	 */
-	public static function In($column, $values, $columnJoin = NULL)
+	public static function in($column, $values, $columnJoin = NULL)
 	{
+		/** @var Condition $obj */
 		$obj = new static();
 		$obj->setColumn($column)
 			->setOperator(self::IN)
@@ -341,8 +369,9 @@ class Condition
 	 * @return static
 	 * @throws QueryException
 	 */
-	public static function Between($column, $start, $end)
+	public static function between($column, $start, $end)
 	{
+		/** @var Condition $obj */
 		$obj = new static();
 		$obj->setColumn($column)
 			->setOperator(self::BETWEEN)
@@ -351,5 +380,3 @@ class Condition
 		return $obj;
 	}
 }
-
-?>

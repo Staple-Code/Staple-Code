@@ -103,7 +103,7 @@ abstract class Query
 	}
 
 	/**
-	 * @return PDO $db
+	 * @return Connection $db
 	 */
 	public function getConnection()
 	{
@@ -223,7 +223,7 @@ abstract class Query
 	
 	public function whereCondition($column, $operator, $value, $columnJoin = NULL)
 	{
-		$this->addWhere(Condition::Get($column, $operator, $value, $columnJoin));
+		$this->addWhere(Condition::get($column, $operator, $value, $columnJoin));
 		return $this;
 	}
 	
@@ -234,7 +234,7 @@ abstract class Query
 	 */
 	public function whereStatement($statement)
 	{
-		$this->addWhere(Condition::Statement($statement));
+		$this->addWhere(Condition::statement($statement));
 		return $this;
 	}
 	
@@ -247,7 +247,20 @@ abstract class Query
 	 */
 	public function whereEqual($column, $value, $columnJoin = NULL)
 	{
-		$this->addWhere(Condition::Equal($column, $value, $columnJoin));
+		$this->addWhere(Condition::equal($column, $value, $columnJoin));
+		return $this;
+	}
+
+	/**
+	 * SQL WHERE <>
+	 * @param string $column
+	 * @param mixed $value
+	 * @param boolean $columnJoin
+	 * @return $this
+	 */
+	public function whereNotEqual($column, $value, $columnJoin = NULL)
+	{
+		$this->addWhere(Condition::notEqual($column, $value, $columnJoin));
 		return $this;
 	}
 	
@@ -258,7 +271,7 @@ abstract class Query
 	 */
 	public function whereLike($column, $value)
 	{
-		$this->addWhere(Condition::Like($column, $value));
+		$this->addWhere(Condition::like($column, $value));
 		return $this;
 	}
 	
@@ -268,7 +281,7 @@ abstract class Query
 	 */
 	public function whereNull($column)
 	{
-		$this->addWhere(Condition::Null($column));
+		$this->addWhere(Condition::null($column));
 		return $this;
 	}
 	
@@ -280,7 +293,7 @@ abstract class Query
 	 */
 	public function whereIn($column, $values)
 	{
-		$this->addWhere(Condition::In($column, $values));
+		$this->addWhere(Condition::in($column, $values));
 		return $this;
 	}
 	
@@ -293,7 +306,7 @@ abstract class Query
 	 */
 	public function whereBetween($column, $start, $end)
 	{
-		$this->addWhere(Condition::Between($column, $start, $end));
+		$this->addWhere(Condition::between($column, $start, $end));
 		return $this;
 	}
 	
@@ -452,5 +465,3 @@ abstract class Query
 		//@todo this function should just accept SQL and execute it in place returning the result.
 	}
 }
-
-?>
