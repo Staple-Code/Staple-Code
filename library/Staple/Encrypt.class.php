@@ -92,7 +92,7 @@ class Encrypt
      */
 	public static function AES_encrypt($encrypt, $key, $salt = '', $pepper = '', $iv = NULL)
 	{
-		return static::encrypt($encrypt, $key, MCRYPT_RIJNDAEL_256, $salt, $pepper, $iv);
+		return static::encrypt($encrypt, $key, MCRYPT_RIJNDAEL_128, $salt, $pepper, $iv);
 	}
 	
 	/**
@@ -134,7 +134,7 @@ class Encrypt
      */
 	public static function AES_decrypt($decrypt, $key, $salt = '', $pepper = '', $iv = NULL)
 	{
-		return static::decrypt($decrypt,$key, MCRYPT_RIJNDAEL_256,$salt,$pepper,$iv);
+		return static::decrypt($decrypt,$key, MCRYPT_RIJNDAEL_128,$salt,$pepper,$iv);
 	}
 	
 	/**
