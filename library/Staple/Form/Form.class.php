@@ -81,7 +81,7 @@ class Form
 	
 	/**
 	 * An array of FieldElement objects, that represent the form fields.
-	 * @var FieldElement[]
+	 * @var FieldElement[]|CheckboxElement[]|SelectElement[]|CheckboxGroupElement[]
 	 */
 	public $fields = array();
 	
@@ -208,7 +208,8 @@ class Form
 	
 	/**
 	 * Retrieves a stored property.
-	 * @param string | int $key
+	 * @param string $key
+	 * @return mixed
 	 */
 	public function __get($key)
 	{
@@ -396,6 +397,7 @@ class Form
 	/**
 	 * Removes an HTML class from the form.
 	 * @param string $class
+	 * @return $this
 	 */
 	public function removeClass($class)
 	{
@@ -438,7 +440,7 @@ class Form
 var {$this->name}validated = false;
 $(function (){
 	$('#{$this->name}_form').submit(function (){
-	var errors = new Array();
+	var errors = [];
 JS;
 		
 		foreach($this->fields as $field)
@@ -599,7 +601,7 @@ JS;
 	}
 	
 	/**
-	 * @return the $errors
+	 * @return array $errors
 	 */
 	public function getErrors()
 	{
@@ -614,13 +616,14 @@ JS;
 		$this->errors = array();
 		return $this;
 	}
-	
+
 	/**
 	 * Adds a callback function to the validation stack. The function can be any standard callback, including an annonymous function.
 	 * A callback function must return a boolean true on success, and boolean false or an array of errors on failure.
-	 * 
+	 *
 	 * @param callback $func
 	 * @param array $params
+	 * @return $this
 	 */
 	public function addValidationCallback($func,$params = array())
 	{
@@ -722,7 +725,7 @@ JS;
 	}
 
 	/**
-	 * @return the $title
+	 * @return string $title
 	 */
 	public function getTitle()
 	{
@@ -730,7 +733,7 @@ JS;
 	}
 
 	/**
-	 * @return the $layout
+	 * @return string $layout
 	 */
 	public function getLayout()
 	{
@@ -769,6 +772,7 @@ JS;
 
 	/**
 	 * @param string $title
+	 * @return $this
 	 */
 	public function setTitle($title)
 	{
@@ -777,7 +781,7 @@ JS;
 	}
 	
 	/**
-	 * @return the $target
+	 * @return string $target
 	 */
 	public function getTarget()
 	{
@@ -786,6 +790,7 @@ JS;
 
 	/**
 	 * @param string $target
+	 * @return $this
 	 */
 	public function setTarget($target)
 	{
