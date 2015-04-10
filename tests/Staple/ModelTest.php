@@ -27,7 +27,7 @@ use Staple\Model;
 
 class userModel extends Model
 {
-
+	protected $userKey = '12345';
 }
 
 class productListCategoryModel extends Model
@@ -167,5 +167,14 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 		$this->assertFalse(isset($user['first_name']));
 		$this->assertFalse(isset($user['last_name']));
 		$this->assertFalse(isset($user['client']['first_name']));
+	}
+
+	public function testJSONEncode()
+	{
+		$model = $this->getTestUserModelObject();
+
+		$jsonObject = '{"first_name":"Jenny","last_name":"McCarthy","client":{"first_name":"Alyson","last_name":"Hannigan"},"fibonacci":[0,1,1,2,3,5,8,13,21],"userKey":"12345"}';
+
+		$this->assertEquals($jsonObject,json_encode($model));
 	}
 }

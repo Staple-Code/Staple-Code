@@ -146,6 +146,45 @@ class ViewTest extends \PHPUnit_Framework_TestCase
 	}
 
 	/**
+	 * Test the dynamic getters and setters
+	 * @test
+	 */
+	public function testRequired()
+	{
+		$view = $this->getTestObject();
+
+		//Assert default
+		$this->assertFalse($view->getRequired());
+
+		//Change
+		$view->setRequired(true);
+		$this->assertTrue($view->getRequired());
+	}
+
+	/**
+	 * Test the dynamic getters and setters
+	 * @test
+	 */
+	public function testStaticViewSetting()
+	{
+		$view = $this->getTestObject();
+
+		//Assert default
+		$this->assertNull($view->getStaticView());
+
+		//Change
+		$view->setStaticView('MyView');
+		$this->assertEquals('MyView',$view->getStaticView());
+
+		//Dynamic Setting
+		$view2 = View::staticContent('contactInfo');
+
+		$this->assertEquals('contactInfo',$view2->getStaticView());
+		$this->assertNull($view2->getView());
+		$this->assertNull($view2->getController());
+	}
+
+	/**
 	 * Test that a model can be properly bound to a model
 	 * @test
 	 */

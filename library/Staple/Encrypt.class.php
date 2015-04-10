@@ -23,60 +23,27 @@
  */
 namespace Staple;
 
-use \Exception;
-
 class Encrypt
-{	
+{
 	const AES = MCRYPT_RIJNDAEL_128;
-	const ECB = MCRYPT_MODE_ECB;
-	const CBC = MCRYPT_MODE_CBC;
-	const CFB = MCRYPT_MODE_CFB;
-	const OFB = MCRYPT_MODE_OFB;
-	const NOFB = MCRYPT_MODE_NOFB;
-	const STREAM = MCRYPT_MODE_STREAM;
-	
-	/**
-	 * The cypher to be used during encryption.
-	 * @var string
-	 */
-	private $cypher;
-	/**
-	 * Salt to added to/removed from the end of the encrypted value.
-	 * @var string
-	 */
-	private $salt;
-	/**
-	 * Pepper to be added to/removed from the beginning of the encrypted value.
-	 * @var string
-	 */
-	private $pepper;
-	/**
-	 * PHP MCRYPT mode. Should be one of the predefined mode constants for PHP. Defaults to MCRYPT_MODE_ECB.
-	 * @var string
-	 */
-	private $mode = MCRYPT_MODE_ECB;
-	/**
-	 * Encryption key
-	 * @var string
-	 */
-	private $key;
-	
+    const AES256 = MCRYPT_RIJNDAEL_256;
+
 	/**
 	 * Simple MD5 hashing function
-	 * @param string $encrypt
+	 * @param string $hash
 	 * @return string
 	 */
-	public static function MD5($hash)
+	public static function md5($hash)
 	{
 		return md5($hash);
 	}
 	
 	/**
 	 * Simple SHA1 function
-	 * @param string $encrypt
+	 * @param string $hash
 	 * @return string
 	 */
-	public static function SHA1($hash)
+	public static function sha1($hash)
 	{
 		return sha1($hash);
 	}
@@ -86,185 +53,90 @@ class Encrypt
 	 * @param string $hash
 	 * @return string
 	 */
-	public static function SHA256($hash)
+	public static function sha256($hash)
 	{
 		return hash('sha256',$hash);
-	}
-	
-	/**
-	 * @return the $cypher
-	 */
-	public function getCypher()
-	{
-		return $this->cypher;
-	}
-
-	/**
-	 * @param string $cypher
-	 */
-	public function setCypher($cypher)
-	{
-		$this->cypher = $cypher;
-		return $this;
-	}
-
-	/**
-	 * @return the $salt
-	 */
-	public function getSalt()
-	{
-		return $this->salt;
-	}
-
-	/**
-	 * @param string $salt
-	 */
-	public function setSalt($salt)
-	{
-		$this->salt = $salt;
-		return $this;
-	}
-
-	/**
-	 * @return the $pepper
-	 */
-	public function getPepper()
-	{
-		return $this->pepper;
-	}
-
-	/**
-	 * @param string $pepper
-	 */
-	public function setPepper($pepper)
-	{
-		$this->pepper = $pepper;
-		return $this;
-	}
-
-	/**
-	 * @return the $mode
-	 */
-	public function getMode()
-	{
-		return $this->mode;
-	}
-
-	/**
-	 * @param string $mode
-	 */
-	public function setMode($mode)
-	{
-		$this->mode = $mode;
-		return $this;
-	}
-
-	/**
-	 * @param string $key
-	 */
-	public function setKey($key)
-	{
-		$this->key = $key;
-		return $this;
-	}
-
-	/**
-	 * @todo Function is incomplete
-	 * Encrypt Data
-	 * @param string $text
-	 * @param string $key
-	 * @throws Exception
-	 * @return string
-	 */
-	public static function Encrypt($text, $key = NULL)
-	{
-		if(isset($key))
-		{
-			$enckey = $key;
-		}
-		elseif(isset($this->key))
-		{
-			$enckey = $this->key;
-		}
-		else
-		{
-			throw new Exception('No Encryption Key', Error::APPLICATION_ERROR);
-		}
-		
-	}
-	
-	/**
-	 * @todo Function is incomplete
-	 * Decrypt data
-	 * @param string $encryptedText
-	 * @param string $key
-	 * @throws Exception
-	 * @return string
-	 */
-	public static function Decrypt($encryptedText, $key = NULL)
-	{
-		if(isset($key))
-		{
-			$enckey = $key;
-		}
-		elseif(isset($this->key))
-		{
-			$enckey = $this->key;
-		}
-		else
-		{
-			throw new Exception('No Decryption Key', Error::APPLICATION_ERROR);
-		}
 	}
 	
 	/**
 	 * Encrypt data with AES
 	 * @param string $encrypt
 	 * @param string $key
+	 * @param string $cypher
 	 * @param string $salt
 	 * @param string $pepper
 	 * @param string $iv
 	 * @return string
 	 */
+	public static function encrypt($encrypt, $key, $cypher = MCRYPT_RIJNDAEL_128, $salt = '', $pepper = '', $iv = NULL)
+    {
+        if($iv == NULL)
+        {
+            $iv_size = mcrypt_get_iv_size($cypher, MCRYPT_MODE_ECB);
+            $iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);
+        }
+
+        //Add salt and pepper
+        $encryptString = $pepper.$encrypt.$salt;
+
+        return mcrypt_encrypt($cypher, $key, $encryptString, MCRYPT_MODE_ECB, $iv);
+    }
+
+    /**
+     * @param $encrypt
+     * @param $key
+     * @param string $salt
+     * @param string $pepper
+     * @param null $iv
+     * @return string
+     * @deprecated
+     */
 	public static function AES_encrypt($encrypt, $key, $salt = '', $pepper = '', $iv = NULL)
 	{
-		if($iv == NULL)
-		{
-    		$iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB);
-    		$iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);
-		}
-    	
-    	//Add salt and pepper
-    	$encstring = $pepper.$encrypt.$salt;
-
-    	return mcrypt_encrypt(self::AES, $key, $encstring, MCRYPT_MODE_ECB, $iv);
+		return static::encrypt($encrypt, $key, MCRYPT_RIJNDAEL_128, $salt, $pepper, $iv);
 	}
 	
 	/**
-	 * Decrypt data using AES
+	 * Decrypt data using specified algorithm
 	 * @param string $decrypt
 	 * @param string $key
+	 * @param string $cypher
 	 * @param string $salt
 	 * @param string $pepper
 	 * @param string $iv
 	 * @return string
 	 */
+	public static function decrypt($decrypt, $key, $cypher = MCRYPT_RIJNDAEL_128, $salt = '', $pepper = '', $iv = NULL)
+    {
+        if($iv == NULL)
+        {
+            $iv_size = mcrypt_get_iv_size($cypher, MCRYPT_MODE_ECB);
+            $iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);
+        }
+
+        //To correctly detect string length we trim the output.
+        $decryptString = trim(mcrypt_decrypt($cypher, $key, $decrypt, MCRYPT_MODE_ECB, $iv));
+
+        //Remove salt and pepper
+        $start = strlen($pepper);
+        $end = strlen($decryptString)-strlen($salt)-strlen($pepper);
+		$decryptString = substr($decryptString, $start, $end);
+        return $decryptString;
+    }
+
+    /**
+     * Decrypt using AES 256
+     * @param $decrypt
+     * @param $key
+     * @param string $salt
+     * @param string $pepper
+     * @param null $iv
+     * @deprecated
+     * @return string
+     */
 	public static function AES_decrypt($decrypt, $key, $salt = '', $pepper = '', $iv = NULL)
 	{
-		if($iv == NULL)
-		{
-    		$iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB);
-    		$iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);
-		}
-		
-		//To correctly detect string length we trim the output.
-    	$encstring = trim(mcrypt_decrypt(self::AES, $key, $decrypt, MCRYPT_MODE_ECB, $iv));
-    	
-    	//Remove salt and pepper
-    	$start = strlen($pepper);
-    	$end = strlen($encstring)-strlen($salt)-strlen($pepper);
-    	$encstring = substr($encstring, $start, $end);
-		return $encstring;
+		return static::decrypt($decrypt,$key, MCRYPT_RIJNDAEL_128,$salt,$pepper,$iv);
 	}
 	
 	/**
@@ -293,10 +165,11 @@ class Encrypt
 		$arr = unpack("H*",$str);
 		return $arr[1];
 	}
-	
+
 	/**
 	 * Converts a hexed string to a normal string
-	 * @param string $str
+	 * @param $str
+	 * @return string
 	 */
 	public static function strhex($str)
 	{

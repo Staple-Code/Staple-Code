@@ -106,7 +106,7 @@ class Main
 			|| define('VIEW_ROOT', APPLICATION_ROOT . 'views' . DIRECTORY_SEPARATOR);
 
 		defined('SCRIPT_ROOT')
-			|| define('SCRIPT_ROOT',APPLICATION_ROOT . 'scripts' . DIRECTORY_SEPARATOR);
+			|| define('SCRIPT_ROOT',FOLDER_ROOT . 'scripts' . DIRECTORY_SEPARATOR);
 		
 		defined('STAPLE_ROOT')
 			|| define('STAPLE_ROOT',LIBRARY_ROOT . 'Staple' . DIRECTORY_SEPARATOR);

@@ -31,6 +31,9 @@ use Staple\Query\Query;
 use Staple\Query\Select;
 use Staple\Query\Statement;
 use Staple\Traits\Factory;
+use \ReflectionClass;
+use \ReflectionProperty;
+use stdClass;
 
 abstract class Model implements \JsonSerializable, \ArrayAccess
 {
@@ -175,6 +178,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
      * 
      * Sets model properties supplied via an associative array.
      * @param array $options
+	 * @return $this
      */
     public function _options($options)
     {
@@ -240,9 +244,27 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	 */
 	public function jsonSerialize()
 	{
-		// TODO Auto-generated method stub
-		
-	}
+		$exclude = ['_primaryKey','_table','_data','_connection'];
+		$reflect = new ReflectionClass($this);
+		$props = $reflect->getProperties(ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED);
+
+		$object = new stdClass();
+		foreach($this->_data as $key=>$data)
+		{
+			$object->$key = $data;
+		}
+
+		foreach ($props as $prop)
+		{
+			$name = $prop->getName();
+			if(in_array($name,$exclude) === false)
+			{
+				$object->$name = $this->$name;
+			}
+		}
+
+		return $object;
+    }
 
 	/* (non-PHPdoc)
 	 * @see ArrayAccess::offsetExists()
@@ -422,5 +444,3 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 		//@todo incomplete function
 	}
 }
-
-?>

@@ -30,18 +30,20 @@ use \Exception;
 class View 
 {
 	use Traits\Helpers;
-	
+
+	const DYNAMIC_VIEW_EXTENSION = 'phtml';
+	const STATIC_VIEW_EXTENSION = 'html';
+
 	/**
 	 * Whether or not to render the view. Set to false to skip view rendering.
 	 * @var bool
 	 */
 	protected $_render = true;
 	/**
-	 * The dynamic datastore.
+	 * The dynamic data store.
 	 * @var array
 	 */
 	protected $_store = array();
-	
 	/**
 	 * A string containing the name of the view to build.
 	 * @var string
@@ -52,12 +54,21 @@ class View
 	 * @var string
 	 */
 	protected $_controller;
-
 	/**
 	 * The Model object that is bound to this view.
 	 * @var Model
 	 */
 	protected $_viewModel;
+	/**
+	 * The static view to be used for the view.
+	 * @var string
+	 */
+	protected $_staticView;
+	/**
+	 * Define true if it is required that the view be loaded.
+	 * @var bool
+	 */
+	protected $_required = false;
 
 	public function __construct($view = NULL, $controller = NULL)
 	{
@@ -136,6 +147,17 @@ class View
 		$inst = new static($view,$controller);
 		return $inst;
 	}
+
+	/**
+	 * @param $staticView
+	 * @return static
+	 */
+	public static function staticContent($staticView)
+	{
+		$inst = new static();
+		$inst->setStaticView($staticView);
+		return $inst;
+	}
 	
 	/**
 	 * Sets the view string
@@ -200,10 +222,47 @@ class View
 
 	/**
 	 * @param Model $viewModel
+	 * @return $this
 	 */
 	public function setViewModel(Model $viewModel)
 	{
 		$this->_viewModel = $viewModel;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getStaticView()
+	{
+		return $this->_staticView;
+	}
+
+	/**
+	 * @param string $staticView
+	 * @return $this
+	 */
+	public function setStaticView($staticView)
+	{
+		$this->_staticView = $staticView;
+		return $this;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function getRequired()
+	{
+		return $this->_required;
+	}
+
+	/**
+	 * @param boolean $required
+	 * @return $this
+	 */
+	public function setRequired($required)
+	{
+		$this->_required = (bool)$required;
 		return $this;
 	}
 
@@ -260,16 +319,29 @@ class View
 	{
 		if($this->_render === true)
 		{
-			//Load the view from the default loader
-			$view = Main::get()->getLoader()->loadView($this->_controller,$this->_view);
-			if(strlen($view) >= 1 && $view !== false)
+			if (isset($this->_staticView))
 			{
-				//Initialize the view model, if set
-				if(isset($this->_viewModel))
-					$model = $this->_viewModel;
+				//Load the view from the static view content folder - Possibly move this to the auto loader at a later date.
+				$view = STATIC_ROOT . $this->_staticView . '.' . static::STATIC_VIEW_EXTENSION;
+				if (file_exists($view))
+				{
+					//include the view
+					include $view;
+				}
+			}
+			else
+			{
+				//Load the view from the default loader
+				$view = Main::get()->getLoader()->loadView($this->_controller, $this->_view);
+				if (strlen($view) >= 1 && $view !== false)
+				{
+					//Initialize the view model, if set
+					if (isset($this->_viewModel))
+						$model = $this->_viewModel;
 
-				//include the view
-				include $view;
+					//include the view
+					include $view;
+				}
 			}
 		}
 		else

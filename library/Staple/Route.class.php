@@ -124,6 +124,9 @@ class Route
 				//If the controller has not been created yet, create an instance and store it in the front controller
 				if(($controller = Main::controller($class)) == NULL)
 				{
+					/**
+					 * @var Controller $controller
+					 */
 					$controller = new $dispatchClass();
 					$controller->_start();
 					
@@ -445,14 +448,14 @@ class Route
 		
 		//Remove trailing forward slash
 		if(substr($route, (strlen($route)-1), 1) == '/') $route = substr($route, 0, strlen($route)-1);
-		
-		//End routing information on the first . ? or # occurance
-		if(($end = strpos($route,'.')) !== false
-			|| ($end = strpos($route,'?')) !== false
-			|| ($end = strpos($route,'#')) !== false)
-		{
+
+		//End routing information on the first . ? or # occurrence, process each separately to get the first of any of the objects.
+		if(($end = strpos($route,'.')) !== false)
 			$route = substr($route, 0, $end);
-		}
+		if(($end = strpos($route,'?')) !== false)
+			$route = substr($route, 0, $end);
+		if(($end = strpos($route,'#')) !== false)
+			$route = substr($route, 0, $end);
 		
 		//Check to see if a script exists with that route.
 		//Split the route into it's component elements.
