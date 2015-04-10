@@ -333,7 +333,7 @@ class Route
 	protected function dispatchController(Controller $controller)
 	{
 		//Set the view's controller to match the route
-		$controller->view->setController($this->getBase());
+		$controller->view->setController($this->getController());
 
 		//Set the view's action to match the route
 		$controller->view->setView($this->getAction());
