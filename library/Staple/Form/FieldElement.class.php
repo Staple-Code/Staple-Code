@@ -89,7 +89,7 @@ abstract class FieldElement
 	protected $filters = array();
 	/**
 	 * An array that holds the validator objects assigned to the form field.
-	 * @var array
+	 * @var FieldValidator[]
 	 */
 	protected $validators = array();
 	/**
@@ -301,6 +301,16 @@ abstract class FieldElement
 	{
 		return $this->errors;
 	}
+
+	/**
+	 * Clears the error list on the field element.
+	 * @return $this
+	 */
+	protected function clearErrors()
+	{
+		$this->errors = [];
+		return $this;
+	}
 	
 	/**
 	 * Checks the form field against any validators to confirm valid data was entered into the form.
@@ -309,27 +319,18 @@ abstract class FieldElement
 	 * into the field for it to be valid, even with no validators.
 	 * 
 	 * @return boolean
-	 * @throws Exception
 	 */
 	public function isValid()
 	{
 		foreach($this->validators as $val)
 		{
-			if($val instanceof FieldValidator)
+			$val->clearErrors();
+			$this->clearErrors();
+			if(!$val->check($this->value))
 			{
-				$val->clearErrors();
-				if(!$val->check($this->Value))
-				{
-					$this->errors[$val->getName()] = $val->getErrors();
-				}
-			}
-			else
-			{
-				throw new Exception('Validation Error', Error::VALIDATION_ERROR);
+				$this->errors[$val->getName()] = $val->getErrors();
 			}
 		}
-		
-		//@todo check for field content if not validators present.
 		
 		if(count($this->errors) == 0)
 		{
@@ -357,6 +358,7 @@ abstract class FieldElement
 	
 	/**
 	 * This function queries all of the validators for javascript to verify their data.
+	 * @throws Exception
 	 * @return string
 	 */
 	public function clientJQuery()
@@ -533,7 +535,7 @@ abstract class FieldElement
 
 	/**
 	 * set instance passed from Form into element
-	 * @param $elementViewAdapter
+	 * @param ElementViewAdapter $adapter
 	 * @return $this
 	 */
 	public function setElementViewAdapter(ElementViewAdapter $adapter)

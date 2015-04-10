@@ -1,9 +1,24 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: ironpilot
- * Date: 4/9/2015
- * Time: 8:14 PM
+ * Unit Tests for \Staple\Form\Validator\DependentFieldValidator object
+ *
+ * @author Ironpilot
+ * @copyright Copyright (c) 2011, STAPLE CODE
+ *
+ * This file is part of the STAPLE Framework.
+ *
+ * The STAPLE Framework is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your option)
+ * any later version.
+ *
+ * The STAPLE Framework is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 namespace Staple\Tests;
@@ -11,7 +26,7 @@ namespace Staple\Tests;
 use Staple\Form\FieldElement;
 use Staple\Form\Validate\DependentFieldValidator;
 
-class dummyField extends FieldElement
+class dummyDependentFieldValidator extends FieldElement
 {
 	/**
 	 * Build the field label
@@ -41,9 +56,18 @@ class dummyField extends FieldElement
 
 class DependentFieldValidatorTest extends \PHPUnit_Framework_TestCase
 {
+	/**
+	 * @param $name
+	 * @return dummyDependentFieldValidator
+	 */
 	private function makeDummyField($name)
 	{
-		return new dummyField($name);
+		return new dummyDependentFieldValidator($name);
+	}
+
+	private function getValidatorObject(FieldElement $field)
+	{
+		return new DependentFieldValidator($field);
 	}
 
 	public function testDependentFieldsAreEqual()
@@ -51,7 +75,7 @@ class DependentFieldValidatorTest extends \PHPUnit_Framework_TestCase
 		$field1 = $this->makeDummyField('field1');
 		$field2 = $this->makeDummyField('field2');
 
-		$validator = new DependentFieldValidator($field2);
+		$validator = $this->getValidatorObject($field2);
 
 		$field1->addValidator($validator);
 
@@ -67,5 +91,13 @@ class DependentFieldValidatorTest extends \PHPUnit_Framework_TestCase
 		$this->assertEquals($field1->getValue(),$field2->getValue());
 		$this->assertTrue($validator->check($field1->getValue()));
 
+	}
+
+	public function testGetField()
+	{
+		$field = $this->makeDummyField('field');
+		$validator = $this->getValidatorObject($field);
+
+		$this->assertInstanceOf('\Staple\Form\FieldElement',$validator->getField());
 	}
 }
