@@ -1,6 +1,6 @@
 <?php
 /**
- * Unit Tests for \Staple\Form\Validator\DependentFieldValidator object
+ * Unit Tests for \Staple\Form\Validate\DependentFieldValidator object
  *
  * @author Ironpilot
  * @copyright Copyright (c) 2011, STAPLE CODE
