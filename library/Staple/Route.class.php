@@ -154,7 +154,7 @@ class Route
 						if($controller->_auth($method) === true)
 						{
 							//Everything went well, dispatch the controller.
-							$this->dispatchController();
+							$this->dispatchController($controller);
 						}
 						else
 						{
@@ -165,7 +165,7 @@ class Route
 					else
 					{
 						//No authentication needed, dispatch the controller
-						$this->dispatchController();
+						$this->dispatchController($controller);
 					}
 					
 					//Return true so that we don't hit the exception.
@@ -182,119 +182,111 @@ class Route
 	 * Function executes a controller action passing parameters using call_user_func_array().
 	 * It also builds the view for the route.
 	 *
+	 * @param Controller $controller
 	 * @throws RoutingException
 	 */
-	protected function dispatchController()
+	protected function dispatchController(Controller $controller)
 	{
-		$controller = Main::controller($this->getController());
-		
-		if($controller instanceof Controller)
+		//Set the view's controller to match the route
+		$controller->view->setController($this->getController());
+
+		//Set the view's action to match the route
+		$controller->view->setView($this->getAction());
+
+		//Call the controller action
+		$actionMethod = new ReflectionMethod($controller,$this->getAction());
+		$return = $actionMethod->invokeArgs($controller, $this->getParams());
+
+		if($return instanceof View)		//Check for a returned View object
 		{
-			//Set the view's controller to match the route
-			$controller->view->setController($this->getController());
-		
-			//Set the view's action to match the route
-			$controller->view->setView($this->getAction());
-		
-			//Call the controller action
-			$actionMethod = new ReflectionMethod($controller,$this->getAction());
-			$return = $actionMethod->invokeArgs($controller, $this->getParams());
-
-			if($return instanceof View)		//Check for a returned View object
+			//If the view does not have a controller name set, set it to the currently executing controller.
+			if(!$return->hasController())
 			{
-				//If the view does not have a controller name set, set it to the currently executing controller.
-				if(!$return->hasController())
-				{
-					$loader = Main::get()->getLoader();
-					$conString = get_class($controller);
+				$loader = Main::get()->getLoader();
+				$conString = get_class($controller);
 
-					$return->setController(substr($conString,0,strlen($conString)-strlen($loader::CONTROLLER_SUFFIX)));
-				}
-
-				//If the view doesn't have a view set, use the route's action.
-				if(!$return->hasView())
-				{
-					$return->setView($this->getAction());
-				}
-
-				//Check for a controller layout and build it.
-				if($controller->layout instanceof Layout)
-				{
-					$controller->layout->build(NULL,$return);
-				}
-				else
-				{
-					$return->build();
-				}
+				$return->setController(substr($conString,0,strlen($conString)-strlen($loader::CONTROLLER_SUFFIX)));
 			}
-			elseif ($return instanceof Json)	//Check for a Json object to be coverted and echoed.
+
+			//If the view doesn't have a view set, use the route's action.
+			if(!$return->hasView())
 			{
-				echo json_encode($return);
+				$return->setView($this->getAction());
 			}
+
+			//Check for a controller layout and build it.
+			if($controller->layout instanceof Layout)
+			{
+				$controller->layout->build(NULL,$return);
+			}
+			else
+			{
+				$return->build();
+			}
+		}
+		elseif ($return instanceof Json)	//Check for a Json object to be coverted and echoed.
+		{
+			echo json_encode($return);
+		}
 			elseif ($return instanceof Route)	//Allow a controller to return a route to redirect the program execution to.
 			{
 				Main::get()->run($return);
 			}
-			elseif (is_object($return))		//Check for another object type
+		elseif (is_object($return))		//Check for another object type
+		{
+			//If the object is stringable, covert it to a string and output it.
+			$class = new ReflectionClass($return);
+			if ($class->implementsInterface('JsonSerializable'))
 			{
-				//If the object is stringable, covert it to a string and output it.
-				$class = new ReflectionClass($return);
-				if ($class->implementsInterface('JsonSerializable'))
-				{
-					echo json_encode($return);
-				}
-				//If the object is stringable, covert to a string and output it.
-				elseif((!is_array($return)) &&
-					((!is_object($return) && settype($return, 'string') !== false) ||
-					(is_object($return) && method_exists($return, '__toString'))))
-				{
-					echo (string)$return;
-				}
-				//If nothing else works, echo the object through the dump method.
-				else
-				{
-					Dev::Dump($return);
-				}
+				echo json_encode($return);
 			}
-			elseif(is_string($return))		//If the return value was simply a string, echo it out.
+			//If the object is stringable, covert to a string and output it.
+			elseif((!is_array($return)) &&
+				((!is_object($return) && settype($return, 'string') !== false) ||
+				(is_object($return) && method_exists($return, '__toString'))))
 			{
-				echo $return;
+				echo (string)$return;
 			}
+			//If nothing else works, echo the object through the dump method.
 			else
 			{
-				//Fall back to previous functionality by rendering views and layouts.
-
-				//If the view does not have a controller name set, set it to the currently executing controller.
-				if(!$controller->view->hasController())
-				{
-					$loader = Main::get()->getLoader();
-					$conString = get_class($controller);
-
-					$controller->view->setController(substr($conString,0,strlen($conString)-strlen($loader::CONTROLLER_SUFFIX)));
-				}
-
-				//If the view doesn't have a view set, use the route's action.
-				if(!$controller->view->hasView())
-				{
-					$controller->view->setView($this->getAction());
-				}
-
-				//Check for a layout
-				if($controller->layout instanceof Layout)
-				{
-					//Align the controller and layout views. They should already be the same anyway.
-					$controller->layout->setView($controller->view);
-					$controller->layout->build();
-				}
-				else
-				{
-					$controller->view->build();
-				}
+				Dev::Dump($return);
 			}
+		}
+		elseif(is_string($return))		//If the return value was simply a string, echo it out.
+		{
+			echo $return;
 		}
 		else
 		{
-			throw new RoutingException('Tried to dispatch to an invalid controller.', Error::APPLICATION_ERROR);
+			//Fall back to previous functionality by rendering views and layouts.
+
+			//If the view does not have a controller name set, set it to the currently executing controller.
+			if(!$controller->view->hasController())
+			{
+				$loader = Main::get()->getLoader();
+				$conString = get_class($controller);
+
+				$controller->view->setController(substr($conString,0,strlen($conString)-strlen($loader::CONTROLLER_SUFFIX)));
+			}
+
+			//If the view doesn't have a view set, use the route's action.
+			if(!$controller->view->hasView())
+			{
+				$controller->view->setView($this->getAction());
+			}
+
+			//Check for a layout
+			if($controller->layout instanceof Layout)
+			{
+				//Align the controller and layout views. They should already be the same anyway.
+				$controller->layout->setView($controller->view);
+				$controller->layout->build();
+			}
+			else
+			{
+				$controller->view->build();
+			}
 		}
 	}
 	
