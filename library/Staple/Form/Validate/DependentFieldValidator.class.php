@@ -27,12 +27,32 @@ use \Staple\Form\FieldElement;
 
 class DependentFieldValidator extends FieldValidator
 {
-	protected $fieldref;
-	protected $requiredval;
+	/**
+	 * @var FieldValidator
+	 */
+	protected $field;
 	
-	public function __construct(FieldElement $field, $value)
+	public function __construct(FieldElement $field)
 	{
-	
+		$this->setField($field);
+	}
+
+	/**
+	 * @return FieldValidator
+	 */
+	public function getField()
+	{
+		return $this->field;
+	}
+
+	/**
+	 * @param FieldValidator $field
+	 * @return $this
+	 */
+	public function setField(FieldElement $field)
+	{
+		$this->field = $field;
+		return $this;
 	}
 
 	/**
@@ -45,8 +65,14 @@ class DependentFieldValidator extends FieldValidator
 	 */
 	public function check($data)
 	{
-	
+		if($data == $this->field->getValue())
+		{
+			return true;
+		}
+		else
+		{
+			$this->addError('Fields are not equal.');
+			return false;
+		}
 	}
 }
-
-?>
