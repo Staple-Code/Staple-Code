@@ -28,7 +28,7 @@ use \Staple\Form\FieldElement;
 class DependentFieldValidator extends FieldValidator
 {
 	/**
-	 * @var FieldValidator
+	 * @var FieldElement
 	 */
 	protected $field;
 	
@@ -38,7 +38,7 @@ class DependentFieldValidator extends FieldValidator
 	}
 
 	/**
-	 * @return FieldValidator
+	 * @return FieldElement
 	 */
 	public function getField()
 	{
@@ -46,7 +46,7 @@ class DependentFieldValidator extends FieldValidator
 	}
 
 	/**
-	 * @param FieldValidator $field
+	 * @param FieldElement $field
 	 * @return $this
 	 */
 	public function setField(FieldElement $field)
