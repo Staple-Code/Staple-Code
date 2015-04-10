@@ -30,7 +30,7 @@ class Encrypt
 
 	/**
 	 * Simple MD5 hashing function
-	 * @param string $encrypt
+	 * @param string $hash
 	 * @return string
 	 */
 	public static function md5($hash)
@@ -40,7 +40,7 @@ class Encrypt
 	
 	/**
 	 * Simple SHA1 function
-	 * @param string $encrypt
+	 * @param string $hash
 	 * @return string
 	 */
 	public static function sha1($hash)
@@ -62,6 +62,7 @@ class Encrypt
 	 * Encrypt data with AES
 	 * @param string $encrypt
 	 * @param string $key
+	 * @param string $cypher
 	 * @param string $salt
 	 * @param string $pepper
 	 * @param string $iv
@@ -76,9 +77,9 @@ class Encrypt
         }
 
         //Add salt and pepper
-        $encstring = $pepper.$encrypt.$salt;
+        $encryptString = $pepper.$encrypt.$salt;
 
-        return mcrypt_encrypt($cypher, $key, $encstring, MCRYPT_MODE_ECB, $iv);
+        return mcrypt_encrypt($cypher, $key, $encryptString, MCRYPT_MODE_ECB, $iv);
     }
 
     /**
@@ -92,13 +93,14 @@ class Encrypt
      */
 	public static function AES_encrypt($encrypt, $key, $salt = '', $pepper = '', $iv = NULL)
 	{
-		return static::encrypt($encrypt, $key, MCRYPT_RIJNDAEL_256, $salt, $pepper, $iv);
+		return static::encrypt($encrypt, $key, MCRYPT_RIJNDAEL_128, $salt, $pepper, $iv);
 	}
 	
 	/**
 	 * Decrypt data using specified algorithm
 	 * @param string $decrypt
 	 * @param string $key
+	 * @param string $cypher
 	 * @param string $salt
 	 * @param string $pepper
 	 * @param string $iv
@@ -113,13 +115,13 @@ class Encrypt
         }
 
         //To correctly detect string length we trim the output.
-        $encstring = trim(mcrypt_decrypt($cypher, $key, $decrypt, MCRYPT_MODE_ECB, $iv));
+        $decryptString = trim(mcrypt_decrypt($cypher, $key, $decrypt, MCRYPT_MODE_ECB, $iv));
 
         //Remove salt and pepper
         $start = strlen($pepper);
-        $end = strlen($encstring)-strlen($salt)-strlen($pepper);
-        $encstring = substr($encstring, $start, $end);
-        return $encstring;
+        $end = strlen($decryptString)-strlen($salt)-strlen($pepper);
+		$decryptString = substr($decryptString, $start, $end);
+        return $decryptString;
     }
 
     /**
@@ -134,7 +136,7 @@ class Encrypt
      */
 	public static function AES_decrypt($decrypt, $key, $salt = '', $pepper = '', $iv = NULL)
 	{
-		return static::decrypt($decrypt,$key, MCRYPT_RIJNDAEL_256,$salt,$pepper,$iv);
+		return static::decrypt($decrypt,$key, MCRYPT_RIJNDAEL_128,$salt,$pepper,$iv);
 	}
 	
 	/**
@@ -163,10 +165,11 @@ class Encrypt
 		$arr = unpack("H*",$str);
 		return $arr[1];
 	}
-	
+
 	/**
 	 * Converts a hexed string to a normal string
-	 * @param string $str
+	 * @param $str
+	 * @return string
 	 */
 	public static function strhex($str)
 	{
