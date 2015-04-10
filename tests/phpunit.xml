@@ -2,6 +2,8 @@
     <testsuites>
         <testsuite name="Staple Test Suite">
             <directory>tests</directory>
+            <file>tests/Staple/AliasTest.php</file>
+            <file>tests/Staple/EncryptTest.php</file>
         </testsuite>
     </testsuites>
 </phpunit>
