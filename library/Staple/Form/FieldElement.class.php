@@ -324,17 +324,11 @@ abstract class FieldElement
 	{
 		foreach($this->validators as $val)
 		{
-			if($val instanceof FieldValidator)
+			$val->clearErrors();
+			$this->clearErrors();
+			if(!$val->check($this->value))
 			{
-				$val->clearErrors();
-				if(!$val->check($this->Value))
-				{
-					$this->errors[$val->getName()] = $val->getErrors();
-				}
-			}
-			else
-			{
-				throw new Exception('Validation Error', Error::VALIDATION_ERROR);
+				$this->errors[$val->getName()] = $val->getErrors();
 			}
 		}
 		
@@ -552,7 +546,7 @@ abstract class FieldElement
 
 	/**
 	 * set instance passed from Form into element
-	 * @param $elementViewAdapter
+	 * @param ElementViewAdapter $adapter
 	 * @return $this
 	 */
 	public function setElementViewAdapter(ElementViewAdapter $adapter)
