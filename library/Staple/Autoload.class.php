@@ -87,7 +87,6 @@ class Autoload
 	protected $throwOnFailure = true;
 	/**
 	 * Automatically loads class files for the application.
-	 * @param string $class_name
 	 * @throws Exception
 	 */
 	public function __construct()
@@ -115,10 +114,11 @@ class Autoload
 	 * Load a class into the application
 	 * @param string $class_name
 	 * @throws Exception
+	 * @return bool
 	 */
 	public function load($class_name)
 	{
-		//Check for an aliased classname
+		//Check for an aliased class name
     	if(!is_null($namespacedClass = Alias::checkAlias($class_name)))					//Look for aliased classes
     	{
     		return $this->loadLibraryClass($namespacedClass, $class_name);
@@ -234,6 +234,7 @@ class Autoload
 	 * Load a custom controller into the application
 	 * @param string $class_name
 	 * @throws Exception
+	 * @return bool
 	 */
 	protected function loadController($class_name)
 	{
@@ -257,6 +258,7 @@ class Autoload
 	 * Load a custom model in the application
 	 * @param string $class_name
 	 * @throws Exception
+	 * @return bool
 	 */
 	protected function loadModel($class_name)
 	{
@@ -280,6 +282,7 @@ class Autoload
 	 * Load a custom form into the application
 	 * @param string $class_name
 	 * @throws Exception
+	 * @return bool
 	 */
 	protected function loadForm($class_name)
 	{
@@ -329,12 +332,12 @@ class Autoload
 
 		return false;
 	}
-	
+
 	/**
-	 * Load a View into the application
-	 * @param string $controller
-	 * @param string $view
-	 * @param bool $required
+	 * Load a Layout into the application
+	 * @param string $name
+	 * @return string
+	 * @throws Exception
 	 */
 	public function loadLayout($name)
 	{
@@ -366,6 +369,7 @@ class Autoload
 	/**
 	 * Allows the programmer to disable thrown exceptions when failing to load classes. Allows another loading system to take over and load the class.
 	 * @param boolean $throwOnFailure
+	 * @return $this
 	 */
 	public function setThrowOnFailure($throwOnFailure)
 	{
@@ -398,6 +402,7 @@ class Autoload
 
 	/**
 	 * @param string $controllerSuffix
+	 * @return $this
 	 */
 	private function setControllerSuffix($controllerSuffix)
 	{
@@ -407,6 +412,7 @@ class Autoload
 
 	/**
 	 * @param string $formSuffix
+	 * @return $this
 	 */
 	private function setFormSuffix($formSuffix)
 	{
@@ -416,6 +422,7 @@ class Autoload
 
 	/**
 	 * @param string $modelSuffix
+	 * @return $this
 	 */
 	private function setModelSuffix($modelSuffix)
 	{
@@ -428,6 +435,8 @@ class Autoload
 	 * Add a search directory for the application to look for controller class files. The second parameter will make the new directory take precedence
 	 * over any previous directories. It is the default to add new directories as the primary directory.
 	 * @param string $dir
+	 * @param bool $primary
+	 * @return $this
 	 */
 	public function addControllerSearchDirectory($dir, $primary = true)
 	{
@@ -446,6 +455,8 @@ class Autoload
 	 * Add a search directory for the application to look for form class files. The second parameter will make the new directory take precedence
 	 * over any previous directories. It is the default to add new directories as the primary directory.
 	 * @param string $dir
+	 * @param bool $primary
+	 * @return $this
 	 */
 	public function addFormSearchDirectory($dir, $primary = true)
 	{
@@ -464,6 +475,8 @@ class Autoload
 	 * Add a search directory for the application to look for model class files. The second parameter will make the new directory take precedence
 	 * over any previous directories. It is the default to add new directories as the primary directory.
 	 * @param string $dir
+	 * @param bool $primary
+	 * @return $this
 	 */
 	public function addModelSearchDirectory($dir, $primary = true)
 	{
@@ -482,6 +495,8 @@ class Autoload
 	 * Add a search directory for the application to look for view files. The second parameter will make the new directory take precedence
 	 * over any previous directories. It is the default to add new directories as the primary directory.
 	 * @param string $dir
+	 * @param bool $primary
+	 * @return $this
 	 */
 	public function addLayoutSearchDirectory($dir, $primary = true)
 	{
@@ -500,6 +515,8 @@ class Autoload
 	 * Add a search directory for the application to look for view files. The second parameter will make the new directory take precedence
 	 * over any previous directories. It is the default to add new directories as the primary directory.
 	 * @param string $dir
+	 * @param bool $primary
+	 * @return $this
 	 */
 	public function addViewSearchDirectory($dir, $primary = true)
 	{
@@ -555,6 +572,7 @@ class Autoload
 
 	/**
 	 * @param array[string] $layoutSearchDirectories
+	 * @return $this
 	 */
 	public function setLayoutSearchDirectories(array $layoutSearchDirectories)
 	{
@@ -564,6 +582,7 @@ class Autoload
 
 	/**
 	 * @param array[string] $controllerSearchDirectories
+	 * @return $this
 	 */
 	public function setControllerSearchDirectories(array $controllerSearchDirectories)
 	{
@@ -573,6 +592,7 @@ class Autoload
 
 	/**
 	 * @param array[string] $formSearchDirectories
+	 * @return $this
 	 */
 	public function setFormSearchDirectories(array $formSearchDirectories)
 	{
@@ -582,6 +602,7 @@ class Autoload
 
 	/**
 	 * @param array[string] $modelSearchDirectories
+	 * @return $this
 	 */
 	public function setModelSearchDirectories(array $modelSearchDirectories)
 	{
@@ -591,6 +612,7 @@ class Autoload
 
 	/**
 	 * @param array[string] $viewSearchDirectories
+	 * @return $this
 	 */
 	public function setViewSearchDirectories(array $viewSearchDirectories)
 	{
