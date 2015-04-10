@@ -1,9 +1,7 @@
 <phpunit bootstrap="bootstrap.php" colors="true">
     <testsuites>
         <testsuite name="Staple Test Suite">
-            <directory>tests</directory>
-            <file>tests/Staple/AliasTest.php</file>
-            <file>tests/Staple/EncryptTest.php</file>
+            <directory>Staple/</directory>
         </testsuite>
     </testsuites>
 </phpunit>
