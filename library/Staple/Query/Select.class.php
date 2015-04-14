@@ -413,43 +413,43 @@ class Select extends Query
 	
 	public function havingCondition($column, $operator, $value, $columnJoin = NULL)
 	{
-		$this->addHaving(Condition::Get($column, $operator, $value, $columnJoin));
+		$this->addHaving(Condition::get($column, $operator, $value, $columnJoin));
 		return $this;
 	}
 	
 	public function havingStatement($statement)
 	{
-		$this->addHaving(Condition::Statement($statement));
+		$this->addHaving(Condition::statement($statement));
 		return $this;
 	}
 	
 	public function havingEqual($column, $value, $columnJoin = NULL)
 	{
-		$this->addHaving(Condition::Equal($column, $value, $columnJoin));
+		$this->addHaving(Condition::equal($column, $value, $columnJoin));
 		return $this;
 	}
 	
 	public function havingLike($column, $value)
 	{
-		$this->addHaving(Condition::Like($column, $value));
+		$this->addHaving(Condition::like($column, $value));
 		return $this;
 	}
 	
 	public function havingNull($column)
 	{
-		$this->addHaving(Condition::Null($column));
+		$this->addHaving(Condition::null($column));
 		return $this;
 	}
 	
 	public function havingIn($column, array $values)
 	{
-		$this->addHaving(Condition::In($column, $values));
+		$this->addHaving(Condition::in($column, $values));
 		return $this;
 	}
 	
 	public function havingBetween($column, $start, $end)
 	{
-		$this->addHaving(Condition::Between($column, $start, $end));
+		$this->addHaving(Condition::between($column, $start, $end));
 		return $this;
 	}
 	
@@ -688,5 +688,3 @@ class Select extends Query
 		return $stmt;
 	}
 }
-
-?>
