@@ -30,14 +30,14 @@ class accountController extends AuthController
 	}
 	public function index()
 	{
-		$this->view->message = Staple_Auth::get()->getMessage();
+		$this->view->message = Auth::get()->getMessage();
 	}
 	public function signin()
 	{
 		$username = $_POST['user'];
 		$password = $_POST['pass'];
 		var_dump($username,$password);
-		$auth = Staple_Auth::get();
+		$auth = Auth::get();
 		$granted = $auth->doAuth(array(
 				'username'=>$username,
 				'password'=>$password,
@@ -52,5 +52,3 @@ class accountController extends AuthController
 		}
 	}
 }
-
-?>
