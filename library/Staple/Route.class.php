@@ -33,12 +33,28 @@ class Route
 	const ROUTE_MVC = 1;
 	const ROUTE_SCRIPT = 2;
 	const CONTROLLER_SUFFIX = "Controller";
+	const PROVIDER_SUFFIX = "Provider";
+
+	const TYPE_CONTROLLER = 1;
+	const TYPE_PROVIDER = 2;
+	const TYPE_CALLABLE = 3;
+
+	const VERB_ANY = 'any';
+	const VERB_DELETE = 'delete';
+	const VERB_GET = 'get';
+	const VERB_HEAD = 'head';
+	const VERB_OPTIONS = 'options';
+	const VERB_PATCH = 'patch';
+	const VERB_POST = 'post';
+	const VERB_PUT = 'put';
+	const VERB_TRACE = 'trace';
+
 	
 	/**
 	 * The name of the controller being executed.
 	 * @var string
 	 */
-	protected $controller;
+	protected $base;
 	/**
 	 * Name of the action being executed.
 	 * @var string
@@ -50,16 +66,31 @@ class Route
 	 */
 	protected $params = array();
 	/**
-	 * Type of route: MVC route or script route.
+	 * Type of route: Controller, Provider, or Callable
 	 * @var int
 	 */
 	protected $type;
-	
-	public function __construct($link = NULL)
+	/**
+	 * An array of routes with callable methods.
+	 * @var callable[]
+	 */
+	protected static $staticRoutes = array();
+
+	/**
+	 * @param string $link
+	 * @param callable $callback
+	 * @param string $verb
+	 * @throws RoutingException
+	 */
+	public function __construct($link = NULL, callable $callback = NULL, $verb = NULL)
 	{
 		if(isset($link))
 		{
-			if(is_array($link))
+			if(is_callable($callback) && !is_null($callback) && !is_null($link))
+			{
+				static::register($link,$callback,$verb);
+			}
+			elseif(is_array($link))
 			{
 				$this->processArrayRoute($link);
 			}
@@ -79,7 +110,7 @@ class Route
 		//$link = Staple_Config::getValue('application', 'public_location');
 		
 		//Add Controller
-		$link = Link::urlCase($this->getController()).'/';
+		$link = Link::urlCase($this->getBase()).'/';
 		
 		//Add Action
 		$link .= Link::urlCase($this->getAction());
@@ -104,6 +135,110 @@ class Route
 	}
 
 	/**
+	 * @param string $route
+	 * @param callable $callback
+	 * @param string $verb
+	 * @return static
+	 */
+	public static function register($route, callable $callback, $verb = self::VERB_ANY)
+	{
+		//Convert array to string for storage in static route
+		if(is_array($route))
+		{
+			$route = implode('/',$route);
+		}
+		self::$staticRoutes[(string)$verb][(string)$route] = $callback;
+		return new static($route);
+	}
+
+	/**
+	 * @param $route
+	 * @param callable $callback
+	 * @return Route
+	 */
+	public static function delete($route, callable $callback)
+	{
+		return static::register($route,$callback,static::VERB_DELETE);
+	}
+
+	/**
+	 * Register a route that responds to the HTTP GET verb.
+	 * @param string $route
+	 * @param callable $callback
+	 * @return Route
+	 */
+	public static function get($route, callable $callback)
+	{
+		return static::register($route,$callback,static::VERB_GET);
+	}
+
+	/**
+	 * Register a route that responds to the HTTP HEAD verb.
+	 * @param string $route
+	 * @param callable $callback
+	 * @return Route
+	 */
+	public static function head($route, callable $callback)
+	{
+		return static::register($route,$callback,static::VERB_HEAD);
+	}
+
+	/**
+	 * Register a route that responds to the HTTP OPTIONS verb.
+	 * @param string $route
+	 * @param callable $callback
+	 * @return Route
+	 */
+	public static function options($route, callable $callback)
+	{
+		return static::register($route,$callback,static::VERB_OPTIONS);
+	}
+
+	/**
+	 * Register a route that responds to the HTTP PATCH verb.
+	 * @param string $route
+	 * @param callable $callback
+	 * @return Route
+	 */
+	public static function patch($route, callable $callback)
+	{
+		return static::register($route,$callback,static::VERB_PATCH);
+	}
+
+	/**
+	 * Register a route that responds to the HTTP POST verb.
+	 * @param string $route
+	 * @param callable $callback
+	 * @return Route
+	 */
+	public static function post($route, callable $callback)
+	{
+		return static::register($route,$callback,static::VERB_POST);
+	}
+
+	/**
+	 * Register a route that responds to the HTTP PUT verb.
+	 * @param string $route
+	 * @param callable $callback
+	 * @return Route
+	 */
+	public static function put($route, callable $callback)
+	{
+		return static::register($route,$callback,static::VERB_PUT);
+	}
+
+	/**
+	 * Register a route that responds to the HTTP TRACE verb.
+	 * @param string $route
+	 * @param callable $callback
+	 * @return Route
+	 */
+	public static function trace($route, callable $callback)
+	{
+		return static::register($route,$callback,static::VERB_TRACE);
+	}
+
+	/**
 	 * Execute the route
 	 */
 	public function execute()
@@ -114,7 +249,7 @@ class Route
 		session_set_save_handler($sessionHandler, true);
 
 		//Route Controller and actions
-		$class = $this->getController();
+		$class = $this->getBase();
 		$method = $this->getAction();
 		
 		//The class name for the controller
@@ -198,7 +333,7 @@ class Route
 	protected function dispatchController(Controller $controller)
 	{
 		//Set the view's controller to match the route
-		$controller->view->setController($this->getController());
+		$controller->view->setController($this->getBase());
 
 		//Set the view's action to match the route
 		$controller->view->setView($this->getAction());
@@ -305,13 +440,22 @@ class Route
 		header('Location: '.$base.$this);
 		exit(0);
 	}
-	
+
+	/**
+	 * @return string
+	 */
+	protected function getBase()
+	{
+		return $this->base;
+	}
+
 	/**
 	 * @return string $controller
+	 * @deprecated
 	 */
 	public function getController()
 	{
-		return $this->controller;
+		return $this->base;
 	}
 
 	/**
@@ -354,15 +498,24 @@ class Route
 		return $this;
 	}
 
+	/**
+	 * @param string $base
+	 * @return $this
+	 */
+	protected function setBase($base)
+	{
+		$this->base = (string)$base;
+		return $this;
+	}
 
 	/**
 	 * @param string $controller
 	 * @return $this
+	 * @deprecated
 	 */
 	public function setController($controller)
 	{
-		$this->controller = $controller;
-		return $this;
+		return $this->setBase($controller);
 	}
 
 	/**
@@ -400,7 +553,7 @@ class Route
 			//Check route info and convert to method case
 			if(ctype_alnum(str_replace('-', '', $controller)) && ctype_alpha(substr($controller, 0, 1)))
 			{
-				$this->setController(Link::methodCase($controller));
+				$this->setBase(Link::methodCase($controller));
 			}
 			else
 			{
@@ -410,7 +563,7 @@ class Route
 		}
 		else
 		{
-			$this->setController('index');
+			$this->setBase('index');
 		}
 		
 		//Set the Action
@@ -494,7 +647,7 @@ class Route
 		$controller = array_shift($splitRoute);
 		if(ctype_alnum(str_replace('-', '', $controller)) && ctype_alpha(substr($controller, 0, 1)))
 		{
-			$this->setController(Link::methodCase($controller));
+			$this->setBase(Link::methodCase($controller));
 		}
 		else
 		{

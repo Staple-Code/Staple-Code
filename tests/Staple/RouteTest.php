@@ -51,4 +51,11 @@ class RouteTest extends \PHPUnit_Framework_TestCase
 		$route->execute();
 
 	}
+
+	public function testStaticRouteRegistration()
+	{
+		$route = Route::register('/add',function($a){return $a+2;});
+
+		$this->assertInstanceOf('Staple\Route',$route);
+	}
 }
