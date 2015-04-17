@@ -141,6 +141,7 @@ class Pager
 	
 	/**
 	 * Returns an array with the page numbers.
+	 * @return int[]
 	 */
 	public function getPages()
 	{
