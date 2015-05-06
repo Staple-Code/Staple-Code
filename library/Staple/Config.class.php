@@ -192,6 +192,37 @@ class Config
 				return null;
 		}
 	}
+
+	/**
+	 * Returns true or false if a configuration key exists, even if it is null.
+	 * @param $set
+	 * @param null $key
+	 * @return bool
+	 */
+    public static function exists($set,$key = null)
+    {
+        //Get the config instance
+        $inst = static::getInstance();
+
+        //Check that the config file has been read.
+        if(!$inst->read)
+        {
+            $inst->read();
+        }
+
+        //Look for the requested key in the data store.
+        if(array_key_exists($set, $inst->store))
+        {
+			if(is_null($key))
+				return true;
+            elseif(array_key_exists($key, $inst->store[$set]))
+				return true;
+            else
+            	return false;
+        }
+        else
+			return false;
+    }
 	
 	/**
 	 * Sets a configuration value at runtime. Returns a true or false on success or failure.

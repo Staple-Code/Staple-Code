@@ -28,7 +28,10 @@ use \Exception;
 trait Singleton
 {
 	private static $inst;
-	
+
+	/**
+	 * @return static
+	 */
 	public static function getInstance()
 	{
 		if (!isset(static::$inst)) 
