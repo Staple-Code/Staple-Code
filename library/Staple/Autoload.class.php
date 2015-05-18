@@ -145,14 +145,17 @@ class Autoload
 			
 			//Split the class into it's namespace components.
 			$namespace = explode('\\',$class_name);
-			
+
+			//Correct for paths in Linux and Windows
+			$pathname = str_replace('\\',DIRECTORY_SEPARATOR,$class_name);
+
 			if($namespace[0] == static::STAPLE_NAMESPACE)
 			{
 				return $this->loadLibraryClass($class_name);
 			}
-			elseif(file_exists(MODULES_ROOT.$class_name.static::PHP_FILE_EXTENSION))
+			elseif(file_exists(MODULES_ROOT.$pathname.static::PHP_FILE_EXTENSION))
 			{
-				require_once MODULES_ROOT.$class_name.static::PHP_FILE_EXTENSION;
+				require_once MODULES_ROOT.$pathname.static::PHP_FILE_EXTENSION;
 			}
 			else
 			{
