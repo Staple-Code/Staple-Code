@@ -125,7 +125,7 @@ class LengthValidator extends FieldValidator
 		}
 		
 		//Additionally Add the default error message.
-		$this->addError();
+		//$this->addError();
 		return false;
 	}
 	
