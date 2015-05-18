@@ -24,28 +24,43 @@
 
 namespace Staple\Form\ViewAdapters;
 
+use Staple\Form\TextElement;
+use Staple\Form\TextareaElement;
+use Staple\Form\SubmitElement;
+use Staple\Form\SelectElement;
+use Staple\Form\RadioElement;
+use Staple\Form\PasswordElement;
+use Staple\Form\ImageElement;
+use Staple\Form\HiddenElement;
+use Staple\Form\FileElement;
+use Staple\Form\CheckboxGroupElement;
+use Staple\Form\CheckboxElement;
+use Staple\Form\ButtonElement;
+
 
 abstract class ElementViewAdapter
 {
-	abstract function textElement();
+	abstract function TextElement(TextElement $field);
 
-	abstract function textareaElement();
+	abstract function TextareaElement(TextareaElement $field);
 
-	abstract function submitElement();
+	abstract function SubmitElement(SubmitElement $field);
 
-	abstract function selectElement();
+	abstract function SelectElement(SelectElement $field);
 
-	abstract function radiogroupElement();
+	abstract function RadioElement(RadioElement $field);
 
-	abstract function passwordElement();
+	abstract function PasswordElement(PasswordElement $field);
 
-	abstract function imageElement();
+	abstract function ImageElement(ImageElement $field);
 
-	abstract function hiddenElement();
+	abstract function HiddenElement(HiddenElement $field);
 
-	abstract function fileElement();
+	abstract function FileElement(FileElement $field);
 
-	abstract function checkboxgroupElement();
+	abstract function CheckboxgroupElement(CheckboxGroupElement $field);
 
-	abstract function checkboxElement();
+	abstract function CheckboxElement(CheckboxElement $field);
+
+    abstract function ButtonElement(ButtonElement $field);
 }

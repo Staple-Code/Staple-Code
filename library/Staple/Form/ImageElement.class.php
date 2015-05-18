@@ -64,6 +64,10 @@ class ImageElement extends FieldElement
 			$buf = ob_get_contents();
 			ob_end_clean();
 		}
+        elseif(isset($this->viewAdapter))
+        {
+            $this->viewAdapter->ImageElement($this);
+        }
 		else 
 		{
 			$this->addClass('form_element');

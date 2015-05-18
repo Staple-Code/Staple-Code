@@ -59,6 +59,10 @@ class SubmitElement extends FieldElement
 			$buf = ob_get_contents();
 			ob_end_clean();
 		}
+        elseif(isset($this->viewAdapter))
+        {
+            $this->viewAdapter->SubmitElement($this);
+        }
 		else 
 		{
 			$this->addClass('form_element');
