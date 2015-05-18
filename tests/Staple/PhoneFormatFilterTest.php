@@ -21,27 +21,44 @@
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Staple\Tests;
+namespace Staple\Form\ViewAdapters;
 
+use Staple\Form\TextElement;
+use Staple\Form\TextareaElement;
+use Staple\Form\SubmitElement;
+use Staple\Form\SelectElement;
+use Staple\Form\RadioElement;
+use Staple\Form\PasswordElement;
+use Staple\Form\ImageElement;
+use Staple\Form\HiddenElement;
+use Staple\Form\FileElement;
+use Staple\Form\CheckboxGroupElement;
+use Staple\Form\CheckboxElement;
+use Staple\Form\ButtonElement;
 
-use Staple\Form\Filter\PhoneFormatFilter;
-
-class PhoneFormatFilterTest extends \PHPUnit_Framework_TestCase
+abstract class ElementViewAdapter
 {
-	private function getTestObject()
-	{
-		return new PhoneFormatFilter();
-	}
+	abstract function TextElement(TextElement $field);
 
-	/**
-	 * Test the ability to format a phone number
-	 */
-	public function testPhoneFilter()
-	{
-		$number = '1.123.456.7890';
+	abstract function TextareaElement(TextareaElement $field);
 
-		$format = $this->getTestObject();
+	abstract function SubmitElement(SubmitElement $field);
 
-		$this->assertEquals('1 (123) 456-7890',$format->filter($number));
-	}
+	abstract function SelectElement(SelectElement $field);
+
+	abstract function RadioElement(RadioElement $field);
+
+	abstract function PasswordElement(PasswordElement $field);
+
+	abstract function ImageElement(ImageElement $field);
+
+	abstract function HiddenElement(HiddenElement $field);
+
+	abstract function FileElement(FileElement $field);
+
+	abstract function CheckboxgroupElement(CheckboxGroupElement $field);
+
+	abstract function CheckboxElement(CheckboxElement $field);
+
+    	abstract function ButtonElement(ButtonElement $field);
 }

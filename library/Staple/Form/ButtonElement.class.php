@@ -60,10 +60,10 @@ class ButtonElement extends FieldElement
 			$buf = ob_get_contents();
 			ob_end_clean();
 		}
-        elseif(isset($this->elementViewAdapter))
-        {
-            $buf = $this->getElementViewAdapter()->ButtonElement($this);
-        }
+	        elseif(isset($this->elementViewAdapter))
+	        {
+	            $buf = $this->getElementViewAdapter()->ButtonElement($this);
+	        }
 		else 
 		{
 			$this->addClass('form_element');
