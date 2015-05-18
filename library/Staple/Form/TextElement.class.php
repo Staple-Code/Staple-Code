@@ -102,9 +102,7 @@ class TextElement extends FieldElement
 		return '	<input type="text" id="'.$this->escape($this->id).'" name="'.$this->escape($this->name).'" value="'.$this->escape($this->value).'"'.$size.$max.$this->getAttribString('input').'>'."\n";
 	}
 
-	/*
-	 * @todo add method to add custom field view
-	 */
+
 
 	/**
 	 * Build the form field.
@@ -114,6 +112,7 @@ class TextElement extends FieldElement
 	public function build($fieldView = NULL)
 	{
 		$buf = '';
+		//@todo look into folder structure for field views
 		$view = FORMS_ROOT.'/fields/TextElement.phtml';
 		if(file_exists($view))
 		{

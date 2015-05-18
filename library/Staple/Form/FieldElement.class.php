@@ -102,6 +102,12 @@ abstract class FieldElement
 	 * @var FormViewAdapter
 	 */
 	protected $viewAdapter;
+
+	/**
+	 * Contains instance of ElementViewAdapter handed down from Form
+	 * @var
+	 */
+	protected $elementViewAdapter;
 	
 	/**
 	 * Form field constructor. Requires a name, has an optional label, id and attribute array.
@@ -528,6 +534,25 @@ abstract class FieldElement
 		$this->instructions = $instructions;
 		return $this;
 	}
+
+	/**
+	 * set instance passed from Form into element
+	 * @param $elementViewAdapter
+	 * @return $this
+	 */
+	public function setElementViewAdapter($elementViewAdapter)
+	{
+		$this->elementViewAdapter = $elementViewAdapter;
+		return $this;
+	}
+
+	/**
+	 * return instance of elementView adapter contained in $elementViewAdapter
+	 */
+	public function getElementViewAdapter()
+	{
+		return $this->elementViewAdapter;
+	}
 	
 	/**
 	 * Sets $readOnly to true
@@ -749,4 +774,8 @@ abstract class FieldElement
 	 * Build the field using a layout, or with the default build.
 	 */
 	abstract public function build($fieldView = NULL);
+
+	/*
+ * @todo add method to add custom field view and add property to hold field view name
+ */
 }

@@ -22,7 +22,7 @@
  *
  */
 
-namespace Staple\Form\View;
+namespace Staple\Form\ViewAdapters;
 
 
 abstract class ElementViewAdapter

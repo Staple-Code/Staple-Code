@@ -166,8 +166,15 @@ class Form
 		}
 
 		/**
-		 * @Todo Add Check for Adapter in .ini
+		 * Loads selected elementViewAdapter from application.ini and verify given adapter is a class before loading
 		 */
+		if(Config::getValue('forms','elementViewAdapter') != '')
+		{
+			if(class_exists(Config::getValue('forms','elementViewAdapter')))
+			{
+				$this->setElementViewAdapter(Config::getValue('forms','elementViewAdapter'));
+			}
+		}
 
 		//Repopulate data from the session -- I might add this.....
 		//if($this->wasSubmitted())
@@ -295,6 +302,7 @@ class Form
 			if($newField instanceof FieldElement)
 			{
 				$this->fields[$newField->getName()] = $newField;
+				$this->fields[$newField->getName()]->setElementViewAdapter;
 			}
 		}
 		return $this;
@@ -749,9 +757,10 @@ JS;
 	/**
 	 * @param ElementViewAdapter $elementViewAdapter
 	 */
-	public function setElementViewAdapter(ElementViewAdapter $elementViewAdapter)
+	public function setElementViewAdapter($elementViewAdapter)
 	{
-		$this->elementViewAdapter = $elementViewAdapter;
+		$this->elementViewAdapter = new $elementViewAdapter;
+		return $this;
 	}
 
 	/**
