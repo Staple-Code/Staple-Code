@@ -140,13 +140,13 @@ class Form
 	 */
 	public function __construct($name = NULL, $action = NULL)
 	{
-        /**
-         * Loads selected elementViewAdapter from application.ini and verify given adapter is a class before loading
-         */
-        if(Config::getValue('forms','elementViewAdapter') != '')
-        {
-            $this->setElementViewAdapter(Config::getValue('forms','elementViewAdapter'));
-        }
+	        /**
+	         * Loads selected elementViewAdapter from application.ini and verify given adapter is a class before loading
+	         */
+	        if(Config::getValue('forms','elementViewAdapter') != '')
+	        {
+	            $this->setElementViewAdapter(Config::getValue('forms','elementViewAdapter'));
+	        }
 
 		$this->_start();
 
@@ -173,6 +173,17 @@ class Form
 						}
 					}
 				}
+			}
+		}
+
+		/**
+		 * Loads selected elementViewAdapter from application.ini and verify given adapter is a class before loading
+		 */
+		if(Config::getValue('forms','elementViewAdapter') != '')
+		{
+			if(class_exists(Config::getValue('forms','elementViewAdapter')))
+			{
+				$this->setElementViewAdapter(Config::getValue('forms','elementViewAdapter'));
 			}
 		}
 
@@ -302,10 +313,10 @@ class Form
 			if($newField instanceof FieldElement)
 			{
 				$this->fields[$newField->getName()] = $newField;
-                if(isset($this->elementViewAdapter))
-                {
-                    $this->fields[$newField->getName()]->setElementViewAdapter($this->getElementViewAdapter());
-                }
+		                if(isset($this->elementViewAdapter))
+		                {
+		                    $this->fields[$newField->getName()]->setElementViewAdapter($this->getElementViewAdapter());
+		                }
 			}
 
 		}

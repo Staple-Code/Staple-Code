@@ -100,7 +100,7 @@ abstract class FieldElement
 
 	/**
 	 * Contains instance of ElementViewAdapter handed down from Form
-	 * @var elementViewAdapter
+	 * @var ElementViewAdapter
 	 */
 	protected $elementViewAdapter;
 	
@@ -324,11 +324,17 @@ abstract class FieldElement
 	{
 		foreach($this->validators as $val)
 		{
-			$val->clearErrors();
-			$this->clearErrors();
-			if(!$val->check($this->value))
+			if($val instanceof FieldValidator)
 			{
-				$this->errors[$val->getName()] = $val->getErrors();
+				$val->clearErrors();
+				if(!$val->check($this->Value))
+				{
+					$this->errors[$val->getName()] = $val->getErrors();
+				}
+			}
+			else
+			{
+				throw new Exception('Validation Error', Error::VALIDATION_ERROR);
 			}
 		}
 		
@@ -522,25 +528,25 @@ abstract class FieldElement
 		return $this;
 	}
 
-    /**
-     * Alias for setInstructions Method
-     * @param string $instructions
-     * @return $this
-     */
-    public function addInstructions($instructions)
-    {
-        $this->setInstructions($instructions);
-        return $this;
-    }
+    	/**
+     	* Alias for setInstructions Method
+     	* @param string $instructions
+     	* @return $this
+     	*/
+    	public function addInstructions($instructions)
+    	{
+		$this->setInstructions($instructions);
+		return $this;
+	}
 
 	/**
 	 * set instance passed from Form into element
-	 * @param ElementViewAdapter $adapter
+	 * @param $elementViewAdapter
 	 * @return $this
 	 */
-	public function setElementViewAdapter(ElementViewAdapter $adapter)
+	public function setElementViewAdapter($elementViewAdapter)
 	{
-		$this->elementViewAdapter = $adapter;
+		$this->elementViewAdapter = $elementViewAdapter;
 		return $this;
 	}
 
