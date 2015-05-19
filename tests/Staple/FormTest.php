@@ -175,6 +175,135 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Staple\\Tests\\MyViewAdapter',$form->getElementViewAdapter());
     }
 
+    /**
+     * Test the creation of a TextElement object from the short form methods.
+     * @throws \Exception
+     */
+    public function testCreateTextElement()
+    {
+        $field = Form::textElement('MyField','My Field')
+                ->setValue('Field Value');
+
+        $this->assertInstanceOf('Staple\\Form\\TextElement',$field);
+        $this->assertEquals('MyField',$field->getName());
+        $this->assertEquals('My Field',$field->getLabel());
+        $this->assertEquals('Field Value',$field->getValue());
+    }
+
+    /**
+     * Test the creation of a ButtonElement object from the short form methods.
+     * @throws \Exception
+     */
+    public function testCreateButtonElement()
+    {
+        $field = Form::buttonElement('MyField','My Field')
+            ->setValue('Field Value');
+
+        $this->assertInstanceOf('Staple\\Form\\ButtonElement',$field);
+        $this->assertEquals('MyField',$field->getName());
+        $this->assertEquals(null,$field->getLabel());
+        $this->assertEquals('Field Value',$field->getValue());
+    }
+
+    /**
+     * Test the creation of a SubmitElement object from the short form methods.
+     * @throws \Exception
+     */
+    public function testCreateSubmitElement()
+    {
+        $field = Form::submitElement('MyField','My Field')
+            ->setValue('Field Value');
+
+        $this->assertInstanceOf('Staple\\Form\\SubmitElement',$field);
+        $this->assertEquals('MyField',$field->getName());
+        $this->assertEquals(null,$field->getLabel());
+        $this->assertEquals('Field Value',$field->getValue());
+    }
+
+    /**
+     * Test the creation of a HiddenElement object from the short form methods.
+     * @throws \Exception
+     */
+    public function testCreateHiddenElement()
+    {
+        $field = Form::hiddenElement('MyField','My Field')
+            ->setValue('Field Value');
+
+        $this->assertInstanceOf('Staple\\Form\\HiddenElement',$field);
+        $this->assertEquals('MyField',$field->getName());
+        $this->assertEquals(null,$field->getLabel());
+        $this->assertEquals('Field Value',$field->getValue());
+    }
+
+    /**
+     * Test the creation of a FileElement object from the short form methods.
+     * @throws \Exception
+     */
+    public function testCreateFileElement()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * Test the creation of a PasswordElement object from the short form methods.
+     * @throws \Exception
+     */
+    public function testCreatePasswordElement()
+    {
+        $field = Form::passwordElement('MyField','My Field')
+            ->setValue('Field Value');
+
+        $this->assertInstanceOf('Staple\\Form\\PasswordElement',$field);
+        $this->assertEquals('MyField',$field->getName());
+        $this->assertEquals('My Field',$field->getLabel());
+        $this->assertEquals('Field Value',$field->getValue());
+    }
+
+    /**
+     * Test the creation of a RadioElement object from the short form methods.
+     * @throws \Exception
+     */
+    public function testCreateRadioElement()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * Test the creation of a SelectElement object from the short form methods.
+     * @throws \Exception
+     */
+    public function testCreateSelectElement()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * Test the creation of a TextareaElement object from the short form methods.
+     * @throws \Exception
+     */
+    public function testCreateTextareaElement()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * Test the creation of a ImageElement object from the short form methods.
+     * @throws \Exception
+     */
+    public function testCreateImageElement()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * Test the creation of a CheckboxElement object from the short form methods.
+     * @throws \Exception
+     */
+    public function testCreateCheckboxElement()
+    {
+        $this->markTestIncomplete();
+    }
+
 	/**
 	 * Test that a form can be fully created and validated.
 	 */
