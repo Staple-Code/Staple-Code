@@ -271,20 +271,6 @@ class Form
 	}
 	
 	/**
-	 * A factory function to encapsulate the creation of form objects.
-	 * @param string $name
-	 * @param string $action
-	 * @param string $method
-	 * @return Form
-	 */
-	public static function create($name, $action=NULL, $method="POST")
-	{
-		$inst = new self($name,$action);
-		$inst->setMethod($method);
-		return $inst;
-	}
-	
-	/**
 	 * Adds a field to the form from an already instantiated form element.
 	 * @param FieldElement $field
 	 * @return $this
@@ -926,4 +912,163 @@ JS;
 		}
 		return $buf;
 	}
+
+    /*---------------------------------------SHORT FORM CREATION METHODS---------------------------------------*/
+
+    /**
+     * A factory function to encapsulate the creation of form objects.
+     * @param string $name
+     * @param string $action
+     * @param string $method
+     * @return Form
+     */
+    public static function create($name, $action = NULL, $method = self::METHOD_POST)
+    {
+        $inst = new self($name,$action);
+        $inst->setMethod($method);
+        return $inst;
+    }
+
+    /**
+     * Short method for creating a text element.
+     * @param string $name
+     * @param string $label
+     * @param string $id
+     * @param array $attributes
+     * @return TextElement
+     */
+    public static function textElement($name, $label = NULL, $id = NULL, array $attributes = array())
+    {
+        return new TextElement($name, $label, $id, $attributes);
+    }
+
+    /**
+     * Short method for creating a text element.
+     * @param string $name
+     * @param string $label
+     * @param string $id
+     * @param array $attributes
+     * @return TextElement
+     */
+    public static function passwordElement($name, $label = NULL, $id = NULL, array $attributes = array())
+    {
+        return new PasswordElement($name, $label, $id, $attributes);
+    }
+
+    /**
+     * Short method for creating a textarea element.
+     * @param string $name
+     * @param string $label
+     * @param string $id
+     * @param array $attributes
+     * @return TextareaElement
+     */
+    public static function textareaElement($name, $label = NULL, $id = NULL, array $attributes = array())
+    {
+        return new TextareaElement($name, $label, $id, $attributes);
+    }
+
+    /**
+     * Short method for creating a radio element.
+     * @param string $name
+     * @param string $label
+     * @param string $id
+     * @param array $attributes
+     * @return RadioElement
+     */
+    public static function radioElement($name, $label = NULL, $id = NULL, array $attributes = array())
+    {
+        return new RadioElement($name, $label, $id, $attributes);
+    }
+
+    /**
+     * Short method for creating a select element.
+     * @param string $name
+     * @param string $label
+     * @param string $id
+     * @param array $attributes
+     * @return SelectElement
+     */
+    public static function selectElement($name, $label = NULL, $id = NULL, array $attributes = array())
+    {
+        return new SelectElement($name, $label, $id, $attributes);
+    }
+
+    /**
+     * Short method for creating a checkbox element.
+     * @param string $name
+     * @param string $label
+     * @param string $id
+     * @param array $attributes
+     * @return CheckboxElement
+     */
+    public static function checkboxElement($name, $label = NULL, $id = NULL, array $attributes = array())
+    {
+        return new CheckboxElement($name, $label, $id, $attributes);
+    }
+
+    /**
+     * Short method for creating a select element.
+     * @param string $name
+     * @param string $label
+     * @param string $id
+     * @param array $attributes
+     * @return SubmitElement
+     */
+    public static function submitElement($name, $label = NULL, $id = NULL, array $attributes = array())
+    {
+        return new SubmitElement($name, $label, $id, $attributes);
+    }
+
+    /**
+     * Short method for creating a button element.
+     * @param string $name
+     * @param string $value
+     * @param string $id
+     * @param array $attributes
+     * @return ButtonElement
+     */
+    public static function buttonElement($name, $value = NULL, $id = NULL, array $attributes = array())
+    {
+        return new ButtonElement($name, $value, $id, $attributes);
+    }
+
+    /**
+     * Short method for creating a file element.
+     * @param string $name
+     * @param string $label
+     * @param string $id
+     * @param array $attributes
+     * @return FileElement
+     */
+    public static function fileElement($name, $label = NULL, $id = NULL, array $attributes = array())
+    {
+        return new FileElement($name, $label, $id, $attributes);
+    }
+
+    /**
+     * Short method for creating a hidden element.
+     * @param string $name
+     * @param string $value
+     * @param string $id
+     * @param array $attributes
+     * @return HiddenElement
+     */
+    public static function hiddenElement($name, $value = NULL, $id = NULL, array $attributes = array())
+    {
+        return new HiddenElement($name, $value, $id, $attributes);
+    }
+
+    /**
+     * Short method for creating a image element.
+     * @param string $name
+     * @param string $label
+     * @param string $id
+     * @param array $attributes
+     * @return ImageElement
+     */
+    public static function imageElement($name, $label = NULL, $id = NULL, array $attributes = array())
+    {
+        return new ImageElement($name, $label, $id, $attributes);
+    }
 }
