@@ -758,15 +758,13 @@ JS;
 	}
 
 	/**
+     * Set the form view adapter
 	 * @param ElementViewAdapter $elementViewAdapter
+     * @return $this
 	 */
-	public function setElementViewAdapter($elementViewAdapter)
+	public function setElementViewAdapter(ElementViewAdapter $elementViewAdapter)
 	{
-        $temp = new $elementViewAdapter();
-        if($temp instanceof ElementViewAdapter)
-        {
-            $this->elementViewAdapter = $temp;
-        }
+        $this->elementViewAdapter = $elementViewAdapter;
 		return $this;
 	}
 
@@ -827,19 +825,23 @@ JS;
 		if(count($this->classes) > 0)
 		{
 			$buf .= ' class="';
-			$cstring = '';
+			$classString = '';
 			foreach($this->classes as $class)
 			{
-				$cstring .= $class.' ';
+				$classString .= $class.' ';
 			}
-			$buf .= trim($cstring);
+			$buf .= trim($classString);
 			$buf .= '"';
 		}
+        else
+        {
+            $classString = '';
+        }
 		$buf .= ">\n";
 		$buf .= "<div id=\"{$this->name}_div\"";
 		if(count($this->classes) > 0)
 		{
-			$buf .= ' class="'.trim($cstring).'"';
+			$buf .= ' class="'.trim($classString).'"';
 		}
 		$buf .= ">\n";
 		return $buf;
