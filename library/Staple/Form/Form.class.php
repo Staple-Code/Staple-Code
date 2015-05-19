@@ -142,9 +142,9 @@ class Form
         /**
          * Loads selected elementViewAdapter from application.ini and verify given adapter is a class before loading
          */
-        if(Config::getValue('forms','elementViewAdapter') != '')
+        if(Config::getValue('forms','elementViewAdapter') != '' && Config::getValue('forms','elementViewAdapter') != null)
         {
-            $this->setElementViewAdapter(Config::getValue('forms','elementViewAdapter'));
+            $this->makeElementViewAdapter(Config::getValue('forms','elementViewAdapter'));
         }
 
 		$this->_start();
@@ -756,6 +756,20 @@ JS;
 	{
 		return $this->elementViewAdapter;
 	}
+
+    /**
+     * @param $viewAdapterString
+     * @return $this
+     */
+    protected function makeElementViewAdapter($viewAdapterString)
+    {
+        $obj = new $viewAdapterString();
+        if($obj instanceof ElementViewAdapter)
+        {
+            $this->setElementViewAdapter($obj);
+        }
+        return $this;
+    }
 
 	/**
      * Set the form view adapter
