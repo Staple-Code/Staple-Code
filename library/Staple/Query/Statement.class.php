@@ -61,4 +61,13 @@ class Statement extends PDOStatement
 	{
 		return $this->fetch(PDO::FETCH_BOTH);
 	}
+
+    /**
+     * Returns the number of rows found in the previous query.
+     * @return string
+     */
+    public function foundRows()
+    {
+        return (int)Query::raw("SELECT FOUND_ROWS()")->fetchColumn();
+    }
 }

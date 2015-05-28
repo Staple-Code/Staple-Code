@@ -456,12 +456,17 @@ abstract class Query
 		return new DataSet($data);
 	}
 
-	/**
-	 * Execute a raw SQL statement
-	 * @param $statement
-	 */
-	public static function raw($statement)
+    /**
+     * Execute a raw SQL statement
+     * @param string | Query $statement
+     * @param Connection $connection
+     * @return Statement
+     */
+	public static function raw($statement, Connection $connection = NULL)
 	{
-		//@todo this function should just accept SQL and execute it in place returning the result.
+        if(isset($connection))
+            return $connection->query($statement);
+        else
+            return Connection::get()->query($statement);
 	}
 }
