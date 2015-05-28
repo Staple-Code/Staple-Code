@@ -24,7 +24,6 @@
 namespace Staple\Query;
 
 use \Staple\Exception\QueryException;
-use \PDO;
 use \Staple\Error;
 use \Staple\Pager;
 use \Exception;
@@ -36,7 +35,7 @@ class Union
 	
 	/**
 	 * The database object. A database object is required to properly escape input.
-	 * @var PDO
+	 * @var Connection
 	 */
 	protected $db;
 	/**
@@ -68,13 +67,13 @@ class Union
 	/**
 	 * Constructor accepts an array of Staple_Query_Select elements and a database connection.
 	 * @param array $queries
-	 * @param PDO $db
+	 * @param Connection $db
 	 * @throws QueryException
 	 */
-	public function __construct(array $queries = array(), PDO $db = NULL)
+	public function __construct(array $queries = array(), Connection $db = NULL)
 	{
 		//Process Database connection
-		if($db instanceof PDO)
+		if($db instanceof Connection)
 		{
 			$this->setDb($db);
 		}
@@ -88,7 +87,7 @@ class Union
 				throw new QueryException('Unable to find a database connection.', Error::DB_ERROR, $e);
 			}
 		}
-		if(!($this->db instanceof PDO))
+		if(!($this->db instanceof Connection))
 		{
 			throw new QueryException('Unable to create database object', Error::DB_ERROR);
 		}
@@ -112,7 +111,7 @@ class Union
 	}
 	
 	/**
-	 * @return PDO $db
+	 * @return Connection $db
 	 */
 	public function getDb()
 	{
@@ -152,10 +151,10 @@ class Union
 	}
 	
 	/**
-	 * @param PDO $db
+	 * @param Connection $db
 	 * @return $this
 	 */
-	public function setDb(PDO $db)
+	public function setDb(Connection $db)
 	{
 		$this->db = $db;
 		return $this;
@@ -341,7 +340,7 @@ class Union
 	 */
 	public function execute()
 	{
-		if($this->db instanceof PDO)
+		if($this->db instanceof Connection)
 		{
 			return $this->db->query($this->build());
 		}
@@ -355,7 +354,7 @@ class Union
 			{
 				throw new QueryException('No Database Connection', Error::DB_ERROR);
 			}
-			if($this->db instanceof PDO)
+			if($this->db instanceof Connection)
 			{
 				return $this->db->query($this->build());
 			}
@@ -363,5 +362,3 @@ class Union
 		return false;
 	}
 }
-
-?>

@@ -25,7 +25,6 @@ namespace Staple\Query;
 use \Exception;
 use \Staple\Error;
 use \Staple\Pager;
-use \PDO;
 
 class Update extends Query
 {
@@ -61,12 +60,12 @@ class Update extends Query
 	/**
 	 * @param string $table
 	 * @param array $data
-	 * @param PDO $db
+	 * @param Connection $db
 	 * @param array | string $order
 	 * @param Pager | int $limit
 	 * @throws Exception
 	 */
-	public function __construct($table = NULL, array $data = NULL, PDO $db = NULL, $order = NULL, $limit = NULL)
+	public function __construct($table = NULL, array $data = NULL, Connection $db = NULL, $order = NULL, $limit = NULL)
 	{
 		$this->data = new DataSet();
 		if(isset($db))
@@ -360,5 +359,3 @@ class Update extends Query
 		return $stmt;
 	}
 }
-
-?>

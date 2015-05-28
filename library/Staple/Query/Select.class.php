@@ -26,7 +26,6 @@ namespace Staple\Query;
 use \Staple\Exception\QueryException;
 use \Staple\Error;
 use \Staple\Pager;
-use \PDO;
 
 class Select extends Query
 {
@@ -86,12 +85,12 @@ class Select extends Query
 	/**
 	 * @param string $table
 	 * @param array $columns
-	 * @param PDO $db
+	 * @param Connection $db
 	 * @param array | string $order
 	 * @param Pager | int $limit
 	 * @throws QueryException
 	 */
-	public function __construct($table = NULL, array $columns = NULL, PDO $db = NULL, $order = NULL, $limit = NULL)
+	public function __construct($table = NULL, array $columns = NULL, Connection $db = NULL, $order = NULL, $limit = NULL)
 	{
 		parent::__construct(NULL, $db);
 		
@@ -218,6 +217,8 @@ class Select extends Query
 	
 	/**
 	 * Different from addColumnsArray(), this function replaces all existing columns in the query.
+     * @param array $columns
+     * @return $this
 	 */
 	public function setColumns(array $columns)
 	{
@@ -239,6 +240,7 @@ class Select extends Query
 	/**
 	 * Set the order.
 	 * @param string | array $order
+     * @return $this
 	 */
 	public function setOrder($order)
 	{
@@ -248,6 +250,7 @@ class Select extends Query
 	
 	/**
 	 * @param string | array $groupBy
+     * @return $this
 	 */
 	public function setGroupBy($groupBy)
 	{
@@ -301,6 +304,7 @@ class Select extends Query
 	/**
 	 * Add an array of columns to the list of selected columns
 	 * @param array $columns
+     * @return $this;
 	 */
 	public function addColumnsArray(array $columns)
 	{
@@ -331,6 +335,7 @@ class Select extends Query
 	/**
 	 * Remove a column from the $columns array.
 	 * @param string $col
+     * @return bool
 	 */
 	public function removeColumn($col)
 	{
@@ -345,6 +350,7 @@ class Select extends Query
 	/**
 	 * Remove a column from the $columns property by it's alias.
 	 * @param string $name
+     * @return bool
 	 */
 	public function removeColumnByName($name)
 	{
@@ -359,6 +365,8 @@ class Select extends Query
 	/**
 	 * Alias of setOrder()
 	 * @see self::setOrder()
+     * @param array|string $order
+     * @return $this
 	 */
 	public function orderBy($order)
 	{
@@ -369,6 +377,7 @@ class Select extends Query
 	 * Alias of setGroupBy()
 	 * @param string | array $group
 	 * @see self::setGroupBy()
+     * @return self::setGroupBy()
 	 */
 	public function groupBy($group)
 	{

@@ -24,7 +24,6 @@ namespace Staple\Query;
 
 use \Staple\Exception\QueryException;
 use \Exception;
-use \PDO;
 use \Staple\Error;
 
 class InsertMultiple extends Insert
@@ -44,14 +43,14 @@ class InsertMultiple extends Insert
 	 * Query to insert multiple rows
 	 * @param string $table
 	 * @param array $columns
-	 * @param PDO $db
+	 * @param Connection $db
 	 * @param string $priority
 	 * @throws QueryException
 	 */
-	public function __construct($table = NULL, array $columns = NULL, PDO $db = NULL, $priority = NULL)
+	public function __construct($table = NULL, array $columns = NULL, Connection $db = NULL, $priority = NULL)
 	{
 		//Process Database connection
-		if($db instanceof PDO)
+		if($db instanceof Connection)
 		{
 			$this->setConnection($db);
 		}
@@ -65,7 +64,7 @@ class InsertMultiple extends Insert
 				throw new QueryException('Unable to find a database connection.', Error::DB_ERROR, $e);
 			}
 		}
-		if(!($this->connection instanceof PDO))
+		if(!($this->connection instanceof Connection))
 		{
 			throw new QueryException('Unable to create database object', Error::DB_ERROR);
 		}
@@ -205,5 +204,3 @@ class InsertMultiple extends Insert
 		return $this;
 	}
 }
-
-?>

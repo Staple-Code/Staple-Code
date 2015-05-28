@@ -30,7 +30,6 @@ use \Exception;
 use \Staple\Error;
 use \DateTime;
 use Staple\Pager;
-use \PDO;
 
 abstract class Query
 {
@@ -42,8 +41,8 @@ abstract class Query
 	public $table;
 	
 	/**
-	 * The PDO database object. A database object is required to properly escape input.
-	 * @var PDO
+	 * The Connection database object. A database object is required to properly escape input.
+	 * @var Connection
 	 */
 	protected $connection;
 	
@@ -55,12 +54,12 @@ abstract class Query
 
 	/**
 	 * @param string $table
-	 * @param PDO $db
+	 * @param Connection $db
 	 * @throws QueryException
 	 */
-	public function __construct($table = NULL, PDO $db = NULL)
+	public function __construct($table = NULL, Connection $db = NULL)
 	{
-		if($db instanceof PDO)
+		if($db instanceof Connection)
 		{
 			$this->setConnection($db);
 		}
@@ -74,7 +73,7 @@ abstract class Query
 				throw new QueryException('Unable to find a database connection.', Error::DB_ERROR, $e);
 			}
 		}
-		if(!($this->connection instanceof PDO))
+		if(!($this->connection instanceof Connection))
 		{
 			throw new QueryException('Unable to create database object', Error::DB_ERROR);
 		}
@@ -140,10 +139,10 @@ abstract class Query
 	}
 
 	/**
-	 * @param PDO $connection
+	 * @param Connection $connection
 	 * @return $this
 	 */
-	public function setConnection(PDO $connection)
+	public function setConnection(Connection $connection)
 	{
 		$this->connection = $connection;
 		return $this;
@@ -156,16 +155,16 @@ abstract class Query
 	
 	/**
 	 * Executes the query and returns the result.
-	 * @param PDO $connection - the database connection to execute the quote upon.
+	 * @param Connection $connection - the database connection to execute the quote upon.
 	 * @return Statement | bool
 	 * @throws Exception
 	 */
-	public function execute(PDO $connection = NULL)
+	public function execute(Connection $connection = NULL)
 	{
 		if(isset($connection))
 			$this->setConnection($connection);
 
-		if($this->connection instanceof PDO)
+		if($this->connection instanceof Connection)
 		{
 			return $this->connection->query($this->build());
 		}
@@ -180,7 +179,7 @@ abstract class Query
 				//@todo try for a default connection if no staple connection
 				throw new QueryException('No Database Connection', Error::DB_ERROR);
 			}
-			if($this->connection instanceof PDO)
+			if($this->connection instanceof Connection)
 			{
 				return $this->connection->query($this->build());
 			}
@@ -191,7 +190,7 @@ abstract class Query
 	/**
 	 * This method gets either the default framework connection or a predefined named connection.
 	 * @param string $namedConnection
-	 * @return PDO
+	 * @return Connection
 	 */
 	public static function connection($namedConnection = NULL)
 	{
@@ -315,13 +314,13 @@ abstract class Query
 	/**
 	 * Converts a PHP data type into a compatible MySQL string.
 	 * @param mixed $inValue
-	 * @param PDO $db
+	 * @param Connection $db
 	 * @throws QueryException
 	 * @return string
 	 */
-	public static function convertTypes($inValue, PDO $db = NULL)
+	public static function convertTypes($inValue, Connection $db = NULL)
 	{
-		if(!($db instanceof PDO))
+		if(!($db instanceof Connection))
 		{
 			try{
 				$db = Connection::get();
@@ -382,12 +381,12 @@ abstract class Query
 	 *
 	 * @param string $table
 	 * @param array $columns
-	 * @param PDO $db
+	 * @param Connection $db
 	 * @param array | string $order
 	 * @param Pager | int $limit
 	 * @return Select
 	 */
-	public static function select($table = NULL, array $columns = NULL, PDO $db = NULL, $order = NULL, $limit = NULL)
+	public static function select($table = NULL, array $columns = NULL, Connection $db = NULL, $order = NULL, $limit = NULL)
 	{
 		return new Select($table, $columns, $db, $order, $limit);
 	}
@@ -397,11 +396,11 @@ abstract class Query
 	 *
 	 * @param string $table
 	 * @param array $data
-	 * @param PDO
+	 * @param Connection
 	 * @param string $priority
 	 * @return Insert
 	 */
-	public static function insert($table = NULL, $data = NULL, PDO $db = NULL, $priority = NULL)
+	public static function insert($table = NULL, $data = NULL, Connection $db = NULL, $priority = NULL)
 	{
 		return new Insert($table, $data, $db, $priority);
 	}
@@ -411,12 +410,12 @@ abstract class Query
 	 *
 	 * @param string $table
 	 * @param array $data
-	 * @param PDO $db
+	 * @param Connection $db
 	 * @param array | string $order
 	 * @param Pager | int $limit
 	 * @return Update
 	 */
-	public static function update($table = NULL, array $data = NULL, PDO $db = NULL, $order = NULL, $limit = NULL)
+	public static function update($table = NULL, array $data = NULL, Connection $db = NULL, $order = NULL, $limit = NULL)
 	{
 		return new Update($table, $data, $db, $order, $limit);
 	}
@@ -425,10 +424,10 @@ abstract class Query
 	 * Construct and return a Delete query object.
 	 *
 	 * @param string $table
-	 * @param PDO $db
+	 * @param Connection $db
 	 * @return Delete
 	 */
-	public static function delete($table = NULL, PDO $db = NULL)
+	public static function delete($table = NULL, Connection $db = NULL)
 	{
 		return new Delete($table, $db);
 	}
@@ -437,10 +436,10 @@ abstract class Query
 	 * Construct and return a Union query object
 	 *
 	 * @param array $queries
-	 * @param PDO $db
+	 * @param Connection $db
 	 * @return Union
 	 */
-	public static function union(array $queries = array(), PDO $db = NULL)
+	public static function union(array $queries = array(), Connection $db = NULL)
 	{
 		return new Union($queries, $db);
 	}

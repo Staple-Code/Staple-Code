@@ -23,8 +23,6 @@
  */
 namespace Staple\Query;
 
-use \PDO;
-
 class Delete extends Query
 {
 	const IGNORE = 'IGNORE';
@@ -44,10 +42,10 @@ class Delete extends Query
 
 	/**
 	 * @param string $table
-	 * @param PDO $db
+	 * @param Connection $db
 	 * @throws \Exception
 	 */
-	public function __construct($table = NULL, PDO $db = NULL)
+	public function __construct($table = NULL, Connection $db = NULL)
 	{
 		parent::__construct($table, $db);
 	}
@@ -56,17 +54,9 @@ class Delete extends Query
 	{
 		switch($flag)
 		{
-			case self::ALL:
-			case self::DISTINCT:
-			case self::DISTINCTROW:
-			case self::HIGH_PRIORITY:
-			case self::STRAIGHT_JOIN:
-			case self::SQL_SMALL_RESULT:
-			case self::SQL_BIG_RESULT:
-			case self::SQL_BUFFER_RESULT:
-		    case self::SQL_CACHE:
-		    case self::SQL_NO_CACHE:
-		    case self::SQL_CALC_FOUND_ROWS:
+			case self::IGNORE:
+			case self::LOW_PRIORITY:
+			case self::QUICK:
 		    	$this->flags[] = $flag;
 		    	break;
 		}
@@ -80,8 +70,9 @@ class Delete extends Query
 	}
 
 	/**
+	 * Set the table to act upon
 	 * @param mixed $table
-	 * @param string $alias
+	 * @return $this
 	 */
 	public function setTable($table)
 	{
@@ -161,5 +152,3 @@ class Delete extends Query
 		return $stmt;
 	}
 }
-
-?>

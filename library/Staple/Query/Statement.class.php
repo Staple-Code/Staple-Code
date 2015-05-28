@@ -27,6 +27,12 @@ use \PDOStatement, \PDO;
 
 class Statement extends PDOStatement
 {
+    /**
+     * The database driver that is currently in use.
+     * @var string
+     */
+    protected $driver;
+
 	/*
 	 * Magic method to fake MySQLi property functions
 	 * @deprecated
@@ -42,6 +48,25 @@ class Statement extends PDOStatement
 				return NULL;
 		}
 	}
+
+    /**
+     * Get the driver string
+     * @return string
+     */
+    public function getDriver()
+    {
+        return $this->driver;
+    }
+
+    /**
+     * Set the driver string
+     * @param string $driver
+     */
+    public function setDriver($driver)
+    {
+        $this->driver = $driver;
+    }
+
 	/**
 	 * Mysqli style associative array fetch style
 	 * @return mixed
@@ -68,6 +93,29 @@ class Statement extends PDOStatement
      */
     public function foundRows()
     {
-        return (int)Query::raw("SELECT FOUND_ROWS()")->fetchColumn();
+        switch($this->getDriver())
+        {
+            case Connection::DRIVER_MYSQL:
+                return (int)Query::raw('SELECT FOUND_ROWS()')->fetchColumn(0);
+            case Connection::DRIVER_SQLSRV:
+                return (int)Query::raw('SELECT @@Rowcount')->fetchColumn(0);
+            default:
+                return count($this->fetchAll(PDO::FETCH_COLUMN, 0));
+        }
     }
+
+	/**
+	 * Override the PDOStatement rowCount() method to return
+	 * @return int
+	 */
+	public function rowCount()
+	{
+		switch($this->getDriver())
+		{
+			case Connection::DRIVER_SQLSRV:
+				return (int)Query::raw('SELECT @@Rowcount')->fetchColumn(0);
+			default:
+				return parent::rowCount();
+		}
+	}
 }

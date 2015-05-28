@@ -304,6 +304,7 @@ class Connection extends PDO implements SplSubject
 	{
 		if (!isset(self::$namedConnections[$namedInstance]))
 		{
+			/** @var Connection $c */
 			$c = __CLASS__;
 			self::$namedConnections[$namedInstance] = $c::createFromConfig(Config::get($namedInstance));
 		}
@@ -496,6 +497,12 @@ class Connection extends PDO implements SplSubject
 		{
 			//Notify the observers that an error has occurred.
 			$this->notify();
+		}
+        else
+		{
+			//Assign the driver type in the statement object
+			if ($result instanceof Statement)
+				$result->setDriver($this->getDriver());
 		}
 
 		//Return the result

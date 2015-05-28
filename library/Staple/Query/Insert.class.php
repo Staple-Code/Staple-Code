@@ -24,7 +24,6 @@ namespace Staple\Query;
 
 use \Staple\Exception\QueryException;
 use \Exception;
-use \PDO;
 use \Staple\Error;
 
 class Insert
@@ -35,7 +34,7 @@ class Insert
 	
 	/**
 	 * The database object. A database object is required to properly escape input.
-	 * @var PDO
+	 * @var Connection
 	 */
 	protected $connection;
 	/**
@@ -73,16 +72,16 @@ class Insert
 	/**
 	 * @param string $table
 	 * @param array $data
-	 * @param PDO $db
+	 * @param Connection $db
 	 * @param string $priority
 	 * @throws QueryException
 	 */
-	public function __construct($table = NULL, $data = NULL, $db = NULL, $priority = NULL)
+	public function __construct($table = NULL, $data = NULL, Connection $db = NULL, $priority = NULL)
 	{
 		$this->data = new DataSet();
 		
 		//Process Database connection
-		if($db instanceof PDO)
+		if($db instanceof Connection)
 		{
 			$this->setConnection($db);
 		}
@@ -96,7 +95,7 @@ class Insert
 				throw new QueryException('Unable to find a database connection.', Error::DB_ERROR, $e);
 			}
 		}
-		if(!($this->connection instanceof PDO))
+		if(!($this->connection instanceof Connection))
 		{
 			throw new QueryException('Unable to create database object', Error::DB_ERROR);
 		}
@@ -196,7 +195,7 @@ class Insert
 	 */
 	public function execute()
 	{
-		if($this->connection instanceof PDO)
+		if($this->connection instanceof Connection)
 		{
 			return $this->connection->query($this->build());
 		}
@@ -211,7 +210,7 @@ class Insert
 				//@todo try for a default connection if no staple connection
 				throw new QueryException('No Database Connection', Error::DB_ERROR);
 			}
-			if($this->connection instanceof PDO)
+			if($this->connection instanceof Connection)
 			{
 				return $this->connection->query($this->build());
 			}
@@ -262,7 +261,7 @@ class Insert
 	//----------------------------------------------GETTERS AND SETTERS----------------------------------------------
 	
 	/**
-	 * @return PDO $db
+	 * @return Connection $db
 	 */
 	public function getConnection()
 	{
@@ -318,10 +317,10 @@ class Insert
 	}
 	
 	/**
-	 * @param PDO $connection
+	 * @param Connection $connection
 	 * @return $this
 	 */
-	public function setConnection(PDO $connection)
+	public function setConnection(Connection $connection)
 	{
 		$this->connection = $connection;
 		return $this;
@@ -451,5 +450,3 @@ class Insert
 		return $this->getConnection()->lastInsertId();
 	}
 }
-
-?>
