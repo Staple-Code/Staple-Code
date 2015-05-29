@@ -113,7 +113,7 @@ class Statement extends PDOStatement
 		switch($this->getDriver())
 		{
 			case Connection::DRIVER_SQLSRV:
-				return (int)Query::raw('SELECT @@Rowcount')->fetchColumn(0);
+				return (parent::rowCount() == -1) ? (int)Query::raw('SELECT @@Rowcount')->fetchColumn(0) : parent::rowCount();
 			default:
 				return parent::rowCount();
 		}

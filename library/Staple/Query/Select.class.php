@@ -65,7 +65,7 @@ class Select extends Query
 	 * The Limit Offset. Used to skip a number of rows before selecting.
 	 * @var int
 	 */
-	protected $limitOffset;
+	protected $limitOffset = 0;
 	/**
 	 * Stores the GROUP BY columns;
 	 * @var array | string
@@ -406,6 +406,26 @@ class Select extends Query
 		return $this;
 	}
 
+	/**
+	 * Alias of setLimitOffset() method
+	 * @param $offset
+	 * @return Select
+	 */
+	public function skip($offset)
+	{
+		return $this->setLimitOffset($offset);
+	}
+
+	/**
+	 * Alias of setLimit() method
+	 * @param $amount
+	 * @return Select
+	 */
+	public function take($amount)
+	{
+		return $this->setLimit($amount);
+	}
+
 	/*-----------------------------------------------HAVING CLAUSES-----------------------------------------------*/
 	
 	public function addHaving(Condition $having)
@@ -545,8 +565,16 @@ class Select extends Query
 	 */
 	function build()
 	{
-		$stmt = 'SELECT ';
-		
+		$stmt = 'SELECT';
+
+		//SQL Server Limit - when offset is zero
+		if($this->getLimit() > 0
+			&& $this->getLimitOffset() == 0
+			&& $this->getConnection()->getDriver() == Connection::DRIVER_SQLSRV)
+		{
+			$stmt .= ' TOP ' . $this->getLimit();
+		}
+
 		//Flags
 		if(count($this->flags) > 0)
 		{
@@ -683,15 +711,32 @@ class Select extends Query
 			{
 				$stmt .= $this->order;
 			}
-		}
-		
-		//LIMIT CLAUSE
-		if(isset($this->limit))
-		{
-			$stmt .= "\nLIMIT ".$this->getLimit();
-			if(isset($this->limitOffset))
+
+			//SQL Server 2012 Pagination
+			if($this->getConnection()->getDriver() == Connection::DRIVER_SQLSRV)
 			{
-				$stmt .= ' OFFSET '.$this->limitOffset;
+				if (isset($this->limit) && !isset($sql2005limit) && $this->getLimitOffset() != 0)
+				{
+					//Offset
+					$stmt .= "\nOFFSET " . $this->getLimitOffset(). ' ROWS ';
+
+					//Limit
+					$stmt .= ' FETCH NEXT ' . $this->getLimit(). ' ROWS ';
+				}
+			}
+		}
+
+		//Limit clause is MySQL specific
+		if($this->getConnection()->getDriver() == Connection::DRIVER_MYSQL)
+		{
+			//LIMIT CLAUSE
+			if (isset($this->limit))
+			{
+				$stmt .= "\nLIMIT " . $this->getLimit();
+				if (isset($this->limitOffset))
+				{
+					$stmt .= ' OFFSET ' . $this->limitOffset;
+				}
 			}
 		}
 		return $stmt;
