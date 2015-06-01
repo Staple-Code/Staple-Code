@@ -69,18 +69,6 @@ class Delete extends Query
 		return $this;
 	}
 
-	/**
-	 * Set the table to act upon
-	 * @param mixed $table
-	 * @return $this
-	 */
-	public function setTable($table)
-	{
-		//@todo expand to include multiple tables
-		$this->table = (string)$table;
-		return $this;
-	}
-
 	/*-----------------------------------------------JOIN FUNCTIONS-----------------------------------------------*/
 	
 	public function addJoin(Join $join)

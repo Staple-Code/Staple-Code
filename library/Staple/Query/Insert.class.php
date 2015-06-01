@@ -99,6 +99,9 @@ class Insert
 		{
 			throw new QueryException('Unable to create database object', Error::DB_ERROR);
 		}
+
+		//Set the dataSet connection
+		$this->data->setConnection($db);
 		
 		//Set Table
 		if(isset($table))
@@ -341,6 +344,7 @@ class Insert
 		elseif(is_array($data))
 		{
 			$this->data = new DataSet($data);
+			$this->data->setConnection($this->getConnection());
 		}
 		else
 		{

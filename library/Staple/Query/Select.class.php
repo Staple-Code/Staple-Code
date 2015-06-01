@@ -439,46 +439,90 @@ class Select extends Query
 		$this->having = array();
 		return $this;
 	}
-	
+
+	/**
+	 * Add A HAVING clause to the SELECT statement using the Condition object
+	 * @param string $column
+	 * @param string $operator
+	 * @param mixed $value
+	 * @param null $columnJoin
+	 * @return $this
+	 */
 	public function havingCondition($column, $operator, $value, $columnJoin = NULL)
 	{
 		$this->addHaving(Condition::get($column, $operator, $value, $columnJoin));
 		return $this;
 	}
-	
+
+	/**
+	 * Add A raw HAVING clause to the SELECT statement
+	 * @param string|Condition $statement
+	 * @return $this
+	 */
 	public function havingStatement($statement)
 	{
 		$this->addHaving(Condition::statement($statement));
 		return $this;
 	}
-	
+
+	/**
+	 * Add A HAVING EQUAL clause to the SELECT statement
+	 * @param string $column
+	 * @param mixed $value
+	 * @param string $columnJoin
+	 * @return $this
+	 */
 	public function havingEqual($column, $value, $columnJoin = NULL)
 	{
 		$this->addHaving(Condition::equal($column, $value, $columnJoin));
 		return $this;
 	}
-	
+
+	/**
+	 * Add A HAVING LIKE clause to the SELECT statement
+	 * @param string $column
+	 * @param mixed $value
+	 * @return $this
+	 */
 	public function havingLike($column, $value)
 	{
 		$this->addHaving(Condition::like($column, $value));
 		return $this;
 	}
-	
+
+	/**
+	 * Add A HAVING NULL clause to the SELECT statement
+	 * @param string $column
+	 * @return $this
+	 */
 	public function havingNull($column)
 	{
 		$this->addHaving(Condition::null($column));
 		return $this;
 	}
-	
+
+	/**
+	 * Add A HAVING IN clause to the SELECT statement
+	 * @param string $column
+	 * @param array $values
+	 * @return $this
+	 */
 	public function havingIn($column, array $values)
 	{
 		$this->addHaving(Condition::in($column, $values));
 		return $this;
 	}
-	
+
+	/**
+	 * Add A HAVING BETWEEN clause to the SELECT statement
+	 * @param string $column
+	 * @param mixed $start
+	 * @param mixed $end
+	 * @return $this
+	 */
 	public function havingBetween($column, $start, $end)
 	{
-		$this->addHaving(Condition::between($column, $start, $end));
+		$this->addHaving(Condition::between($column, $start, $end, $this->getConnection()));
 		return $this;
 	}
 	

@@ -199,6 +199,11 @@ class InsertMultiple extends Insert
 			{
 				throw new QueryException('To set the data for this object, the submission must be an array of Staple_Query_DataSet objects.', Error::APPLICATION_ERROR);
 			}
+			else
+			{
+				//Sync the dataSet with the current query's connection.
+				$row->setConnection($this->getConnection());
+			}
 		}
 		$this->data = $data;
 		return $this;
