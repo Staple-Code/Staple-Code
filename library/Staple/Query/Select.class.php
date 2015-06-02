@@ -185,6 +185,8 @@ class Select extends Query
 	}
 
 	/**
+	 * Set the table for the select query. This can be another Select object or a Union object. However, a table
+	 * alias is required when using another object.
 	 * @param mixed $table
 	 * @param string $alias
 	 * @throws QueryException
@@ -198,10 +200,14 @@ class Select extends Query
 		}
 		elseif($table instanceof Query || $table instanceof Union)
 		{
+			//Check for a derived table alias
 			if(!isset($alias))
-			{
 				throw new QueryException('Every derived table must have its own alias', Error::DB_ERROR);
-			}
+
+			//Remove the order by clause in derived table.
+			$table->setOrder(null);
+
+			//Set the table.
 			$this->table = array($alias=>$table);
 		}
 		elseif(isset($alias) && is_string($table))
@@ -611,18 +617,18 @@ class Select extends Query
 	{
 		$stmt = 'SELECT';
 
+		//Flags
+		if(count($this->flags) > 0)
+		{
+			$stmt .= ' '.implode(' ', $this->flags);
+		}
+
 		//SQL Server Limit - when offset is zero
 		if($this->getLimit() > 0
 			&& $this->getLimitOffset() == 0
 			&& $this->getConnection()->getDriver() == Connection::DRIVER_SQLSRV)
 		{
-			$stmt .= ' TOP ' . $this->getLimit();
-		}
-
-		//Flags
-		if(count($this->flags) > 0)
-		{
-			$stmt .= ' '.implode(' ', $this->flags);
+			$stmt .= ' TOP ' . $this->getLimit().' ';
 		}
 		
 		//Collect Select Columns
@@ -700,7 +706,7 @@ class Select extends Query
 							$tables .= " AS `$name`";
 							break;
 						default:
-							$tables .= " AS `$name`";
+							$tables .= " AS $name";
 					}
 				}
 			}

@@ -24,6 +24,7 @@ namespace Staple\Query;
 
 use \Exception;
 use \Staple\Error;
+use Staple\Exception\QueryException;
 use \Staple\Pager;
 
 class Update extends Query
@@ -72,6 +73,16 @@ class Update extends Query
 		{
 			$this->setConnection($db);
 			$this->data->setConnection($db);
+		}
+		else
+		{
+			try {
+				$this->setConnection(Connection::get());
+			}
+			catch (Exception $e)
+			{
+				throw new QueryException('Unable to find a database connection.', Error::DB_ERROR, $e);
+			}
 		}
 		if(isset($table))
 		{
