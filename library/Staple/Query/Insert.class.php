@@ -88,7 +88,8 @@ class Insert
 		else
 		{
 			try {
-				$this->setConnection(Connection::get());
+				$db = Connection::get();
+				$this->setConnection($db);
 			}
 			catch (QueryException $e)
 			{
