@@ -771,7 +771,7 @@ class Select extends Query
 					$stmt .= "\nOFFSET " . $this->getLimitOffset(). ' ROWS ';
 
 					//Limit
-					$stmt .= ' FETCH NEXT ' . $this->getLimit(). ' ROWS ';
+					$stmt .= ' FETCH NEXT ' . $this->getLimit(). ' ROWS ONLY ';
 				}
 			}
 		}
