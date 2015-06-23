@@ -307,11 +307,22 @@ class Form
 	 */
 	public function addData(array $data)
 	{
-		foreach($this->fields as $fieldname=>$obj)
+		$this->addDataToTarget($data,$this->fields);
+
+		return $this;
+	}
+
+	/**
+	 * @param array $data
+	 * @param FieldElement | array $target
+	 */
+	private function addDataToTarget(array $data, $target)
+	{
+		foreach($target as $fieldName=>$obj)
 		{
-			if(array_key_exists($fieldname, $data))
+			if(array_key_exists($fieldName, $data))
 			{
-				$obj->setValue($data[$fieldname]);
+				$obj->setValue($data[$fieldName]);
 			}
 			elseif($obj instanceof CheckboxGroupElement)
 			{
@@ -324,6 +335,12 @@ class Form
 					}
 				}
 			}
+			elseif(is_array($obj))
+			{
+				if(isset($data[$fieldName]))
+					if(is_array($data[$fieldName]))
+						$this->addDataToTarget($data[$fieldName],$obj);
+			}
 			else
 			{
 				//Checkbox Fix
@@ -333,7 +350,6 @@ class Form
 				}
 			}
 		}
-		return $this;
 	}
 	
 	/**
@@ -439,6 +455,23 @@ JS;
 				if($field->isRequired())
 				{
 					$script .= $field->clientJQuery();
+				}
+			}
+			elseif(is_array($field))	//Limited Recursion here.
+			{
+				foreach($field as $subField)
+				{
+					if($subField instanceof FieldElement)
+					{
+						if($subField->isRequired())
+						{
+							$script .= $subField->clientJQuery();
+						}
+					}
+					else
+					{
+						throw new Exception('Form Error', Error::FORM_ERROR);
+					}
 				}
 			}
 			else
