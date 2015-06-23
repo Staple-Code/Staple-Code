@@ -28,6 +28,7 @@ use \Exception;
 use \Staple\Error;
 use \Staple\Config;
 use \Staple\Encrypt;
+use Staple\Exception\FormBuildException;
 use Staple\Form\View\ElementViewAdapter;
 
 class Form
@@ -80,7 +81,7 @@ class Form
 	
 	/**
 	 * An array of FieldElement objects, that represent the form fields.
-	 * @var FieldElement[]|CheckboxElement[]|SelectElement[]|CheckboxGroupElement[]
+	 * @var FieldElement[]|CheckboxElement[]|SelectElement[]|CheckboxGroupElement[]|array
 	 */
 	public $fields = array();
 	
@@ -320,7 +321,13 @@ class Form
 	{
 		foreach($target as $fieldName=>$obj)
 		{
-			if(array_key_exists($fieldName, $data))
+			if(is_array($obj))
+			{
+				if(isset($data[$fieldName]))
+					if(is_array($data[$fieldName]))
+						$this->addDataToTarget($data[$fieldName],$obj);
+			}
+			elseif(array_key_exists($fieldName, $data))
 			{
 				$obj->setValue($data[$fieldName]);
 			}
@@ -334,12 +341,6 @@ class Form
 						$chk->setValue($data[$chk->getName()]);
 					}
 				}
-			}
-			elseif(is_array($obj))
-			{
-				if(isset($data[$fieldName]))
-					if(is_array($data[$fieldName]))
-						$this->addDataToTarget($data[$fieldName],$obj);
 			}
 			else
 			{
@@ -359,10 +360,23 @@ class Form
 	 */
 	public function exportFormData()
 	{
+		return $this->fieldData($this->fields);
+	}
+
+	/**
+	 * Recursively pulls field data.
+	 * @param array $start
+	 * @return array
+	 */
+	private function fieldData(array $start)
+	{
 		$data = array();
-		foreach($this->fields as $name=>$field)
+		foreach($start as $name=>$field)
 		{
-			$data[$field->getName()] = $field->getValue();
+			if(is_array($field))
+				$data[$name] = $this->fieldData($field);
+			else
+				$data[$field->getName()] = $field->getValue();
 		}
 		return $data;
 	}
@@ -526,9 +540,37 @@ JS;
 	public function validate()
 	{
 		$this->clearErrors();
+		$errors = [];
 		
 		//Process validation callbacks.
-		foreach($this->callbacks as $func)
+		$errors = array_merge($errors,$this->validateCallbacks($this->callbacks));
+		
+		//Process all validation fields.
+		$errors = array_merge($errors,$this->validateFields($this->fields));
+
+		//Set the validation errors
+		$this->setErrors($errors);
+		
+		//Check for errors.
+		if(count($this->errors) > 0)
+		{
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+	}
+
+	/**
+	 * Process the supplied array of validation callbacks and return errors.
+	 * @param array $callbacks
+	 * @return array
+	 */
+	public function validateCallbacks($callbacks)
+	{
+		$errors = [];
+		foreach($callbacks as $func)
 		{
 			try{
 				$result = call_user_func_array($func['func'],$func['params']);
@@ -537,23 +579,34 @@ JS;
 			{
 				$result = false;
 			}
-			
+
 			if(is_array($result))
 			{
-				$this->errors[] = array('label'=>'Additional Form Validation','errors'=>array($result));
+				$errors[] = array('label'=>'Additional Form Validation','errors'=>array($result));
 			}
 			else
 			{
 				$result = (bool)$result;
 				if($result === false)
 				{
-					$this->errors[] = array('label'=>'Additional Form Validation','errors'=>array(array('Form Validation Returned False.')));
+					$errors[] = array('label'=>'Additional Form Validation','errors'=>array(array('Form Validation Returned False.')));
 				}
 			}
 		}
-		
-		//Process all validation fields.
-		foreach($this->fields as $field)
+
+		return $errors;
+	}
+
+	/**
+	 * Run validation on supplied array of fields. Runs recursively for nested arrays.
+	 * @param array $fields
+	 * @return array
+	 * @throws Exception
+	 */
+	public function validateFields($fields)
+	{
+		$errors = [];
+		foreach($fields as $key=>$field)
 		{
 			if($field instanceof FieldElement)
 			{
@@ -561,7 +614,7 @@ JS;
 				{
 					if($field->isRequired())
 					{
-						$this->errors[$field->getName()] = array('label'=>$field->getLabel(),'errors'=>$field->getErrors());
+						$errors[$key] = array('label'=>$field->getLabel(),'errors'=>$field->getErrors());
 					}
 					elseif($field->getValue() != '')
 					{
@@ -575,41 +628,39 @@ JS;
 								{
 									if($file['error'] != UPLOAD_ERR_NO_FILE)
 									{
-										$this->errors[$field->getName()] = array('label'=>$field->getLabel(),'errors'=>$field->getErrors());
+										$errors[$key] = array('label'=>$field->getLabel(),'errors'=>$field->getErrors());
 									}
 								}
 								else
 								{
-									$this->errors[$field->getName()] = array('label'=>$field->getLabel(),'errors'=>$field->getErrors());
+									$errors[$key] = array('label'=>$field->getLabel(),'errors'=>$field->getErrors());
 								}
 							}
 							else
 							{
-								$this->errors[$field->getName()] = array('label'=>$field->getLabel(),'errors'=>$field->getErrors());
+								$errors[$key] = array('label'=>$field->getLabel(),'errors'=>$field->getErrors());
 							}
 						}
 						else
 						{
-							$this->errors[$field->getName()] = array('label'=>$field->getLabel(),'errors'=>$field->getErrors());
+							$errors[$key] = array('label'=>$field->getLabel(),'errors'=>$field->getErrors());
 						}
 					}
 				}
 			}
+			elseif(is_array($field))        //Parse Field Validation Recursively
+			{
+				$errArray = $this->validateFields($field);
+				if(count($errArray) > 0)
+					$errors[$key] = $errArray;
+			}
 			else
 			{
-				throw new Exception('Form Error', Error::FORM_ERROR);
+				throw new FormBuildException('Form Error', Error::FORM_ERROR);
 			}
 		}
-		
-		//Check for errors.
-		if(count($this->errors) > 0)
-		{
-			return false;
-		}
-		else
-		{
-			return true;
-		}
+
+		return $errors;
 	}
 	
 	/**
@@ -628,6 +679,17 @@ JS;
 	public function getErrors()
 	{
 		return $this->errors;
+	}
+
+	/**
+	 * Set the error array
+	 * @param array $errors
+	 * @return $this
+	 */
+	protected function setErrors(array $errors)
+	{
+		$this->errors = $errors;
+		return $this;
 	}
 
 	/**
