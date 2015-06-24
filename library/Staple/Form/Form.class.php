@@ -143,9 +143,9 @@ class Form
 	        /**
 	         * Loads selected elementViewAdapter from application.ini and verify given adapter is a class before loading
 	         */
-        if(Config::getValue('forms','elementViewAdapter') != '' && Config::getValue('forms','elementViewAdapter') != null)
+        	if(Config::getValue('forms','elementViewAdapter') != '' && Config::getValue('forms','elementViewAdapter') != null)
 	        {
-            $this->makeElementViewAdapter(Config::getValue('forms','elementViewAdapter'));
+            		$this->makeElementViewAdapter(Config::getValue('forms','elementViewAdapter'));
 	        }
 
 		$this->_start();
@@ -933,19 +933,23 @@ JS;
 		if(count($this->classes) > 0)
 		{
 			$buf .= ' class="';
-			$cstring = '';
+			$classString = '';
 			foreach($this->classes as $class)
 			{
-				$cstring .= $class.' ';
+				$classString .= $class.' ';
 			}
-			$buf .= trim($cstring);
+			$buf .= trim($classString);
 			$buf .= '"';
 		}
+	        else
+	        {
+	            $classString = '';
+	        }
 		$buf .= ">\n";
 		$buf .= "<div id=\"{$this->name}_div\"";
 		if(count($this->classes) > 0)
 		{
-			$buf .= ' class="'.trim($cstring).'"';
+			$buf .= ' class="'.trim($classString).'"';
 		}
 		$buf .= ">\n";
 		return $buf;
