@@ -522,17 +522,6 @@ abstract class FieldElement
 		return $this;
 	}
 
-    	/**
-     	* Alias for setInstructions Method
-     	* @param string $instructions
-     	* @return $this
-     	*/
-    	public function addInstructions($instructions)
-    	{
-		$this->setInstructions($instructions);
-		return $this;
-	}
-
     /**
      * Alias for setInstructions Method
      * @param string $instructions
