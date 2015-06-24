@@ -305,7 +305,7 @@ abstract class Query
 	 */
 	public function whereBetween($column, $start, $end)
 	{
-		$this->addWhere(Condition::between($column, $start, $end));
+		$this->addWhere(Condition::between($column, $start, $end, $this->getConnection()));
 		return $this;
 	}
 	
@@ -342,7 +342,14 @@ abstract class Query
 		}
 		elseif(is_bool($inValue))
 		{
-			return ($inValue) ? 'TRUE' : 'FALSE';
+			//Switch based on driver used in the connection.
+			switch ($db->getDriver())
+			{
+				case Connection::DRIVER_MYSQL:
+					return ($inValue) ? 'TRUE' : 'FALSE';
+				default:
+					return ($inValue) ? '1' : '2';
+			}
 		}
 		elseif(is_null($inValue))
 		{
@@ -448,11 +455,12 @@ abstract class Query
 	 * Create and return a Query DataSet object
 	 *
 	 * @param array $data
+	 * @param Connection $connection
 	 * @return DataSet
 	 */
-	public static function dataSet(array $data = NULL)
+	public static function dataSet(array $data = NULL, Connection $connection = NULL)
 	{
-		return new DataSet($data);
+		return new DataSet($data,$connection);
 	}
 
     /**

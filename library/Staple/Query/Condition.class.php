@@ -63,13 +63,22 @@ class Condition
 	 * @var bool
 	 */
 	protected $columnJoin = false;
-	
-	public function __construct($statement = NULL)
+	/**
+	 * Reference to the connection object in use for this clause.
+	 * @var Connection
+	 */
+	protected $connection;
+
+	/**
+	 * @param string $statement
+	 * @param Connection $connection
+	 */
+	public function __construct($statement = NULL, Connection $connection = NULL)
 	{
 		if(isset($statement))
-		{
 			$this->setStatement($statement);
-		}
+		if(isset($connection))
+			$this->setConnection($connection);
 	}
 	
 	/**
@@ -79,7 +88,7 @@ class Condition
 	public function __toString()
 	{
 		try {
-			$return = $this->build(); 
+			$return = $this->build($this->getConnection());
 		}
 		catch (Exception $e)
 		{
@@ -100,7 +109,7 @@ class Condition
 		return $this;
 	}
 	
-	public function build()
+	public function build(Connection $connection)
 	{
 		if(isset($this->statement))
 		{
@@ -119,7 +128,7 @@ class Condition
 						{
 							$value .= ",";
 						}
-						$value .= $this->columnJoin ? $aValue : Query::convertTypes($aValue);
+						$value .= $this->columnJoin ? $aValue : Query::convertTypes($aValue,$connection);
 					}
 				}
 				elseif($this->value instanceof Select)
@@ -128,7 +137,7 @@ class Condition
 				}
 				else
 				{
-					$value = $this->columnJoin ? $this->value : Query::convertTypes($this->value);
+					$value = $this->columnJoin ? $this->value : Query::convertTypes($this->value,$connection);
 				}
 				$value .= ")";
 			}
@@ -138,7 +147,7 @@ class Condition
 			}
 			else 
 			{
-				$value = $this->columnJoin ? $this->value : Query::convertTypes($this->value);
+				$value = $this->columnJoin ? $this->value : Query::convertTypes($this->value,$connection);
 			}
 			return $this->column.' '.$this->operator.' '.$value;
 		}
@@ -235,6 +244,29 @@ class Condition
 		$this->columnJoin = (bool)$columnJoin;
 		return $this;
 	}
+
+	/**
+	 * Return the currently set connection or attempt to retrieve the default connection if non specified.
+	 * @return Connection
+	 */
+	public function getConnection()
+	{
+		if(isset($this->connection))
+			return $this->connection;
+		else
+			return Connection::get();
+	}
+
+	/**
+	 * Set the connection.
+	 * @param Connection $connection
+	 */
+	public function setConnection(Connection $connection)
+	{
+		$this->connection = $connection;
+	}
+
+
 	
 	/*-----------------------------------------------CONDITION ENCAPSULATORS-----------------------------------------------*/
 

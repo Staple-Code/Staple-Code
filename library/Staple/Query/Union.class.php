@@ -37,7 +37,7 @@ class Union
 	 * The database object. A database object is required to properly escape input.
 	 * @var Connection
 	 */
-	protected $db;
+	protected $connection;
 	/**
 	 * UNION flag: ALL | DISTINCT
 	 * @var string
@@ -67,15 +67,15 @@ class Union
 	/**
 	 * Constructor accepts an array of Staple_Query_Select elements and a database connection.
 	 * @param array $queries
-	 * @param Connection $db
+	 * @param Connection $connection
 	 * @throws QueryException
 	 */
-	public function __construct(array $queries = array(), Connection $db = NULL)
+	public function __construct(array $queries = array(), Connection $connection = NULL)
 	{
 		//Process Database connection
-		if($db instanceof Connection)
+		if($connection instanceof Connection)
 		{
-			$this->setDb($db);
+			$this->setDb($connection);
 		}
 		else
 		{
@@ -87,7 +87,7 @@ class Union
 				throw new QueryException('Unable to find a database connection.', Error::DB_ERROR, $e);
 			}
 		}
-		if(!($this->db instanceof Connection))
+		if(!($this->connection instanceof Connection))
 		{
 			throw new QueryException('Unable to create database object', Error::DB_ERROR);
 		}
@@ -107,7 +107,14 @@ class Union
 	 */
 	public function __toString()
 	{
-		return $this->build();
+		try
+		{
+			return $this->build();
+		}
+		catch(QueryException $e)
+		{
+			return 'A query exception occurred when building the query string.';
+		}
 	}
 	
 	/**
@@ -115,7 +122,7 @@ class Union
 	 */
 	public function getDb()
 	{
-		return $this->db;
+		return $this->connection;
 	}
 	
 	/**
@@ -156,9 +163,31 @@ class Union
 	 */
 	public function setDb(Connection $db)
 	{
-		$this->db = $db;
+		$this->connection = $db;
 		return $this;
 	}
+
+	/**
+	 * Retrieve the current connection.
+	 * @return Connection
+	 */
+	public function getConnection()
+	{
+		return $this->connection;
+	}
+
+	/**
+	 * Set the connection on the Union object.
+	 * @param Connection $connection
+	 * @return $this
+	 */
+	public function setConnection($connection)
+	{
+		$this->connection = $connection;
+		return $this;
+	}
+
+
 	
 	/**
 	 * Set the UNION flag.
@@ -250,29 +279,64 @@ class Union
 	/**
 	 * Build the Query
 	 * @return string
+	 * @throws QueryException
 	 */
 	function build()
 	{
-		$stmt = '';
+		$stmt = 'SELECT ';
 		if(count($this->queries) <= 0)
 		{
-			return 'SELECT 0 FROM (SELECT 0) AS `a` WHERE 1=0';
+			throw new QueryException('No queries were supplied to union.');
 		}
 		elseif(count($this->queries) == 1)
 		{
-			$stmt .= 'SELECT * FROM ('.implode('', $this->queries).') AS `stapleunion` ';
+			//Render the union statement into a sub-select statement when only one query is attached.
+			$stmt .= '* FROM ('.implode('', $this->queries).')';
+
+			//Switch the method based on database driver of the current connection
+			switch($this->getConnection()->getDriver())
+			{
+				case Connection::DRIVER_MYSQL:
+					$stmt .= " AS `stapleunion`";
+					break;
+				default:
+					$stmt .= " AS stapleunion";
+			}
 		}
 		else
 		{
+			//SQL Server Limit - when offset is zero
+			if($this->getLimit() > 0
+				&& $this->getLimitOffset() == 0
+				&& $this->getConnection()->getDriver() == Connection::DRIVER_SQLSRV)
+			{
+				$stmt .= 'TOP ' . $this->getLimit();
+			}
+
+			//Start the union as a sub-query.
+			$stmt .=  '* FROM (';
+
+			//Union the statements together with optional flags
 			if(isset($this->flag))
 			{
-				$glue = ")\nUNION {$this->flag} \n(";
+				$glue = "\nUNION {$this->flag} \n";
 			}
 			else
 			{
-				$glue = ")\nUNION \n(";
+				$glue = "\nUNION \n";
 			}
-			$stmt .= '('.implode($glue, $this->queries).')';
+			$stmt .= implode($glue, $this->queries);
+			$stmt .= ')';
+
+			//Switch the method based on database driver of the current connection
+			switch($this->getConnection()->getDriver())
+			{
+				case Connection::DRIVER_MYSQL:
+					$stmt .= " AS `stapleunion`";
+					break;
+				default:
+					$stmt .= " AS stapleunion";
+			}
 		}
 		
 		//ORDER CLAUSE
@@ -287,15 +351,31 @@ class Union
 			{
 				$stmt .= $this->order;
 			}
+
+			//SQL Server 2012 Pagination
+			if($this->getConnection()->getDriver() == Connection::DRIVER_SQLSRV)
+			{
+				if (isset($this->limit) && !isset($sql2005limit) && $this->getLimitOffset() != 0)
+				{
+					//Offset
+					$stmt .= "\nOFFSET " . $this->getLimitOffset(). ' ROWS ';
+
+					//Limit
+					$stmt .= ' FETCH NEXT ' . $this->getLimit(). ' ROWS ';
+				}
+			}
 		}
 		
 		//LIMIT CLAUSE
-		if(isset($this->limit))
+		if($this->getConnection()->getDriver() == Connection::DRIVER_MYSQL)
 		{
-			$stmt .= "\nLIMIT ".$this->getLimit();
-			if(isset($this->limitOffset))
+			if (isset($this->limit))
 			{
-				$stmt .= ' OFFSET '.$this->limitOffset;
+				$stmt .= "\nLIMIT " . $this->getLimit();
+				if (isset($this->limitOffset))
+				{
+					$stmt .= ' OFFSET ' . $this->limitOffset;
+				}
 			}
 		}
 		
@@ -340,9 +420,9 @@ class Union
 	 */
 	public function execute()
 	{
-		if($this->db instanceof Connection)
+		if($this->connection instanceof Connection)
 		{
-			return $this->db->query($this->build());
+			return $this->connection->query($this->build());
 		}
 		else
 		{
@@ -354,9 +434,9 @@ class Union
 			{
 				throw new QueryException('No Database Connection', Error::DB_ERROR);
 			}
-			if($this->db instanceof Connection)
+			if($this->connection instanceof Connection)
 			{
-				return $this->db->query($this->build());
+				return $this->connection->query($this->build());
 			}
 		}
 		return false;

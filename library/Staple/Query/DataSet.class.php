@@ -24,15 +24,55 @@ namespace Staple\Query;
 
 class DataSet implements \ArrayAccess, \Iterator, \Countable
 {
-	private $data = array();
-	private $literal = array();
-	
-	public function __construct(array $data = NULL)
+	/**
+	 * Array of data contained in the set
+	 * @var array
+	 */
+	protected $data = array();
+	/**
+	 * Literal data in the set
+	 * @var array
+	 */
+	protected $literal = array();
+	/**
+	 * The database connection
+	 * @var Connection
+	 */
+	protected $connection;
+
+	/**
+	 * @param array $data
+	 * @param Connection $connection
+	 */
+	public function __construct(array $data = NULL, Connection $connection = NULL)
 	{
 		if(isset($data))
 		{
 			$this->setData($data);
 		}
+		if(isset($connection))
+			$this->setConnection($connection);
+	}
+
+	/**
+	 * Return the currently set connection or attempt to retrieve the default connection if non specified.
+	 * @return Connection
+	 */
+	public function getConnection()
+	{
+		if(isset($this->connection))
+			return $this->connection;
+		else
+			return Connection::get();
+	}
+
+	/**
+	 * Set the connection.
+	 * @param Connection $connection
+	 */
+	public function setConnection(Connection $connection)
+	{
+		$this->connection = $connection;
 	}
 	
 	/* (non-PHPdoc)
@@ -162,6 +202,7 @@ class DataSet implements \ArrayAccess, \Iterator, \Countable
 	 * Clears any current data and uses the supplied data array.
 	 * 
 	 * @param array $data
+	 * @return $this
 	 */
 	public function setData(array $data)
 	{
@@ -229,7 +270,7 @@ class DataSet implements \ArrayAccess, \Iterator, \Countable
 			}
 			else
 			{
-				$stmt .= Query::convertTypes($col);
+				$stmt .= Query::convertTypes($col,$this->getConnection());
 			}
 			$colcount++;
 		}
@@ -253,7 +294,7 @@ class DataSet implements \ArrayAccess, \Iterator, \Countable
 			}
 			else
 			{
-				$stmt .= Query::convertTypes($col);
+				$stmt .= Query::convertTypes($col,$this->getConnection());
 			}
 			$colcount++;
 		}
@@ -278,7 +319,7 @@ class DataSet implements \ArrayAccess, \Iterator, \Countable
 			}
 			else
 			{
-				$stmt .= Query::convertTypes($col);
+				$stmt .= Query::convertTypes($col,$this->getConnection());
 			}
 			$colcount++;
 		}
