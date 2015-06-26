@@ -302,8 +302,12 @@ class FoundationViewAdapter extends ElementViewAdapter
 
     public function CheckboxElement(CheckboxElement $field)
     {
+
+		$field->addClass('row');
+
         $classes = $field->getClassString();
-        $buf = "<div class=\"$classes row\">\n"; //Row Start
+
+        $buf = "<div $classes\n"; //Row Start
         $buf .= "<div class=\"small-12 columns\">\n"; //Label Start
 
         if(count($field->getErrors()) != 0)
@@ -367,10 +371,13 @@ class FoundationViewAdapter extends ElementViewAdapter
 
     public function CheckboxgroupElement(CheckboxGroupElement $field)
     {
+
+		$field->addClass('row');
+
         $buf = '';
         $classes = $field->getClassString();
 
-        $buf .= "<div class=\"$classes row\">\n"; //Row Start
+        $buf .= "<div $classes>\n"; //Row Start
         $buf .= "<div class=\"small-12 columns\">\n"; //Label Start
 
 
@@ -435,10 +442,12 @@ class FoundationViewAdapter extends ElementViewAdapter
 
     public function RadioElement(RadioElement $field)
     {
+
+		$field->addClass('row');
         $buf = '';
         $classes = $field->getClassString();
 
-        $buf .= "<div class=\"$classes row\">\n"; //Row Start
+        $buf .= "<div $classes>\n"; //Row Start
         $buf .= "<div class=\"small-12 columns\">\n"; //Label Start
 
 
