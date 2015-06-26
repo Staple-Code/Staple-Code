@@ -3,7 +3,7 @@
  * Textarea element for use on forms.
  * 
  * @author Ironpilot
- * @copyright Copywrite (c) 2011, STAPLE CODE
+ * @copyright Copyright (c) 2011, STAPLE CODE
  * 
  * This file is part of the STAPLE Framework.
  * 
@@ -20,7 +20,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Form_TextareaElement extends Staple_Form_Element
+namespace Staple\Form;
+
+class TextareaElement extends FieldElement
 {
 	protected $rows;
 	protected $cols;
@@ -49,7 +51,7 @@ class Staple_Form_TextareaElement extends Staple_Form_Element
 	 */
 	public function field()
 	{
-		return '	<textarea rows="'.$this->rows.'" cols="'.$this->cols.'" id="'.$this->escape($this->id).'" name="'.$this->escape($this->name).'"'.$this->getAttribString().'>'.$this->escape($this->value)."</textarea>\n";
+		return '	<textarea rows="'.$this->rows.'" cols="'.$this->cols.'" id="'.$this->escape($this->id).'" name="'.$this->escape($this->name).'"'.$this->getAttribString('textarea').'>'.$this->escape($this->value)."</textarea>\n";
 	}
 
 	/* (non-PHPdoc)
@@ -57,10 +59,10 @@ class Staple_Form_TextareaElement extends Staple_Form_Element
 	 */
 	public function label()
 	{
-		return '	<label for="'.$this->escape($this->id).'"'.$this->getClassString().'>'.$this->label."</label>\n";
+		return '	<label for="'.$this->escape($this->id).'"'.$this->getClassString('label').'>'.$this->label."</label>\n";
 	}
 
-	public function build()
+	public function build($fieldView = NULL)
 	{
 		$buf = '';
 		$view = FORMS_ROOT.'/fields/TextareaElement.phtml';
@@ -75,7 +77,7 @@ class Staple_Form_TextareaElement extends Staple_Form_Element
 		{
 			$this->addClass('form_element');
 			$this->addClass('element_textarea');
-			$classes = $this->getClassString();
+			$classes = $this->getClassString('div');
 			$buf .= "<div$classes id=\"".$this->escape($this->id)."_element\">\n";
 			$buf .= $this->label();
 			$buf .= $this->field();

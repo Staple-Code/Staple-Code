@@ -9,7 +9,7 @@
  * 
  * 
  * @author Ironpilot
- * @copyright Copywrite (c) 2011, STAPLE CODE
+ * @copyright Copyright (c) 2011, STAPLE CODE
  * 
  * This file is part of the STAPLE Framework.
  * 
@@ -27,7 +27,11 @@
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-class Staple_Mail
+namespace Staple;
+
+use \Exception;
+
+class Mail
 {
 	const EMAIL_BODY_FIELD = '<!--STAPLE-EMAIL-BODY-->';
 	/**
@@ -84,7 +88,9 @@ class Staple_Mail
 	 * @var array
 	 */
 	protected $callbacks = array();
-	
+	/**
+	 * @var string
+	 */
 	protected $lastEmailStatus;
 	
 	/**
@@ -98,7 +104,7 @@ class Staple_Mail
 	public function __construct($to = NULL, $from = NULL, array $cc = array(), array $bcc = array())
 	{
 		//Load the ini settings
-		$settings = Staple_Config::get('email');
+		$settings = Config::get('email');
 		if($settings['from'] != '')
 		{
 			$this->setFrom($settings['from']);
@@ -171,11 +177,11 @@ class Staple_Mail
 	 * @param string $from
 	 * @param array $cc
 	 * @param array $bcc
-	 * @return Staple_Mail
+	 * @return $this
 	 */
 	public static function Create($to = NULL, $from = NULL, array $cc = array(), array $bcc = array())
 	{
-		return new self($to, $from, $cc);
+		return new self($to, $from, $cc, $bcc);
 	}
 	
 	/**
@@ -386,7 +392,7 @@ class Staple_Mail
 	/**
 	 * Add a single email address to the To list.
 	 * @param string $to
-	 * @return Staple_Mail
+	 * @return $this
 	 */
 	public function addTo($to)
 	{
@@ -403,7 +409,7 @@ class Staple_Mail
 	/**
 	 * Add a single email address to the CC list.
 	 * @param string $to
-	 * @return Staple_Mail
+	 * @return $this
 	 */
 	public function addCc($to)
 	{
@@ -417,7 +423,7 @@ class Staple_Mail
 	/**
 	 * Add a single email address to the BCC list.
 	 * @param string $to
-	 * @return Staple_Mail
+	 * @return $this
 	 */
 	public function addBcc($to)
 	{
@@ -438,7 +444,7 @@ class Staple_Mail
 
 	/**
 	 * @param array $to
-	 * @return Staple_Mail
+	 * @return $this
 	 */
 	public function setTo(array $to)
 	{
@@ -454,7 +460,7 @@ class Staple_Mail
 	}
 
 	/**
-	 * @return the $cc
+	 * @return array $cc
 	 */
 	public function getCc()
 	{
@@ -463,7 +469,7 @@ class Staple_Mail
 
 	/**
 	 * @param array $cc
-	 * @return Staple_Mail
+	 * @return $this
 	 */
 	public function setCc(array $cc)
 	{
@@ -479,7 +485,7 @@ class Staple_Mail
 	}
 
 	/**
-	 * @return the $from
+	 * @return string $from
 	 */
 	public function getFrom()
 	{
@@ -488,7 +494,7 @@ class Staple_Mail
 
 	/**
 	 * @param string $from
-	 * @return Staple_Mail
+	 * @return $this
 	 */
 	public function setFrom($from)
 	{
@@ -500,7 +506,7 @@ class Staple_Mail
 	}
 
 	/**
-	 * @return the $replyto
+	 * @return string $replyto
 	 */
 	public function getReplyto()
 	{
@@ -509,7 +515,7 @@ class Staple_Mail
 
 	/**
 	 * @param string $replyto
-	 * @return Staple_Mail
+	 * @return $this
 	 */
 	public function setReplyto($replyto)
 	{
@@ -521,7 +527,7 @@ class Staple_Mail
 	}
 
 	/**
-	 * @return the $subject
+	 * @return string $subject
 	 */
 	public function getSubject()
 	{
@@ -530,7 +536,7 @@ class Staple_Mail
 
 	/**
 	 * @param string $subject
-	 * @return Staple_Mail
+	 * @return $this
 	 */
 	public function setSubject($subject)
 	{
@@ -539,7 +545,8 @@ class Staple_Mail
 	}
 
 	/**
-	 * @return the $body
+	 * @return mixed|string
+	 * @throws Exception
 	 */
 	public function getBody()
 	{
@@ -556,7 +563,7 @@ class Staple_Mail
 				}
 				else 
 				{
-					throw new Exception('Invalid Template File:'.$templateFile, Staple_Error::EMAIL_ERROR);
+					throw new Exception('Invalid Template File:'.$templateFile, Error::EMAIL_ERROR);
 				}
 			}
 			else
@@ -573,7 +580,7 @@ class Staple_Mail
 
 	/**
 	 * @param string $body
-	 * @return Staple_Mail
+	 * @return $this
 	 */
 	public function setBody($body)
 	{
@@ -581,7 +588,7 @@ class Staple_Mail
 		return $this;
 	}
 	/**
-	 * @return the $bcc
+	 * @return array $bcc
 	 */
 	public function getBcc()
 	{
@@ -590,7 +597,7 @@ class Staple_Mail
 
 	/**
 	 * @param array $bcc
-	 * @return Staple_Mail
+	 * @return $this
 	 */
 	public function setBcc(array $bcc)
 	{
@@ -606,8 +613,8 @@ class Staple_Mail
 	
 	/**
 	 * Sets the SMTP server to connect to.
-	 * @param unknown_type $smtp
-	 * @return Staple_Mail
+	 * @param string $smtp
+	 * @return $this
 	 */
 	public function setServer($smtp)
 	{
@@ -616,7 +623,7 @@ class Staple_Mail
 	}
 
 	/**
-	 * @return the $lastEmailStatus
+	 * @return string $lastEmailStatus
 	 */
 	public function getLastEmailStatus()
 	{
@@ -624,7 +631,8 @@ class Staple_Mail
 	}
 
 	/**
-	 * @param field_type $lastEmailStatus
+	 * @param string $lastEmailStatus
+	 * @return $this
 	 */
 	public function setLastEmailStatus($lastEmailStatus)
 	{
@@ -633,7 +641,7 @@ class Staple_Mail
 	}
 
 	/**
-	 * @return the $template
+	 * @return string $template
 	 */
 	public function getTemplate()
 	{
@@ -642,6 +650,7 @@ class Staple_Mail
 
 	/**
 	 * @param string $template
+	 * @return $this
 	 */
 	public function setTemplate($template)
 	{
@@ -658,7 +667,7 @@ class Staple_Mail
 
 	/**
 	 * Find out if HTML is enabled for this email.
-	 * @return the $html
+	 * @return string $html
 	 */
 	public function isHtmlEnabled()
 	{
@@ -668,7 +677,7 @@ class Staple_Mail
 	/**
 	 * Turn HTML on or off for current message.
 	 * @param boolean $html
-	 * @return Staple_Mail
+	 * @return $this
 	 */
 	public function sendAsHtml($html)
 	{
@@ -757,5 +766,3 @@ class Staple_Mail
 		return true;
 	}
 }
-
-?>

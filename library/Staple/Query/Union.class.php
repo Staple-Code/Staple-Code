@@ -4,7 +4,7 @@
  * A Class for creating a UNION query in MySQL
  * 
  * @author Ironpilot
- * @copyright Copywrite (c) 2011, STAPLE CODE
+ * @copyright Copyright (c) 2011, STAPLE CODE
  * 
  * This file is part of the STAPLE Framework.
  * 
@@ -20,19 +20,24 @@
  * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
  */
-class Staple_Query_Union
+namespace Staple\Query;
+
+use \Staple\Exception\QueryException;
+use \Staple\Error;
+use \Staple\Pager;
+use \Exception;
+
+class Union
 {
 	const DISTINCT = 'DISTINCT';
 	const ALL = 'ALL';
 	
 	/**
 	 * The database object. A database object is required to properly escape input.
-	 * @var mysqli
+	 * @var Connection
 	 */
-	protected $db;
+	protected $connection;
 	/**
 	 * UNION flag: ALL | DISTINCT
 	 * @var string
@@ -50,7 +55,7 @@ class Staple_Query_Union
 	protected $order;
 	/**
 	 * Limit number of rows to return.
-	 * @var int
+	 * @var Pager | int
 	 */
 	protected $limit;
 	/**
@@ -62,34 +67,34 @@ class Staple_Query_Union
 	/**
 	 * Constructor accepts an array of Staple_Query_Select elements and a database connection.
 	 * @param array $queries
-	 * @param mysqli $db
+	 * @param Connection $connection
+	 * @throws QueryException
 	 */
-	public function __construct(array $queries = array(), mysqli $db = NULL)
+	public function __construct(array $queries = array(), Connection $connection = NULL)
 	{
 		//Process Database connection
-		if($db instanceof mysqli)
+		if($connection instanceof Connection)
 		{
-			$this->setDb($db);
+			$this->setDb($connection);
 		}
 		else
 		{
 			try {
-				$this->setDb(Staple_DB::get());
+				$this->setDb(Connection::get());
 			}
 			catch (Exception $e)
 			{
-				$this->setDb(new mysqli());
+				throw new QueryException('Unable to find a database connection.', Error::DB_ERROR, $e);
 			}
 		}
-		//No DB = Bad
-		if(!($this->db instanceof mysqli))
+		if(!($this->connection instanceof Connection))
 		{
-			throw new Exception('Unable to create database object', Staple_Error::DB_ERROR);
+			throw new QueryException('Unable to create database object', Error::DB_ERROR);
 		}
 		
 		foreach($queries as $q)
 		{
-			if($q instanceof Staple_Query_Select)
+			if($q instanceof Select)
 			{
 				$this->addQuery($q);
 			}
@@ -102,15 +107,22 @@ class Staple_Query_Union
 	 */
 	public function __toString()
 	{
-		return $this->build();
+		try
+		{
+			return $this->build();
+		}
+		catch(QueryException $e)
+		{
+			return 'A query exception occurred when building the query string.';
+		}
 	}
 	
 	/**
-	 * @return mysqli $db
+	 * @return Connection $db
 	 */
 	public function getDb()
 	{
-		return $this->db;
+		return $this->connection;
 	}
 	
 	/**
@@ -130,7 +142,7 @@ class Staple_Query_Union
 		return $this->order;
 	}
 	/**
-	 * @return the $limit
+	 * @return Pager | int $limit
 	 */
 	public function getLimit()
 	{
@@ -138,7 +150,7 @@ class Staple_Query_Union
 	}
 
 	/**
-	 * @return the $limitOffset
+	 * @return int $limitOffset
 	 */
 	public function getLimitOffset()
 	{
@@ -146,17 +158,41 @@ class Staple_Query_Union
 	}
 	
 	/**
-	 * @param mysqli $db
+	 * @param Connection $db
+	 * @return $this
 	 */
-	public function setDb(mysqli $db)
+	public function setDb(Connection $db)
 	{
-		$this->db = $db;
+		$this->connection = $db;
 		return $this;
 	}
+
+	/**
+	 * Retrieve the current connection.
+	 * @return Connection
+	 */
+	public function getConnection()
+	{
+		return $this->connection;
+	}
+
+	/**
+	 * Set the connection on the Union object.
+	 * @param Connection $connection
+	 * @return $this
+	 */
+	public function setConnection($connection)
+	{
+		$this->connection = $connection;
+		return $this;
+	}
+
+
 	
 	/**
 	 * Set the UNION flag.
 	 * @param string $flag
+	 * @return $this
 	 */
 	public function setFlag($flag)
 	{
@@ -172,6 +208,8 @@ class Staple_Query_Union
 	
 	/**
 	 * Resets all of the columns in all the currently added queries to the specified column array.
+	 * @param Query[] $columns
+	 * @return $this
 	 */
 	public function setColumns(array $columns)
 	{
@@ -185,6 +223,7 @@ class Staple_Query_Union
 	/**
 	 * Set the order.
 	 * @param string | array $order
+	 * @return $this
 	 */
 	public function setOrder($order)
 	{
@@ -194,17 +233,17 @@ class Staple_Query_Union
 
 	/**
 	 * @param int $limit
-	 * @return Staple_Query_Select
+	 * @return Select
 	 */
 	public function setLimit($limit)
 	{
-		$this->limit = (int)$limit;
+		$this->limit = $limit;
 		return $this;
 	}
 	
 	/**
 	 * @param int $limitOffset
-	 * @return Staple_Query_Select
+	 * @return Select
 	 */
 	public function setLimitOffset($limitOffset)
 	{
@@ -214,9 +253,10 @@ class Staple_Query_Union
 	
 	/**
 	 * Add a query to the UNION
-	 * @param Staple_Query_Select $query
+	 * @param Select $query
+	 * @return $this
 	 */
-	public function addQuery(Staple_Query_Select $query)
+	public function addQuery(Select $query)
 	{
 		$this->queries[] = $query;
 		return $this;
@@ -224,9 +264,10 @@ class Staple_Query_Union
 	
 	/**
 	 * Remove a query from the UNION
-	 * @param Staple_Query_Select $query
+	 * @param Select $query
+	 * @return $this
 	 */
-	public function removeQuery(Staple_Query_Select $query)
+	public function removeQuery(Select $query)
 	{
 		if(($key = array_search($query, $this->queries, true)) !== false)
 		{
@@ -234,29 +275,68 @@ class Staple_Query_Union
 		}
 		return $this;
 	}
-	
+
+	/**
+	 * Build the Query
+	 * @return string
+	 * @throws QueryException
+	 */
 	function build()
 	{
-		$stmt = '';
+		$stmt = 'SELECT ';
 		if(count($this->queries) <= 0)
 		{
-			return 'SELECT 0 FROM (SELECT 0) AS `a` WHERE 1=0';
+			throw new QueryException('No queries were supplied to union.');
 		}
 		elseif(count($this->queries) == 1)
 		{
-			$stmt .= 'SELECT * FROM ('.implode('', $this->queries).') AS `stapleunion` ';
+			//Render the union statement into a sub-select statement when only one query is attached.
+			$stmt .= '* FROM ('.implode('', $this->queries).')';
+
+			//Switch the method based on database driver of the current connection
+			switch($this->getConnection()->getDriver())
+			{
+				case Connection::DRIVER_MYSQL:
+					$stmt .= " AS `stapleunion`";
+					break;
+				default:
+					$stmt .= " AS stapleunion";
+			}
 		}
 		else
 		{
+			//SQL Server Limit - when offset is zero
+			if($this->getLimit() > 0
+				&& $this->getLimitOffset() == 0
+				&& $this->getConnection()->getDriver() == Connection::DRIVER_SQLSRV)
+			{
+				$stmt .= 'TOP ' . $this->getLimit();
+			}
+
+			//Start the union as a sub-query.
+			$stmt .=  '* FROM (';
+
+			//Union the statements together with optional flags
 			if(isset($this->flag))
 			{
-				$glue = ")\nUNION {$this->flag} \n(";
+				$glue = "\nUNION {$this->flag} \n";
 			}
 			else
 			{
-				$glue = ")\nUNION \n(";
+				$glue = "\nUNION \n";
 			}
-			$stmt .= '('.implode($glue, $this->queries).')';
+			$stmt .= implode($glue, $this->queries);
+			$stmt .= ')';
+
+			//Switch the method based on database driver of the current connection
+			switch($this->getConnection()->getDriver())
+			{
+				case Connection::DRIVER_MYSQL:
+					$stmt .= " AS `stapleunion`";
+					break;
+				default:
+					$stmt .= " AS stapleunion";
+			}
 		}
 		
 		//ORDER CLAUSE
@@ -271,15 +351,31 @@ class Staple_Query_Union
 			{
 				$stmt .= $this->order;
 			}
+
+			//SQL Server 2012 Pagination
+			if($this->getConnection()->getDriver() == Connection::DRIVER_SQLSRV)
+			{
+				if (isset($this->limit) && !isset($sql2005limit) && $this->getLimitOffset() != 0)
+				{
+					//Offset
+					$stmt .= "\nOFFSET " . $this->getLimitOffset(). ' ROWS ';
+
+					//Limit
+					$stmt .= ' FETCH NEXT ' . $this->getLimit(). ' ROWS ';
+				}
+			}
 		}
 		
 		//LIMIT CLAUSE
-		if(isset($this->limit))
+		if($this->getConnection()->getDriver() == Connection::DRIVER_MYSQL)
 		{
-			$stmt .= "\nLIMIT ".$this->getLimit();
-			if(isset($this->limitOffset))
+			if (isset($this->limit))
 			{
-				$stmt .= ' OFFSET '.$this->limitOffset;
+				$stmt .= "\nLIMIT " . $this->getLimit();
+				if (isset($this->limitOffset))
+				{
+					$stmt .= ' OFFSET ' . $this->limitOffset;
+				}
 			}
 		}
 		
@@ -297,12 +393,13 @@ class Staple_Query_Union
 	
 	/**
 	 * Sets the limit and the offset in one function.
-	 * @param int | Staple_Pager $limit
+	 * @param int | Pager $limit
 	 * @param int $offset
+	 * @return $this
 	 */
 	public function limit($limit,$offset = NULL)
 	{
-		if($limit instanceof Staple_Pager)
+		if($limit instanceof Pager)
 		{
 			$this->setLimit($limit->getItemsPerPage());
 			$this->setLimitOffset($limit->getStartingItem());
@@ -318,32 +415,30 @@ class Staple_Query_Union
 	
 	/**
 	 * Executes the query.
-	 * @return mysqli_result | bool
+	 * @throws QueryException
+	 * @return Statement | bool
 	 */
-	public function Execute()
+	public function execute()
 	{
-		if($this->db instanceof mysqli)
+		if($this->connection instanceof Connection)
 		{
-			return $this->db->query($this->build());
+			return $this->connection->query($this->build());
 		}
 		else
 		{
 			try 
 			{
-				$this->db = Staple_DB::get();
+				$this->db = Connection::get();
 			}
 			catch (Exception $e)
 			{
-				//@todo try for a default connection if no staple connection
-				throw new Exception('No Database Connection', Staple_Error::DB_ERROR);
+				throw new QueryException('No Database Connection', Error::DB_ERROR);
 			}
-			if($this->db instanceof mysqli)
+			if($this->connection instanceof Connection)
 			{
-				return $this->db->query($this->build());
+				return $this->connection->query($this->build());
 			}
 		}
 		return false;
 	}
 }
-
-?>

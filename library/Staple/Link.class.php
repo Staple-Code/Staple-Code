@@ -4,7 +4,7 @@
  * This class manages url links between controllers and actions.
  * 
  * @author Ironpilot
- * @copyright Copywrite (c) 2011, STAPLE CODE
+ * @copyright Copyright (c) 2011, STAPLE CODE
  * 
  * This file is part of the STAPLE Framework.
  * 
@@ -21,7 +21,11 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Link
+namespace Staple;
+
+use \Exception;
+
+class Link
 {
 	protected $link;
 	
@@ -42,7 +46,7 @@ class Staple_Link
 		return $this->link;
 	}
 	
-	public static function Create($route, array $get = array())
+	public static function create($route, array $get = array())
 	{
 		return new static($route, $get);
 	}
@@ -55,15 +59,16 @@ class Staple_Link
 	 * 
 	 * @param mixed $route
 	 * @param array $get
+	 * @throws Exception
 	 * @return string
 	 */
 	public static function get($route, array $get = array())
 	{
 		//Convert Get array to get string.
-		$getString = self::getArraytoString($get);
+		$getString = self::getArrayToString($get);
 		
 		//Set the link base
-		$base = Staple_Config::getValue('application', 'public_location');
+		$base = Config::getValue('application', 'public_location');
 		
 		//Is the link an array or a string?
 		if(!is_array($route))
@@ -73,20 +78,13 @@ class Staple_Link
 		}
 		else
 		{
-			//Process and Controller/Action/Parameter route
-			
-			//Setup the default link and the case-insensitive replacements.
-			$link = '#';
-			
-			
-			
 			//Count the route elements
-			$routesize = count($route);
-			if($routesize == 0)
+			$routeSize = count($route);
+			if($routeSize == 0)
 			{
 				$link = $base;			//An empty array returns a base link.
 			}
-			elseif($routesize == 1)
+			elseif($routeSize == 1)
 			{
 				if(ctype_alnum((string)$route[0]))
 				{
@@ -103,7 +101,7 @@ class Staple_Link
 				}
 				else
 				{
-					throw new Exception('Bad Link',Staple_Error::LINK_ERROR);
+					throw new Exception('Bad Link',Error::LINK_ERROR);
 				}
 			}
 			else
@@ -133,22 +131,22 @@ class Staple_Link
 					{
 						if(count($params) > 0)
 						{
-							$paramstring = '/'.implode('/', $params);
+							$paramString = '/'.implode('/', $params);
 						}
 						else
 						{
-							$paramstring = '';
+							$paramString = '';
 						}
 						//Convert action to case-insensitive value
 						$controller = self::urlCase($controller);
 						$action = self::urlCase($action);
 						
-						$link = $base.$controller.'/'.$action.$paramstring;
+						$link = $base.$controller.'/'.$action.$paramString;
 					}
 				}
 				else
 				{
-					throw new Exception('Bad Link',Staple_Error::LINK_ERROR);
+					throw new Exception('Bad Link',Error::LINK_ERROR);
 				}
 			}
 		}
@@ -186,12 +184,12 @@ class Staple_Link
 	}
 	
 	/**
-	 * Converts a get array key/value pairset to a get string.
+	 * Converts a get array key/value pair set to a get string.
 	 * 
 	 * @param array $get
 	 * @return string
 	 */
-	public static function getArraytoString(array $get)
+	public static function getArrayToString(array $get)
 	{
 		$getString = '';
 		foreach($get as $gkey=>$gvalue)

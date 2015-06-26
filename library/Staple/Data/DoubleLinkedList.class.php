@@ -5,7 +5,7 @@
  * the list is compressed and all subsequent keys are reset.
  * 
  * @author Ironpilot
- * @copyright Copywrite (c) 2011, STAPLE CODE
+ * @copyright Copyright (c) 2011, STAPLE CODE
  * 
  * This file is part of the STAPLE Framework.
  * 
@@ -22,8 +22,11 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
+namespace Staple\Data;
 
-class Staple_Data_DoubleLinkedList implements Iterator, Countable, ArrayAccess
+use \Exception;
+
+class DoubleLinkedList implements \Iterator, \Countable, \ArrayAccess
 {
 	/**
 	 * Pointer to the starting list node
@@ -159,7 +162,7 @@ class Staple_Data_DoubleLinkedList implements Iterator, Countable, ArrayAccess
 	public function offsetSet($offset, $value)
 	{
 		$item = $this->findItemByKey($offset);
-		if($item instanceof Staple_Data_LinkedListNodeDouble)
+		if($item instanceof LinkedListNodeDouble)
 		{
 			$item->setData($value);
 		}
@@ -188,7 +191,7 @@ class Staple_Data_DoubleLinkedList implements Iterator, Countable, ArrayAccess
 	 * Add a node to the beginning of the list.
 	 * @param mixed $data
 	 */
-	public function addBefore($data, Staple_Data_LinkedListNodeDouble $beforeNode)
+	public function addBefore($data, LinkedListNodeDouble $beforeNode)
 	{
 		if($this->is_empty())
 		{
@@ -197,7 +200,7 @@ class Staple_Data_DoubleLinkedList implements Iterator, Countable, ArrayAccess
 		else
 		{
 			//Create the new node and insert it into the list.
-			$new = new Staple_Data_LinkedListNodeDouble($data,$beforeNode, $beforeNode->prev);
+			$new = new LinkedListNodeDouble($data,$beforeNode, $beforeNode->prev);
 			
 			//Set the Surrounding Nodes
 			if($beforeNode->prev != NULL)
@@ -226,11 +229,11 @@ class Staple_Data_DoubleLinkedList implements Iterator, Countable, ArrayAccess
 	{
 		if($this->is_empty())
 		{
-			$this->first = $this->last = new Staple_Data_LinkedListNodeDouble($data);
+			$this->first = $this->last = new LinkedListNodeDouble($data);
 		}
 		else
 		{
-			$new = new Staple_Data_LinkedListNodeDouble($data,$this->first);
+			$new = new LinkedListNodeDouble($data,$this->first);
 			$this->first = $new;
 		}
 		
@@ -252,11 +255,11 @@ class Staple_Data_DoubleLinkedList implements Iterator, Countable, ArrayAccess
 		//Adds a node to the end of the list.
 		if($this->is_empty())
 		{
-			$this->first = $this->last = new Staple_Data_LinkedListNodeDouble($data);
+			$this->first = $this->last = new LinkedListNodeDouble($data);
 		}
 		else
 		{
-			$new = new Staple_Data_LinkedListNodeDouble($data);
+			$new = new LinkedListNodeDouble($data);
 			$new->prev = $this->last;
 			$this->last->next = $new;
 			$this->last = $new;
@@ -284,7 +287,7 @@ class Staple_Data_DoubleLinkedList implements Iterator, Countable, ArrayAccess
 	 * @param Staple_Data_LinkedListNodeDouble $node
 	 * @return boolean|Ambigous <the, mixed>
 	 */
-	public function removeNode(Staple_Data_LinkedListNodeDouble $node)
+	public function removeNode(LinkedListNodeDouble $node)
 	{
 		if($this->is_empty())
 		{
@@ -529,32 +532,14 @@ class Staple_Data_DoubleLinkedList implements Iterator, Countable, ArrayAccess
 	}
 	
 	/**
-	 * An internal troubleshooting test to see if the list is sizing correctly
-	 * @todo remove this function
-	 * @deprecated
-	 */
-	private function check_size()
-	{
-		echo "List thinks it is {$this->size} item(s) long.<br>";
-		$newSize = 0;
-		$current = $this->first;
-		while($current != null)
-		{
-			$newSize++;
-			$current = $current->next;
-		}
-		echo "List currently contains $newSize node(s)";
-	}
-	
-	/**
 	 * Returns the key for a specified node
 	 * @param Staple_Data_LinkedListNodeDouble $item
 	 */
-	private function findKey(Staple_Data_LinkedListNodeDouble $item)
+	private function findKey(LinkedListNodeDouble $item)
 	{
 		$counter = 0;
 		$current = $this->first;
-		while($item !== $current && $current instanceof Staple_Data_LinkedListNodeDouble)
+		while($item !== $current && $current instanceof LinkedListNodeDouble)
 		{
 			$current = $current->getNext();
 			$counter++;

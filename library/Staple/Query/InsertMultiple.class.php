@@ -1,11 +1,32 @@
 <?php
-
-/** 
+/**
+ * A class for creating SQL Multi-INSERT statements.
+ *
  * @author Ironpilot
- * 
- * 
+ * @copyright Copyright (c) 2011, STAPLE CODE
+ *
+ * This file is part of the STAPLE Framework.
+ *
+ * The STAPLE Framework is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your option)
+ * any later version.
+ *
+ * The STAPLE Framework is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Query_InsertMultiple extends Staple_Query_Insert
+namespace Staple\Query;
+
+use \Staple\Exception\QueryException;
+use \Exception;
+use \Staple\Error;
+
+class InsertMultiple extends Insert
 {
 	/**
 	 * The data to insert. May be a Select Statement Object or an array of DataSets
@@ -22,31 +43,30 @@ class Staple_Query_InsertMultiple extends Staple_Query_Insert
 	 * Query to insert multiple rows
 	 * @param string $table
 	 * @param array $columns
-	 * @param mysqli $db
-	 * @param unknown_type $priority
-	 * @throws Exception
+	 * @param Connection $db
+	 * @param string $priority
+	 * @throws QueryException
 	 */
-	public function __construct($table = NULL, array $columns = NULL, $db = NULL, $priority = NULL)
-	{	
+	public function __construct($table = NULL, array $columns = NULL, Connection $db = NULL, $priority = NULL)
+	{
 		//Process Database connection
-		if($db instanceof mysqli)
+		if($db instanceof Connection)
 		{
-			$this->setDb($db);
+			$this->setConnection($db);
 		}
 		else
 		{
 			try {
-				$this->setDb(Staple_DB::get());
+				$this->setConnection(Connection::get());
 			}
 			catch (Exception $e)
 			{
-				$this->setDb(new mysqli());
+				throw new QueryException('Unable to find a database connection.', Error::DB_ERROR, $e);
 			}
 		}
-		//No DB = Bad
-		if(!($this->db instanceof mysqli))
+		if(!($this->connection instanceof Connection))
 		{
-			throw new Exception('Unable to create database object', Staple_Error::DB_ERROR);
+			throw new QueryException('Unable to create database object', Error::DB_ERROR);
 		}
 		
 		//Set Table
@@ -92,7 +112,7 @@ class Staple_Query_InsertMultiple extends Staple_Query_Insert
 		$rows = array();
 		foreach($this->data as $dataset)
 		{
-			if($dataset instanceof Staple_Query_DataSet)
+			if($dataset instanceof DataSet)
 			{
 				$rows[] = trim($dataset->getInsertMultipleString());
 			}
@@ -127,14 +147,16 @@ class Staple_Query_InsertMultiple extends Staple_Query_Insert
 	}
 	
 	/**
-	 * Adds a dataset to the object
-	 * @param Staple_Query_DataSet $row
+	 * Adds a data set to the object
+	 * @param DataSet $row
+	 * @throws QueryException
+	 * @return $this
 	 */
-	public function addRow(Staple_Query_DataSet $row)
+	public function addRow(DataSet $row)
 	{
 		if(count($row->getColumns()) != count($this->columns))
 		{
-			throw new Exception('DataSet row count does not match the count for this object');
+			throw new QueryException('DataSet row count does not match the count for this object');
 		}
 		else
 		{
@@ -146,7 +168,7 @@ class Staple_Query_InsertMultiple extends Staple_Query_Insert
 	//------------------------------------------------GETTERS AND SETTERS------------------------------------------------//
 	
 	/**
-	 * @return the $columns
+	 * @return array $columns
 	 */
 	public function getColumns()
 	{
@@ -154,6 +176,7 @@ class Staple_Query_InsertMultiple extends Staple_Query_Insert
 	}
 	/**
 	 * @param array[string] $columns
+	 * @return $this
 	 */
 	public function setColumns(array $columns)
 	{
@@ -163,22 +186,26 @@ class Staple_Query_InsertMultiple extends Staple_Query_Insert
 	
 	/**
 	 * Overides the original setter to verify that the dataset is inserted with proper specifications. 
-	 * @param array[Staple_Query_DataSet] $data
-	 * @return Staple_Query_InsertMultiple
+	 * @param array[DataSet] $data
+	 * @throws QueryException
+	 * @return $this
 	 */
 	public function setData(array $data)
 	{
 		//Check all the array values
 		foreach ($data as $row)
 		{
-			if(!($row instanceof Staple_Query_DataSet))
+			if(!($row instanceof DataSet))
 			{
-				throw new Exception('To set the data for this object, the submission must be an array of Staple_Query_DataSet objects.', Staple_Error::APPLICATION_ERROR);
+				throw new QueryException('To set the data for this object, the submission must be an array of Staple_Query_DataSet objects.', Error::APPLICATION_ERROR);
+			}
+			else
+			{
+				//Sync the dataSet with the current query's connection.
+				$row->setConnection($this->getConnection());
 			}
 		}
 		$this->data = $data;
 		return $this;
 	}
 }
-
-?>

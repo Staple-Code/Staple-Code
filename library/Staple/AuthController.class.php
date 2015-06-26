@@ -3,7 +3,7 @@
  * This is a template file for the program's AuthController.
  * 
  * @author Ironpilot
- * @copyright Copywrite (c) 2011, STAPLE CODE
+ * @copyright Copyright (c) 2011, STAPLE CODE
  * 
  * This file is part of the STAPLE Framework.
  * 
@@ -21,7 +21,9 @@
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-abstract class Staple_AuthController extends Staple_Controller
+namespace Staple;
+
+abstract class AuthController extends Controller
 {
 	public function _start()
 	{

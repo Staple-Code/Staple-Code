@@ -3,7 +3,7 @@
  * 
  * This class is the central class for site-wide authentication.
  * @author Ironpilot
- * @copyright Copywrite (c) 2011, STAPLE CODE
+ * @copyright Copyright (c) 2011, STAPLE CODE
  * 
  * This file is part of the STAPLE Framework.
  * 
@@ -21,12 +21,20 @@
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-class Staple_Auth
+namespace Staple;
+
+use \Exception;
+use \ReflectionMethod;
+use \ReflectionClass;
+use Staple\Exception\PageNotFoundException;
+use Staple\Exception\AuthException;
+
+class Auth
 {
 	/**
 	 * 
 	 * Holds the singleton instance for the Auth class
-	 * @var Staple_Auth
+	 * @var Auth
 	 */
 	private static $instance;
 	
@@ -35,12 +43,12 @@ class Staple_Auth
 	 * Holds the user identifier.
 	 * @var int | string
 	 */
-	private $userid = NULL;
+	private $userId = NULL;
 	
 	/**
 	 * 
 	 * Holds a reference to the AuthAdapter object.
-	 * @var Staple_AuthAdapter
+	 * @var AuthAdapter
 	 */
 	private $adapter;
 	
@@ -101,7 +109,7 @@ class Staple_Auth
 		}
 		else
 		{
-			throw new Exception('Authentication Module Failure', Staple_Error::AUTH_ERROR);
+			throw new Exception('Authentication Module Failure', Error::AUTH_ERROR);
 		}
 	}
 	
@@ -129,7 +137,7 @@ class Staple_Auth
 		{
 			if(!array_key_exists($keyval, $conf))
 			{
-				throw new Exception('Authentication Module Configuration Error',Staple_Error::AUTH_ERROR);
+				throw new Exception('Authentication Module Configuration Error',Error::AUTH_ERROR);
 			}
 		}
 		return true;
@@ -139,17 +147,17 @@ class Staple_Auth
 	 * 
 	 * Gets the singleton instance of the object. Checks the session to see if a current auth
 	 * object already exists. If not a new Auth object is created.
-	 * @return Staple_Auth
+	 * @return Auth
 	 */
 	public static function get()
 	{			
-		if(!(self::$instance instanceof Staple_Auth))
+		if(!(self::$instance instanceof Auth))
 		{
 			if(array_key_exists('Staple', $_SESSION))
 				if(array_key_exists('auth', $_SESSION['Staple']))
 					self::$instance = $_SESSION['Staple']['auth'];
-			if(!(self::$instance instanceof Staple_Auth))
-				self::$instance = new Staple_Auth();
+			if(!(self::$instance instanceof Auth))
+				self::$instance = new Auth();
 		}
 		return self::$instance;
 	}
@@ -182,7 +190,7 @@ class Staple_Auth
 	 */
 	public function getAuthId()
 	{
-		return $this->userid;
+		return $this->userId;
 	}
 	
 	/**
@@ -197,13 +205,13 @@ class Staple_Auth
 	public function doAuth(array $credentials)
 	{
 		//Make sure an adapter is loaded.
-		if(!($this->adapter instanceof Staple_AuthAdapter))
+		if(!($this->adapter instanceof AuthAdapter))
 		{
 			$adapt = $this->_settings['adapter'];
 			$this->adapter = new $adapt();
-			if(!($this->adapter instanceof Staple_AuthAdapter))
+			if(!($this->adapter instanceof AuthAdapter))
 			{
-				throw new Exception('Invalid Authentication Adapter', Staple_Error::AUTH_ERROR);
+				throw new Exception('Invalid Authentication Adapter', Error::AUTH_ERROR);
 			}
 		}
 		
@@ -212,15 +220,15 @@ class Staple_Auth
 		{
 			session_regenerate_id();
 			$this->authed = true;
-			$this->userid = $this->adapter->getUserId();
-			$this->authLevel = $this->adapter->getLevel($this->userid);
+			$this->userId = $this->adapter->getUserId();
+			$this->authLevel = $this->adapter->getLevel($this->userId);
 			$this->message = "Authentication Successful";
 			return true;
 		}
 		else
 		{
 			$this->authed = false;
-			$this->userid = null;
+			$this->userId = null;
 			$this->authLevel = 0;
 			$this->message = "Authentication Failed";
 		}
@@ -230,10 +238,13 @@ class Staple_Auth
 	/**
 	 * In the event that authorization fails, this method is called by the framework. noAuth() 
 	 * dispatches to the AuthController -> index action.
+	 * This method accepts an optional route parameter that can be sent forward to the auth controller
+	 * which will allow the developer to react to the route that was requested.
+	 * @param Route $attemptedRoute
 	 */
-	public function noAuth()
+	public function noAuth($attemptedRoute = NULL)
 	{
-		$this->dispatchAuthController();
+		$this->dispatchAuthController($attemptedRoute);
 	}
 	
 	/**
@@ -242,7 +253,7 @@ class Staple_Auth
 	 */
 	public function clearAuth()
 	{
-		$this->userid = NULL;
+		$this->userId = NULL;
 		$this->authed = false;
 		$this->authLevel = 0;
 		$this->message = 'Logged Out';
@@ -262,55 +273,137 @@ class Staple_Auth
 	 * 
 	 * Dispatches to the AuthController -> index action. Throws an Exception if the controller does
 	 * not extend Staple_AuthController.
+	 * @param Route $previousRoute
 	 * @throws Exception
 	 */
-	private function dispatchAuthController()
+	private function dispatchAuthController($previousRoute = NULL)
 	{
-		$conString = $this->_settings['controller'];
-		$class = substr($conString, 0, strlen($conString)-10);
-		$authCon = Staple_Main::getController($class);
-		if(!($authCon instanceof Staple_AuthController))
+		//Get and Construct the Auth Controller
+		$controllerClass = Config::getValue('auth','controller'); //$this->_settings['controller'];
+		$class = substr($controllerClass, 0, strlen($controllerClass)-10);
+
+		//Setup the action to call
+		$action = (strlen(Config::getValue('auth', 'action', false)) > 0) ? Config::getValue('auth', 'action', false) : 'index';
+
+		//Check for the controller existence
+		if(class_exists($controllerClass))
 		{
-			$authCon = new $conString();
-		}
-		if($authCon instanceof Staple_AuthController)
-		{
-			//Start the Controller
-			$authCon->_start();
-			
-			//Register Auth Controller with the Front Controller
-			Staple_Main::get()->registerController($authCon);
-			
-			//Set the view's controller to match the route
-			$authCon->view->setController($class);
-			
-			//Set the view's action to match the route
-			$authCon->view->setView('index');
-			
-			//Call the controller action, Send the route requested to the action
-			//@todo Add option to customize the controller action
-			call_user_func_array(array($authCon,'index'), array(Staple_Main::getRoute()));
-			
-			//Grab the buffer contents from the controller and post it after the header.
-			$buffer = ob_get_contents();
-			ob_clean();
-			
-			//Process the header
-			Staple_Main::get()->processHeader();
-			
-			if($authCon->layout instanceof Staple_Layout)
+			//Check for the action existence
+			if (method_exists($controllerClass, $action))
 			{
-				$authCon->layout->build($buffer);
-			}
-			else
-			{
-				echo $buffer;
-				$authCon->view->build();
+				//Create and Start the Auth Controller
+				$controller = new $controllerClass();
+				$controller->_start();
+
+				//Register the controller with the front controller
+				Main::controller($controllerClass);
+
+				//If the controller
+				//@todo Add support for AuthProviders here as well
+				if ($controller instanceof AuthController)
+				{
+					//Set the view's controller to match the route
+					$controller->view->setController($class);
+
+					//Set the view's action to match the route
+					$controller->view->setView($action);
+
+					//Call the controller action
+					$actionMethod = new ReflectionMethod($controller, $action);
+					$return = $actionMethod->invokeArgs($controller, array($previousRoute));
+
+					if ($return instanceof View)        //Check for a returned View object
+					{
+						//If the view does not have a controller name set, set it to the currently executing controller.
+						if ($return->hasController() == false)
+						{
+							$loader = Main::get()->getLoader();
+							$conString = get_class($controller);
+
+							$return->setController(substr($conString, 0, strlen($conString) - strlen($loader::CONTROLLER_SUFFIX)));
+						}
+
+						//Check for a controller layout and build it.
+						if ($controller->layout instanceof Layout)
+						{
+							$controller->layout->build(NULL, $return);
+						}
+						else
+						{
+							$return->build();
+						}
+
+						//The view has been built return true
+						return true;
+					}
+					elseif ($return instanceof Json)    //Check for a Json object to be coverted and echoed.
+					{
+						echo json_encode($return);
+
+						//JSON echoed return true
+						return true;
+					}
+					elseif (is_object($return))        //Check for another object type
+					{
+						//If the object is stringable, covert it to a string and output it.
+						$class = new ReflectionClass($return);
+						if ($class->implementsInterface('JsonSerializable'))
+						{
+							echo json_encode($return);
+
+							//Object successfully converted to JSON
+							return true;
+						}
+						//If the object is stringable, covert to a string and output it.
+						elseif ((!is_array($return)) &&
+							((!is_object($return) && settype($return, 'string') !== false) ||
+								(is_object($return) && method_exists($return, '__toString'))))
+						{
+							echo (string)$return;
+
+							//Object stringified successfully
+							return true;
+						}
+						//If nothing else works, echo the object through the dump method.
+						else
+						{
+							Dev::Dump($return);
+
+							//Object was dumped to the browser
+							return true;
+						}
+					}
+					elseif (is_string($return))        //If the return value was simply a string, echo it out.
+					{
+						echo $return;
+
+						//String sent to the browser
+						return true;
+					}
+					else
+					{
+						//Fall back to previous functionality by rendering views and layouts.
+						if ($controller->layout instanceof Layout)
+						{
+							$controller->layout->build();
+						}
+						else
+						{
+							$controller->view->build();
+						}
+
+						//The legacy view has been built return true
+						return true;
+					}
+				}
+				else
+				{
+					throw new AuthException('Fatal Error connecting to Auth Controller', Error::AUTH_ERROR);
+				}
 			}
 		}
-		else
-		{
-			throw new Exception('Fatal Error connecting to Auth Controller', Staple_Error::AUTH_ERROR);
-		}
+
+		//Throw an exception if the auth page cannot be found
+		throw new PageNotFoundException('Page Not Found.', Error::PAGE_NOT_FOUND);
 	}
 }

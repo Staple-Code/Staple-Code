@@ -3,7 +3,7 @@
  * Text element for use on forms.
  * 
  * @author Ironpilot
- * @copyright Copywrite (c) 2011, STAPLE CODE
+ * @copyright Copyright (c) 2011, STAPLE CODE
  * 
  * This file is part of the STAPLE Framework.
  * 
@@ -21,7 +21,11 @@
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Staple_Form_TextElement extends Staple_Form_Element
+namespace Staple\Form;
+
+use Staple;
+
+class TextElement extends FieldElement
 {
 	/**
 	 * Size of the text field.
@@ -35,7 +39,7 @@ class Staple_Form_TextElement extends Staple_Form_Element
 	protected $max;
 	
 	/**
-	 * @return the $size
+	 * @return int $size
 	 */
 	public function getSize()
 	{
@@ -43,7 +47,7 @@ class Staple_Form_TextElement extends Staple_Form_Element
 	}
 
 	/**
-	 * @return the $max
+	 * @return int $max
 	 */
 	public function getMax()
 	{
@@ -75,7 +79,7 @@ class Staple_Form_TextElement extends Staple_Form_Element
 	 */
 	public function label()
 	{
-		return '	<label for="'.$this->escape($this->id).'"'.$this->getClassString().'>'.$this->label."</label>\n";
+		return '	<label for="'.$this->escape($this->id).'"'.$this->getClassString('label').'>'.$this->label."</label>\n";
 	}
 
 	/**
@@ -95,30 +99,39 @@ class Staple_Form_TextElement extends Staple_Form_Element
 		{
 			$max = ' maxlength="'.((int)$this->max).'"';
 		}
-		return '	<input type="text" id="'.$this->escape($this->id).'" name="'.$this->escape($this->name).'" value="'.$this->escape($this->value).'"'.$size.$max.$this->getAttribString().'>'."\n";
+		return '	<input type="text" id="'.$this->escape($this->id).'" name="'.$this->escape($this->name).'" value="'.$this->escape($this->value).'"'.$size.$max.$this->getAttribString('input').'>'."\n";
 	}
+
+	/*
+	 * @todo add method to add custom field view
+	 */
 
 	/**
 	 * Build the form field.
 	 * @see Staple_Form_Element::build()
 	 * @return string
 	 */
-	public function build()
+	public function build($fieldView = NULL)
 	{
 		$buf = '';
 		$view = FORMS_ROOT.'/fields/TextElement.phtml';
 		if(file_exists($view))
 		{
+			//@todo use the custom view
 			ob_start();
 			include $view;
 			$buf = ob_get_contents();
 			ob_end_clean();
 		}
+		elseif(isset($this->viewAdapter))
+		{
+			//@todo utilize the viewAdapter
+		}
 		else
 		{
 			$this->addClass('form_element');
 			$this->addClass('element_text');
-			$classes = $this->getClassString();
+			$classes = $this->getClassString('div');
 			$buf .= "<div$classes id=\"".$this->escape($this->id)."_element\">\n";
 			$buf .= $this->label();
 			$buf .= $this->field();

@@ -3,7 +3,7 @@
  * A container to reference config settings without having to re-read the config file.
  * 
  * @author Ironpilot
- * @copyright Copywrite (c) 2011, STAPLE CODE
+ * @copyright Copyright (c) 2011, STAPLE CODE
  * 
  * This file is part of the STAPLE Framework.
  * 
@@ -20,32 +20,72 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Config extends Staple_Registry
+namespace Staple;
+
+use \Exception;
+use \Staple\Exception\ConfigurationException;
+use \stdClass;
+
+/**
+* Added to include Singleton Trait once so Config class will load with out autoloader being started.
+*/
+require_once STAPLE_ROOT.'Traits'.DIRECTORY_SEPARATOR.'Singleton.trait.php';
+require_once STAPLE_ROOT.'Exception'.DIRECTORY_SEPARATOR.'ConfigurationException.class.php';
+
+class Config
 {
-	protected static $read = false;
+	use \Staple\Traits\Singleton;
+	
+	/**
+	 * Variable to specify whether the config has already been read from the filesystem.
+	 * @var boolean
+	 */
+	protected $read = false;
+	
+	/**
+	 * The name of the configset to load.
+	 * @var string
+	 */
+	protected $configSet = 'application';
+	
+	/**
+	 * The configuration set store.
+	 * @var array
+	 */
+	protected $store = array();
 	
 	/**
 	 * Disable construction of this object.
 	 */
-	private function __construct(){}
+	public function __construct($configName = NULL)
+	{
+		$this->read = false;
+		if(isset($configName))
+			$this->setConfigSet($configName);
+		$this->read();
+	}
 	
 	/**
 	 * Get a config set by header.
 	 * @param string $name
+	 * @throws ConfigurationException
+	 * @return mixed
 	 */
 	public function __get($name)
 	{
-		if(!self::$read)
+		if(!$this->$read)
 		{
-			self::read();
+			$this->read();
 		}
-		if(array_key_exists($name, self::$store))
+		
+		//Check for the existence of
+		if(array_key_exists($name, $this->store))
 		{
-			return self::$store[$name];
+			return $this->store[$name];
 		}
 		else
 		{
-			return array();
+			throw new ConfigurationException('Configuration value does not exist in the current scope.');
 		}
 	}
 	
@@ -55,27 +95,48 @@ class Staple_Config extends Staple_Registry
 	 */
 	public function __set($name,$value)
 	{
-		throw new Exception('Config changes are not allowed at execution', Staple_Error::APPLICATION_ERROR);
+		throw new ConfigurationException('Config changes are not allowed at execution',Error::APPLICATION_ERROR);
 	}
 	
 	/**
 	 * Get a config set by header.
+	 * @todo this doesn't really work as a static method and needs to be refactored.
 	 * @param string $name
+	 * @param bool $getAsObject
+	 * @throws ConfigurationException
 	 * @return array
 	 */
-	public static function get($name)
+	public static function get($name, $getAsObject = false)
 	{
-		if(!self::$read)
+		//Get the config instance
+		$inst = static::getInstance();
+		
+		//Check that the config file has been read.
+		if(!$inst->read)
 		{
-			self::read();
+			$inst->read();
 		}
-		if(array_key_exists($name, self::$store))
+		
+		//Look for the requested key in the data store.
+		if(array_key_exists($name, $inst->store))
 		{
-			return self::$store[$name];
+			if($getAsObject === true)
+			{
+				$object = new stdClass();
+				foreach ($inst->store[$name] as $key => $value)
+				{
+					$object->$key = $value;
+				}
+				return $object;
+			}
+			else
+			{
+				return $inst->store[$name];
+			}
 		}
 		else
 		{
-			return array();
+			throw new ConfigurationException('Configuration value does not exist in the current scope.');
 		}
 	}
 	
@@ -85,7 +146,7 @@ class Staple_Config extends Staple_Registry
 	 */
 	public static function getAll()
 	{
-		return self::$store;
+		return static::getInstance()->store;
 	}
 	
 	/**
@@ -93,39 +154,75 @@ class Staple_Config extends Staple_Registry
 	 * 
 	 * @param string $set
 	 * @param string $key
+	 * @param boolean $throwOnError
+	 * @throws ConfigurationException
 	 * @return mixed
 	 */
-	public static function getValue($set,$key)
+	public static function getValue($set,$key, $throwOnError = true)
 	{
-		if(!self::$read)
+		//Get the config instance
+		$inst = static::getInstance();
+		
+		//Check that the config file has been read.
+		if(!$inst->read)
 		{
-			self::read();
+			$inst->read();
 		}
-		if(array_key_exists($set, self::$store))
+		
+		//Look for the requested key in the data store.
+		if(array_key_exists($set, $inst->store))
 		{
-			if(array_key_exists($key, self::$store[$set]))
+			if(array_key_exists($key, $inst->store[$set]))
 			{
-				return self::$store[$set][$key];
+				return $inst->store[$set][$key];
 			}
 			else
 			{
-				return NULL;
+				if($throwOnError)
+					throw new ConfigurationException('Configuration value does not exist in the current scope.');
+				else
+					return null;
 			}
 		}
 		else
 		{
-			return NULL;
+			if($throwOnError)
+				throw new ConfigurationException('Configuration value does not exist in the current scope.');
+			else
+				return null;
 		}
 	}
-	
+
 	/**
-	 * Setting config values during runtime are not allowed.
-	 * @throws Exception
+	 * Returns true or false if a configuration key exists, even if it is null.
+	 * @param $set
+	 * @param null $key
+	 * @return bool
 	 */
-	public static function set($name,$value,$storeInSession = false)
-	{
-		throw new Exception('Config changes are not allowed at execution', Staple_Error::APPLICATION_ERROR);
-	}
+    public static function exists($set,$key = null)
+    {
+        //Get the config instance
+        $inst = static::getInstance();
+
+        //Check that the config file has been read.
+        if(!$inst->read)
+        {
+            $inst->read();
+        }
+
+        //Look for the requested key in the data store.
+        if(array_key_exists($set, $inst->store))
+        {
+			if(is_null($key))
+				return true;
+            elseif(array_key_exists($key, $inst->store[$set]))
+				return true;
+            else
+            	return false;
+        }
+        else
+			return false;
+    }
 	
 	/**
 	 * Sets a configuration value at runtime. Returns a true or false on success or failure.
@@ -135,7 +232,7 @@ class Staple_Config extends Staple_Registry
 	 * @param mixed $value
 	 * @return bool
 	 */
-	public static function setValue($set,$key,$value)
+	/*public static function setValue($set,$key,$value)
 	{
 		if(!self::$read)
 		{
@@ -150,22 +247,42 @@ class Staple_Config extends Staple_Registry
 			}
 		}
 		return false;
-	}
-	
+	}*/
 	
 	/**
 	 * Read and store the application.ini config file.
 	 */
-	private static function read()
+	private function read()
 	{
-		if(defined('CONFIG_ROOT'))
+		if($this->read == false)
 		{
-			$settings = array();
-			if(file_exists(CONFIG_ROOT.'application.ini'))
+			if(defined('CONFIG_ROOT'))
 			{
-				self::$store = parse_ini_file(CONFIG_ROOT.'application.ini',true);
+				if(file_exists(CONFIG_ROOT.$this->getConfigSet().'.ini'))
+				{
+					$this->store = parse_ini_file(CONFIG_ROOT.$this->getConfigSet().'.ini',true);
+				}
 			}
+			$this->read = true;
 		}
-		self::$read = true;
 	}
+	
+	/**
+	 * @return string $configSet
+	 */
+	public function getConfigSet()
+	{
+		return $this->configSet;
+	}
+
+	/**
+	 * @param string $configSet
+	 * @return $this
+	 */
+	public function setConfigSet($configSet)
+	{
+		$this->configSet = $configSet;
+		return $this;
+	}
+
 }

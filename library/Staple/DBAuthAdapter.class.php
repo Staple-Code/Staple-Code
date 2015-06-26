@@ -12,7 +12,7 @@
  * rolefield - (optional) This field specifies the database table that holds the access level. If no field is provided or it is null, 1 will be returned.
  * 
  * @author Ironpilot
- * @copyright Copywrite (c) 2011, STAPLE CODE
+ * @copyright Copyright (c) 2011, STAPLE CODE
  * 
  * This file is part of the STAPLE Framework.
  * 
@@ -30,7 +30,11 @@
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-class Staple_DBAuthAdapter implements Staple_AuthAdapter
+namespace Staple;
+
+use \Exception;
+
+class DBAuthAdapter implements AuthAdapter
 {
 	/**
 	 * Settings Array
@@ -52,25 +56,13 @@ class Staple_DBAuthAdapter implements Staple_AuthAdapter
 	 */
 	public function __construct()
 	{
-		if(file_exists(CONFIG_ROOT.'application.ini'))
+		if($this->checkConfig(Config::get('auth')))
 		{
-			$curConfig = parse_ini_file(CONFIG_ROOT.'application.ini',true);
-			if($this->checkConfig($curConfig['auth']))
-			{
-				$this->_settings = $curConfig['auth'];
-			}
-		}
-		elseif(file_exists(CONFIG_ROOT.'auth.ini'))
-		{
-			$curConfig = parse_ini_file(CONFIG_ROOT.'auth.ini');
-			if($this->checkConfig($curConfig))
-			{
-				$this->_settings = $curConfig;
-			}
+			$this->_settings = Config::get('auth');
 		}
 		else
 		{
-			throw new Exception('Staple_DBAuthAdapter critical failure.',500);
+			throw new Exception('Staple_DBAuthAdapter critical failure.',Error::AUTH_ERROR);
 		}
 
 	}
@@ -87,7 +79,7 @@ class Staple_DBAuthAdapter implements Staple_AuthAdapter
 		{
 			if(array_key_exists('username', $cred) AND array_key_exists('password', $cred))
 			{
-				$db = Staple_DB::get();
+				$db = DB::get();
 				$this->uid = $cred['username'];
 				switch($this->_settings['pwenctype'])
 				{
@@ -135,7 +127,7 @@ class Staple_DBAuthAdapter implements Staple_AuthAdapter
 		{
 			if(array_key_exists('rolefield', $this->_settings))
 			{
-				$db = Staple_DB::get();
+				$db = DB::get();
 				$sql = 'SELECT '.$db->real_escape_string($this->_settings['rolefield']).' 
 						FROM '.$db->real_escape_string($this->_settings['authtable']).'
 						WHERE '.$db->real_escape_string($this->_settings['uidfield']).' = '.
@@ -180,12 +172,12 @@ class Staple_DBAuthAdapter implements Staple_AuthAdapter
 		{
 			if(!array_key_exists($value, $config))
 			{
-				throw new Exception('Staple_DBAuthAdapter configuration error.',Staple_Error::AUTH_ERROR);
+				throw new Exception('Staple_DBAuthAdapter configuration error.',Error::AUTH_ERROR);
 			}
 		}
 		if($config['adapter'] != get_class($this))
 		{
-			throw new Exception('Staple_DBAuthAdapter configuration error.',Staple_Error::AUTH_ERROR);
+			throw new Exception('Staple_DBAuthAdapter configuration error.',Error::AUTH_ERROR);
 		}
 		return true;
 	}
@@ -201,5 +193,3 @@ class Staple_DBAuthAdapter implements Staple_AuthAdapter
 	}
 
 }
-
-?>

@@ -1,4 +1,0 @@
-RewriteEngine On
-RewriteCond %{DOCUMENT_ROOT}/%{REQUEST_FILENAME} !-f
-RewriteCond %{DOCUMENT_ROOT}/%{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ index.php/$1 [PT,L,QSA]

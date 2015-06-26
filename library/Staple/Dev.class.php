@@ -4,7 +4,7 @@
  * A development class for troubleshooting
  * 
  * @author Ironpilot
- * @copyright Copywrite (c) 2011, STAPLE CODE
+ * @copyright Copyright (c) 2011, STAPLE CODE
  * 
  * This file is part of the STAPLE Framework.
  * 
@@ -22,18 +22,21 @@
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-class Staple_Dev
+namespace Staple;
+
+class Dev
 {
+	//Timer - @todo make this into it's own class.
 	protected static $timer;
 	
 	/**
 	 * This function takes multiple arguments and dumps them to the source code.
 	 */
-	public static function Dump()
+	public static function dump()
 	{
-		if(class_exists('Staple_Config'))
+		if(class_exists('\Staple\Config'))
 		{
-			if(Staple_Config::getValue('errors', 'devmode') == 1)
+			if(Config::getValue('errors', 'devmode') == 1)
 			{
 				$args = func_get_args();
 				echo "<pre>";
@@ -61,7 +64,7 @@ class Staple_Dev
 	/**
 	 * Starts a script timer.
 	 */
-	public static function StartTimer()
+	public static function startTimer()
 	{
 		self::$timer = microtime(true);
 	}
@@ -69,27 +72,9 @@ class Staple_Dev
 	/**
 	 * Stops a previously started timer.
 	 */
-	public static function StopTimer()
+	public static function stopTimer()
 	{
 		return microtime(true) - self::$timer;
 	}
-	
-	public static function GetRouteInfo()
-	{
-		$blah = Staple_Main::getRoute();
-	} 
-	
-	/*public static function ResetController(Staple_Controller $controllerRef)
-	{
-		//$controllerRef::__destruct();
-		unset($controllerRef);
-	}
-	public static function ResetAuth()
-	{
-		$auth = Staple_Auth::get();
-		$auth->clearAuth();
-		$auth::__destruct();
-		unset($auth);
-	}*/
 }
 ?>

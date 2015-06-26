@@ -6,7 +6,7 @@
  * to the view on the fly.
  * 
  * @author Ironpilot
- * @copyright Copywrite (c) 2011, STAPLE CODE
+ * @copyright Copyright (c) 2011, STAPLE CODE
  * 
  * This file is part of the STAPLE Framework.
  * 
@@ -23,32 +23,59 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_View 
+namespace Staple;
+
+use \Exception;
+
+class View 
 {
-	use Staple_Trait_Helpers;
-	
+	use Traits\Helpers;
+
+	const DYNAMIC_VIEW_EXTENSION = 'phtml';
+	const STATIC_VIEW_EXTENSION = 'html';
+
 	/**
 	 * Whether or not to render the view. Set to false to skip view rendering.
 	 * @var bool
 	 */
 	protected $_render = true;
 	/**
-	 * The dynamic datastore.
+	 * The dynamic data store.
 	 * @var array
 	 */
 	protected $_store = array();
-	
 	/**
 	 * A string containing the name of the view to build.
 	 * @var string
 	 */
-	protected $view;
+	protected $_view;
 	/**
 	 * A string containing the name of the controller under which to look for the view.
 	 * @var string
 	 */
-	protected $controller;
-	
+	protected $_controller;
+	/**
+	 * The Model object that is bound to this view.
+	 * @var Model
+	 */
+	protected $_viewModel;
+	/**
+	 * The static view to be used for the view.
+	 * @var string
+	 */
+	protected $_staticView;
+	/**
+	 * Define true if it is required that the view be loaded.
+	 * @var bool
+	 */
+	protected $_required = false;
+
+	public function __construct($view = NULL, $controller = NULL)
+	{
+		if(isset($view)) $this->setView($view);
+		if(isset($controller)) $this->setController($controller);
+	}
+
 	/**
 	 * Overloaded __set allows for dynamic addition of properties.
 	 * @param string | int $key
@@ -100,7 +127,7 @@ class Staple_View
 		catch (Exception $e)
 		{
 			$msg = '<p class=\"viewerror\">The View threw an Uncaught Exception when converting to a string....</p>';
-			if(Staple_Config::getValue('errors', 'devmode'))
+			if(Config::getValue('errors', 'devmode'))
 			{
 				$msg .= '<p>'.$e->getMessage().'</p>';
 			}
@@ -108,22 +135,38 @@ class Staple_View
 		}
 		
 	}
-	
+
 	/**
-	 * This function allows you to disable the rendering of the view from the controller.
+	 * Create a new view object and return the instance.
+	 * @param string $view
+	 * @param string $controller
+	 * @return View
 	 */
-	public function noRender()
+	public static function create($view = NULL,$controller = NULL)
 	{
-		$this->_render = false;
+		$inst = new static($view,$controller);
+		return $inst;
+	}
+
+	/**
+	 * @param $staticView
+	 * @return static
+	 */
+	public static function staticContent($staticView)
+	{
+		$inst = new static();
+		$inst->setStaticView($staticView);
+		return $inst;
 	}
 	
 	/**
 	 * Sets the view string
 	 * @param string $view
+	 * @return $this
 	 */
 	public function setView($view)
 	{
-		$this->view = $view;
+		$this->_view = $view;
 		return $this;
 	}
 	/**
@@ -132,7 +175,7 @@ class Staple_View
 	 */
 	public function getView()
 	{
-		return $this->view;
+		return $this->_view;
 	}
 	/**
 	 * Returns isset on the $view parameter
@@ -140,15 +183,16 @@ class Staple_View
 	 */
 	public function hasView()
 	{
-		return isset($this->view);
+		return isset($this->_view);
 	}
 	/**
 	 * Sets the controller string
 	 * @param string $controller
+	 * @return $this
 	 */
 	public function setController($controller)
 	{
-		$this->controller = $controller;
+		$this->_controller = $controller;
 		return $this;
 	}
 	/**
@@ -157,7 +201,7 @@ class Staple_View
 	 */
 	public function getController()
 	{
-		return $this->controller;
+		return $this->_controller;
 	}
 	/**
 	 * Returns isset on the $controller parameter.
@@ -165,26 +209,139 @@ class Staple_View
 	 */
 	public function hasController()
 	{
-		return isset($this->controller);
+		return isset($this->_controller);
+	}
+
+	/**
+	 * @return Model
+	 */
+	public function getViewModel()
+	{
+		return $this->_viewModel;
+	}
+
+	/**
+	 * @param Model $viewModel
+	 * @return $this
+	 */
+	public function setViewModel(Model $viewModel)
+	{
+		$this->_viewModel = $viewModel;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getStaticView()
+	{
+		return $this->_staticView;
+	}
+
+	/**
+	 * @param string $staticView
+	 * @return $this
+	 */
+	public function setStaticView($staticView)
+	{
+		$this->_staticView = $staticView;
+		return $this;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function getRequired()
+	{
+		return $this->_required;
+	}
+
+	/**
+	 * @param boolean $required
+	 * @return $this
+	 */
+	public function setRequired($required)
+	{
+		$this->_required = (bool)$required;
+		return $this;
+	}
+
+	/**
+	 * When a model is provided, the model is bound to the view and the View object is returned.
+	 * With no parameters set, the bound Model object is returned.
+	 * @param Model $model
+	 * @return Model|View|NULL
+	 */
+	public function model(Model $model = NULL)
+	{
+		//Set or get the model depending upon the parameters
+		if(isset($model))
+			return $this->setViewModel($model);
+		else
+			return $this->getViewModel();
+	}
+
+	/**
+	 * Add data to the view data store for accessibility within the view.
+	 * @param string $key
+	 * @param mixed $value
+	 * @return $this
+	 */
+	public function addData($key,$value)
+	{
+		$this->_store[$key] = $value;
+		return $this;
+	}
+
+	/**
+	 * Add data to the view as an associative array
+	 * @param array $data
+	 * @throws Exception
+	 * @return $this
+	 */
+	public function data(array $data)
+	{
+		foreach($data as $key=>$value)
+		{
+			if(is_int($key)) throw new Exception('Array keys must be associative.');
+			$this->addData($key,$value);
+		}
+
+		return $this;
 	}
 	
 	/**
-	 * 
 	 * This function renders the view. If accepts a string representing the controller and
 	 * a string representing the requested action. With this information the correct view
 	 * is selected and rendered.
-	 * @param string $class
-	 * @param string $view
 	 */
 	public function build()
 	{
 		if($this->_render === true)
 		{
-			//Load the view from the default loader
-			$view = Staple_Main::get()->getLoader()->loadView($this->controller,$this->view);
-			if(strlen($view) >= 1)
+			if (isset($this->_staticView))
 			{
-				include $view;
+				//Load the view from the static view content folder - Possibly move this to the auto loader at a later date.
+				$view = STATIC_ROOT . $this->_staticView . '.' . static::STATIC_VIEW_EXTENSION;
+				if (file_exists($view))
+				{
+					//include the view
+					include $view;
+				}
+			}
+			else
+			{
+				//Load the view from the default loader
+				$view = Main::get()->getLoader()->loadView($this->_controller, $this->_view);
+				if (strlen($view) >= 1 && $view !== false)
+				{
+					//Initialize the view model, if set
+					if (isset($this->_viewModel))
+						$model = $this->_viewModel;
+
+					//include the view
+					include $view;
+				}
 			}
 		}
 		else

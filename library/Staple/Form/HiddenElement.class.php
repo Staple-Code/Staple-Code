@@ -3,7 +3,7 @@
  * Hidden element for use on forms.
  * 
  * @author Ironpilot
- * @copyright Copywrite (c) 2011, STAPLE CODE
+ * @copyright Copyright (c) 2011, STAPLE CODE
  * 
  * This file is part of the STAPLE Framework.
  * 
@@ -20,7 +20,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Form_HiddenElement extends Staple_Form_Element
+namespace Staple\Form;
+
+class HiddenElement extends FieldElement
 {
 	/* (non-PHPdoc)
 	 * @see Staple_Form_Element::Create()
@@ -71,7 +73,7 @@ class Staple_Form_HiddenElement extends Staple_Form_Element
 		return '';
 	}
 
-	public function build()
+	public function build($fieldView = NULL)
 	{
 		$buf = '';
 		$view = FORMS_ROOT.'/fields/HiddenElement.phtml';

@@ -1,7 +1,8 @@
 <?php
+use Staple\DB;
 /**
  * @author Ironpilot
- * @copyright Copywrite (c) 2011, STAPLE CODE
+ * @copyright Copyright (c) 2011, STAPLE CODE
  * 
  * This file is part of the STAPLE Framework.
  * 
@@ -18,7 +19,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class indexController extends Staple_Controller
+class indexController extends Controller
 {
 	public function _start()
 	{
@@ -27,21 +28,6 @@ class indexController extends Staple_Controller
 	
 	public function index()
 	{
-		
-	}
-	
-	public function documentation()
-	{
-		
-	}
-	
-	public function about()
-	{
-		
-	}
-	
-	public function license()
-	{
-		
+		return View::create('index');
 	}
 }

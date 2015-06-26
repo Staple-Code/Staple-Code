@@ -3,7 +3,7 @@
  * A class to create SELECT form elements.
  * 
  * @author Ironpilot
- * @copyright Copywrite (c) 2011, STAPLE CODE
+ * @copyright Copyright (c) 2011, STAPLE CODE
  * 
  * This file is part of the STAPLE Framework.
  * 
@@ -20,7 +20,12 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Form_SelectElement extends Staple_Form_Element
+namespace Staple\Form;
+
+use \Exception;
+use \Staple\Error;
+
+class SelectElement extends FieldElement
 {
 	const SORT_VALUES = 1;
 	const SORT_LABELS_ALPHA = 2;
@@ -72,12 +77,11 @@ class Staple_Form_SelectElement extends Staple_Form_Element
 	{
 		return $this->multiple;
 	}
-
-    /**
-     * Set the multiple attribute of the select element.
-     * @param bool $bool
-     * @return $this
-     */
+	
+	/**
+	 * Set the multiple attribute of the select element.
+	 * @param bool $bool
+	 */
 	public function setMultiple($bool = true)
 	{
 		$this->multiple = (bool)$bool;
@@ -87,19 +91,18 @@ class Staple_Form_SelectElement extends Staple_Form_Element
 	/**
 	 * Sets the value for the select box
 	 * @param boolean $val
-	 * @return Staple_Form_CheckboxElement
+	 * @return $this
 	 */
 	public function setValue($val)
 	{
 		$this->selected = true;
 		return parent::setValue($val);
 	}
-
-    /**
-     * Sets the size of the select element
-     * @param int $size
-     * @return $this
-     */
+	
+	/**
+	 * Sets the size of the select element
+	 * @param int $size
+	 */
 	public function setSize($size)
 	{
 		$this->size = (int)$size;
@@ -114,20 +117,19 @@ class Staple_Form_SelectElement extends Staple_Form_Element
 	{
 		return $this->size;
 	}
-
-    /**
-     * Add a single option to the select list.
-     *
-     * @param mixed $value
-     * @param string $label
-     * @return $this
-     * @throws Exception
-     */
+	
+	/**
+	 * Add a single option to the select list.
+	 * 
+	 * @param mixed $value
+	 * @param string $label
+	 * @throws Exception
+	 */
 	public function addOption($value,$label = NULL)
 	{
 		if(is_array($value) || is_resource($value))
 		{
-			throw new Exception('Select values must be strings or integers.', Staple_Error::APPLICATION_ERROR);
+			throw new Exception('Select values must be strings or integers.', Error::APPLICATION_ERROR);
 		}
 		else 
 		{
@@ -142,24 +144,23 @@ class Staple_Form_SelectElement extends Staple_Form_Element
 		}
 		return $this;
 	}
-
-    /**
-     * Add an array of values to the select list. Keys of the array become values of the options and the values
-     * become the labels for the options. The second option allows the use of the labels as the values for the
-     * options.
-     *
-     * @param array $options
-     * @param boolean $labelvalues
-     * @return $this
-     * @throws Exception
-     */
+	
+	/**
+	 * Add an array of values to the select list. Keys of the array become values of the options and the values
+	 * become the labels for the options. The second option allows the use of the labels as the values for the
+	 * options.
+	 * 
+	 * @param array $options
+	 * @param boolean $labelvalues
+	 * @throws Exception
+	 */
 	public function addOptionsArray(array $options, $labelvalues = FALSE)
 	{
 		foreach($options as $value=>$label)
 		{
 			if(is_array($value) || is_resource($value))
 			{
-				throw new Exception('Select values must be strings or integers.', Staple_Error::APPLICATION_ERROR);
+				throw new Exception('Select values must be strings or integers.', Error::APPLICATION_ERROR);
 			}
 			else
 			{
@@ -193,12 +194,11 @@ class Staple_Form_SelectElement extends Staple_Form_Element
 	{
 		return $this->options;
 	}
-
-    /**
-     * Sorts the options list based on a set of preset sorts.
-     * @param int $how
-     * @return $this
-     */
+	
+	/**
+	 * Sorts the options list based on a set of preset sorts.
+	 * @param int $how
+	 */
 	public function sortOptions($how)
 	{
 		switch($how)
@@ -231,7 +231,7 @@ class Staple_Form_SelectElement extends Staple_Form_Element
 		{
 			$buf .= ' multiple="multiple"';
 		}
-		$buf .= $this->getAttribString().">\n";
+		$buf .= $this->getAttribString('select').">\n";
 		foreach($this->options as $value=>$label)
 		{
 			$select = '';
@@ -250,7 +250,7 @@ class Staple_Form_SelectElement extends Staple_Form_Element
 	 */
 	public function label()
 	{
-		return '	<label for="'.$this->escape($this->id).'"'.$this->getClassString().'>'.$this->label."</label>\n";
+		return '	<label for="'.$this->escape($this->id).'"'.$this->getClassString('label').'>'.$this->label."</label>\n";
 	}
 
 	/**
@@ -258,7 +258,7 @@ class Staple_Form_SelectElement extends Staple_Form_Element
 	 * 
 	 * @see Staple_Form_Element::build()
 	 */
-	public function build()
+	public function build($fieldView = NULL)
 	{
 		$buf = '';
 		$view = FORMS_ROOT.'/fields/SelectElement.phtml';
@@ -273,7 +273,7 @@ class Staple_Form_SelectElement extends Staple_Form_Element
 		{
 			$this->addClass('form_element');
 			$this->addClass('element_select');
-			$classes = $this->getClassString();
+			$classes = $this->getClassString('div');
 			$buf .= "<div$classes id=\"".$this->escape($this->id)."_element\">\n";
 			$buf .= $this->label();
 			$buf .= $this->field();

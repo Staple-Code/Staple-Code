@@ -2,7 +2,7 @@
 
 /** 
  * @author Ironpilot
- * @copyright Copywrite (c) 2011, STAPLE CODE
+ * @copyright Copyright (c) 2011, STAPLE CODE
  *  
  * 
  * This file is part of the STAPLE Framework.
@@ -21,7 +21,7 @@
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-class accountController extends Staple_AuthController
+class accountController extends AuthController
 {
 	public function _start()
 	{
@@ -30,14 +30,14 @@ class accountController extends Staple_AuthController
 	}
 	public function index()
 	{
-		$this->view->message = Staple_Auth::get()->getMessage();
+		$this->view->message = Auth::get()->getMessage();
 	}
 	public function signin()
 	{
 		$username = $_POST['user'];
 		$password = $_POST['pass'];
 		var_dump($username,$password);
-		$auth = Staple_Auth::get();
+		$auth = Auth::get();
 		$granted = $auth->doAuth(array(
 				'username'=>$username,
 				'password'=>$password,
@@ -52,5 +52,3 @@ class accountController extends Staple_AuthController
 		}
 	}
 }
-
-?>

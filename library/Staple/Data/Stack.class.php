@@ -4,7 +4,7 @@
  * A modification of the Staple_Data_LinkedList class. 
  * 
  * @author Ironpilot
- * @copyright Copywrite (c) 2011, STAPLE CODE
+ * @copyright Copyright (c) 2011, STAPLE CODE
  * 
  * This file is part of the STAPLE Framework.
  * 
@@ -21,7 +21,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Data_Stack extends Staple_Data_LinkedList
+namespace Staple\Data;
+
+class Stack extends LinkedList
 {
 	/**
 	 * Stack push function

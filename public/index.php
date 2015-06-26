@@ -1,20 +1,20 @@
 <?php
 defined('FOLDER_ROOT')
-    || define('FOLDER_ROOT', realpath(dirname(__FILE__) . '/../'));
+    || define('FOLDER_ROOT', realpath(dirname(__FILE__) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR));
 
 defined('LIBRARY_ROOT')
-    || define('LIBRARY_ROOT', FOLDER_ROOT . '/library/');
+    || define('LIBRARY_ROOT', FOLDER_ROOT . DIRECTORY_SEPARATOR . 'library' . DIRECTORY_SEPARATOR);
 
 defined('SITE_ROOT')
-    || define('SITE_ROOT', FOLDER_ROOT . '/public/');
+    || define('SITE_ROOT', FOLDER_ROOT . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR);
 
-defined('PROGRAM_ROOT')
-    || define('PROGRAM_ROOT', FOLDER_ROOT . '/application/');
+defined('APPLICATION_ROOT')
+    || define('APPLICATION_ROOT', FOLDER_ROOT . DIRECTORY_SEPARATOR . 'application' . DIRECTORY_SEPARATOR);
 
-defined('ELEMENTS_ROOT')
-	|| define('ELEMENTS_ROOT', FOLDER_ROOT . '/elements/');
+defined('MODULES_ROOT')
+	|| define('MODULES_ROOT', FOLDER_ROOT . DIRECTORY_SEPARATOR . 'modules' . DIRECTORY_SEPARATOR);
 
-require_once LIBRARY_ROOT.'Staple/Main.class.php';
+require_once LIBRARY_ROOT . 'Staple' . DIRECTORY_SEPARATOR . 'Main.class.php';
 
-$main = Staple_Main::get();
+$main = \Staple\Main::get();
 $main->run();

@@ -4,7 +4,8 @@
  * This class is designed to include canned scripts into a website.
  * 
  * @author Ironpilot
- * @copyright Copywrite (c) 2011, STAPLE CODE
+ * @copyright Copyright (c) 2011, STAPLE CODE
+ * @deprecated
  * 
  * This file is part of the STAPLE Framework.
  * 
@@ -21,14 +22,16 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Script
+namespace Staple;
+
+class Script
 {
 	const JQUERY_CURRENT = '2.0.1';
 	const JQUERYUI_CURRENT = '1.10.3';
 	
-	public static function jQuery($version = NULL, Staple_Layout $layout = NULL)
+	public static function jQuery($version = NULL, Layout $layout = NULL)
 	{
-		if(Staple_Request::isSecure())
+		if(Request::isSecure())
 		{
 			$protocol = 'https://';
 		}
@@ -44,17 +47,17 @@ class Staple_Script
 		{
 			$script = $protocol.'ajax.googleapis.com/ajax/libs/jquery/'.self::JQUERY_CURRENT.'/jquery.min.js';
 		}
-		if($layout instanceof Staple_Layout)
+		if($layout instanceof Layout)
 		{
 			$layout->addScript($script);
 		}
 		return $script;
 	}
 	
-	public static function jQueryUI($version = NULL, Staple_Layout $layout = NULL)
+	public static function jQueryUI($version = NULL, Layout $layout = NULL)
 	{
 		
-		if(Staple_Request::isSecure())
+		if(Request::isSecure())
 		{
 			$protocol = 'https://';
 		}
@@ -70,14 +73,14 @@ class Staple_Script
 		{
 			$script = $protocol.'ajax.googleapis.com/ajax/libs/jqueryui/'.self::JQUERYUI_CURRENT.'/jquery-ui.min.js';
 		}
-		if($layout instanceof Staple_Layout)
+		if($layout instanceof Layout)
 		{
 			$layout->addScript($script);
 		}
 		return $script;
 	}
 	
-	public static function GoogleMaps(Staple_Layout $layout,$sensor = false)
+	public static function GoogleMaps(Layout $layout,$sensor = false)
 	{
 		$sensor = (bool)$sensor;
 		$layout->addScript('http://maps.google.com/maps/api/js?sensor='.$sensor);

@@ -13,9 +13,9 @@
  * connection. If you use the set functions, you will have to manually connect to the database 
  * by calling the connect function or constructor for this object.
  * 
- * @todo add a database reconnection function for when the username, host, pw, or db changes.
+ * @deprecated
  * @author Ironpilot
- * @copyright Copywrite (c) 2011, STAPLE CODE
+ * @copyright Copyright (c) 2011, STAPLE CODE
  * 
  * This file is part of the STAPLE Framework.
  * 
@@ -32,15 +32,20 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_DB extends mysqli
+namespace Staple;
+
+use \mysqli, \Exception, \SplObserver, \SplSubject, \SplObjectStorage;
+
+class DB extends mysqli implements SplSubject
 {
-	/**
-	 * 
-	 * Holds the singleton instance for the object.
-	 * @var Staple_DB
-	 * @static
-	 */
-	protected static $conn;
+	use Traits\Singleton;
+	
+    /**
+     * The object observers
+     * @var SplObjectStorage
+     */
+    private $_observers;
+    
 	/**
 	 * 
 	 * Hostname for the database server
@@ -77,7 +82,7 @@ class Staple_DB extends mysqli
 	 * Stores the last executed SQL Statement
 	 * @var string
 	 */
-	public static $last_query;
+	public $last_query;
 	
 	/**
 	 * Storage for Named Database Connections
@@ -94,6 +99,9 @@ class Staple_DB extends mysqli
 	 */
 	public function __construct(array $config = array())
 	{
+	    //Setup Object Storage for observers
+	    $this->_observers = new SplObjectStorage();
+	    
 		if($this->checkConfig($config))
 		{
 			$this->host = $config['host'];
@@ -103,7 +111,7 @@ class Staple_DB extends mysqli
 		}
 		elseif(!$this->isReady())
 		{
-			$globalSettings = Staple_Config::get('db');
+			$globalSettings = Config::get('db');
 			if($this->checkConfig($globalSettings))
 			{
 				$this->host = $globalSettings['host'];
@@ -127,6 +135,9 @@ class Staple_DB extends mysqli
 		}
 	}
 	
+	/**
+	 * Upon destruction attempt to close the database connection.
+	 */
 	public function __destruct()
 	{
 		//Close an open connection
@@ -137,30 +148,25 @@ class Staple_DB extends mysqli
 	}
 	
     /**
-     * 
      * Creates and returns the primary database connection.
-     * @return Staple_DB
+     * @return DB
      * @static
      */
 	public static function get(array $conf = array())
 	{
-		if (!isset(self::$conn) || $conf != array()) {
-            $c = __CLASS__;
-            self::$conn = new $c($conf);
-        }
-		return self::$conn;
+		return static::getInstance();
 	}
 	
 	/**
 	 * Creates and/or returns a named database connection.
-	 * @return Staple_DB
+	 * @return DB
 	 * @static
 	 */
 	public static function getNamedConnection($name)
 	{
 		if (!isset(self::$namedConnections[$name])) {
 			$c = __CLASS__;
-			self::$namedConnections[$name] = new $c(Staple_Config::get($name));
+			self::$namedConnections[$name] = new $c(Config::get($name));
 		}
 		return self::$namedConnections[$name];
 	}
@@ -220,7 +226,7 @@ class Staple_DB extends mysqli
 		 */
 		if($this->connected === true)
 		{
-			self::$last_query = $query;
+			$this->last_query = $query;
 			return parent::query($query,$resultmode);
 		}
 		else
@@ -230,7 +236,7 @@ class Staple_DB extends mysqli
 	}
 	
 	/**
-	 * @return the $host
+	 * @return string $host
 	 */
 	public function getHost()
 	{
@@ -247,7 +253,7 @@ class Staple_DB extends mysqli
 	}
 
 	/**
-	 * @return the $username
+	 * @return string $username
 	 */
 	public function getUsername()
 	{
@@ -264,7 +270,7 @@ class Staple_DB extends mysqli
 	}
 
 	/**
-	 * @return the $db
+	 * @return string $db
 	 */
 	public function getDb()
 	{
@@ -291,7 +297,7 @@ class Staple_DB extends mysqli
 	}
 	
 	/**
-	 * @return the $connected
+	 * @return bool $connected
 	 */
 	public function getConnected()
 	{
@@ -308,11 +314,11 @@ class Staple_DB extends mysqli
 	}
 
 	/**
-	 * @return the $last_query
+	 * @return string $last_query
 	 */
 	public function getLastQuery()
 	{
-		return self::$last_query;
+		return $this->last_query;
 	}
 
 	/**
@@ -320,7 +326,7 @@ class Staple_DB extends mysqli
 	 */
 	protected function setLastQuery($last_query)
 	{
-		self::$last_query = $last_query;
+		$this->last_query = $last_query;
 	}
 	
 	/**
@@ -383,4 +389,32 @@ class Staple_DB extends mysqli
 		}
 		return true;
 	}
+	
+	/* (non-PHPdoc)
+	 * @see SplSubject::attach()
+	 */
+	public function attach(SplObserver $observer)
+	{
+		$this->_observers->attach($observer);
+	}
+
+	/* (non-PHPdoc)
+	 * @see SplSubject::detach()
+	 */
+	public function detach(SplObserver $observer)
+	{
+		$this->_observers->detach($observer);
+	}
+
+	/* (non-PHPdoc)
+	 * @see SplSubject::notify()
+	 */
+	public function notify()
+	{
+		foreach($this->_observers as $observer)
+		{
+		    $observer->update($this);
+		}
+	}
+
 }

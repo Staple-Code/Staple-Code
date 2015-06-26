@@ -4,7 +4,7 @@
  * A class for creating SQL SELECT statements
  * 
  * @author Ironpilot
- * @copyright Copywrite (c) 2011, STAPLE CODE
+ * @copyright Copyright (c) 2011, STAPLE CODE
  * 
  * This file is part of the STAPLE Framework.
  * 
@@ -21,7 +21,13 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Query_Select extends Staple_Query
+namespace Staple\Query;
+
+use \Staple\Exception\QueryException;
+use \Staple\Error;
+use \Staple\Pager;
+
+class Select extends Query
 {
 	const ALL = 'ALL';
 	const DISTINCT = 'DISTINCT';
@@ -59,24 +65,32 @@ class Staple_Query_Select extends Staple_Query
 	 * The Limit Offset. Used to skip a number of rows before selecting.
 	 * @var int
 	 */
-	protected $limitOffset;
+	protected $limitOffset = 0;
 	/**
 	 * Stores the GROUP BY columns;
-	 * @var unknown_type
+	 * @var array | string
 	 */
 	protected $groupBy;
 	/**
 	 * An array that holds the HAVING clauses
-	 * @var array[Staple_Query_Condition]
+	 * @var Condition[]
 	 */
 	protected $having = array();
 	/**
 	 * Array of Staple_Query_Join objects that represent table joins on the query
-	 * @var array[Staple_Query_Join]
+	 * @var Join[]
 	 */
 	protected $joins = array();
-	
-	public function __construct($table = NULL, array $columns = NULL, $db = NULL, $order = NULL, $limit = NULL)
+
+	/**
+	 * @param string $table
+	 * @param array $columns
+	 * @param Connection $db
+	 * @param array | string $order
+	 * @param Pager | int $limit
+	 * @throws QueryException
+	 */
+	public function __construct($table = NULL, array $columns = NULL, Connection $db = NULL, $order = NULL, $limit = NULL)
 	{
 		parent::__construct(NULL, $db);
 		
@@ -130,7 +144,7 @@ class Staple_Query_Select extends Staple_Query
 	}
 
 	/**
-	 * @return the $columns
+	 * @return array $columns
 	 */
 	public function getColumns()
 	{
@@ -138,7 +152,7 @@ class Staple_Query_Select extends Staple_Query
 	}
 
 	/**
-	 * Returns the order.
+	 * Returns array | string order.
 	 * @return string | array
 	 */
 	public function getOrder()
@@ -147,7 +161,7 @@ class Staple_Query_Select extends Staple_Query
 	}
 	
 	/**
-	 * @return the $groupBy
+	 * @return array | string $groupBy
 	 */
 	public function getGroupBy()
 	{
@@ -155,7 +169,7 @@ class Staple_Query_Select extends Staple_Query
 	}
 
 	/**
-	 * @return the $limit
+	 * @return Pager | int $limit
 	 */
 	public function getLimit()
 	{
@@ -163,7 +177,7 @@ class Staple_Query_Select extends Staple_Query
 	}
 
 	/**
-	 * @return the $limitOffset
+	 * @return int $limitOffset
 	 */
 	public function getLimitOffset()
 	{
@@ -171,8 +185,12 @@ class Staple_Query_Select extends Staple_Query
 	}
 
 	/**
+	 * Set the table for the select query. This can be another Select object or a Union object. However, a table
+	 * alias is required when using another object.
 	 * @param mixed $table
 	 * @param string $alias
+	 * @throws QueryException
+	 * @return $this
 	 */
 	public function setTable($table,$alias = NULL)
 	{
@@ -180,12 +198,16 @@ class Staple_Query_Select extends Staple_Query
 		{
 			$this->table = $table;
 		}
-		elseif($table instanceof Staple_Query || $table instanceof Staple_Query_Union)
+		elseif($table instanceof Query || $table instanceof Union)
 		{
+			//Check for a derived table alias
 			if(!isset($alias))
-			{
-				throw new Exception('Every derived table must have its own alias', Staple_Error::DB_ERROR);
-			}
+				throw new QueryException('Every derived table must have its own alias', Error::DB_ERROR);
+
+			//Remove the order by clause in derived table.
+			$table->setOrder(null);
+
+			//Set the table.
 			$this->table = array($alias=>$table);
 		}
 		elseif(isset($alias) && is_string($table))
@@ -201,6 +223,8 @@ class Staple_Query_Select extends Staple_Query
 	
 	/**
 	 * Different from addColumnsArray(), this function replaces all existing columns in the query.
+     * @param array $columns
+     * @return $this
 	 */
 	public function setColumns(array $columns)
 	{
@@ -222,6 +246,7 @@ class Staple_Query_Select extends Staple_Query
 	/**
 	 * Set the order.
 	 * @param string | array $order
+     * @return $this
 	 */
 	public function setOrder($order)
 	{
@@ -231,6 +256,7 @@ class Staple_Query_Select extends Staple_Query
 	
 	/**
 	 * @param string | array $groupBy
+     * @return $this
 	 */
 	public function setGroupBy($groupBy)
 	{
@@ -240,7 +266,7 @@ class Staple_Query_Select extends Staple_Query
 
 	/**
 	 * @param int $limit
-	 * @return Staple_Query_Select
+	 * @return Select
 	 */
 	public function setLimit($limit)
 	{
@@ -250,7 +276,7 @@ class Staple_Query_Select extends Staple_Query
 	
 	/**
 	 * @param int $limitOffset
-	 * @return Staple_Query_Select
+	 * @return Select
 	 */
 	public function setLimitOffset($limitOffset)
 	{
@@ -260,12 +286,13 @@ class Staple_Query_Select extends Staple_Query
 
 	/**
 	 * Add to the list of columns. Optional parameter to name a column.
-	 * @param string | Staple_Query_Select $col
+	 * @param string | Select $col
 	 * @param string $name
+	 * @return $this
 	 */
 	public function addColumn($col,$name = NULL)
 	{
-		if($col instanceof Staple_Query)
+		if($col instanceof Query)
 			$col = '('.(string)$col.')';
 		
 		if(isset($name))
@@ -283,6 +310,7 @@ class Staple_Query_Select extends Staple_Query
 	/**
 	 * Add an array of columns to the list of selected columns
 	 * @param array $columns
+     * @return $this;
 	 */
 	public function addColumnsArray(array $columns)
 	{
@@ -303,7 +331,7 @@ class Staple_Query_Select extends Staple_Query
 	/**
 	 * An alias of setColumns()
 	 * @param array $cols
-	 * @return Staple_Query_Select
+	 * @return Select
 	 */
 	public function columns(array $cols)
 	{
@@ -313,6 +341,7 @@ class Staple_Query_Select extends Staple_Query
 	/**
 	 * Remove a column from the $columns array.
 	 * @param string $col
+     * @return bool
 	 */
 	public function removeColumn($col)
 	{
@@ -327,6 +356,7 @@ class Staple_Query_Select extends Staple_Query
 	/**
 	 * Remove a column from the $columns property by it's alias.
 	 * @param string $name
+     * @return bool
 	 */
 	public function removeColumnByName($name)
 	{
@@ -341,6 +371,8 @@ class Staple_Query_Select extends Staple_Query
 	/**
 	 * Alias of setOrder()
 	 * @see self::setOrder()
+     * @param array|string $order
+     * @return $this
 	 */
 	public function orderBy($order)
 	{
@@ -351,6 +383,7 @@ class Staple_Query_Select extends Staple_Query
 	 * Alias of setGroupBy()
 	 * @param string | array $group
 	 * @see self::setGroupBy()
+     * @return self::setGroupBy()
 	 */
 	public function groupBy($group)
 	{
@@ -359,12 +392,13 @@ class Staple_Query_Select extends Staple_Query
 	
 	/**
 	 * Sets the limit and the offset in one function.
-	 * @param int | Staple_Pager $limit
+	 * @param int | Pager $limit
 	 * @param int $offset
+	 * @return $this
 	 */
 	public function limit($limit,$offset = NULL)
 	{
-		if($limit instanceof Staple_Pager)
+		if($limit instanceof Pager)
 		{
 			$this->setLimit($limit->getItemsPerPage());
 			$this->setLimitOffset($limit->getStartingItem());
@@ -378,9 +412,29 @@ class Staple_Query_Select extends Staple_Query
 		return $this;
 	}
 
+	/**
+	 * Alias of setLimitOffset() method
+	 * @param $offset
+	 * @return Select
+	 */
+	public function skip($offset)
+	{
+		return $this->setLimitOffset($offset);
+	}
+
+	/**
+	 * Alias of setLimit() method
+	 * @param $amount
+	 * @return Select
+	 */
+	public function take($amount)
+	{
+		return $this->setLimit($amount);
+	}
+
 	/*-----------------------------------------------HAVING CLAUSES-----------------------------------------------*/
 	
-	public function addHaving(Staple_Query_Condition $having)
+	public function addHaving(Condition $having)
 	{
 		$this->having[] = $having;
 		return $this;
@@ -391,46 +445,90 @@ class Staple_Query_Select extends Staple_Query
 		$this->having = array();
 		return $this;
 	}
-	
+
+	/**
+	 * Add A HAVING clause to the SELECT statement using the Condition object
+	 * @param string $column
+	 * @param string $operator
+	 * @param mixed $value
+	 * @param null $columnJoin
+	 * @return $this
+	 */
 	public function havingCondition($column, $operator, $value, $columnJoin = NULL)
 	{
-		$this->addHaving(Staple_Query_Condition::Get($column, $operator, $value, $columnJoin));
+		$this->addHaving(Condition::get($column, $operator, $value, $columnJoin));
 		return $this;
 	}
-	
+
+	/**
+	 * Add A raw HAVING clause to the SELECT statement
+	 * @param string|Condition $statement
+	 * @return $this
+	 */
 	public function havingStatement($statement)
 	{
-		$this->addHaving(Staple_Query_Condition::Statement($statement));
+		$this->addHaving(Condition::statement($statement));
 		return $this;
 	}
-	
+
+	/**
+	 * Add A HAVING EQUAL clause to the SELECT statement
+	 * @param string $column
+	 * @param mixed $value
+	 * @param string $columnJoin
+	 * @return $this
+	 */
 	public function havingEqual($column, $value, $columnJoin = NULL)
 	{
-		$this->addHaving(Staple_Query_Condition::Equal($column, $value, $columnJoin));
+		$this->addHaving(Condition::equal($column, $value, $columnJoin));
 		return $this;
 	}
-	
+
+	/**
+	 * Add A HAVING LIKE clause to the SELECT statement
+	 * @param string $column
+	 * @param mixed $value
+	 * @return $this
+	 */
 	public function havingLike($column, $value)
 	{
-		$this->addHaving(Staple_Query_Condition::Like($column, $value));
+		$this->addHaving(Condition::like($column, $value));
 		return $this;
 	}
-	
+
+	/**
+	 * Add A HAVING NULL clause to the SELECT statement
+	 * @param string $column
+	 * @return $this
+	 */
 	public function havingNull($column)
 	{
-		$this->addHaving(Staple_Query_Condition::Null($column));
+		$this->addHaving(Condition::null($column));
 		return $this;
 	}
-	
+
+	/**
+	 * Add A HAVING IN clause to the SELECT statement
+	 * @param string $column
+	 * @param array $values
+	 * @return $this
+	 */
 	public function havingIn($column, array $values)
 	{
-		$this->addHaving(Staple_Query_Condition::In($column, $values));
+		$this->addHaving(Condition::in($column, $values));
 		return $this;
 	}
-	
+
+	/**
+	 * Add A HAVING BETWEEN clause to the SELECT statement
+	 * @param string $column
+	 * @param mixed $start
+	 * @param mixed $end
+	 * @return $this
+	 */
 	public function havingBetween($column, $start, $end)
 	{
-		$this->addHaving(Staple_Query_Condition::Between($column, $start, $end));
+		$this->addHaving(Condition::between($column, $start, $end, $this->getConnection()));
 		return $this;
 	}
 	
@@ -438,9 +536,10 @@ class Staple_Query_Select extends Staple_Query
 	/*-----------------------------------------------JOIN FUNCTIONS-----------------------------------------------*/
 	/**
 	 * Add a join to the query.
-	 * @param Staple_Query_Join $join
+	 * @param Join $join
+	 * @return $this
 	 */
-	public function addJoin(Staple_Query_Join $join)
+	public function addJoin(Join $join)
 	{
 		$this->joins[] = $join;
 		return $this;
@@ -481,15 +580,21 @@ class Staple_Query_Select extends Staple_Query
 		return false;
 	}
 	
-	public function leftJoin($table, $condition)
+	public function leftJoin($table, $condition, $alias = NULL)
 	{
-		$this->addJoin(Staple_Query_Join::left($table, $condition));
+		$this->addJoin(Join::left($table, $condition,$alias));
 		return $this;
 	}
 	
-	public function innerJoin($table, $condition)
+	public function innerJoin($table, $condition, $alias = NULL)
 	{
-		$this->addJoin(Staple_Query_Join::inner($table, $condition));
+		$this->addJoin(Join::inner($table, $condition,$alias));
+		return $this;
+	}
+
+	public function join($table, $condition, $alias = NULL)
+	{
+		$this->addJoin(Join::inner($table,$condition,$alias));
 		return $this;
 	}
 	
@@ -510,12 +615,20 @@ class Staple_Query_Select extends Staple_Query
 	 */
 	function build()
 	{
-		$stmt = 'SELECT ';
-		
+		$stmt = 'SELECT';
+
 		//Flags
 		if(count($this->flags) > 0)
 		{
 			$stmt .= ' '.implode(' ', $this->flags);
+		}
+
+		//SQL Server Limit - when offset is zero
+		if($this->getLimit() > 0
+			&& $this->getLimitOffset() == 0
+			&& $this->getConnection()->getDriver() == Connection::DRIVER_SQLSRV)
+		{
+			$stmt .= ' TOP ' . $this->getLimit().' ';
 		}
 		
 		//Collect Select Columns
@@ -528,11 +641,14 @@ class Staple_Query_Select extends Staple_Query
 			$columns = '';
 			foreach($this->columns as $name=>$col)
 			{
+				//Add commas between columns
 				if(strlen($columns) >= 1)
 				{
-					$columns .= ',';
+					$columns .= ', ';
 				}
-				if($col instanceof Staple_Query_Select)
+
+				//Wrap sub-selects in parenthesis
+				if($col instanceof Select)
 				{
 					$columns .= '('.$col.')';
 				}
@@ -540,9 +656,19 @@ class Staple_Query_Select extends Staple_Query
 				{
 					$columns .= $col;
 				}
+
+				//Add column aliases where applicable
 				if(is_string($name))
 				{
-					$columns .= " AS `$name`";
+					//Switch the method based on database driver of the current connection
+					switch($this->getConnection()->getDriver())
+					{
+						case Connection::DRIVER_MYSQL:
+							$columns .= " AS `$name`";
+							break;
+						default:
+							$columns .= " AS $name";
+					}
 				}
 			}
 		}
@@ -554,11 +680,14 @@ class Staple_Query_Select extends Staple_Query
 			$tables = '';
 			foreach($this->table as $name=>$tbl)
 			{
+				//Add commas between tables
 				if(strlen($tables) > 1)
 				{
-					$tables .= ',';
+					$tables .= ', ';
 				}
-				if($tbl instanceof Staple_Query || $tbl instanceof Staple_Query_Union)
+
+				//Wrap subqueries in parenthesis
+				if($tbl instanceof Query || $tbl instanceof Union)
 				{
 					$tables	= '('.$tbl.')';
 				}
@@ -566,9 +695,19 @@ class Staple_Query_Select extends Staple_Query
 				{
 					$tables .= $tbl;
 				}
+
+				//Add table aliases where applicable
 				if(is_string($name))
 				{
-					$tables .= " AS `$name`";
+					//Switch the method based on database driver of the current connection
+					switch($this->getConnection()->getDriver())
+					{
+						case Connection::DRIVER_MYSQL:
+							$tables .= " AS `$name`";
+							break;
+						default:
+							$tables .= " AS $name";
+					}
 				}
 			}
 			$stmt .= $tables;
@@ -622,19 +761,34 @@ class Staple_Query_Select extends Staple_Query
 			{
 				$stmt .= $this->order;
 			}
-		}
-		
-		//LIMIT CLAUSE
-		if(isset($this->limit))
-		{
-			$stmt .= "\nLIMIT ".$this->getLimit();
-			if(isset($this->limitOffset))
+
+			//SQL Server 2012 Pagination
+			if($this->getConnection()->getDriver() == Connection::DRIVER_SQLSRV)
 			{
-				$stmt .= ' OFFSET '.$this->limitOffset;
+				if (isset($this->limit) && !isset($sql2005limit) && $this->getLimitOffset() != 0)
+				{
+					//Offset
+					$stmt .= "\nOFFSET " . $this->getLimitOffset(). ' ROWS ';
+
+					//Limit
+					$stmt .= ' FETCH NEXT ' . $this->getLimit(). ' ROWS ONLY ';
+				}
+			}
+		}
+
+		//Limit clause is MySQL specific
+		if($this->getConnection()->getDriver() == Connection::DRIVER_MYSQL)
+		{
+			//LIMIT CLAUSE
+			if (isset($this->limit))
+			{
+				$stmt .= "\nLIMIT " . $this->getLimit();
+				if (isset($this->limitOffset))
+				{
+					$stmt .= ' OFFSET ' . $this->limitOffset;
+				}
 			}
 		}
 		return $stmt;
 	}
 }
-
-?>

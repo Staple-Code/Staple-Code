@@ -2,7 +2,7 @@
 
 /** 
  * @author Ironpilot
- * @copyright Copywrite (c) 2011, STAPLE CODE
+ * @copyright Copyright (c) 2011, STAPLE CODE
  * 
  * This file is part of the STAPLE Framework.
  * 
@@ -20,7 +20,9 @@
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-class Staple_Pager
+namespace Staple;
+
+class Pager
 {
 	/**
 	 * Total number of items in the paged set.
@@ -90,6 +92,7 @@ class Staple_Pager
 	}
 	/**
 	 * Returns the displayPaging() function.
+	 * @return string
 	 */
 	public function __toString()
 	{
@@ -138,6 +141,7 @@ class Staple_Pager
 	
 	/**
 	 * Returns an array with the page numbers.
+	 * @return int[]
 	 */
 	public function getPages()
 	{
@@ -169,7 +173,7 @@ class Staple_Pager
 	
 	//---------------------------------------------Getters and Setters---------------------------------------------
 	/**
-	 * @return the $total
+	 * @return int $total
 	 */
 	public function getTotal()
 	{
@@ -178,6 +182,7 @@ class Staple_Pager
 
 	/**
 	 * @param int $total
+	 * @return $this
 	 */
 	public function setTotal($total)
 	{
@@ -199,7 +204,7 @@ class Staple_Pager
 	}
 	
 	/**
-	 * @return the $page
+	 * @return int $page
 	 */
 	public function getPage()
 	{
@@ -208,6 +213,7 @@ class Staple_Pager
 
 	/**
 	 * @param int $page
+	 * @return $this
 	 */
 	public function setPage($page)
 	{
@@ -227,7 +233,7 @@ class Staple_Pager
 	}
 
 	/**
-	 * @return the $itemsPerPage
+	 * @return int $itemsPerPage
 	 */
 	public function getItemsPerPage()
 	{
@@ -236,6 +242,7 @@ class Staple_Pager
 
 	/**
 	 * @param int $itemsPerPage
+	 * @return $this
 	 */
 	public function setItemsPerPage($itemsPerPage)
 	{
@@ -261,6 +268,7 @@ class Staple_Pager
 
 	/**
 	 * @param boolean $displayItemAmountSelector
+	 * @return $this
 	 */
 	public function setDisplayItemAmountSelector($displayItemAmountSelector)
 	{
@@ -270,6 +278,7 @@ class Staple_Pager
 
 	/**
 	 * @param array[int]  $itemAmountSelections
+	 * @return $this
 	 */
 	public function setItemAmountSelections(array $itemAmountSelections)
 	{
@@ -286,7 +295,7 @@ class Staple_Pager
 	/**
 	 * Add a single entry to the selection list.
 	 * @param int $amount
-	 * @return Staple_Pager
+	 * @return $this
 	 */
 	public function addItemAmountSelection($amount)
 	{
@@ -296,7 +305,7 @@ class Staple_Pager
 	}
 
 	/**
-	 * @return the $pagesBeforeCurrent
+	 * @return int $pagesBeforeCurrent
 	 */
 	public function getPagesBeforeCurrent()
 	{
@@ -304,7 +313,7 @@ class Staple_Pager
 	}
 
 	/**
-	 * @return the $pagesAfterCurrent
+	 * @return int $pagesAfterCurrent
 	 */
 	public function getPagesAfterCurrent()
 	{
@@ -313,6 +322,7 @@ class Staple_Pager
 
 	/**
 	 * @param int $pagesBeforeCurrent
+	 * @return $this
 	 */
 	public function setPagesBeforeCurrent($pagesBeforeCurrent)
 	{
@@ -322,6 +332,7 @@ class Staple_Pager
 
 	/**
 	 * @param int $pagesAfterCurrent
+	 * @return $this
 	 */
 	public function setPagesAfterCurrent($pagesAfterCurrent)
 	{
@@ -332,6 +343,7 @@ class Staple_Pager
 	/**
 	 * Sets the $pagesBeforeCurrent and $pagesAfterCurrent to the same value.
 	 * @param int $pages
+	 * @return $this
 	 */
 	public function setPageBuffer($pages)
 	{
@@ -344,7 +356,7 @@ class Staple_Pager
 	 * This function allows the user to add additional variables to the GET string of the page links.
 	 * The array should be associative with it formated such that variabelName=>value.
 	 * @param array $vars
-	 * @return Staple_Pager
+	 * @return Pager
 	 */
 	public function setVariables(array $vars)
 	{
@@ -359,6 +371,7 @@ class Staple_Pager
 	 * Add a single variable to the page GET string
 	 * @param string $varname
 	 * @param string $value
+	 * @return $this
 	 */
 	public function addVariable($varname,$value)
 	{
@@ -368,6 +381,7 @@ class Staple_Pager
 	/**
 	 * Remove a single variable from the GET string.
 	 * @param string $varname
+	 * @return bool
 	 */
 	public function removeVariable($varname)
 	{
@@ -386,6 +400,7 @@ class Staple_Pager
 	 * This function is a temporary fix until the changes are completed to Staple_Route.
 	 * @param string $action
 	 * @deprecated
+	 * @return string
 	 */
 	public function displayPaging($action = NULL)
 	{
@@ -399,7 +414,7 @@ class Staple_Pager
 		//Set a default link action location if none is submitted.
 		if($action == NULL)
 		{
-			$action = Staple_Main::getRoute();
+			$action = Main::get()->getRoute();
 		}
 		$buffer = "<div class=\"staple_pager\">\n<div class=\"staple_pager_pages\">\nPage: ";
 		$pages = $this->getPages();
@@ -411,8 +426,8 @@ class Staple_Pager
 			}
 			elseif($this->getCurrentPage() > 1) 
 			{
-				$buffer .= '<a href="'.Staple_Link::get($action,array_merge($linkVars,array('page'=>1))).'">&lt;&lt;</a> - ';
-				$buffer .= '<a href="'.Staple_Link::get($action,array_merge($linkVars,array('page'=>($this->getCurrentPage()-1)))).'">&lt;</a> ';
+				$buffer .= '<a href="'.Link::get($action,array_merge($linkVars,array('page'=>1))).'">&lt;&lt;</a> - ';
+				$buffer .= '<a href="'.Link::get($action,array_merge($linkVars,array('page'=>($this->getCurrentPage()-1)))).'">&lt;</a> ';
 			}
 			if($pages[0] != 1)
 			{
@@ -426,7 +441,7 @@ class Staple_Pager
 				}
 				else 
 				{
-					$buffer .= '<a href="'.Staple_Link::get($action,array_merge($linkVars,array('page'=>(int)$page))).'">'.((int)$page).'</a> ';
+					$buffer .= '<a href="'.Link::get($action,array_merge($linkVars,array('page'=>(int)$page))).'">'.((int)$page).'</a> ';
 				}
 			}
 			if($pages[count($pages)-1] != $this->getNumberOfPages())
@@ -439,8 +454,8 @@ class Staple_Pager
 			}
 			else
 			{
-				$buffer .= '<a href="'.Staple_Link::get($action,array_merge($linkVars,array('page'=>($this->getCurrentPage()+1)))).'">&gt;</a> - '; 
-				$buffer .= '<a href="'.Staple_Link::get($action,array_merge($linkVars,array('page'=>$this->getNumberOfPages()))).'">&gt;&gt;</a> ';
+				$buffer .= '<a href="'.Link::get($action,array_merge($linkVars,array('page'=>($this->getCurrentPage()+1)))).'">&gt;</a> - '; 
+				$buffer .= '<a href="'.Link::get($action,array_merge($linkVars,array('page'=>$this->getNumberOfPages()))).'">&gt;&gt;</a> ';
 			}
 		}
 		else 
@@ -452,7 +467,7 @@ class Staple_Pager
 		{
 			
 			$buffer .= "<div class=\"staple_pager_items\">\n";
-			$buffer .= 'Items Per Page: <select onChange="window.location=\''.Staple_Link::get($action,array_merge($linkVars,array('page'=>1)))."&items='+this.value\">\n";
+			$buffer .= 'Items Per Page: <select onChange="window.location=\''.Link::get($action,array_merge($linkVars,array('page'=>1)))."&items='+this.value\">\n";
 			foreach($this->getItemAmountSelections() as $value)
 			{
 				$selected = '';

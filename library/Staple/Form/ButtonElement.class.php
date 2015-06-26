@@ -3,7 +3,7 @@
  * Submit button element for use on forms.
  * 
  * @author Ironpilot
- * @copyright Copywrite (c) 2011, STAPLE CODE
+ * @copyright Copyright (c) 2011, STAPLE CODE
  * 
  * This file is part of the STAPLE Framework.
  * 
@@ -21,7 +21,9 @@
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Staple_Form_ButtonElement extends Staple_Form_Element
+namespace Staple\Form;
+
+class ButtonElement extends FieldElement
 {
 	public function __construct($name, $value=NULL, $label = NULL, $id = NULL, array $attrib = array())
 	{
@@ -36,7 +38,7 @@ class Staple_Form_ButtonElement extends Staple_Form_Element
 	 */
 	public function field()
 	{
-		return '	<input type="button" id="'.$this->escape($this->id).'" name="'.$this->escape($this->name).'" value="'.$this->escape($this->value).'"'.$this->getAttribString().">\n";
+		return '	<input type="button" id="'.$this->escape($this->id).'" name="'.$this->escape($this->name).'" value="'.$this->escape($this->value).'"'.$this->getAttribString('input').">\n";
 	}
 
 	/* (non-PHPdoc)
@@ -44,10 +46,10 @@ class Staple_Form_ButtonElement extends Staple_Form_Element
 	 */
 	public function label()
 	{
-		return "	<label for=\"".$this->escape($this->id)."\"".$this->getClassString().">".$this->label."</label>\n";
+		return "	<label for=\"".$this->escape($this->id)."\"".$this->getClassString('label').">".$this->label."</label>\n";
 	}
 
-	public function build()
+	public function build($fieldView = NULL)
 	{
 		$buf = '';
 		$view = FORMS_ROOT.'/fields/SubmitElement.phtml';
@@ -62,7 +64,7 @@ class Staple_Form_ButtonElement extends Staple_Form_Element
 		{
 			$this->addClass('form_element');
 			$this->addClass('element_button');
-			$classes = $this->getClassString();
+			$classes = $this->getClassString('div');
 			$buf .= "<div$classes id=\"".$this->escape($this->id)."_element\">\n";
 			if(isset($this->label))
 			{

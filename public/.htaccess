@@ -1,29 +1,11 @@
 #Turns on URL Rewrite
-#DirectoryIndex index.php
 RewriteEngine on
 RewriteBase /
 
 #Checks for existing files -f and directories -d and disables rewrite
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{DOCUMENT_ROOT}/%{REQUEST_FILENAME} !-f
+RewriteCond %{DOCUMENT_ROOT}/%{REQUEST_FILENAME} !-d
 
-#RewriteCond %{DOCUMENT_ROOT}/%{REQUEST_FILENAME} !-f
-#RewriteCond %{DOCUMENT_ROOT}/%{REQUEST_FILENAME} !-d
-
-
-#Current Cross System working Rule - Note the ? forces the Query string
-#for hosting services such as Godaddy. Not all hosts will need this.
 
 RewriteRule ^(.[a-zA-Z0-9\/-]*)$ index.php?/$1 [PT,QSA,L]
-#RewriteRule ^(.[a-zA-Z0-9\/-]*)$ index.php?/$1 [PT,QSA,L]
-
-
-
-
-# ******* Old Rewrite Rules *******
-#Rewrite Rule - ERROR - Will cause faults with GET variables passed to methods
-#RewriteRule ^(.*)$ index.php [PT,QSA,L]
-#RewriteRule ^(.*)$ index.php?/$1 [PT,QSA,L]
-
-
 

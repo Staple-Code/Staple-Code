@@ -3,7 +3,7 @@
  * Image button element for use on forms.
  * 
  * @author Ironpilot
- * @copyright Copywrite (c) 2011, STAPLE CODE
+ * @copyright Copyright (c) 2011, STAPLE CODE
  * 
  * This file is part of the STAPLE Framework.
  * 
@@ -20,7 +20,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Form_ImageElement extends Staple_Form_Element
+namespace Staple\Form;
+
+class ImageElement extends FieldElement
 {
 	protected $src;
 	
@@ -48,10 +50,10 @@ class Staple_Form_ImageElement extends Staple_Form_Element
 	 */
 	public function label()
 	{
-		return '	<label for="'.$this->escape($this->id).'"'.$this->getClassString().'>'.$this->label.'</label>';
+		return '	<label for="'.$this->escape($this->id).'"'.$this->getClassString('label').'>'.$this->label.'</label>';
 	}
 
-	public function build()
+	public function build($fieldView = NULL)
 	{
 		$buf = '';
 		$view = FORMS_ROOT.'/fields/ImageElement.phtml';
@@ -66,7 +68,7 @@ class Staple_Form_ImageElement extends Staple_Form_Element
 		{
 			$this->addClass('form_element');
 			$this->addClass('element_image');
-			$classes = $this->getClassString();
+			$classes = $this->getClassString('div');
 			$buf .= "<div$classes id=\"".$this->escape($this->id)."_element\">\n";
 			if(isset($this->label))
 			{

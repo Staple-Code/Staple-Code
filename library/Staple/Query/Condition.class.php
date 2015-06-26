@@ -4,7 +4,7 @@
  * A class to contain SQL condional statements.
  * 
  * @author Ironpilot
- * @copyright Copywrite (c) 2011, STAPLE CODE
+ * @copyright Copyright (c) 2011, STAPLE CODE
  * 
  * This file is part of the STAPLE Framework.
  * 
@@ -21,16 +21,22 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Query_Condition
+namespace Staple\Query;
+
+use \Exception;
+use \Staple\Exception\QueryException;
+
+class Condition
 {
 	const EQUAL = '=';
 	const GREATER = '>';
 	const GREATER_EQUAL = '>=';
 	const LESS = '<';
 	const LESS_EQUAL = '<=';
-	const NOTEQUAL = '!=';
+	const NOTEQUAL = '<>';
 	const IN = "IN";
 	const IS = "IS";
+	const IS_NOT = "IS NOT";
 	const BETWEEN = "BETWEEN";
 	/**
 	 * The column for the where
@@ -44,7 +50,7 @@ class Staple_Query_Condition
 	protected $operator;
 	/**
 	 * The value of the comparison
-	 * @var string | int | bool
+	 * @var mixed
 	 */
 	protected $value;
 	/**
@@ -57,13 +63,22 @@ class Staple_Query_Condition
 	 * @var bool
 	 */
 	protected $columnJoin = false;
-	
-	public function __construct($statement = NULL)
+	/**
+	 * Reference to the connection object in use for this clause.
+	 * @var Connection
+	 */
+	protected $connection;
+
+	/**
+	 * @param string $statement
+	 * @param Connection $connection
+	 */
+	public function __construct($statement = NULL, Connection $connection = NULL)
 	{
 		if(isset($statement))
-		{
 			$this->setStatement($statement);
-		}
+		if(isset($connection))
+			$this->setConnection($connection);
 	}
 	
 	/**
@@ -73,7 +88,7 @@ class Staple_Query_Condition
 	public function __toString()
 	{
 		try {
-			$return = $this->build(); 
+			$return = $this->build($this->getConnection());
 		}
 		catch (Exception $e)
 		{
@@ -85,7 +100,8 @@ class Staple_Query_Condition
 	
 	/**
 	 * Sets the where statement.
-	 * @param unknown_type $where
+	 * @param string $where
+	 * @return $this
 	 */
 	public function setWhere($where)
 	{
@@ -93,7 +109,7 @@ class Staple_Query_Condition
 		return $this;
 	}
 	
-	public function build()
+	public function build(Connection $connection)
 	{
 		if(isset($this->statement))
 		{
@@ -112,16 +128,16 @@ class Staple_Query_Condition
 						{
 							$value .= ",";
 						}
-						$value .= $this->columnJoin ? $aValue : Staple_Query::convertTypes($aValue);
+						$value .= $this->columnJoin ? $aValue : Query::convertTypes($aValue,$connection);
 					}
 				}
-				elseif($this->value instanceof Staple_Query_Select)
+				elseif($this->value instanceof Select)
 				{
 					$value .= $this->value;
 				}
 				else
 				{
-					$value = $this->columnJoin ? $this->value : Staple_Query::convertTypes($this->value);
+					$value = $this->columnJoin ? $this->value : Query::convertTypes($this->value,$connection);
 				}
 				$value .= ")";
 			}
@@ -131,7 +147,7 @@ class Staple_Query_Condition
 			}
 			else 
 			{
-				$value = $this->columnJoin ? $this->value : Staple_Query::convertTypes($this->value);
+				$value = $this->columnJoin ? $this->value : Query::convertTypes($this->value,$connection);
 			}
 			return $this->column.' '.$this->operator.' '.$value;
 		}
@@ -140,7 +156,7 @@ class Staple_Query_Condition
 	/*-----------------------------------------------GETTERS AND SETTERS-----------------------------------------------*/
 	
 	/**
-	 * @return the $column
+	 * @return string $column
 	 */
 	public function getColumn()
 	{
@@ -148,7 +164,7 @@ class Staple_Query_Condition
 	}
 
 	/**
-	 * @return the $operator
+	 * @return string $operator
 	 */
 	public function getOperator()
 	{
@@ -156,7 +172,7 @@ class Staple_Query_Condition
 	}
 
 	/**
-	 * @return the $value
+	 * @return mixed $value
 	 */
 	public function getValue()
 	{
@@ -164,7 +180,7 @@ class Staple_Query_Condition
 	}
 
 	/**
-	 * @return the $statement
+	 * @return string $statement
 	 */
 	public function getStatement()
 	{
@@ -173,6 +189,7 @@ class Staple_Query_Condition
 
 	/**
 	 * @param string $column
+	 * @return $this
 	 */
 	public function setColumn($column)
 	{
@@ -182,6 +199,7 @@ class Staple_Query_Condition
 
 	/**
 	 * @param string $operator
+	 * @return $this
 	 */
 	public function setOperator($operator)
 	{
@@ -191,6 +209,7 @@ class Staple_Query_Condition
 
 	/**
 	 * @param string $value
+	 * @return $this
 	 */
 	public function setValue($value)
 	{
@@ -200,6 +219,7 @@ class Staple_Query_Condition
 
 	/**
 	 * @param string $statement
+	 * @return $this
 	 */
 	public function setStatement($statement)
 	{
@@ -217,17 +237,49 @@ class Staple_Query_Condition
 
 	/**
 	 * @param bool $columnJoin
+	 * @return $this
 	 */
 	public function setColumnJoin($columnJoin)
 	{
 		$this->columnJoin = (bool)$columnJoin;
 		return $this;
 	}
+
+	/**
+	 * Return the currently set connection or attempt to retrieve the default connection if non specified.
+	 * @return Connection
+	 */
+	public function getConnection()
+	{
+		if(isset($this->connection))
+			return $this->connection;
+		else
+			return Connection::get();
+	}
+
+	/**
+	 * Set the connection.
+	 * @param Connection $connection
+	 */
+	public function setConnection(Connection $connection)
+	{
+		$this->connection = $connection;
+	}
+
+
 	
 	/*-----------------------------------------------CONDITION ENCAPSULATORS-----------------------------------------------*/
 
-	public static function Get($column, $operator, $value, $columnJoin = NULL)
+	/**
+	 * @param $column
+	 * @param $operator
+	 * @param $value
+	 * @param bool $columnJoin
+	 * @return static
+	 */
+	public static function get($column, $operator, $value, $columnJoin = NULL)
 	{
+		/** @var Condition $obj */
 		$obj = new static();
 		$obj->setColumn($column)
 			->setOperator($operator)
@@ -236,8 +288,12 @@ class Staple_Query_Condition
 			$obj->setColumnJoin($columnJoin);
 		return $obj;
 	}
-	
-	public static function Statement($statement)
+
+	/**
+	 * @param $statement
+	 * @return static
+	 */
+	public static function statement($statement)
 	{
 		$class = new static();
 		$class->setStatement($statement);
@@ -249,10 +305,11 @@ class Staple_Query_Condition
 	 * @param string $column
 	 * @param mixed $value
 	 * @param bool $columnJoin
-	 * @return Staple_Query_Condition
+	 * @return Condition
 	 */
-	public static function Equal($column, $value, $columnJoin = NULL)
+	public static function equal($column, $value, $columnJoin = NULL)
 	{
+		/** @var Condition $obj */
 		$obj = new static();
 		$obj->setColumn($column)
 			->setValue($value);
@@ -264,9 +321,38 @@ class Staple_Query_Condition
 			$obj->setColumnJoin($columnJoin);
 		return $obj;
 	}
-	
-	public static function Like($column, $value, $columnJoin = NULL)
+
+	/**
+	 * Setup a SQL WHERE clause where a column is not equal to a value.
+	 * @param string $column
+	 * @param mixed $value
+	 * @param bool $columnJoin
+	 * @return Condition
+	 */
+	public static function notEqual($column, $value, $columnJoin = NULL)
 	{
+		/** @var Condition $obj */
+		$obj = new static();
+		$obj->setColumn($column)
+			->setValue($value);
+
+		//Check for NULLS
+		is_null($value) ? $obj->setOperator(self::IS_NOT) :	$obj->setOperator(self::NOTEQUAL);
+
+		if(isset($columnJoin))
+			$obj->setColumnJoin($columnJoin);
+		return $obj;
+	}
+
+	/**
+	 * @param $column
+	 * @param $value
+	 * @param bool $columnJoin
+	 * @return static
+	 */
+	public static function like($column, $value, $columnJoin = NULL)
+	{
+		/** @var Condition $obj */
 		$obj = new static();
 		$obj->setColumn($column)
 			->setOperator('LIKE')
@@ -275,18 +361,30 @@ class Staple_Query_Condition
 			$obj->setColumnJoin($columnJoin);
 		return $obj;
 	}
-	
-	public static function Null($column)
+
+	/**
+	 * @param $column
+	 * @return static
+	 */
+	public static function null($column)
 	{
+		/** @var Condition $obj */
 		$obj = new static();
 		$obj->setColumn($column)
 			->setOperator('IS')
 			->setValue(NULL);
 		return $obj;
 	}
-	
-	public static function In($column, $values, $columnJoin = NULL)
+
+	/**
+	 * @param $column
+	 * @param $values
+	 * @param bool $columnJoin
+	 * @return static
+	 */
+	public static function in($column, $values, $columnJoin = NULL)
 	{
+		/** @var Condition $obj */
 		$obj = new static();
 		$obj->setColumn($column)
 			->setOperator(self::IN)
@@ -295,16 +393,22 @@ class Staple_Query_Condition
 			$obj->setColumnJoin($columnJoin);
 		return $obj;
 	}
-	
-	public static function Between($column, $start, $end)
+
+	/**
+	 * @param $column
+	 * @param $start
+	 * @param $end
+	 * @return static
+	 * @throws QueryException
+	 */
+	public static function between($column, $start, $end)
 	{
+		/** @var Condition $obj */
 		$obj = new static();
 		$obj->setColumn($column)
 			->setOperator(self::BETWEEN)
-			->setValue(Staple_Query::convertTypes($start)." AND ".Staple_Query::convertTypes($end))
+			->setValue(Query::convertTypes($start)." AND ".Query::convertTypes($end))
 			->setColumnJoin(true);
 		return $obj;
 	}
 }
-
-?>

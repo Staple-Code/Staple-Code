@@ -4,7 +4,7 @@
  * This class will be a container for routes generated from link strings.
  * 
  * @author Ironpilot
- * @copyright Copywrite (c) 2011, STAPLE CODE
+ * @copyright Copyright (c) 2011, STAPLE CODE
  * 
  * This file is part of the STAPLE Framework.
  * 
@@ -21,7 +21,14 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Route
+namespace Staple;
+
+use \ReflectionMethod;
+use \ReflectionClass;
+use Staple\Exception\PageNotFoundException;
+use Staple\Exception\RoutingException;
+
+class Route
 {
 	const ROUTE_MVC = 1;
 	const ROUTE_SCRIPT = 2;
@@ -42,11 +49,6 @@ class Staple_Route
 	 * @var array[mixed]
 	 */
 	protected $params = array();
-	/**
-	 * The script route string.
-	 * @var string
-	 */
-	protected $script;
 	/**
 	 * Type of route: MVC route or script route.
 	 * @var int
@@ -73,14 +75,14 @@ class Staple_Route
 	 */
 	public function __toString()
 	{
-		//Website Base
+		//Website Base - don't remember why this was here
 		//$link = Staple_Config::getValue('application', 'public_location');
 		
 		//Add Controller
-		$link = Staple_Link::urlCase($this->getController()).'/';
+		$link = Link::urlCase($this->getController()).'/';
 		
 		//Add Action
-		$link .= Staple_Link::urlCase($this->getAction());
+		$link .= Link::urlCase($this->getAction());
 		
 		//Add Parameters
 		if(count($this->params) >= 1)
@@ -90,57 +92,215 @@ class Staple_Route
 		
 		return $link;
 	}
-	
+
 	/**
-	 * Returns the currently executing route. This is processed direct from the PATH_INFO php variable.
-	 * Returns a Staple_Route object.
-	 * @return Staple_Route
+	 * Create and return an instance of the object.
+	 * @param string $link
+	 * @return static
 	 */
-	public static function GetCurrentRoute()
+	public static function make($link = NULL)
 	{
-		$route = new static();
+		return new static($link);
+	}
+
+	/**
+	 * Execute the route
+	 */
+	public function execute()
+	{
+		//Route Controller and actions
+		$class = $this->getController();
+		$method = $this->getAction();
 		
-		//First determine which routing information to use
-		if(array_key_exists('PATH_INFO', $_SERVER))		//Use the URI route
+		//The class name for the controller
+		$dispatchClass = $class.'Controller';
+	
+		//Check for the controller existence
+		if(class_exists($dispatchClass))
 		{
-			$routeString = $_SERVER['PATH_INFO'];
-			$routeString = urldecode($routeString);			//URL decode any special characters
-		}
-		elseif(array_key_exists('REQUEST_URI', $_SERVER))		//Use the URI route
-		{
-			$routeString = $_SERVER['REQUEST_URI'];
-			$routeString = urldecode($routeString);			//URL decode any special characters
-		}
-		else												//Use the default route
-		{
-			$routeString = 'index/index';
+			//Check for the action existence
+			if(method_exists($dispatchClass, $method))
+			{
+				//If the controller has not been created yet, create an instance and store it in the front controller
+				if(($controller = Main::controller($class)) == NULL)
+				{
+					/**
+					 * @var Controller $controller
+					 */
+					$controller = new $dispatchClass();
+					$controller->_start();
+					
+					//Store the controller object
+					Main::controller($controller);
+				}
+				else
+				{
+					//If the controller already exists in the session just execute the start method again.
+					$controller->_start();
+				}
+				
+				//Verify that an instance of the controller class exists and is of the right type
+				if($controller instanceof Controller)
+				{
+					//Check if global Auth is enabled.
+					if(Config::getValue('auth', 'enabled') != 0)
+					{
+						//Check the sub-controller for access to the method
+						if($controller->_auth($method) === true)
+						{
+							//Everything went well, dispatch the controller.
+							$this->dispatchController();
+						}
+						else
+						{
+							//No Authentication, send us to the login screen.
+							Auth::get()->noAuth($this);
+						}
+					}
+					else
+					{
+						//No authentication needed, dispatch the controller
+						$this->dispatchController();
+					}
+					
+					//Return true so that we don't hit the exception.
+					return true;
+				}
+			}
 		}
 		
-		$route->processStringRoute($routeString);
-		
-		return $route;
+		//If a valid page cannot be found, throw page not found exception
+		throw new PageNotFoundException('Page Not Found',Error::PAGE_NOT_FOUND);
 	}
 	
 	/**
-	 * Dispatch the route
+	 * Function executes a controller action passing parameters using call_user_func_array().
+	 * It also builds the view for the route.
+	 *
+	 * @throws RoutingException
 	 */
-	public function Execute()
+	protected function dispatchController()
 	{
-		//@todo incomplete method
+		$controller = Main::controller($this->getController());
+		
+		if($controller instanceof Controller)
+		{
+			//Set the view's controller to match the route
+			$controller->view->setController($this->getController());
+		
+			//Set the view's action to match the route
+			$controller->view->setView($this->getAction());
+		
+			//Call the controller action
+			$actionMethod = new ReflectionMethod($controller,$this->getAction());
+			$return = $actionMethod->invokeArgs($controller, $this->getParams());
+
+			if($return instanceof View)		//Check for a returned View object
+			{
+				//If the view does not have a controller name set, set it to the currently executing controller.
+				if(!$return->hasController())
+				{
+					$loader = Main::get()->getLoader();
+					$conString = get_class($controller);
+
+					$return->setController(substr($conString,0,strlen($conString)-strlen($loader::CONTROLLER_SUFFIX)));
+				}
+
+				//If the view doesn't have a view set, use the route's action.
+				if(!$return->hasView())
+				{
+					$return->setView($this->getAction());
+				}
+
+				//Check for a controller layout and build it.
+				if($controller->layout instanceof Layout)
+				{
+					$controller->layout->build(NULL,$return);
+				}
+				else
+				{
+					$return->build();
+				}
+			}
+			elseif ($return instanceof Json)	//Check for a Json object to be coverted and echoed.
+			{
+				echo json_encode($return);
+			}
+			elseif (is_object($return))		//Check for another object type
+			{
+				//If the object is stringable, covert it to a string and output it.
+				$class = new ReflectionClass($return);
+				if ($class->implementsInterface('JsonSerializable'))
+				{
+					echo json_encode($return);
+				}
+				//If the object is stringable, covert to a string and output it.
+				elseif((!is_array($return)) &&
+					((!is_object($return) && settype($return, 'string') !== false) ||
+					(is_object($return) && method_exists($return, '__toString'))))
+				{
+					echo (string)$return;
+				}
+				//If nothing else works, echo the object through the dump method.
+				else
+				{
+					Dev::Dump($return);
+				}
+			}
+			elseif(is_string($return))		//If the return value was simply a string, echo it out.
+			{
+				echo $return;
+			}
+			else
+			{
+				//Fall back to previous functionality by rendering views and layouts.
+
+				//If the view does not have a controller name set, set it to the currently executing controller.
+				if(!$controller->view->hasController())
+				{
+					$loader = Main::get()->getLoader();
+					$conString = get_class($controller);
+
+					$controller->view->setController(substr($conString,0,strlen($conString)-strlen($loader::CONTROLLER_SUFFIX)));
+				}
+
+				//If the view doesn't have a view set, use the route's action.
+				if(!$controller->view->hasView())
+				{
+					$controller->view->setView($this->getAction());
+				}
+
+				//Check for a layout
+				if($controller->layout instanceof Layout)
+				{
+					//Align the controller and layout views. They should already be the same anyway.
+					$controller->layout->setView($controller->view);
+					$controller->layout->build();
+				}
+				else
+				{
+					$controller->view->build();
+				}
+			}
+		}
+		else
+		{
+			throw new RoutingException('Tried to dispatch to an invalid controller.', Error::APPLICATION_ERROR);
+		}
 	}
 	
 	/**
 	 * Redirect to the route location.
 	 */
-	public function Redirect()
+	public function redirect()
 	{
-		$base = Staple_Config::getValue('application', 'public_location');
+		$base = Config::getValue('application', 'public_location');
 		header('Location: '.$base.$this);
 		exit(0);
 	}
 	
 	/**
-	 * @return the $controller
+	 * @return string $controller
 	 */
 	public function getController()
 	{
@@ -148,7 +308,7 @@ class Staple_Route
 	}
 
 	/**
-	 * @return the $action
+	 * @return string $action
 	 */
 	public function getAction()
 	{
@@ -156,7 +316,7 @@ class Staple_Route
 	}
 
 	/**
-	 * @return the $params
+	 * @return array $params
 	 */
 	public function getParams()
 	{
@@ -164,15 +324,7 @@ class Staple_Route
 	}
 
 	/**
-	 * @return the $script
-	 */
-	public function getScript()
-	{
-		return $this->script;
-	}
-
-	/**
-	 * @return the $type
+	 * @return int $type
 	 */
 	public function getType()
 	{
@@ -181,6 +333,7 @@ class Staple_Route
 
 	/**
 	 * @param number $type
+	 * @return $this
 	 */
 	public function setType($type)
 	{
@@ -194,17 +347,10 @@ class Staple_Route
 		return $this;
 	}
 
-	/**
-	 * @param string $script
-	 */
-	public function setScript($script)
-	{
-		$this->script = (string)$script;
-		return $this;
-	}
 
 	/**
 	 * @param string $controller
+	 * @return $this
 	 */
 	public function setController($controller)
 	{
@@ -214,6 +360,7 @@ class Staple_Route
 
 	/**
 	 * @param string $action
+	 * @return $this
 	 */
 	public function setAction($action)
 	{
@@ -223,6 +370,7 @@ class Staple_Route
 
 	/**
 	 * @param array[mixed] $params
+	 * @return $this
 	 */
 	public function setParams(array $params)
 	{
@@ -233,14 +381,25 @@ class Staple_Route
 	/**
 	 * Process an array route
 	 * @param array $route
+	 * @throws RoutingException
 	 */
 	protected function processArrayRoute(array $route)
 	{
 		//Set the Controller
 		if(array_key_exists(0, $route))
 		{
-			$this->setController($route[0]);
+			$controller = $route[0];
 			unset($route[0]);
+			//Check route info and convert to method case
+			if(ctype_alnum(str_replace('-', '', $controller)) && ctype_alpha(substr($controller, 0, 1)))
+			{
+				$this->setController(Link::methodCase($controller));
+			}
+			else
+			{
+				//Bad info in the route, error out.
+				throw new RoutingException('Invalid Route', Error::PAGE_NOT_FOUND);
+			}
 		}
 		else
 		{
@@ -250,8 +409,17 @@ class Staple_Route
 		//Set the Action
 		if(array_key_exists(1, $route))
 		{
-			$this->setAction($route[1]);
+			$action = $route[1];
 			unset($route[1]);
+			if(ctype_alnum(str_replace('-', '', $action)) && ctype_alpha(substr($action, 0, 1)))
+			{
+				$this->setAction(Link::methodCase($action));
+			}
+			else
+			{
+				//Bad info in the route, error out.
+				throw new RoutingException('Invalid Route', Error::PAGE_NOT_FOUND);
+			}
 		}
 		else
 		{
@@ -265,6 +433,11 @@ class Staple_Route
 		}
 	}
 	
+	/**
+	 * Process a string-based route
+	 * @param string $route
+	 * @throws RoutingException
+	 */
 	protected function processStringRoute($route)
 	{
 		//Run some route cleaning operations.
@@ -275,80 +448,68 @@ class Staple_Route
 		
 		//Remove trailing forward slash
 		if(substr($route, (strlen($route)-1), 1) == '/') $route = substr($route, 0, strlen($route)-1);
-		
-		//End routing information on the first "." occurance
+
+		//End routing information on the first . ? or # occurrence, process each separately to get the first of any of the objects.
 		if(($end = strpos($route,'.')) !== false)
-		{
 			$route = substr($route, 0, $end);
-		}
+		if(($end = strpos($route,'?')) !== false)
+			$route = substr($route, 0, $end);
+		if(($end = strpos($route,'#')) !== false)
+			$route = substr($route, 0, $end);
 		
 		//Check to see if a script exists with that route.
-		$scriptRoute = SCRIPT_ROOT.$route.'.php';
-		if(file_exists($scriptRoute))
+		//Split the route into it's component elements.
+		$splitRoute = explode('/',$route);
+		$routeCount = count($splitRoute);
+		
+		//If the route only contains a controller add the index action
+		if($routeCount == 0 || strlen($route) == 0)
 		{
-			//Check for valid path information
-			if(ctype_alnum(str_replace(array('/','_','-'),'',$route)))
+			$splitRoute = array();
+			array_push($splitRoute, 'index');
+			array_push($splitRoute, 'index');
+		}
+		elseif($routeCount == 1)
+		{
+			array_push($splitRoute, 'index');
+		}
+		elseif($routeCount >= 2)
+		{
+			//If the action is numeric, it is not the action. Insert the index action into the route.
+			if(is_numeric($splitRoute[1]))
 			{
-				$this->setScript($route)
-					->setType(self::ROUTE_SCRIPT);
+				$shift = array_shift($splitRoute);
+				array_unshift($splitRoute, $shift, 'index');
 			}
+		}
+		
+		//Check the Controller value and Set a valid value
+		$controller = array_shift($splitRoute);
+		if(ctype_alnum(str_replace('-', '', $controller)) && ctype_alpha(substr($controller, 0, 1)))
+		{
+			$this->setController(Link::methodCase($controller));
 		}
 		else
 		{
-			//No Script found, routing to controller/action
-				
-			//Split the route into it's component elements.
-			$splitRoute = explode('/',$route);
-			$routeCount = count($splitRoute);
-			
-			//If the route only contains a controller add the index action
-			if($routeCount == 0)
-			{
-				array_push($splitRoute, 'index');
-				array_push($splitRoute, 'index');
-			}
-			elseif($routeCount == 1)
-			{
-				array_push($splitRoute, 'index');
-			}
-			elseif($routeCount >= 2)
-			{
-				//If the action is numeric, it is not the action. Insert the index action into the route.
-				if(is_numeric($splitRoute[1]))
-				{
-					$shift = array_shift($splitRoute);
-					array_unshift($splitRoute, $shift, 'index');
-				}
-			}
-			
-			//Check the Controller value and Set a valid value
-			$controller = array_shift($splitRoute);
-			if(ctype_alnum(str_replace('-', '', $controller)) && ctype_alpha(substr($controller, 0, 1)))
-			{
-				$this->setController(Staple_Link::methodCase($controller));
-			}
-			else
-			{
-				//Bad info in the route, error out.
-				throw new Exception('Invalid Route', Staple_Error::PAGE_NOT_FOUND);
-			}
-			
-			//Check the Action Value and Set a valid value
-			$action = array_shift($splitRoute);
-			if(ctype_alnum(str_replace('-', '', $action)) && ctype_alpha(substr($action, 0, 1)))
-			{
-				$this->setAction(Staple_Link::methodCase($action));
-			}
-			else
-			{
-				//Bad info in the route, error out.
-				throw new Exception('Invalid Route', Staple_Error::PAGE_NOT_FOUND);
-			}
-			
-			$this
-				->setParams($splitRoute)
-				->setType(self::ROUTE_MVC);
+			//Bad info in the route, error out.
+			throw new RoutingException('Invalid Route', Error::PAGE_NOT_FOUND);
 		}
+		
+		//Check the Action Value and Set a valid value
+		$action = array_shift($splitRoute);
+		if(ctype_alnum(str_replace('-', '', $action)) && ctype_alpha(substr($action, 0, 1)))
+		{
+			$this->setAction(Link::methodCase($action));
+		}
+		else
+		{
+			//Bad info in the route, error out.
+			throw new RoutingException('Invalid Route', Error::PAGE_NOT_FOUND);
+		}
+		
+		$this
+			->setParams($splitRoute)
+			->setType(self::ROUTE_MVC);
 	}
 }
 

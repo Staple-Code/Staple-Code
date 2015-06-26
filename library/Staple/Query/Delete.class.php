@@ -4,7 +4,7 @@
  * A class for creating SQL DELETE statements
  * 
  * @author Ironpilot
- * @copyright Copywrite (c) 2011, STAPLE CODE
+ * @copyright Copyright (c) 2011, STAPLE CODE
  * 
  * This file is part of the STAPLE Framework.
  * 
@@ -21,7 +21,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Query_Delete extends Staple_Query
+namespace Staple\Query;
+
+class Delete extends Query
 {
 	const IGNORE = 'IGNORE';
 	const LOW_PRIORITY = 'LOW_PRIORITY';
@@ -34,11 +36,16 @@ class Staple_Query_Delete extends Staple_Query
 	protected $flags = array();
 	/**
 	 * Array of Staple_Query_Join objects that represent table joins on the query
-	 * @var array[Staple_Query_Join]
+	 * @var Join[]
 	 */
 	protected $joins = array();
-	
-	public function __construct($table = NULL, mysqli $db = NULL)
+
+	/**
+	 * @param string $table
+	 * @param Connection $db
+	 * @throws \Exception
+	 */
+	public function __construct($table = NULL, Connection $db = NULL)
 	{
 		parent::__construct($table, $db);
 	}
@@ -47,17 +54,9 @@ class Staple_Query_Delete extends Staple_Query
 	{
 		switch($flag)
 		{
-			case self::ALL:
-			case self::DISTINCT:
-			case self::DISTINCTROW:
-			case self::HIGH_PRIORITY:
-			case self::STRAIGHT_JOIN:
-			case self::SQL_SMALL_RESULT:
-			case self::SQL_BIG_RESULT:
-			case self::SQL_BUFFER_RESULT:
-		    case self::SQL_CACHE:
-		    case self::SQL_NO_CACHE:
-		    case self::SQL_CALC_FOUND_ROWS:
+			case self::IGNORE:
+			case self::LOW_PRIORITY:
+			case self::QUICK:
 		    	$this->flags[] = $flag;
 		    	break;
 		}
@@ -70,20 +69,9 @@ class Staple_Query_Delete extends Staple_Query
 		return $this;
 	}
 
-	/**
-	 * @param mixed $table
-	 * @param string $alias
-	 */
-	public function setTable($table)
-	{
-		//@todo expand to include multiple tables
-		$this->table = (string)$table;
-		return $this;
-	}
-
 	/*-----------------------------------------------JOIN FUNCTIONS-----------------------------------------------*/
 	
-	public function addJoin(Staple_Query_Join $join)
+	public function addJoin(Join $join)
 	{
 		$this->joins[] = $join;
 	}
@@ -103,13 +91,13 @@ class Staple_Query_Delete extends Staple_Query
 	
 	public function leftJoin($table, $condition)
 	{
-		$this->addJoin(Staple_Query_Join::left($table, $condition));
+		$this->addJoin(Join::left($table, $condition));
 		return $this;
 	}
 	
 	public function innerJoin($table, $condition)
 	{
-		$this->addJoin(Staple_Query_Join::inner($table, $condition));
+		$this->addJoin(Join::inner($table, $condition));
 		return $this;
 	}
 	
@@ -152,5 +140,3 @@ class Staple_Query_Delete extends Staple_Query
 		return $stmt;
 	}
 }
-
-?>

@@ -4,7 +4,7 @@
  * @todo this class needs to be redesigned
  * 
  * @author Ironpilot
- * @copyright Copywrite (c) 2011, STAPLE CODE
+ * @copyright Copyright (c) 2011, STAPLE CODE
  * 
  * This file is part of the STAPLE Framework.
  * 
@@ -21,7 +21,11 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Error implements SplSubject
+namespace Staple;
+
+use \SplObjectStorage, \SplSubject, \SplObserver, \ErrorException, \Exception, \Staple\Exception\PageNotFoundException;
+
+class Error implements SplSubject
 {
 	const PAGE_NOT_FOUND = 404;
 	const APPLICATION_ERROR = 500;
@@ -49,7 +53,7 @@ class Staple_Error implements SplSubject
 	 * The last exception that was thrown by the system.
 	 * @var Exception
 	 */
-	private $lastException;
+	private static $lastException;
 	
 	/**
 	 * The default constructor.
@@ -84,7 +88,7 @@ class Staple_Error implements SplSubject
 	 */
 	public function getLastException()
 	{
-		return $this->lastException;
+		return self::$lastException;
 	}
 
 	/**
@@ -92,7 +96,7 @@ class Staple_Error implements SplSubject
 	 */
 	private function setLastException(Exception $lastException)
 	{
-		$this->lastException = $lastException;
+		self::$lastException = $lastException;
 		return $this;
 	}
 
@@ -128,11 +132,20 @@ class Staple_Error implements SplSubject
 		ob_clean();
 		
 		//Get the Front Controller
-		$main = Staple_Main::get();
-		
-		//Process the Header
-		$main->processHeader(true);
-		 
+		$main = Main::get();
+
+		//Set the HTTP response code
+		if($ex instanceof PageNotFoundException || $ex->getCode() == 404)
+		{
+			http_response_code(404);
+		}
+		else
+		{
+			http_response_code(500);
+		}
+
+		ob_start();
+
 		//Echo the error message
 		echo "<p>".$ex->getMessage()." Code: ".$ex->getCode()."</p>";
 		
@@ -141,7 +154,7 @@ class Staple_Error implements SplSubject
 		{
 			if(($p = $ex->getPrevious()) instanceof Exception)
 			{
-				echo "<p><b>Previous Error:</b> ".$p->getMessage." Code: ".$p->getCode()."</p>";
+				echo "<p><b>Previous Error:</b> ".$p->getMessage()." Code: ".$p->getCode()."</p>";
 			}
 			echo "<pre>".$ex->getTraceAsString()."</pre>";
 			foreach ($ex->getTrace() as $traceln)
@@ -151,17 +164,20 @@ class Staple_Error implements SplSubject
 				echo "</pre>";
 			}
 		}
+
+		$buffer = ob_get_contents();
+		ob_end_clean();
 		
 		//If the site uses layout, build the default layout and put the error message inside.
-		if(Staple_Layout::layoutExists(Staple_Config::getValue('layout', 'default')))
+		if(Layout::layoutExists(Config::getValue('layout', 'default')))
 		{
-		    //Grab the current buffer contents to add to the layout
-			$buffer = ob_get_contents();
-			ob_clean();
-			
 			//Create the layout object and build the layout
-			$layout = new Staple_Layout(Staple_Config::getValue('layout', 'default'));
+			$layout = new Layout(Config::getValue('layout', 'default'));
 			$layout->build($buffer);
+		}
+		else
+		{
+			echo $buffer;
 		}
 	}
 	

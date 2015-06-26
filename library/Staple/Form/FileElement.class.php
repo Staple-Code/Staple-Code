@@ -3,7 +3,7 @@
  * Creates a file field to be added to the form. Class is incomplete.
  * 
  * @author Ironpilot
- * @copyright Copywrite (c) 2011, STAPLE CODE
+ * @copyright Copyright (c) 2011, STAPLE CODE
  * 
  * This file is part of the STAPLE Framework.
  * 
@@ -20,7 +20,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Form_FileElement extends Staple_Form_Element
+namespace Staple\Form;
+
+class FileElement extends FieldElement
 {
 	/**
 	 * Holds the MIME for the HTML Accept property
@@ -29,7 +31,7 @@ class Staple_Form_FileElement extends Staple_Form_Element
 	protected $accept;
 	
 	/**
-	 * @return the $accept
+	 * @return string $accept
 	 */
 	public function getAccept()
 	{
@@ -38,7 +40,7 @@ class Staple_Form_FileElement extends Staple_Form_Element
 
 	/**
 	 * @param string $accept
-	 * @return Staple_Form_FileElement
+	 * @return $this
 	 */
 	public function setAccept($accept)
 	{
@@ -57,7 +59,7 @@ class Staple_Form_FileElement extends Staple_Form_Element
 		{
 			$accept = ' accept="'.htmlentities($this->accept).'"';
 		}
-		return '	<input type="file" id="'.$this->escape($this->id).'" name="'.$this->escape($this->name).'" value=""'.$accept.$this->getAttribString().'>'."\n";
+		return '	<input type="file" id="'.$this->escape($this->id).'" name="'.$this->escape($this->name).'" value=""'.$accept.$this->getAttribString('input').'>'."\n";
 	}
 
 	/**
@@ -66,14 +68,14 @@ class Staple_Form_FileElement extends Staple_Form_Element
 	 */
 	public function label()
 	{
-		return '	<label for="'.$this->escape($this->id).'"'.$this->getClassString().'>'.$this->label."</label>\n";
+		return '	<label for="'.$this->escape($this->id).'"'.$this->getClassString('label').'>'.$this->label."</label>\n";
 	}
 
 	/**
 	 * 
 	 * @see Staple_Form_Element::build()
 	 */
-	public function build()
+	public function build($fieldView = NULL)
 	{
 		$buf = '';
 		$view = FORMS_ROOT.'/fields/FileElement.phtml';
@@ -88,7 +90,7 @@ class Staple_Form_FileElement extends Staple_Form_Element
 		{
 			$this->addClass('form_element');
 			$this->addClass('element_file');
-			$classes = $this->getClassString();
+			$classes = $this->getClassString('div');
 			$buf .= "<div$classes id=\"".$this->escape($this->id)."_element\">\n";
 			$buf .= $this->label();
 			$buf .= $this->field();

@@ -1,10 +1,9 @@
 <?php
- 
 /** 
  * A class for creating SQL SELECT statements
  * 
  * @author Ironpilot
- * @copyright Copywrite (c) 2011, STAPLE CODE
+ * @copyright Copyright (c) 2011, STAPLE CODE
  * 
  * This file is part of the STAPLE Framework.
  * 
@@ -21,7 +20,14 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Query_Update extends Staple_Query
+namespace Staple\Query;
+
+use \Exception;
+use \Staple\Error;
+use Staple\Exception\QueryException;
+use \Staple\Pager;
+
+class Update extends Query
 {
 	const LOW_PRIORITY = 'LOW_PRIORITY';
 	const IGNORE = 'IGNORE';
@@ -33,7 +39,7 @@ class Staple_Query_Update extends Staple_Query
 	protected $flags = array();
 	/**
 	 * The data with which to update.
-	 * @var array[string]
+	 * @var DataSet[]
 	 */
 	public $data = array();
 	/**
@@ -43,7 +49,7 @@ class Staple_Query_Update extends Staple_Query
 	protected $order;
 	/**
 	 * Limit number of rows to return.
-	 * @var int
+	 * @var Pager | int
 	 */
 	protected $limit;
 	/**
@@ -51,13 +57,32 @@ class Staple_Query_Update extends Staple_Query
 	 * @var int
 	 */
 	protected $limitOffset;
-	
-	public function __construct($table = NULL, array $data = NULL, $db = NULL, $order = NULL, $limit = NULL)
+
+	/**
+	 * @param string $table
+	 * @param array $data
+	 * @param Connection $db
+	 * @param array | string $order
+	 * @param Pager | int $limit
+	 * @throws Exception
+	 */
+	public function __construct($table = NULL, array $data = NULL, Connection $db = NULL, $order = NULL, $limit = NULL)
 	{
-		$this->data = new Staple_Query_DataSet();
+		$this->data = new DataSet();
 		if(isset($db))
 		{
-			$this->setDb($db);
+			$this->setConnection($db);
+			$this->data->setConnection($db);
+		}
+		else
+		{
+			try {
+				$this->setConnection(Connection::get());
+			}
+			catch (Exception $e)
+			{
+				throw new QueryException('Unable to find a database connection.', Error::DB_ERROR, $e);
+			}
 		}
 		if(isset($table))
 		{
@@ -131,7 +156,7 @@ class Staple_Query_Update extends Staple_Query
 	//----------------------------------------------GETTERS AND SETTERS----------------------------------------------
 	
 	/**
-	 * @return the $columns
+	 * @return DataSet[] $columns
 	 */
 	public function getData()
 	{
@@ -148,7 +173,7 @@ class Staple_Query_Update extends Staple_Query
 	}
 
 	/**
-	 * @return the $limit
+	 * @return Pager | int $limit
 	 */
 	public function getLimit()
 	{
@@ -156,7 +181,7 @@ class Staple_Query_Update extends Staple_Query
 	}
 
 	/**
-	 * @return the $limitOffset
+	 * @return int $limitOffset
 	 */
 	public function getLimitOffset()
 	{
@@ -177,7 +202,7 @@ class Staple_Query_Update extends Staple_Query
 
 	/**
 	 * @param int $limit
-	 * @return Staple_Query_Select
+	 * @return Select
 	 */
 	public function setLimit($limit)
 	{
@@ -187,21 +212,24 @@ class Staple_Query_Update extends Staple_Query
 	
 	/**
 	 * Sets the $data
-	 * @param Staple_Query_DataSet
+	 * @param DataSet
+	 * @return $this
+	 * @throws Exception
 	 */
 	public function setData($data)
 	{
-		if($data instanceof Staple_Query_DataSet)
+		if($data instanceof DataSet)
 		{
 			$this->data = $data;
 		}
 		elseif(is_array($data))
 		{
-			$this->data = new Staple_Query_DataSet($data);
+			$this->data = new DataSet($data);
+			$this->data->setConnection($this->getConnection());
 		}
 		else
 		{
-			throw new Exception('Data must be an instance of Staple_Query_DataSet or an array', Staple_Error::APPLICATION_ERROR);
+			throw new Exception('Data must be an instance of Staple_Query_DataSet or an array', Error::APPLICATION_ERROR);
 		}
 		return $this;
 	}
@@ -212,6 +240,7 @@ class Staple_Query_Update extends Staple_Query
 	 * @param mixed $data
 	 * @param bool $literal
 	 * @throws Exception
+	 * @return $this
 	 */
 	public function setDataColumn($column,$data,$literal = false)
 	{
@@ -237,12 +266,13 @@ class Staple_Query_Update extends Staple_Query
 	
 	/**
 	 * Sets the limit and the offset in one function.
-	 * @param int | Staple_Pager $limit
+	 * @param int | Pager $limit
 	 * @param int $offset
+	 * @return $this
 	 */
 	public function limit($limit,$offset = NULL)
 	{
-		if($limit instanceof Staple_Pager)
+		if($limit instanceof Pager)
 		{
 			$this->setLimit($limit->getItemsPerPage());
 			$this->setLimitOffset($limit->getStartingItem());
@@ -258,7 +288,7 @@ class Staple_Query_Update extends Staple_Query
 
 	/**
 	 * @param int $limitOffset
-	 * @return Staple_Query_Select
+	 * @return Select
 	 */
 	public function setLimitOffset($limitOffset)
 	{
@@ -343,5 +373,3 @@ class Staple_Query_Update extends Staple_Query
 		return $stmt;
 	}
 }
-
-?>

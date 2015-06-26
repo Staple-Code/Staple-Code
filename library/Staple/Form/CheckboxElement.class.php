@@ -3,7 +3,7 @@
  * Checkbox element for use on forms.
  * 
  * @author Ironpilot
- * @copyright Copywrite (c) 2011, STAPLE CODE
+ * @copyright Copyright (c) 2011, STAPLE CODE
  * 
  * This file is part of the STAPLE Framework.
  * 
@@ -20,7 +20,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Staple_Form_CheckboxElement extends Staple_Form_Element
+namespace Staple\Form;
+
+class CheckboxElement extends FieldElement
 {
 	private $changed = false;
 	
@@ -28,7 +30,7 @@ class Staple_Form_CheckboxElement extends Staple_Form_Element
 	/**
 	 * 
 	 * Override the default field value
-	 * @var unknown_type
+	 * @var int
 	 */
 	protected $value = 1;
 	
@@ -58,7 +60,7 @@ class Staple_Form_CheckboxElement extends Staple_Form_Element
 	/**
 	 * Sets the starting value for the checkbox
 	 * @param boolean $val
-	 * @return Staple_Form_CheckboxElement
+	 * @return CheckboxElement
 	 */
 	public function setValue($val)
 	{
@@ -86,7 +88,7 @@ class Staple_Form_CheckboxElement extends Staple_Form_Element
 		{
 			$checked = ' checked';
 		}
-		return '	<input type="checkbox" id="'.$this->escape($this->id).'" name="'.$this->escape($this->name).'" value="'.$this->escape($this->value).'"'.$checked.$this->getAttribString().'>';
+		return '	<input type="checkbox" id="'.$this->escape($this->id).'" name="'.$this->escape($this->name).'" value="'.$this->escape($this->value).'"'.$checked.$this->getAttribString('input').'>';
 	}
 
 	/* (non-PHPdoc)
@@ -94,10 +96,10 @@ class Staple_Form_CheckboxElement extends Staple_Form_Element
 	 */
 	public function label()
 	{
-		return '	<label for="'.$this->escape($this->id).'"'.$this->getClassString().'>'.$this->label.'</label>';
+		return '	<label for="'.$this->escape($this->id).'"'.$this->getClassString('label').'>'.$this->label.'</label>';
 	}
 
-	public function build()
+	public function build($fieldView = NULL)
 	{
 		$buf = '';
 		$view = FORMS_ROOT.'/fields/CheckboxElement.phtml';
@@ -112,7 +114,7 @@ class Staple_Form_CheckboxElement extends Staple_Form_Element
 		{
 			$this->addClass('form_element');
 			$this->addClass('element_checkbox');
-			$classes = $this->getClassString();
+			$classes = $this->getClassString('div');
 			$buf .= "<div$classes id=\"".$this->escape($this->id)."_element\">\n";
 			$buf .= $this->field();
 			$buf .= $this->label();
