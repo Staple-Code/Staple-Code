@@ -100,7 +100,7 @@ abstract class FieldElement
 
 	/**
 	 * Contains instance of ElementViewAdapter handed down from Form
-	 * @var elementViewAdapter
+	 * @var ElementViewAdapter
 	 */
 	protected $elementViewAdapter;
 	

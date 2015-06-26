@@ -26,7 +26,6 @@ namespace Staple\Query;
 use \Staple\Exception\QueryException;
 use \Staple\Error;
 use \Staple\Pager;
-use \PDO;
 
 class Select extends Query
 {
@@ -66,7 +65,7 @@ class Select extends Query
 	 * The Limit Offset. Used to skip a number of rows before selecting.
 	 * @var int
 	 */
-	protected $limitOffset;
+	protected $limitOffset = 0;
 	/**
 	 * Stores the GROUP BY columns;
 	 * @var array | string
@@ -86,12 +85,12 @@ class Select extends Query
 	/**
 	 * @param string $table
 	 * @param array $columns
-	 * @param PDO $db
+	 * @param Connection $db
 	 * @param array | string $order
 	 * @param Pager | int $limit
 	 * @throws QueryException
 	 */
-	public function __construct($table = NULL, array $columns = NULL, PDO $db = NULL, $order = NULL, $limit = NULL)
+	public function __construct($table = NULL, array $columns = NULL, Connection $db = NULL, $order = NULL, $limit = NULL)
 	{
 		parent::__construct(NULL, $db);
 		
@@ -218,6 +217,8 @@ class Select extends Query
 	
 	/**
 	 * Different from addColumnsArray(), this function replaces all existing columns in the query.
+     * @param array $columns
+     * @return $this
 	 */
 	public function setColumns(array $columns)
 	{
@@ -239,6 +240,7 @@ class Select extends Query
 	/**
 	 * Set the order.
 	 * @param string | array $order
+     * @return $this
 	 */
 	public function setOrder($order)
 	{
@@ -248,6 +250,7 @@ class Select extends Query
 	
 	/**
 	 * @param string | array $groupBy
+     * @return $this
 	 */
 	public function setGroupBy($groupBy)
 	{
@@ -301,6 +304,7 @@ class Select extends Query
 	/**
 	 * Add an array of columns to the list of selected columns
 	 * @param array $columns
+     * @return $this;
 	 */
 	public function addColumnsArray(array $columns)
 	{
@@ -331,6 +335,7 @@ class Select extends Query
 	/**
 	 * Remove a column from the $columns array.
 	 * @param string $col
+     * @return bool
 	 */
 	public function removeColumn($col)
 	{
@@ -345,6 +350,7 @@ class Select extends Query
 	/**
 	 * Remove a column from the $columns property by it's alias.
 	 * @param string $name
+     * @return bool
 	 */
 	public function removeColumnByName($name)
 	{
@@ -359,6 +365,8 @@ class Select extends Query
 	/**
 	 * Alias of setOrder()
 	 * @see self::setOrder()
+     * @param array|string $order
+     * @return $this
 	 */
 	public function orderBy($order)
 	{
@@ -369,6 +377,7 @@ class Select extends Query
 	 * Alias of setGroupBy()
 	 * @param string | array $group
 	 * @see self::setGroupBy()
+     * @return self::setGroupBy()
 	 */
 	public function groupBy($group)
 	{
@@ -395,6 +404,26 @@ class Select extends Query
 				$this->setLimitOffset($offset);
 		}
 		return $this;
+	}
+
+	/**
+	 * Alias of setLimitOffset() method
+	 * @param $offset
+	 * @return Select
+	 */
+	public function skip($offset)
+	{
+		return $this->setLimitOffset($offset);
+	}
+
+	/**
+	 * Alias of setLimit() method
+	 * @param $amount
+	 * @return Select
+	 */
+	public function take($amount)
+	{
+		return $this->setLimit($amount);
 	}
 
 	/*-----------------------------------------------HAVING CLAUSES-----------------------------------------------*/
@@ -536,8 +565,16 @@ class Select extends Query
 	 */
 	function build()
 	{
-		$stmt = 'SELECT ';
-		
+		$stmt = 'SELECT';
+
+		//SQL Server Limit - when offset is zero
+		if($this->getLimit() > 0
+			&& $this->getLimitOffset() == 0
+			&& $this->getConnection()->getDriver() == Connection::DRIVER_SQLSRV)
+		{
+			$stmt .= ' TOP ' . $this->getLimit();
+		}
+
 		//Flags
 		if(count($this->flags) > 0)
 		{
@@ -674,15 +711,32 @@ class Select extends Query
 			{
 				$stmt .= $this->order;
 			}
-		}
-		
-		//LIMIT CLAUSE
-		if(isset($this->limit))
-		{
-			$stmt .= "\nLIMIT ".$this->getLimit();
-			if(isset($this->limitOffset))
+
+			//SQL Server 2012 Pagination
+			if($this->getConnection()->getDriver() == Connection::DRIVER_SQLSRV)
 			{
-				$stmt .= ' OFFSET '.$this->limitOffset;
+				if (isset($this->limit) && !isset($sql2005limit) && $this->getLimitOffset() != 0)
+				{
+					//Offset
+					$stmt .= "\nOFFSET " . $this->getLimitOffset(). ' ROWS ';
+
+					//Limit
+					$stmt .= ' FETCH NEXT ' . $this->getLimit(). ' ROWS ';
+				}
+			}
+		}
+
+		//Limit clause is MySQL specific
+		if($this->getConnection()->getDriver() == Connection::DRIVER_MYSQL)
+		{
+			//LIMIT CLAUSE
+			if (isset($this->limit))
+			{
+				$stmt .= "\nLIMIT " . $this->getLimit();
+				if (isset($this->limitOffset))
+				{
+					$stmt .= ' OFFSET ' . $this->limitOffset;
+				}
 			}
 		}
 		return $stmt;

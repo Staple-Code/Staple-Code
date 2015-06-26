@@ -28,6 +28,7 @@ use \Exception;
 use \Staple\Error;
 use \Staple\Config;
 use \Staple\Encrypt;
+use Staple\Exception\FormBuildException;
 use \Staple\Form\ViewAdapters\ElementViewAdapter;
 
 class Form
@@ -81,7 +82,7 @@ class Form
 	
 	/**
 	 * An array of FieldElement objects, that represent the form fields.
-	 * @var FieldElement[]|CheckboxElement[]|SelectElement[]|CheckboxGroupElement[]
+	 * @var FieldElement[]|CheckboxElement[]|SelectElement[]|CheckboxGroupElement[]|array
 	 */
 	public $fields = array();
 	
@@ -139,13 +140,13 @@ class Form
 	 */
 	public function __construct($name = NULL, $action = NULL)
 	{
-        /**
-         * Loads selected elementViewAdapter from application.ini and verify given adapter is a class before loading
-         */
-        if(Config::getValue('forms','elementViewAdapter') != '')
-        {
-            $this->setElementViewAdapter(Config::getValue('forms','elementViewAdapter'));
-        }
+	        /**
+	         * Loads selected elementViewAdapter from application.ini and verify given adapter is a class before loading
+	         */
+        	if(Config::getValue('forms','elementViewAdapter') != '' && Config::getValue('forms','elementViewAdapter') != null)
+	        {
+            		$this->makeElementViewAdapter(Config::getValue('forms','elementViewAdapter'));
+	        }
 
 		$this->_start();
 
@@ -172,6 +173,17 @@ class Form
 						}
 					}
 				}
+			}
+		}
+
+		/**
+		 * Loads selected elementViewAdapter from application.ini and verify given adapter is a class before loading
+		 */
+		if(Config::getValue('forms','elementViewAdapter') != '')
+		{
+			if(class_exists(Config::getValue('forms','elementViewAdapter')))
+			{
+				$this->setElementViewAdapter(Config::getValue('forms','elementViewAdapter'));
 			}
 		}
 
@@ -271,20 +283,6 @@ class Form
 	}
 	
 	/**
-	 * A factory function to encapsulate the creation of form objects.
-	 * @param string $name
-	 * @param string $action
-	 * @param string $method
-	 * @return Form
-	 */
-	public static function create($name, $action=NULL, $method="POST")
-	{
-		$inst = new self($name,$action);
-		$inst->setMethod($method);
-		return $inst;
-	}
-	
-	/**
 	 * Adds a field to the form from an already instantiated form element.
 	 * @param FieldElement $field
 	 * @return $this
@@ -301,10 +299,10 @@ class Form
 			if($newField instanceof FieldElement)
 			{
 				$this->fields[$newField->getName()] = $newField;
-                if(isset($this->elementViewAdapter))
-                {
-                    $this->fields[$newField->getName()]->setElementViewAdapter($this->getElementViewAdapter());
-                }
+		                if(isset($this->elementViewAdapter))
+		                {
+		                    $this->fields[$newField->getName()]->setElementViewAdapter($this->getElementViewAdapter());
+		                }
 			}
 
 		}
@@ -318,11 +316,28 @@ class Form
 	 */
 	public function addData(array $data)
 	{
-		foreach($this->fields as $fieldname=>$obj)
+		$this->addDataToTarget($data,$this->fields);
+
+		return $this;
+	}
+
+	/**
+	 * @param array $data
+	 * @param FieldElement | array $target
+	 */
+	private function addDataToTarget(array $data, $target)
+	{
+		foreach($target as $fieldName=>$obj)
 		{
-			if(array_key_exists($fieldname, $data))
+			if(is_array($obj))
 			{
-				$obj->setValue($data[$fieldname]);
+				if(isset($data[$fieldName]))
+					if(is_array($data[$fieldName]))
+						$this->addDataToTarget($data[$fieldName],$obj);
+			}
+			elseif(array_key_exists($fieldName, $data))
+			{
+				$obj->setValue($data[$fieldName]);
 			}
 			elseif($obj instanceof CheckboxGroupElement)
 			{
@@ -344,7 +359,6 @@ class Form
 				}
 			}
 		}
-		return $this;
 	}
 	
 	/**
@@ -354,10 +368,23 @@ class Form
 	 */
 	public function exportFormData()
 	{
+		return $this->fieldData($this->fields);
+	}
+
+	/**
+	 * Recursively pulls field data.
+	 * @param array $start
+	 * @return array
+	 */
+	private function fieldData(array $start)
+	{
 		$data = array();
-		foreach($this->fields as $name=>$field)
+		foreach($start as $name=>$field)
 		{
-			$data[$field->getName()] = $field->getValue();
+			if(is_array($field))
+				$data[$name] = $this->fieldData($field);
+			else
+				$data[$field->getName()] = $field->getValue();
 		}
 		return $data;
 	}
@@ -452,6 +479,23 @@ JS;
 					$script .= $field->clientJQuery();
 				}
 			}
+			elseif(is_array($field))	//Limited Recursion here.
+			{
+				foreach($field as $subField)
+				{
+					if($subField instanceof FieldElement)
+					{
+						if($subField->isRequired())
+						{
+							$script .= $subField->clientJQuery();
+						}
+					}
+					else
+					{
+						throw new Exception('Form Error', Error::FORM_ERROR);
+					}
+				}
+			}
 			else
 			{
 				throw new Exception('Form Error', Error::FORM_ERROR);
@@ -504,9 +548,37 @@ JS;
 	public function validate()
 	{
 		$this->clearErrors();
+		$errors = [];
 		
 		//Process validation callbacks.
-		foreach($this->callbacks as $func)
+		$errors = array_merge($errors,$this->validateCallbacks($this->callbacks));
+		
+		//Process all validation fields.
+		$errors = array_merge($errors,$this->validateFields($this->fields));
+
+		//Set the validation errors
+		$this->setErrors($errors);
+		
+		//Check for errors.
+		if(count($this->errors) > 0)
+		{
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+	}
+
+	/**
+	 * Process the supplied array of validation callbacks and return errors.
+	 * @param array $callbacks
+	 * @return array
+	 */
+	public function validateCallbacks($callbacks)
+	{
+		$errors = [];
+		foreach($callbacks as $func)
 		{
 			try{
 				$result = call_user_func_array($func['func'],$func['params']);
@@ -515,23 +587,34 @@ JS;
 			{
 				$result = false;
 			}
-			
+
 			if(is_array($result))
 			{
-				$this->errors[] = array('label'=>'Additional Form Validation','errors'=>array($result));
+				$errors[] = array('label'=>'Additional Form Validation','errors'=>array($result));
 			}
 			else
 			{
 				$result = (bool)$result;
 				if($result === false)
 				{
-					$this->errors[] = array('label'=>'Additional Form Validation','errors'=>array(array('Form Validation Returned False.')));
+					$errors[] = array('label'=>'Additional Form Validation','errors'=>array(array('Form Validation Returned False.')));
 				}
 			}
 		}
-		
-		//Process all validation fields.
-		foreach($this->fields as $field)
+
+		return $errors;
+	}
+
+	/**
+	 * Run validation on supplied array of fields. Runs recursively for nested arrays.
+	 * @param array $fields
+	 * @return array
+	 * @throws Exception
+	 */
+	public function validateFields($fields)
+	{
+		$errors = [];
+		foreach($fields as $key=>$field)
 		{
 			if($field instanceof FieldElement)
 			{
@@ -539,7 +622,7 @@ JS;
 				{
 					if($field->isRequired())
 					{
-						$this->errors[$field->getName()] = array('label'=>$field->getLabel(),'errors'=>$field->getErrors());
+						$errors[$key] = array('label'=>$field->getLabel(),'errors'=>$field->getErrors());
 					}
 					elseif($field->getValue() != '')
 					{
@@ -553,41 +636,39 @@ JS;
 								{
 									if($file['error'] != UPLOAD_ERR_NO_FILE)
 									{
-										$this->errors[$field->getName()] = array('label'=>$field->getLabel(),'errors'=>$field->getErrors());
+										$errors[$key] = array('label'=>$field->getLabel(),'errors'=>$field->getErrors());
 									}
 								}
 								else
 								{
-									$this->errors[$field->getName()] = array('label'=>$field->getLabel(),'errors'=>$field->getErrors());
+									$errors[$key] = array('label'=>$field->getLabel(),'errors'=>$field->getErrors());
 								}
 							}
 							else
 							{
-								$this->errors[$field->getName()] = array('label'=>$field->getLabel(),'errors'=>$field->getErrors());
+								$errors[$key] = array('label'=>$field->getLabel(),'errors'=>$field->getErrors());
 							}
 						}
 						else
 						{
-							$this->errors[$field->getName()] = array('label'=>$field->getLabel(),'errors'=>$field->getErrors());
+							$errors[$key] = array('label'=>$field->getLabel(),'errors'=>$field->getErrors());
 						}
 					}
 				}
 			}
+			elseif(is_array($field))        //Parse Field Validation Recursively
+			{
+				$errArray = $this->validateFields($field);
+				if(count($errArray) > 0)
+					$errors[$key] = $errArray;
+			}
 			else
 			{
-				throw new Exception('Form Error', Error::FORM_ERROR);
+				throw new FormBuildException('Form Error', Error::FORM_ERROR);
 			}
 		}
-		
-		//Check for errors.
-		if(count($this->errors) > 0)
-		{
-			return false;
-		}
-		else
-		{
-			return true;
-		}
+
+		return $errors;
 	}
 	
 	/**
@@ -606,6 +687,17 @@ JS;
 	public function getErrors()
 	{
 		return $this->errors;
+	}
+
+	/**
+	 * Set the error array
+	 * @param array $errors
+	 * @return $this
+	 */
+	protected function setErrors(array $errors)
+	{
+		$this->errors = $errors;
+		return $this;
 	}
 
 	/**
@@ -758,15 +850,29 @@ JS;
 	}
 
 	/**
+	* @param $viewAdapterString
+	* @return $this
+	*/
+	protected function makeElementViewAdapter($viewAdapterString)
+	{
+		$obj = new $viewAdapterString();
+		if($obj instanceof ElementViewAdapter)
+		{
+		    $this->setElementViewAdapter($obj);
+		}
+		return $this;
+	}
+
+	/**
 	 * @param ElementViewAdapter $elementViewAdapter
 	 */
 	public function setElementViewAdapter($elementViewAdapter)
 	{
-        $temp = new $elementViewAdapter();
-        if($temp instanceof ElementViewAdapter)
-        {
-            $this->elementViewAdapter = $temp;
-        }
+	        $temp = new $elementViewAdapter();
+	        if($temp instanceof ElementViewAdapter)
+	        {
+	            $this->elementViewAdapter = $temp;
+	        }
 		return $this;
 	}
 
@@ -827,19 +933,23 @@ JS;
 		if(count($this->classes) > 0)
 		{
 			$buf .= ' class="';
-			$cstring = '';
+			$classString = '';
 			foreach($this->classes as $class)
 			{
-				$cstring .= $class.' ';
+				$classString .= $class.' ';
 			}
-			$buf .= trim($cstring);
+			$buf .= trim($classString);
 			$buf .= '"';
 		}
+	        else
+	        {
+	            $classString = '';
+	        }
 		$buf .= ">\n";
 		$buf .= "<div id=\"{$this->name}_div\"";
 		if(count($this->classes) > 0)
 		{
-			$buf .= ' class="'.trim($cstring).'"';
+			$buf .= ' class="'.trim($classString).'"';
 		}
 		$buf .= ">\n";
 		return $buf;
@@ -910,4 +1020,163 @@ JS;
 		}
 		return $buf;
 	}
+
+    /*---------------------------------------SHORT FORM CREATION METHODS---------------------------------------*/
+
+    /**
+     * A factory function to encapsulate the creation of form objects.
+     * @param string $name
+     * @param string $action
+     * @param string $method
+     * @return Form
+     */
+    public static function create($name, $action = NULL, $method = self::METHOD_POST)
+    {
+        $inst = new self($name,$action);
+        $inst->setMethod($method);
+        return $inst;
+    }
+
+    /**
+     * Short method for creating a text element.
+     * @param string $name
+     * @param string $label
+     * @param string $id
+     * @param array $attributes
+     * @return TextElement
+     */
+    public static function textElement($name, $label = NULL, $id = NULL, array $attributes = array())
+    {
+        return new TextElement($name, $label, $id, $attributes);
+    }
+
+    /**
+     * Short method for creating a text element.
+     * @param string $name
+     * @param string $label
+     * @param string $id
+     * @param array $attributes
+     * @return TextElement
+     */
+    public static function passwordElement($name, $label = NULL, $id = NULL, array $attributes = array())
+    {
+        return new PasswordElement($name, $label, $id, $attributes);
+    }
+
+    /**
+     * Short method for creating a textarea element.
+     * @param string $name
+     * @param string $label
+     * @param string $id
+     * @param array $attributes
+     * @return TextareaElement
+     */
+    public static function textareaElement($name, $label = NULL, $id = NULL, array $attributes = array())
+    {
+        return new TextareaElement($name, $label, $id, $attributes);
+    }
+
+    /**
+     * Short method for creating a radio element.
+     * @param string $name
+     * @param string $label
+     * @param string $id
+     * @param array $attributes
+     * @return RadioElement
+     */
+    public static function radioElement($name, $label = NULL, $id = NULL, array $attributes = array())
+    {
+        return new RadioElement($name, $label, $id, $attributes);
+    }
+
+    /**
+     * Short method for creating a select element.
+     * @param string $name
+     * @param string $label
+     * @param string $id
+     * @param array $attributes
+     * @return SelectElement
+     */
+    public static function selectElement($name, $label = NULL, $id = NULL, array $attributes = array())
+    {
+        return new SelectElement($name, $label, $id, $attributes);
+    }
+
+    /**
+     * Short method for creating a checkbox element.
+     * @param string $name
+     * @param string $label
+     * @param string $id
+     * @param array $attributes
+     * @return CheckboxElement
+     */
+    public static function checkboxElement($name, $label = NULL, $id = NULL, array $attributes = array())
+    {
+        return new CheckboxElement($name, $label, $id, $attributes);
+    }
+
+    /**
+     * Short method for creating a select element.
+     * @param string $name
+     * @param string $label
+     * @param string $id
+     * @param array $attributes
+     * @return SubmitElement
+     */
+    public static function submitElement($name, $label = NULL, $id = NULL, array $attributes = array())
+    {
+        return new SubmitElement($name, $label, $id, $attributes);
+    }
+
+    /**
+     * Short method for creating a button element.
+     * @param string $name
+     * @param string $value
+     * @param string $id
+     * @param array $attributes
+     * @return ButtonElement
+     */
+    public static function buttonElement($name, $value = NULL, $id = NULL, array $attributes = array())
+    {
+        return new ButtonElement($name, $value, $id, $attributes);
+    }
+
+    /**
+     * Short method for creating a file element.
+     * @param string $name
+     * @param string $label
+     * @param string $id
+     * @param array $attributes
+     * @return FileElement
+     */
+    public static function fileElement($name, $label = NULL, $id = NULL, array $attributes = array())
+    {
+        return new FileElement($name, $label, $id, $attributes);
+    }
+
+    /**
+     * Short method for creating a hidden element.
+     * @param string $name
+     * @param string $value
+     * @param string $id
+     * @param array $attributes
+     * @return HiddenElement
+     */
+    public static function hiddenElement($name, $value = NULL, $id = NULL, array $attributes = array())
+    {
+        return new HiddenElement($name, $value, $id, $attributes);
+    }
+
+    /**
+     * Short method for creating a image element.
+     * @param string $name
+     * @param string $label
+     * @param string $id
+     * @param array $attributes
+     * @return ImageElement
+     */
+    public static function imageElement($name, $label = NULL, $id = NULL, array $attributes = array())
+    {
+        return new ImageElement($name, $label, $id, $attributes);
+    }
 }

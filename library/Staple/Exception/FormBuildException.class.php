@@ -1,6 +1,6 @@
 <?php
 /**
- * Unit Tests for \Staple\Form\Filter\PhoneFormatFilter object
+ * An exception class to handle page not found errors.
  *
  * @author Ironpilot
  * @copyright Copyright (c) 2011, STAPLE CODE
@@ -20,21 +20,11 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Staple\Tests;
-use Staple\Form\Filter\PhoneFormatFilter;
-class PhoneFormatFilterTest extends \PHPUnit_Framework_TestCase
+
+namespace Staple\Exception;
+
+
+class FormBuildException extends \Exception
 {
-    private function getTestObject()
-    {
-        return new PhoneFormatFilter();
-    }
-    /**
-     * Test the ability to format a phone number
-     */
-    public function testPhoneFilter()
-    {
-        $number = '1.123.456.7890';
-        $format = $this->getTestObject();
-        $this->assertEquals('1 (123) 456-7890',$format->filter($number));
-    }
-}
+
+} 

@@ -42,6 +42,8 @@ class testForm extends Form
             ->setAction($this->link(array('test','index')));
 
         $text = new TextElement('text','Text Element');
+        $text->setRequired()
+            ->addValidator(new LengthValidator(1,2));
 
         $textInstructions = new TextElement('textInstruction','Text Element with Instructions');
         $textInstructions->setRequired()
@@ -111,6 +113,11 @@ class testForm extends Form
         ->addValidator(new InArrayValidator(array("6","7","8","9","10")))
         ->addInstructions('Instructions are here')
         ->addAttrib('placeholder','Placeholder');
+
+        $file = new FileElement('file','File Element');
+        $file->setRequired();
+
+        $button = new ButtonElement('button','Button Element');
 
         $file = new FileElement('file','File Element');
         $file->setRequired();
