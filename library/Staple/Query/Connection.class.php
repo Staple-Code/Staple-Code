@@ -209,11 +209,30 @@ class Connection extends PDO implements SplSubject
 			$options = array();
 		}
 
+		//Check for SSL Params - MySQL Specific
+		if($config['driver'] == self::DRIVER_MYSQL)
+		{
+			//SSL Certificate
+			if(isset($config['ssl_cert']))
+				$options[PDO::MYSQL_ATTR_SSL_CERT] = $config['ssl_cert'];
+
+			//SSL Private Key
+			if(isset($config['ssl_key']))
+				$options[PDO::MYSQL_ATTR_SSL_KEY] = $config['ssl_key'];
+
+			//SSL CA
+			if(isset($config['ssl_ca']))
+				$options[PDO::MYSQL_ATTR_SSL_CA] = $config['ssl_ca'];
+		}
+
 		//Call the constructor.
 		$inst = new static($dsn, $config['username'], $config['password'], $options);
 
 		//Set the driver to use
 		isset($config['driver']) ? $inst->setDriver($config['driver']) : $inst->setDriver(self::DRIVER_MYSQL);
+
+		//Register the options used
+		$inst->setOptions($options);
 
 		//Set the DB Name property
 		if(isset($config['db']))
@@ -410,6 +429,12 @@ class Connection extends PDO implements SplSubject
 	public function setOptions(array $options)
 	{
 		$this->options = $options;
+		return $this;
+	}
+
+	public function addOption($key,$value)
+	{
+		$this->options[$key] = $value;
 		return $this;
 	}
 
