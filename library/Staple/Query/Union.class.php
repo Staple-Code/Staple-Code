@@ -44,8 +44,13 @@ class Union
 	 */
 	protected $flag;
 	/**
+	 * Select statement flags
+	 * @var array
+	 */
+	protected $selectFlags = [];
+	/**
 	 * An array of the queries to union.
-	 * @var array[Staple_Query]
+	 * @var Select[]
 	 */
 	protected $queries = array();
 	/**
@@ -65,7 +70,7 @@ class Union
 	protected $limitOffset;
 
 	/**
-	 * Constructor accepts an array of Staple_Query_Select elements and a database connection.
+	 * Constructor accepts an array of Select elements and a database connection.
 	 * @param array $queries
 	 * @param Connection $connection
 	 * @throws QueryException
@@ -187,6 +192,41 @@ class Union
 		return $this;
 	}
 
+	/**
+	 * Add a select flag on the query.
+	 * @param $flag
+	 * @return $this
+	 */
+	public function addSelectFlag($flag)
+	{
+		switch($flag)
+		{
+			case Select::ALL:
+			case Select::DISTINCT:
+			case Select::DISTINCTROW:
+			case Select::HIGH_PRIORITY:
+			case Select::STRAIGHT_JOIN:
+			case Select::SQL_SMALL_RESULT:
+			case Select::SQL_BIG_RESULT:
+			case Select::SQL_BUFFER_RESULT:
+			case Select::SQL_CACHE:
+			case Select::SQL_NO_CACHE:
+			case Select::SQL_CALC_FOUND_ROWS:
+				$this->selectFlags[] = $flag;
+				break;
+		}
+		return $this;
+	}
+
+	/**
+	 * Clear any select flags added to the query.
+	 * @return $this
+	 */
+	public function clearSelectFlags()
+	{
+		$this->selectFlags = array();
+		return $this;
+	}
 
 	
 	/**
@@ -208,7 +248,7 @@ class Union
 	
 	/**
 	 * Resets all of the columns in all the currently added queries to the specified column array.
-	 * @param Query[] $columns
+	 * @param array $columns
 	 * @return $this
 	 */
 	public function setColumns(array $columns)
@@ -284,6 +324,22 @@ class Union
 	function build()
 	{
 		$stmt = 'SELECT ';
+
+		//SELECT Statement Flags
+		if(count($this->selectFlags) > 0)
+		{
+			$stmt .= ' '.implode(' ', $this->selectFlags);
+		}
+
+		//SQL Server Limit - when offset is zero
+		if($this->getLimit() > 0
+			&& $this->getLimitOffset() == 0
+			&& $this->getConnection()->getDriver() == Connection::DRIVER_SQLSRV)
+		{
+			$stmt .= ' TOP ' . $this->getLimit().' ';
+		}
+
+		//Throw exception if no queries exist.
 		if(count($this->queries) <= 0)
 		{
 			throw new QueryException('No queries were supplied to union.');
@@ -291,7 +347,7 @@ class Union
 		elseif(count($this->queries) == 1)
 		{
 			//Render the union statement into a sub-select statement when only one query is attached.
-			$stmt .= '* FROM ('.implode('', $this->queries).')';
+			$stmt .= "\n\t*\n\tFROM (".implode('', $this->queries).')';
 
 			//Switch the method based on database driver of the current connection
 			switch($this->getConnection()->getDriver())
@@ -314,7 +370,7 @@ class Union
 			}
 
 			//Start the union as a sub-query.
-			$stmt .=  '* FROM (';
+			$stmt .=  "\n\t*\n\tFROM (";
 
 			//Union the statements together with optional flags
 			if(isset($this->flag))
@@ -358,10 +414,10 @@ class Union
 				if (isset($this->limit) && !isset($sql2005limit) && $this->getLimitOffset() != 0)
 				{
 					//Offset
-					$stmt .= "\nOFFSET " . $this->getLimitOffset(). ' ROWS ';
+					$stmt .= "\n\tOFFSET " . $this->getLimitOffset(). ' ROWS ';
 
 					//Limit
-					$stmt .= ' FETCH NEXT ' . $this->getLimit(). ' ROWS ';
+					$stmt .= "\n\tFETCH NEXT " . $this->getLimit(). ' ROWS ';
 				}
 			}
 		}
@@ -371,7 +427,7 @@ class Union
 		{
 			if (isset($this->limit))
 			{
-				$stmt .= "\nLIMIT " . $this->getLimit();
+				$stmt .= "\n\tLIMIT " . $this->getLimit();
 				if (isset($this->limitOffset))
 				{
 					$stmt .= ' OFFSET ' . $this->limitOffset;
