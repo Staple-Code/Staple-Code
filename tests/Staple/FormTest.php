@@ -241,7 +241,13 @@ class FormTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateFileElement()
     {
-        $this->markTestIncomplete();
+        $field = Form::fileElement('MyField','My Field')
+            ->setValue('/filefolder/filelocation.html');
+
+        $this->assertInstanceOf('Staple\\Form\\FileElement',$field);
+        $this->assertEquals('MyField',$field->getName());
+        $this->assertEquals('My Field',$field->getLabel());
+        $this->assertEquals('/filefolder/filelocation.html',$field->getValue());
     }
 
     /**
@@ -265,7 +271,22 @@ class FormTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateRadioElement()
     {
-        $this->markTestIncomplete();
+		$buttons = [
+			1	=>	'Camel',
+			2	=>	'Horse',
+			3	=>	'Car',
+			4	=>	'Train',
+			5	=>	'Plane'
+		];
+		$field = Form::radioElement('transportMethod','Favorite Method of Travel')
+			->addButtonsArray($buttons)
+			->setValue(5);
+
+		$this->assertInstanceOf('Staple\\Form\\RadioElement',$field);
+		$this->assertEquals('transportMethod',$field->getName());
+		$this->assertEquals('Favorite Method of Travel',$field->getLabel());
+		$this->assertEquals(5,$field->getValue());
+		$this->assertSame($buttons,$field->getButtons());
     }
 
     /**
@@ -274,7 +295,22 @@ class FormTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateSelectElement()
     {
-        $this->markTestIncomplete();
+		$options = [
+			1	=>	'New York',
+			2	=>	'Boston',
+			3	=>	'Los Angeles',
+			4	=>	'Portland',
+			5	=>	'Austin'
+		];
+		$field = Form::selectElement('city','Cities')
+			->addOptionsArray($options)
+			->setValue(3);
+
+		$this->assertInstanceOf('Staple\\Form\\SelectElement',$field);
+		$this->assertEquals('city',$field->getName());
+		$this->assertEquals('Cities',$field->getLabel());
+		$this->assertEquals(3,$field->getValue());
+		$this->assertSame($options,$field->getOptions());
     }
 
     /**
@@ -321,4 +357,9 @@ class FormTest extends \PHPUnit_Framework_TestCase
 		$form->addData($dataArray);
 		$this->assertTrue($form->validate());
 	}
+
+    public function testFormBuild()
+    {
+
+    }
 }

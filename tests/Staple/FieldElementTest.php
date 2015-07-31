@@ -60,6 +60,7 @@ class dummyFieldElementValidator extends FieldValidator
 
 	public function __construct($value)
 	{
+		parent::__construct();
 		$this->value = $value;
 	}
 
@@ -170,5 +171,19 @@ class FieldElementTest extends \PHPUnit_Framework_TestCase
 		$field->setValue('bar');
 
 		$this->assertTrue($field->isValid());
+	}
+
+	/**
+	 * Test that we can set and retrieve values from the object
+	 * @test
+	 * @throws \Exception
+	 */
+	public function testValueSetAndRetrieve()
+	{
+		$element = $this->getTestObject('MyObject');
+
+		$element->setValue('TestValue');
+
+		$this->assertEquals('TestValue',$element->getValue());
 	}
 }
