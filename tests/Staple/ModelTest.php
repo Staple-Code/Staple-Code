@@ -302,8 +302,11 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
 	public function testFind()
 	{
+		/** @var userModel $user */
 		$user = userModel::find(1, $this->getMockConnection());
+		/** @var userModel $user2 */
 		$user2 = userModel::find(2, $this->getMockConnection());
+		/** @var bool $user3 */
 		$user3 = userModel::find(3, $this->getMockConnection());
 
 		//Assert user 1 results
