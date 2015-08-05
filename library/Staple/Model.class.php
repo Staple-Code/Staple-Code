@@ -30,10 +30,10 @@ use ReflectionProperty;
 use Staple\Exception\ModelNotFoundException;
 use Staple\Exception\QueryException;
 use Staple\Query\Connection;
+use Staple\Query\IConnection;
 use Staple\Query\Insert;
+use Staple\Query\IStatement;
 use Staple\Query\Query;
-use Staple\Query\Select;
-use Staple\Query\Statement;
 use Staple\Traits\Factory;
 use stdClass;
 
@@ -57,7 +57,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	protected $_data = array();
 	/**
 	 * A database connection object that the model uses
-	 * @var Connection
+	 * @var IConnection
 	 */
 	protected $_connection;
 	/**
@@ -336,7 +336,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	}
 
 	/**
-	 * @return Connection $_connection
+	 * @return IConnection $_connection
 	 */
 	public function getConnection()
 	{
@@ -351,10 +351,10 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	}
 
 	/**
-	 * @param Connection $connection
+	 * @param IConnection $connection
 	 * @return $this
 	 */
-	public function setConnection(Connection $connection)
+	public function setConnection(IConnection $connection)
 	{
 		$this->_connection = $connection;
 		return $this;
@@ -393,11 +393,11 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	/**
 	 * Return an instance of the model from the primary key.
 	 * @param int $id
-	 * @param Connection $connection
+	 * @param IConnection $connection
 	 * @return $this | $this[]
 	 * @throws ModelNotFoundException
 	 */
-	public static function find($id, Connection $connection = NULL)
+	public static function find($id, IConnection $connection = NULL)
 	{
 		//Make a model instance
 		$model = static::make();
@@ -410,7 +410,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 
 		//Execute the query
 		$result = $query->execute();
-		if($result instanceof Statement)
+		if($result instanceof IStatement)
 		{
 			$models = array();
 			while($row = $result->fetch(PDO::FETCH_ASSOC))
