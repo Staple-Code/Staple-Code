@@ -39,7 +39,9 @@ use Staple\Form\TextElement;
 use Staple\Form\Validate\EqualValidator;
 use Staple\Form\Validate\InArrayValidator;
 use Staple\Form\Validate\LengthValidator;
+use Staple\Form\ViewAdapters\BootstrapViewAdapter;
 use Staple\Form\ViewAdapters\ElementViewAdapter;
+use Staple\Form\ViewAdapters\FoundationViewAdapter;
 
 class MyViewAdapter extends ElementViewAdapter
 {
@@ -319,7 +321,13 @@ class FormTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateTextareaElement()
     {
-        $this->markTestIncomplete();
+        $field = Form::textareaElement('comments','Questions or Comments')
+            ->setValue("The best site that ever existed!");
+
+        $this->assertInstanceOf('Staple\\Form\\TextareaElement',$field);
+        $this->assertEquals('comments',$field->getName());
+        $this->assertEquals('Questions or Comments',$field->getLabel());
+        $this->assertEquals("The best site that ever existed!",$field->getValue());
     }
 
     /**
@@ -328,7 +336,12 @@ class FormTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateImageElement()
     {
-        $this->markTestIncomplete();
+        $field = Form::imageElement('submitImage')
+            ->setSrc('images/button.jpg');
+
+        $this->assertInstanceOf('Staple\\Form\\ImageElement',$field);
+        $this->assertEquals('submitImage',$field->getName());
+        $this->assertEquals('images/button.jpg',$field->getSrc());
     }
 
     /**
@@ -337,7 +350,14 @@ class FormTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateCheckboxElement()
     {
-        $this->markTestIncomplete();
+        $field = Form::checkboxElement('emailList','Join our mailing list!')
+            ->setChecked(true);
+
+        $this->assertInstanceOf('Staple\\Form\\CheckboxElement',$field);
+        $this->assertEquals('emailList',$field->getName());
+        $this->assertEquals('Join our mailing list!',$field->getLabel());
+        $this->assertEquals('1',$field->getValue());
+        $this->assertEquals(true,$field->isChecked());
     }
 
 	/**
@@ -358,8 +378,153 @@ class FormTest extends \PHPUnit_Framework_TestCase
 		$this->assertTrue($form->validate());
 	}
 
-    public function testFormBuild()
+    public function testFormStandardBuild()
     {
+		$form = $this->getComplexTestForm();
+		$ident = $form->fields['ident']->getValue();
+		$expectedOutput = "\n<form name=\"testform\" id=\"testform_form\" action=\"/test/form\" method=\"GET\">"
+			."\n<div id=\"testform_div\">"
+			."\n\n<div class=\"form-group\">\n\t<label class=\"control-label\">First Name <small>(Required)</small></label>"
+			."\n\t<input type=\"text\" id=\"fname\" name=\"fname\" value=\"\" class=\"form_required form-control\">"
+			."\n</div>"
+			."\n<div class=\"form-group\">"
+			."\n\t<label class=\"control-label\">Last Name</label>"
+			."\n\t<input type=\"text\" id=\"lname\" name=\"lname\" value=\"\" class=\"form-control\">"
+			."\n</div>\n<div class=\"form-group\">"
+			."\n\t<label class=\"control-label\">Your Biography</label>"
+			."\n\t<textarea rows=\"5\" cols=\"40\" id=\"bio\" name=\"bio\" class=\"form-control\"></textarea>"
+			."\n</div>\n<div class=\"form-group\">"
+			."\n\t<label class=\"control-label\">Year of Birth <small>(Required)</small></label>"
+			."\n\t<select name=\"birthyear\" id=\"birthyear\" class=\"form_required form-control\">"
+			."\n\t\t<option value=\"\"></option>"
+			."\n\t\t<option value=\"1994\">1994</option>"
+			."\n\t\t<option value=\"1995\">1995</option>"
+			."\n\t\t<option value=\"1996\">1996</option>"
+			."\n\t\t<option value=\"1997\">1997</option>"
+			."\n\t\t<option value=\"1998\">1998</option>"
+			."\n\t\t<option value=\"1999\">1999</option>"
+			."\n\t\t<option value=\"2000\">2000</option>"
+			."\n\t</select>"
+			."\n</div>"
+			."\n<div class=\"form-group\">"
+			."\n\t<label class=\"control-label\">I need to add a spouse:</label>"
+			."\n\t<div class=\"form_radio\" id=\"spouse_0_div\">"
+			."\n\t\t<input type=\"radio\" name=\"spouse\" id=\"spouse_0\" value=\"0\">"
+			."\n\t\t<label for=\"spouse_0\">Yes</label>"
+			."\n\t</div>"
+			."\n\t<div class=\"form_radio\" id=\"spouse_1_div\">"
+			."\n\t\t<input type=\"radio\" name=\"spouse\" id=\"spouse_1\" value=\"1\" checked>"
+			."\n\t\t<label for=\"spouse_1\">No</label>"
+			."\n\t</div>"
+			."\n</div>"
+			."\n<div class=\"form-group\">\t<input type=\"submit\" id=\"send\" name=\"send\" value=\"Send Query\" class=\"btn\">"
+			."\n</div>\n"
+			."\n<div class=\"form-group\">\t<input type=\"hidden\" id=\"ident\" name=\"ident\" value=\"$ident\">\n\n</div>\n</div>\n</form>\n";
+		$output = $form->build();
 
+		$this->assertEquals($expectedOutput, $output);
     }
+
+	public function testFormBootstrapBuild()
+	{
+		$this->markTestIncomplete();
+		$form = $this->getComplexTestForm();
+		$form->setElementViewAdapter(new BootstrapViewAdapter());
+		$ident = $form->fields['ident']->getValue();
+		$expectedOutput = "\n<form name=\"testform\" id=\"testform_form\" action=\"/test/form\" method=\"GET\">"
+			."\n<div id=\"testform_div\">"
+			."\n\n<div class=\"form-group\">\n\t<label class=\"control-label\">First Name <small>(Required)</small></label>"
+			."\n\t<input type=\"text\" id=\"fname\" name=\"fname\" value=\"\" class=\"form_required form-control\">"
+			."\n</div>"
+			."\n<div class=\"form-group\">"
+			."\n\t<label class=\"control-label\">Last Name</label>"
+			."\n\t<input type=\"text\" id=\"lname\" name=\"lname\" value=\"\" class=\"form-control\">"
+			."\n</div>\n<div class=\"form-group\">"
+			."\n\t<label class=\"control-label\">Your Biography</label>"
+			."\n\t<textarea rows=\"5\" cols=\"40\" id=\"bio\" name=\"bio\" class=\"form-control\"></textarea>"
+			."\n</div>\n<div class=\"form-group\">"
+			."\n\t<label class=\"control-label\">Year of Birth <small>(Required)</small></label>"
+			."\n\t<select name=\"birthyear\" id=\"birthyear\" class=\"form_required form-control\">"
+			."\n\t\t<option value=\"\"></option>"
+			."\n\t\t<option value=\"1994\">1994</option>"
+			."\n\t\t<option value=\"1995\">1995</option>"
+			."\n\t\t<option value=\"1996\">1996</option>"
+			."\n\t\t<option value=\"1997\">1997</option>"
+			."\n\t\t<option value=\"1998\">1998</option>"
+			."\n\t\t<option value=\"1999\">1999</option>"
+			."\n\t\t<option value=\"2000\">2000</option>"
+			."\n\t</select>"
+			."\n</div>"
+			."\n<div class=\"form-group\">"
+			."\n\t<label class=\"control-label\">I need to add a spouse:</label>"
+			."\n\t<div class=\"form_radio\" id=\"spouse_0_div\">"
+			."\n\t\t<input type=\"radio\" name=\"spouse\" id=\"spouse_0\" value=\"0\">"
+			."\n\t\t<label for=\"spouse_0\">Yes</label>"
+			."\n\t</div>"
+			."\n\t<div class=\"form_radio\" id=\"spouse_1_div\">"
+			."\n\t\t<input type=\"radio\" name=\"spouse\" id=\"spouse_1\" value=\"1\" checked>"
+			."\n\t\t<label for=\"spouse_1\">No</label>"
+			."\n\t</div>"
+			."\n</div>"
+			."\n<div class=\"form-group\">\t<input type=\"submit\" id=\"send\" name=\"send\" value=\"Send Query\" class=\"btn\">"
+			."\n</div>\n"
+			."\n<div class=\"form-group\">\t<input type=\"hidden\" id=\"ident\" name=\"ident\" value=\"$ident\">\n\n</div>\n</div>\n</form>\n";
+		$output = $form->build();
+
+		$this->assertEquals('', $output);
+	}
+
+	public function testFormFoundationBuild()
+	{
+		$this->markTestIncomplete();
+		$form = $this->getComplexTestForm();
+		$form->setElementViewAdapter(new FoundationViewAdapter());
+		$ident = $form->fields['ident']->getValue();
+		$expectedOutput = "\n<form name=\"testform\" id=\"testform_form\" action=\"/test/form\" method=\"GET\">"
+			."\n<div id=\"testform_div\">"
+			."\n\n<div class=\"form-group\">\n\t<label class=\"control-label\">First Name <small>(Required)</small></label>"
+			."\n\t<input type=\"text\" id=\"fname\" name=\"fname\" value=\"\" class=\"form_required form-control\">"
+			."\n</div>"
+			."\n<div class=\"form-group\">"
+			."\n\t<label class=\"control-label\">Last Name</label>"
+			."\n\t<input type=\"text\" id=\"lname\" name=\"lname\" value=\"\" class=\"form-control\">"
+			."\n</div>\n<div class=\"form-group\">"
+			."\n\t<label class=\"control-label\">Your Biography</label>"
+			."\n\t<textarea rows=\"5\" cols=\"40\" id=\"bio\" name=\"bio\" class=\"form-control\"></textarea>"
+			."\n</div>\n<div class=\"form-group\">"
+			."\n\t<label class=\"control-label\">Year of Birth <small>(Required)</small></label>"
+			."\n\t<select name=\"birthyear\" id=\"birthyear\" class=\"form_required form-control\">"
+			."\n\t\t<option value=\"\"></option>"
+			."\n\t\t<option value=\"1994\">1994</option>"
+			."\n\t\t<option value=\"1995\">1995</option>"
+			."\n\t\t<option value=\"1996\">1996</option>"
+			."\n\t\t<option value=\"1997\">1997</option>"
+			."\n\t\t<option value=\"1998\">1998</option>"
+			."\n\t\t<option value=\"1999\">1999</option>"
+			."\n\t\t<option value=\"2000\">2000</option>"
+			."\n\t</select>"
+			."\n</div>"
+			."\n<div class=\"form-group\">"
+			."\n\t<label class=\"control-label\">I need to add a spouse:</label>"
+			."\n\t<div class=\"form_radio\" id=\"spouse_0_div\">"
+			."\n\t\t<input type=\"radio\" name=\"spouse\" id=\"spouse_0\" value=\"0\">"
+			."\n\t\t<label for=\"spouse_0\">Yes</label>"
+			."\n\t</div>"
+			."\n\t<div class=\"form_radio\" id=\"spouse_1_div\">"
+			."\n\t\t<input type=\"radio\" name=\"spouse\" id=\"spouse_1\" value=\"1\" checked>"
+			."\n\t\t<label for=\"spouse_1\">No</label>"
+			."\n\t</div>"
+			."\n</div>"
+			."\n<div class=\"form-group\">\t<input type=\"submit\" id=\"send\" name=\"send\" value=\"Send Query\" class=\"btn\">"
+			."\n</div>\n"
+			."\n<div class=\"form-group\">\t<input type=\"hidden\" id=\"ident\" name=\"ident\" value=\"$ident\">\n\n</div>\n</div>\n</form>\n";
+		$output = $form->build();
+
+		$this->assertEquals('', $output);
+	}
+
+	public function testFormCustomBuild()
+	{
+		$this->markTestIncomplete();
+	}
 }

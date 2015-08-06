@@ -183,7 +183,7 @@ class Form
 		{
 			if(class_exists(Config::getValue('forms','elementViewAdapter')))
 			{
-				$this->setElementViewAdapter(Config::getValue('forms','elementViewAdapter'));
+				$this->makeElementViewAdapter(Config::getValue('forms','elementViewAdapter'));
 			}
 		}
 
@@ -834,6 +834,7 @@ JS;
 
 	/**
 	 * @param string $layout
+	 * @return $this
 	 */
 	public function setLayout($layout)
 	{
@@ -850,6 +851,7 @@ JS;
 	}
 
 	/**
+	* Make a view adapter from the string name
 	* @param $viewAdapterString
 	* @return $this
 	*/
@@ -860,19 +862,31 @@ JS;
 		{
 		    $this->setElementViewAdapter($obj);
 		}
+
+		//Attach to all of the fields in the object
+		foreach($this->fields as $field)
+		{
+			$field->setElementViewAdapter($obj);
+		}
+
 		return $this;
 	}
 
 	/**
+	 * Set the view adapter to use when building the form.
 	 * @param ElementViewAdapter $elementViewAdapter
+	 * @return $this
 	 */
-	public function setElementViewAdapter($elementViewAdapter)
+	public function setElementViewAdapter(ElementViewAdapter $elementViewAdapter)
 	{
-	        $temp = new $elementViewAdapter();
-	        if($temp instanceof ElementViewAdapter)
-	        {
-	            $this->elementViewAdapter = $temp;
-	        }
+		$this->elementViewAdapter = $elementViewAdapter;
+
+		//Attach to all of the fields in the object
+		foreach($this->fields as $field)
+		{
+			$field->setElementViewAdapter($elementViewAdapter);
+		}
+
 		return $this;
 	}
 
