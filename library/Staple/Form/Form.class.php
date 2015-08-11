@@ -140,14 +140,6 @@ class Form
 	 */
 	public function __construct($name = NULL, $action = NULL)
 	{
-	        /**
-	         * Loads selected elementViewAdapter from application.ini and verify given adapter is a class before loading
-	         */
-        	if(Config::getValue('forms','elementViewAdapter') != '' && Config::getValue('forms','elementViewAdapter') != null)
-	        {
-            		$this->makeElementViewAdapter(Config::getValue('forms','elementViewAdapter'));
-	        }
-
 		$this->_start();
 
 		if(isset($name))
@@ -163,14 +155,11 @@ class Form
 			//check that the form was submitted.
 			if(isset($_SESSION['Staple']['Forms'][$this->name]))
 			{
-				if(array_key_exists('ident', $_SESSION['Staple']['Forms'][$this->name]))
+				if(array_key_exists('ident', $_SESSION['Staple']['Forms'][$this->name]) && array_key_exists('ident', $_REQUEST))
 				{
-					if(array_key_exists('ident', $_REQUEST))
+					if($_SESSION['Staple']['Forms'][$this->name]['ident'] == $_REQUEST['ident'])
 					{
-						if($_SESSION['Staple']['Forms'][$this->name]['ident'] == $_REQUEST['ident'])
-						{
-							$this->submitted = true;
-						}
+						$this->submitted = true;
 					}
 				}
 			}
@@ -179,19 +168,13 @@ class Form
 		/**
 		 * Loads selected elementViewAdapter from application.ini and verify given adapter is a class before loading
 		 */
-		if(Config::getValue('forms','elementViewAdapter') != '')
+		if(Config::getValue('forms','elementViewAdapter', false) != '')
 		{
 			if(class_exists(Config::getValue('forms','elementViewAdapter')))
 			{
 				$this->makeElementViewAdapter(Config::getValue('forms','elementViewAdapter'));
 			}
 		}
-
-		//Repopulate data from the session -- I might add this.....
-		//if($this->wasSubmitted())
-		//{
-			
-		//}
 		
 		//create the form's identity field.
 		if($this->createIdent === true)
@@ -323,7 +306,7 @@ class Form
 
 	/**
 	 * @param array $data
-	 * @param FieldElement | array $target
+	 * @param FieldElement[] | array $target
 	 */
 	private function addDataToTarget(array $data, $target)
 	{

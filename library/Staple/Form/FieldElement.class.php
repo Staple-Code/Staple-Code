@@ -390,7 +390,7 @@ abstract class FieldElement
 		{
 			if($val instanceof FieldValidator)
 			{
-				$script .= $val->clientJS(get_class($this), $this->id);
+				$script .= $val->clientJS(get_class($this), $this);
 			}
 			else
 			{
@@ -534,7 +534,7 @@ abstract class FieldElement
     }
 
 	/**
-	 * set instance passed from Form into element
+	 * Set instance passed from Form into element
 	 * @param ElementViewAdapter $adapter
 	 * @return $this
 	 */
@@ -545,7 +545,8 @@ abstract class FieldElement
 	}
 
 	/**
-	 * return instance of elementView adapter contained in $elementViewAdapter
+	 * Return instance of elementView adapter contained in $elementViewAdapter
+	 * @return ElementViewAdapter
 	 */
 	public function getElementViewAdapter()
 	{

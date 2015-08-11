@@ -381,21 +381,27 @@ class FormTest extends \PHPUnit_Framework_TestCase
     public function testFormStandardBuild()
     {
 		$form = $this->getComplexTestForm();
+
+		$this->assertNull($form->getElementViewAdapter());
+
 		$ident = $form->fields['ident']->getValue();
 		$expectedOutput = "\n<form name=\"testform\" id=\"testform_form\" action=\"/test/form\" method=\"GET\">"
 			."\n<div id=\"testform_div\">"
-			."\n\n<div class=\"form-group\">\n\t<label class=\"control-label\">First Name <small>(Required)</small></label>"
-			."\n\t<input type=\"text\" id=\"fname\" name=\"fname\" value=\"\" class=\"form_required form-control\">"
+			."\n<div  class=\"form_required form_element element_text\" id=\"fname_element\">"
+			."\n\t<label for=\"fname\" class=\"form_required form_element element_text\">First Name</label>"
+			."\n\t<input type=\"text\" id=\"fname\" name=\"fname\" value=\"\" class=\"form_required form_element element_text\">"
 			."\n</div>"
-			."\n<div class=\"form-group\">"
-			."\n\t<label class=\"control-label\">Last Name</label>"
-			."\n\t<input type=\"text\" id=\"lname\" name=\"lname\" value=\"\" class=\"form-control\">"
-			."\n</div>\n<div class=\"form-group\">"
-			."\n\t<label class=\"control-label\">Your Biography</label>"
-			."\n\t<textarea rows=\"5\" cols=\"40\" id=\"bio\" name=\"bio\" class=\"form-control\"></textarea>"
-			."\n</div>\n<div class=\"form-group\">"
-			."\n\t<label class=\"control-label\">Year of Birth <small>(Required)</small></label>"
-			."\n\t<select name=\"birthyear\" id=\"birthyear\" class=\"form_required form-control\">"
+			."\n<div  class=\"form_element element_text\" id=\"lname_element\">"
+			."\n\t<label for=\"lname\" class=\"form_element element_text\">Last Name</label>"
+			."\n\t<input type=\"text\" id=\"lname\" name=\"lname\" value=\"\" class=\"form_element element_text\">"
+			."\n</div>"
+			."\n<div  class=\"form_element element_textarea\" id=\"bio_element\">"
+			."\n\t<label for=\"bio\" class=\"form_element element_textarea\">Your Biography</label>"
+			."\n\t<textarea rows=\"5\" cols=\"40\" id=\"bio\" name=\"bio\" class=\"form_element element_textarea\"></textarea>"
+			."\n</div>"
+			."\n<div class=\"form_required form_element element_select\" id=\"birthyear_element\">"
+			."\n\t<label for=\"birthyear\" class=\"form_required form_element element_select\">Year of Birth</label>"
+			."\n\t<select name=\"birthyear\" id=\"birthyear\" class=\"form_required form_element element_select\">"
 			."\n\t\t<option value=\"\"></option>"
 			."\n\t\t<option value=\"1994\">1994</option>"
 			."\n\t\t<option value=\"1995\">1995</option>"
@@ -406,20 +412,24 @@ class FormTest extends \PHPUnit_Framework_TestCase
 			."\n\t\t<option value=\"2000\">2000</option>"
 			."\n\t</select>"
 			."\n</div>"
-			."\n<div class=\"form-group\">"
-			."\n\t<label class=\"control-label\">I need to add a spouse:</label>"
+			."\n<div class=\"form_element element_radiogroup\" id=\"spouse_element\">"
+			."\n\t<label class=\"form_element element_radiogroup\">I need to add a spouse:</label>"
 			."\n\t<div class=\"form_radio\" id=\"spouse_0_div\">"
-			."\n\t\t<input type=\"radio\" name=\"spouse\" id=\"spouse_0\" value=\"0\">"
+			."\n\t\t<input type=\"radio\" name=\"spouse\" id=\"spouse_0\" value=\"0\" class=\"form_element element_radiogroup\">"
 			."\n\t\t<label for=\"spouse_0\">Yes</label>"
 			."\n\t</div>"
 			."\n\t<div class=\"form_radio\" id=\"spouse_1_div\">"
-			."\n\t\t<input type=\"radio\" name=\"spouse\" id=\"spouse_1\" value=\"1\" checked>"
+			."\n\t\t<input type=\"radio\" name=\"spouse\" id=\"spouse_1\" value=\"1\" checked class=\"form_element element_radiogroup\">"
 			."\n\t\t<label for=\"spouse_1\">No</label>"
 			."\n\t</div>"
 			."\n</div>"
-			."\n<div class=\"form-group\">\t<input type=\"submit\" id=\"send\" name=\"send\" value=\"Send Query\" class=\"btn\">"
+			."\n<div  class=\"form_element element_submit\" id=\"send_element\">"
+			."\n\t<label for=\"send\" class=\"form_element element_submit\"></label>"
+			."\n\t<input type=\"submit\" id=\"send\" name=\"send\" value=\"Send Query\" class=\"form_element element_submit\">"
 			."\n</div>\n"
-			."\n<div class=\"form-group\">\t<input type=\"hidden\" id=\"ident\" name=\"ident\" value=\"$ident\">\n\n</div>\n</div>\n</form>\n";
+			."\n\t<input type=\"hidden\" id=\"ident\" name=\"ident\" value=\"$ident\">\n"
+			."\n</div>"
+			."\n</form>\n";
 		$output = $form->build();
 
 		$this->assertEquals($expectedOutput, $output);
@@ -427,7 +437,6 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
 	public function testFormBootstrapBuild()
 	{
-		$this->markTestIncomplete();
 		$form = $this->getComplexTestForm();
 		$form->setElementViewAdapter(new BootstrapViewAdapter());
 		$ident = $form->fields['ident']->getValue();
@@ -466,34 +475,56 @@ class FormTest extends \PHPUnit_Framework_TestCase
 			."\n\t\t<label for=\"spouse_1\">No</label>"
 			."\n\t</div>"
 			."\n</div>"
-			."\n<div class=\"form-group\">\t<input type=\"submit\" id=\"send\" name=\"send\" value=\"Send Query\" class=\"btn\">"
+			."\n<div class=\"form-group\">"
+			."\n\t<input type=\"submit\" id=\"send\" name=\"send\" value=\"Send Query\" class=\"btn\">"
 			."\n</div>\n"
-			."\n<div class=\"form-group\">\t<input type=\"hidden\" id=\"ident\" name=\"ident\" value=\"$ident\">\n\n</div>\n</div>\n</form>\n";
+			."\n<div class=\"form-group\">"
+			."\n\t<input type=\"hidden\" id=\"ident\" name=\"ident\" value=\"$ident\">\n"
+			."\n</div>"
+			."\n</div>"
+			."\n</form>\n";
 		$output = $form->build();
 
-		$this->assertEquals('', $output);
+		$this->assertEquals($expectedOutput, $output);
 	}
 
 	public function testFormFoundationBuild()
 	{
-		$this->markTestIncomplete();
 		$form = $this->getComplexTestForm();
 		$form->setElementViewAdapter(new FoundationViewAdapter());
 		$ident = $form->fields['ident']->getValue();
 		$expectedOutput = "\n<form name=\"testform\" id=\"testform_form\" action=\"/test/form\" method=\"GET\">"
-			."\n<div id=\"testform_div\">"
-			."\n\n<div class=\"form-group\">\n\t<label class=\"control-label\">First Name <small>(Required)</small></label>"
-			."\n\t<input type=\"text\" id=\"fname\" name=\"fname\" value=\"\" class=\"form_required form-control\">"
+            ."\n<div id=\"testform_div\">\n"
+			."\n<div class=\"row\">"
+			."\n<div class=\"small-12 columns\">"
+			."\n<label for=\"fname\"><b>First Name</b> <small>(<i>Required</i>)</small></label>"
 			."\n</div>"
-			."\n<div class=\"form-group\">"
-			."\n\t<label class=\"control-label\">Last Name</label>"
-			."\n\t<input type=\"text\" id=\"lname\" name=\"lname\" value=\"\" class=\"form-control\">"
-			."\n</div>\n<div class=\"form-group\">"
-			."\n\t<label class=\"control-label\">Your Biography</label>"
-			."\n\t<textarea rows=\"5\" cols=\"40\" id=\"bio\" name=\"bio\" class=\"form-control\"></textarea>"
-			."\n</div>\n<div class=\"form-group\">"
-			."\n\t<label class=\"control-label\">Year of Birth <small>(Required)</small></label>"
-			."\n\t<select name=\"birthyear\" id=\"birthyear\" class=\"form_required form-control\">"
+			."\n<div class=\"small-12 columns\">"
+			."\n\t<input type=\"text\" id=\"fname\" name=\"fname\" value=\"\" class=\"form_required\">"
+			."\n</div>"
+			."\n</div>\n"
+			."\n<div class=\"row\">"
+			."\n<div class=\"small-12 columns\">"
+			."\n<label for=\"lname\">Last Name</label>"
+			."\n</div>"
+			."\n<div class=\"small-12 columns\">"
+			."\n\t<input type=\"text\" id=\"lname\" name=\"lname\" value=\"\">"
+			."\n</div>"
+			."\n</div>"
+			."\n<div class=\"row\">"
+			."\n<div class=\"small-12 columns\">"
+			."\n<label for=\"bio\">Your Biography</label>"
+			."\n</div>"
+			."\n<div class=\"small-12 columns\">"
+			."\n\t<textarea rows=\"5\" cols=\"40\" id=\"bio\" name=\"bio\"></textarea>"
+			."\n</div>"
+			."\n</div>"
+			."\n<div class=\"row\">"
+			."\n<div class=\"small-12 columns\">"
+			."\n<label for=\"birthyear\"><b>Year of Birth</b> <small>(<i>Required</i>)</small></label>"
+			."\n</div>"
+			."\n<div class=\"small-12 columns\">"
+			."\n\t<select name=\"birthyear\" id=\"birthyear\" class=\"form_required\">"
 			."\n\t\t<option value=\"\"></option>"
 			."\n\t\t<option value=\"1994\">1994</option>"
 			."\n\t\t<option value=\"1995\">1995</option>"
@@ -504,27 +535,33 @@ class FormTest extends \PHPUnit_Framework_TestCase
 			."\n\t\t<option value=\"2000\">2000</option>"
 			."\n\t</select>"
 			."\n</div>"
-			."\n<div class=\"form-group\">"
-			."\n\t<label class=\"control-label\">I need to add a spouse:</label>"
+			."\n</div>"
+			."\n<div  class=\"row\">"
+			."\n<div class=\"small-12 columns\">"
+			."\n<label for=\"spouse\">I need to add a spouse:</label>"
+			."\n</div>"
+			."\n<div class=\"small-12 columns\">"
 			."\n\t<div class=\"form_radio\" id=\"spouse_0_div\">"
-			."\n\t\t<input type=\"radio\" name=\"spouse\" id=\"spouse_0\" value=\"0\">"
+			."\n\t\t<input type=\"radio\" name=\"spouse\" id=\"spouse_0\" value=\"0\" class=\"row\">"
 			."\n\t\t<label for=\"spouse_0\">Yes</label>"
 			."\n\t</div>"
 			."\n\t<div class=\"form_radio\" id=\"spouse_1_div\">"
-			."\n\t\t<input type=\"radio\" name=\"spouse\" id=\"spouse_1\" value=\"1\" checked>"
+			."\n\t\t<input type=\"radio\" name=\"spouse\" id=\"spouse_1\" value=\"1\" checked class=\"row\">"
 			."\n\t\t<label for=\"spouse_1\">No</label>"
 			."\n\t</div>"
 			."\n</div>"
-			."\n<div class=\"form-group\">\t<input type=\"submit\" id=\"send\" name=\"send\" value=\"Send Query\" class=\"btn\">"
+			."\n</div>"
+			."\n<div class=\"row\"><div class=\"small-12 columns\">	<input type=\"submit\" id=\"send\" name=\"send\" value=\"Send Query\" class=\"button\">"
+			."\n</div></div>"
+			."\n<div class=\"row hide\">"
+			."\n<div class=\"small-12 columns\">"
+			."\n\t<input type=\"hidden\" id=\"ident\" name=\"ident\" value=\"$ident\">"
+			."\n</div>"
 			."\n</div>\n"
-			."\n<div class=\"form-group\">\t<input type=\"hidden\" id=\"ident\" name=\"ident\" value=\"$ident\">\n\n</div>\n</div>\n</form>\n";
+			."\n</div>"
+			."\n</form>\n";
 		$output = $form->build();
 
-		$this->assertEquals('', $output);
-	}
-
-	public function testFormCustomBuild()
-	{
-		$this->markTestIncomplete();
+		$this->assertEquals($expectedOutput, $output);
 	}
 }

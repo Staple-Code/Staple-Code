@@ -22,6 +22,8 @@
  */
 namespace Staple\Form;
 
+use Staple\Form\ViewAdapters\ElementViewAdapter;
+
 class SubmitElement extends FieldElement
 {
 	public function __construct($name, $value=NULL, $label = NULL, $id = NULL, array $attrib = array())
@@ -59,10 +61,10 @@ class SubmitElement extends FieldElement
 			$buf = ob_get_contents();
 			ob_end_clean();
 		}
-	        elseif(isset($this->elementViewAdapter))
-	        {
-	            $buf = $this->getElementViewAdapter()->SubmitElement($this);
-	        }
+		elseif($this->elementViewAdapter instanceof ElementViewAdapter)
+		{
+			$buf = $this->getElementViewAdapter()->SubmitElement($this);
+		}
 		else 
 		{
 			$this->addClass('form_element');

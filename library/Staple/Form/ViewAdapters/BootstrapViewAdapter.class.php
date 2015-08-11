@@ -211,7 +211,7 @@ class BootstrapViewAdapter extends ElementViewAdapter
     function HiddenElement(HiddenElement $field)
     {
         $field->addClass('form-control');
-        $buf = "\n<div class=\"form-group\">"; //Start Form-Group
+        $buf = "\n<div class=\"form-group\">\n"; //Start Form-Group
         $buf .= $field->field();
         $buf .= "\n</div>"; //End Form-Group
         return $buf;
@@ -493,7 +493,7 @@ class BootstrapViewAdapter extends ElementViewAdapter
     function SubmitElement(SubmitElement $field)
     {
         $field->addClass('btn');
-        $buf = "\n<div class=\"form-group\">"; //Start Form-Group
+        $buf = "\n<div class=\"form-group\">\n"; //Start Form-Group
         $buf .= $field->field();
         $buf .= "</div>"; //End Form-Group
         return $buf;
