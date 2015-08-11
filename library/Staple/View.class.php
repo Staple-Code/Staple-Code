@@ -241,7 +241,7 @@ class View
 	 */
 	public function getViewForm()
 	{
-		return $this->_viewModel;
+		return $this->_viewForm;
 	}
 
 	/**
