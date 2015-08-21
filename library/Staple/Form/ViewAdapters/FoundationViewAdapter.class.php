@@ -40,588 +40,589 @@ use Staple\Form\ButtonElement;
 class FoundationViewAdapter extends ElementViewAdapter
 {
 
-    public function TextElement(TextElement $field)
-    {
-        $classes = $field->getClassString();
+	public function TextElement(TextElement $field)
+	{
+		//@todo add the class string in to this element.
+		$classes = $field->getClassString();
 
-        $buf = "\n<div class=\"row\">\n<div class=\"small-12 columns\">\n"; //Label Start
+		$buf = "\n<div class=\"row\">\n<div class=\"small-12 columns\">\n"; //Label Start
 
-        if(count($field->getErrors()) != 0)
-        {
-            $buf .= "<label for=\"".$this->escape($field->getId())."\" class=\"error\">";
-        }
-        else
-        {
-            $buf .= "<label for=\"".$this->escape($field->getId())."\">";
-        }
+		if (count($field->getErrors()) != 0)
+		{
+			$buf .= "<label for=\"" . $this->escape($field->getId()) . "\" class=\"error\">";
+		}
+		else
+		{
+			$buf .= "<label for=\"" . $this->escape($field->getId()) . "\">";
+		}
 
-        if($field->isRequired() == 1)
-        {
-            $buf .= "<b>";
-            $buf .= $field->getLabel();
-            $buf .= "</b> <small>(<i>Required</i>)</small>";
-        }
-        else
-        {
-            $buf .= $field->getLabel();
-        }
+		if ($field->isRequired() == 1)
+		{
+			$buf .= "<b>";
+			$buf .= $field->getLabel();
+			$buf .= "</b> <small>(<i>Required</i>)</small>";
+		}
+		else
+		{
+			$buf .= $field->getLabel();
+		}
 
-        $buf .= "</label>\n";
-        $buf .= "</div>\n"; //Label End
+		$buf .= "</label>\n";
+		$buf .= "</div>\n"; //Label End
 
-        if(strlen($field->getInstructions()) >= 1)
-        {
-            $buf .= "<div class=\"small-12 columns\">\n"; //Instructions Start
-            $buf .= $field->getInstructions();
-            $buf .= "</div>"; //Instructions End
-        }
+		if (strlen($field->getInstructions()) >= 1)
+		{
+			$buf .= "<div class=\"small-12 columns\">\n"; //Instructions Start
+			$buf .= $field->getInstructions();
+			$buf .= "</div>"; //Instructions End
+		}
 
-        $buf .= "<div class=\"small-12 columns\">\n"; //Field Start
-        if(count($field->getErrors()) != 0)
-        {
-            $buf .= "<label class=\"error\">";
-        }
+		$buf .= "<div class=\"small-12 columns\">\n"; //Field Start
+		if (count($field->getErrors()) != 0)
+		{
+			$buf .= "<label class=\"error\">";
+		}
 
-       $buf .= $field->field();
+		$buf .= $field->field();
 
-        if(count($field->getErrors()) != 0)
-        {
-            $buf .= "</label>";
-            $buf .= "<small class=\"error\">";
-            foreach($field->getErrors() as $error)
-            {
-                foreach($error as $message)
-                {
-                    $buf .= "- $message<br>\n";
-                }
-            }
-            $buf .= "</small>";
-        }
-        $buf .= "</div>\n"; //Field End
-        $buf .= "</div>\n"; //Row End
-        return $buf;
-    }
+		if (count($field->getErrors()) != 0)
+		{
+			$buf .= "</label>";
+			$buf .= "<small class=\"error\">";
+			foreach ($field->getErrors() as $error)
+			{
+				foreach ($error as $message)
+				{
+					$buf .= "- $message<br>\n";
+				}
+			}
+			$buf .= "</small>";
+		}
+		$buf .= "</div>\n"; //Field End
+		$buf .= "</div>\n"; //Row End
+		return $buf;
+	}
 
-    public function TextareaElement(TextareaElement $field)
-    {
-        $buf = "<div class=\"row\">\n"; //Row Start
-        $buf .= "<div class=\"small-12 columns\">\n"; //Label Start
+	public function TextareaElement(TextareaElement $field)
+	{
+		$buf = "<div class=\"row\">\n"; //Row Start
+		$buf .= "<div class=\"small-12 columns\">\n"; //Label Start
 
-        if(count($field->getErrors()) != 0)
-        {
-            $buf .= "<label for=\"".$this->escape($field->getId())."\" class=\"error\">";
-        }
-        else
-        {
-            $buf .= "<label for=\"".$this->escape($field->getId())."\">";
-        }
+		if (count($field->getErrors()) != 0)
+		{
+			$buf .= "<label for=\"" . $this->escape($field->getId()) . "\" class=\"error\">";
+		}
+		else
+		{
+			$buf .= "<label for=\"" . $this->escape($field->getId()) . "\">";
+		}
 
-        if($field->isRequired() == 1)
-        {
-            $buf .= "<b>";
-            $buf .= $field->getLabel();
-            $buf .= "</b> <small>(<i>Required</i>)</small>";
-        }
-        else
-        {
-            $buf .= $field->getLabel();
-        }
+		if ($field->isRequired() == 1)
+		{
+			$buf .= "<b>";
+			$buf .= $field->getLabel();
+			$buf .= "</b> <small>(<i>Required</i>)</small>";
+		}
+		else
+		{
+			$buf .= $field->getLabel();
+		}
 
-        $buf .= "</label>\n";
+		$buf .= "</label>\n";
 
-        $buf .= "</div>\n"; //Label End
+		$buf .= "</div>\n"; //Label End
 
-        if(strlen($field->getInstructions()) >= 1)
-        {
-            $buf .= "<div class=\"small-12 columns\">\n"; //Instructions Start
-            $buf .= $field->getInstructions();
-            $buf .= "</div>\n"; //Instructions End
-        }
+		if (strlen($field->getInstructions()) >= 1)
+		{
+			$buf .= "<div class=\"small-12 columns\">\n"; //Instructions Start
+			$buf .= $field->getInstructions();
+			$buf .= "</div>\n"; //Instructions End
+		}
 
-        $buf .= "<div class=\"small-12 columns\">\n"; //Field Start
-        if(count($field->getErrors()) != 0)
-        {
-            $buf .= "<label class=\"error\">";
-        }
+		$buf .= "<div class=\"small-12 columns\">\n"; //Field Start
+		if (count($field->getErrors()) != 0)
+		{
+			$buf .= "<label class=\"error\">";
+		}
 
-        $buf .= $field->field();
+		$buf .= $field->field();
 
-        if(count($field->getErrors()) != 0)
-        {
-            $buf .= "</label>";
-            $buf .= "<small class=\"error\">";
-            foreach($field->getErrors() as $error)
-            {
-                foreach($error as $message)
-                {
-                    $buf .= "- $message<br>\n";
-                }
-            }
-            $buf .= "</small>";
-        }
-        $buf .= "</div>\n"; //Field End
-        $buf .= "</div>\n"; //Row End
-        return $buf;
-    }
+		if (count($field->getErrors()) != 0)
+		{
+			$buf .= "</label>";
+			$buf .= "<small class=\"error\">";
+			foreach ($field->getErrors() as $error)
+			{
+				foreach ($error as $message)
+				{
+					$buf .= "- $message<br>\n";
+				}
+			}
+			$buf .= "</small>";
+		}
+		$buf .= "</div>\n"; //Field End
+		$buf .= "</div>\n"; //Row End
+		return $buf;
+	}
 
-    public function PasswordElement(PasswordElement $field)
-    {
-        $buf = "<div class=\"row\">\n"; //Row Start
-        $buf .= "<div class=\"small-12 columns\">\n"; //Label Start
-
-
-        if(count($field->getErrors()) != 0)
-        {
-            $buf .= "<label for=\"".$this->escape($field->getId())."\" class=\"error\">";
-        }
-        else
-        {
-            $buf .= "<label for=\"".$this->escape($field->getId())."\">";
-        }
-
-        if($field->isRequired() == 1)
-        {
-            $buf .= "<b>";
-            $buf .= $field->getLabel();
-            $buf .= "</b> <small>(<i>Required</i>)</small>";
-        }
-        else
-        {
-            $buf .= $field->getLabel();
-        }
-
-        $buf .= "</label>\n";
-
-        $buf .= "</div>\n"; //Label End
-
-        if(strlen($field->getInstructions()) >= 1)
-        {
-            $buf .= "<div class=\"small-12 columns\">\n"; //Instructions Start
-            $buf .= $field->getInstructions();
-            $buf .= "</div>\n"; //Instructions End
-        }
-
-        $buf .= "<div class=\"small-12 columns\">\n"; //Field Start
-        if(count($field->getErrors()) != 0)
-        {
-            $buf .= "<label class=\"error\">";
-        }
-
-        $buf .= $field->field();
-
-        if(count($field->getErrors()) != 0)
-        {
-            $buf .= "</label>";
-            $buf .= "<small class=\"error\">";
-            foreach($field->getErrors() as $error)
-            {
-                foreach($error as $message)
-                {
-                    $buf .= "- $message<br>\n";
-                }
-            }
-            $buf .= "</small>";
-        }
-        $buf .= "</div>\n"; //Field End
-        $buf .= "</div>\n"; //Row end
-
-        return $buf;
-    }
-
-    public function HiddenElement(HiddenElement $field)
-    {
-        $buf = "<div class=\"row hide\">\n"; //Row Start
-        $buf .= "<div class=\"small-12 columns\">\n"; //Field Start
-        $buf .= $field->field();
-        $buf .= "</div>\n"; //Field End
-        $buf .= "</div>\n"; //Row end
-        return $buf;
-    }
-
-    public function SelectElement(SelectElement $field)
-    {
-        $buf = "<div class=\"row\">\n"; //Row Start
-        $buf .= "<div class=\"small-12 columns\">\n"; //Label Start
-
-        if(count($field->getErrors()) != 0)
-        {
-            $buf .= "<label for=\"".$this->escape($field->getId())."\" class=\"error\">";
-        }
-        else
-        {
-            $buf .= "<label for=\"".$this->escape($field->getId())."\">";
-        }
-
-        if($field->isRequired() == 1)
-        {
-            $buf .= "<b>";
-            $buf .= $field->getLabel();
-            $buf .= "</b> <small>(<i>Required</i>)</small>";
-        }
-        else
-        {
-            $buf .= $field->getLabel();
-        }
-
-        $buf .= "</label>\n";
-
-        $buf .= "</div>\n"; //Label End
-
-        if(strlen($field->getInstructions()) >= 1)
-        {
-            $buf .= "<div class=\"small-12 columns\">\n"; //Instructions Start
-            $buf .= $field->getInstructions();
-            $buf .= "</div>\n"; //Instructions End
-        }
-
-        $buf .= "<div class=\"small-12 columns\">\n"; //Field Start
-        if(count($field->getErrors()) != 0)
-        {
-            $buf .= "<label class=\"error\">";
-        }
-
-        $buf .= $field->field();
-
-        if(count($field->getErrors()) != 0)
-        {
-            $buf .= "</label>";
-            $buf .= "<small class=\"error\">";
-            foreach($field->getErrors() as $error)
-            {
-                foreach($error as $message)
-                {
-                    $buf .= "- $message<br>\n";
-                }
-            }
-            $buf .= "</small>";
-        }
-        $buf .= "</div>\n"; //Field End
-        $buf .= "</div>\n"; //Row End
-        return $buf;
-    }
-
-    public function CheckboxElement(CheckboxElement $field)
-    {
-
-		$field->addClass('row');
-
-        $classes = $field->getClassString();
-
-        $buf = "<div $classes\n"; //Row Start
-        $buf .= "<div class=\"small-12 columns\">\n"; //Label Start
-
-        if(count($field->getErrors()) != 0)
-        {
-            $buf .= "<label for=\"".$this->escape($field->getId())."\" class=\"error\">";
-        }
-        else
-        {
-            $buf .= "<label for=\"".$this->escape($field->getId())."\">";
-        }
-
-        if($field->isRequired() == 1)
-        {
-            $buf .= "<b>";
-            $buf .= $field->getLabel();
-            $buf .= "</b> <small>(<i>Required</i>)</small>";
-        }
-        else
-        {
-            $buf .= $field->getLabel();
-        }
-
-        $buf .= "</label>\n";
-
-        $buf .= "</div>\n"; //Label End
-
-        if(strlen($field->getInstructions()) >= 1)
-        {
-            $buf .= "<div class=\"small-12 columns\">\n"; //Instructions Start
-            $buf .= $field->getInstructions();
-            $buf .= "</div>\n"; //Instructions End
-        }
+	public function PasswordElement(PasswordElement $field)
+	{
+		$buf = "<div class=\"row\">\n"; //Row Start
+		$buf .= "<div class=\"small-12 columns\">\n"; //Label Start
 
 
-        $buf .= "<div class=\"small-12 columns\">\n"; //Field Start
-        if(count($field->getErrors()) != 0)
-        {
-            $buf .= "<label class=\"error\">";
-        }
+		if (count($field->getErrors()) != 0)
+		{
+			$buf .= "<label for=\"" . $this->escape($field->getId()) . "\" class=\"error\">";
+		}
+		else
+		{
+			$buf .= "<label for=\"" . $this->escape($field->getId()) . "\">";
+		}
 
-        $buf .= $field->field();
+		if ($field->isRequired() == 1)
+		{
+			$buf .= "<b>";
+			$buf .= $field->getLabel();
+			$buf .= "</b> <small>(<i>Required</i>)</small>";
+		}
+		else
+		{
+			$buf .= $field->getLabel();
+		}
 
-        if(count($field->getErrors()) != 0)
-        {
-            $buf .= "</label>";
-            $buf .= "<small class=\"error\">";
-            foreach($field->getErrors() as $error)
-            {
-                foreach($error as $message)
-                {
-                    $buf .= "- $message<br>\n";
-                }
-            }
-            $buf .= "</small>";
-        }
-        $buf .= "</div>\n"; //Field End
-        $buf .= "</div>\n"; //Row end
+		$buf .= "</label>\n";
 
-        return $buf;
-    }
+		$buf .= "</div>\n"; //Label End
 
-    public function CheckboxgroupElement(CheckboxGroupElement $field)
-    {
+		if (strlen($field->getInstructions()) >= 1)
+		{
+			$buf .= "<div class=\"small-12 columns\">\n"; //Instructions Start
+			$buf .= $field->getInstructions();
+			$buf .= "</div>\n"; //Instructions End
+		}
+
+		$buf .= "<div class=\"small-12 columns\">\n"; //Field Start
+		if (count($field->getErrors()) != 0)
+		{
+			$buf .= "<label class=\"error\">";
+		}
+
+		$buf .= $field->field();
+
+		if (count($field->getErrors()) != 0)
+		{
+			$buf .= "</label>";
+			$buf .= "<small class=\"error\">";
+			foreach ($field->getErrors() as $error)
+			{
+				foreach ($error as $message)
+				{
+					$buf .= "- $message<br>\n";
+				}
+			}
+			$buf .= "</small>";
+		}
+		$buf .= "</div>\n"; //Field End
+		$buf .= "</div>\n"; //Row end
+
+		return $buf;
+	}
+
+	public function HiddenElement(HiddenElement $field)
+	{
+		$buf = "<div class=\"row hide\">\n"; //Row Start
+		$buf .= "<div class=\"small-12 columns\">\n"; //Field Start
+		$buf .= $field->field();
+		$buf .= "</div>\n"; //Field End
+		$buf .= "</div>\n"; //Row end
+		return $buf;
+	}
+
+	public function SelectElement(SelectElement $field)
+	{
+		$buf = "<div class=\"row\">\n"; //Row Start
+		$buf .= "<div class=\"small-12 columns\">\n"; //Label Start
+
+		if (count($field->getErrors()) != 0)
+		{
+			$buf .= "<label for=\"" . $this->escape($field->getId()) . "\" class=\"error\">";
+		}
+		else
+		{
+			$buf .= "<label for=\"" . $this->escape($field->getId()) . "\">";
+		}
+
+		if ($field->isRequired() == 1)
+		{
+			$buf .= "<b>";
+			$buf .= $field->getLabel();
+			$buf .= "</b> <small>(<i>Required</i>)</small>";
+		}
+		else
+		{
+			$buf .= $field->getLabel();
+		}
+
+		$buf .= "</label>\n";
+
+		$buf .= "</div>\n"; //Label End
+
+		if (strlen($field->getInstructions()) >= 1)
+		{
+			$buf .= "<div class=\"small-12 columns\">\n"; //Instructions Start
+			$buf .= $field->getInstructions();
+			$buf .= "</div>\n"; //Instructions End
+		}
+
+		$buf .= "<div class=\"small-12 columns\">\n"; //Field Start
+		if (count($field->getErrors()) != 0)
+		{
+			$buf .= "<label class=\"error\">";
+		}
+
+		$buf .= $field->field();
+
+		if (count($field->getErrors()) != 0)
+		{
+			$buf .= "</label>";
+			$buf .= "<small class=\"error\">";
+			foreach ($field->getErrors() as $error)
+			{
+				foreach ($error as $message)
+				{
+					$buf .= "- $message<br>\n";
+				}
+			}
+			$buf .= "</small>";
+		}
+		$buf .= "</div>\n"; //Field End
+		$buf .= "</div>\n"; //Row End
+		return $buf;
+	}
+
+	public function CheckboxElement(CheckboxElement $field)
+	{
 
 		$field->addClass('row');
 
-        $buf = '';
-        $classes = $field->getClassString();
+		$classes = $field->getClassString();
 
-        $buf .= "<div $classes>\n"; //Row Start
-        $buf .= "<div class=\"small-12 columns\">\n"; //Label Start
+		$buf = "<div$classes>\n"; //Row Start
+		$buf .= "<div class=\"small-12 columns\">\n"; //Label Start
+
+		if (count($field->getErrors()) != 0)
+		{
+			$buf .= "\t<label for=\"" . $this->escape($field->getId()) . "\" class=\"error\">";
+		}
+		else
+		{
+			$buf .= "\t<label for=\"" . $this->escape($field->getId()) . "\">";
+		}
+
+		if ($field->isRequired() == 1)
+		{
+			$buf .= "<b>";
+			$buf .= $field->getLabel();
+			$buf .= "</b> <small>(<i>Required</i>)</small>";
+		}
+		else
+		{
+			$buf .= $field->getLabel();
+		}
+
+		$buf .= "</label>\n";
+
+		$buf .= "</div>\n"; //Label End
+
+		if (strlen($field->getInstructions()) >= 1)
+		{
+			$buf .= "<div class=\"small-12 columns\">\n"; //Instructions Start
+			$buf .= $field->getInstructions();
+			$buf .= "</div>\n"; //Instructions End
+		}
 
 
-        if(count($field->getErrors()) != 0)
-        {
-            $buf .= "<label for=\"".$this->escape($field->getId())."\" class=\"error\">";
-        }
-        else
-        {
-            $buf .= "<label for=\"".$this->escape($field->getId())."\">";
-        }
+		$buf .= "<div class=\"small-12 columns\">\n"; //Field Start
+		if (count($field->getErrors()) != 0)
+		{
+			$buf .= "<label class=\"error\">";
+		}
 
-        if($field->isRequired() == 1)
-        {
-            $buf .= "<b>";
-            $buf .= $field->getLabel();
-            $buf .= "</b> <small>(<i>Required</i>)</small>";
-        }
-        else
-        {
-            $buf .= $field->getLabel();
-        }
+		$buf .= $field->field();
 
-        $buf .= "</label>\n";
+		if (count($field->getErrors()) != 0)
+		{
+			$buf .= "</label>";
+			$buf .= "<small class=\"error\">";
+			foreach ($field->getErrors() as $error)
+			{
+				foreach ($error as $message)
+				{
+					$buf .= "- $message<br>\n";
+				}
+			}
+			$buf .= "</small>";
+		}
+		$buf .= "</div>\n"; //Field End
+		$buf .= "</div>\n"; //Row end
 
-        $buf .= "</div>\n"; //Label End
+		return $buf;
+	}
 
-        if(strlen($field->getInstructions()) >= 1)
-        {
-            $buf .= "<div class=\"small-12 columns\">\n"; //Instructions Start
-            $buf .= $field->getInstructions();
-            $buf .= "</div>\n"; //Instructions End
-        }
-
-        $buf .= "<div class=\"small-12 columns\">\n"; //Field Start
-        if(count($field->getErrors()) != 0)
-        {
-            $buf .= "<label class=\"error\">";
-        }
-
-        $buf .= $field->field();
-        $buf .= $field->getInstructions();
-
-        if(count($field->getErrors()) != 0)
-        {
-            $buf .= "</label>";
-            $buf .= "<small class=\"error\">";
-            foreach($field->getErrors() as $error)
-            {
-                foreach($error as $message)
-                {
-                    $buf .= "- $message<br>\n";
-                }
-            }
-            $buf .= "</small>";
-        }
-        $buf .= "</div>\n"; //Field End
-        $buf .= "</div>\n"; //Row end
-
-        return $buf;
-    }
-
-    public function RadioElement(RadioElement $field)
-    {
+	public function CheckboxgroupElement(CheckboxGroupElement $field)
+	{
 
 		$field->addClass('row');
-        $buf = '';
-        $classes = $field->getClassString();
 
-        $buf .= "<div $classes>\n"; //Row Start
-        $buf .= "<div class=\"small-12 columns\">\n"; //Label Start
+		$buf = '';
+		$classes = $field->getClassString();
 
-
-        if(count($field->getErrors()) != 0)
-        {
-            $buf .= "<label for=\"".$this->escape($field->getId())."\" class=\"error\">";
-        }
-        else
-        {
-            $buf .= "<label for=\"".$this->escape($field->getId())."\">";
-        }
-
-        if($field->isRequired() == 1)
-        {
-            $buf .= "<b>";
-            $buf .= $field->getLabel();
-            $buf .= "</b> <small>(<i>Required</i>)</small>";
-        }
-        else
-        {
-            $buf .= $field->getLabel();
-        }
-
-        $buf .= "</label>\n";
-
-        $buf .= "</div>\n"; //Label End
-
-        if(strlen($field->getInstructions()) >= 1)
-        {
-            $buf .= "<div class=\"small-12 columns\">\n"; //Instructions Start
-            $buf .= $field->getInstructions();
-            $buf .= "</div>\n"; //Instructions End
-        }
-
-        $buf .= "<div class=\"small-12 columns\">\n"; //Field Start
-        if(count($field->getErrors()) != 0)
-        {
-            $buf .= "<label class=\"error\">";
-        }
-
-        $buf .= $field->field();
-
-        if(count($field->getErrors()) != 0)
-        {
-            $buf .= "</label>";
-            $buf .= "<small class=\"error\">";
-            foreach($field->getErrors() as $error)
-            {
-                foreach($error as $message)
-                {
-                    $buf .= "- $message<br>\n";
-                }
-            }
-            $buf .= "</small>";
-        }
-        $buf .= "</div>\n"; //Field End
-        $buf .= "</div>\n"; //Row end
-
-        return $buf;
-    }
+		$buf .= "<div $classes>\n"; //Row Start
+		$buf .= "<div class=\"small-12 columns\">\n"; //Label Start
 
 
-    public function FileElement(FileElement $field)
-    {
-        $field->addClass('');
+		if (count($field->getErrors()) != 0)
+		{
+			$buf .= "<label for=\"" . $this->escape($field->getId()) . "\" class=\"error\">";
+		}
+		else
+		{
+			$buf .= "<label for=\"" . $this->escape($field->getId()) . "\">";
+		}
 
-        $buf = "<div class=\"row\">\n"; //Row Start
-        $buf .= "<div class=\"small-12 columns\">\n"; //Label Start
+		if ($field->isRequired() == 1)
+		{
+			$buf .= "<b>";
+			$buf .= $field->getLabel();
+			$buf .= "</b> <small>(<i>Required</i>)</small>";
+		}
+		else
+		{
+			$buf .= $field->getLabel();
+		}
+
+		$buf .= "</label>\n";
+
+		$buf .= "</div>\n"; //Label End
+
+		if (strlen($field->getInstructions()) >= 1)
+		{
+			$buf .= "<div class=\"small-12 columns\">\n"; //Instructions Start
+			$buf .= $field->getInstructions();
+			$buf .= "</div>\n"; //Instructions End
+		}
+
+		$buf .= "<div class=\"small-12 columns\">\n"; //Field Start
+		if (count($field->getErrors()) != 0)
+		{
+			$buf .= "<label class=\"error\">";
+		}
+
+		$buf .= $field->field();
+		$buf .= $field->getInstructions();
+
+		if (count($field->getErrors()) != 0)
+		{
+			$buf .= "</label>";
+			$buf .= "<small class=\"error\">";
+			foreach ($field->getErrors() as $error)
+			{
+				foreach ($error as $message)
+				{
+					$buf .= "- $message<br>\n";
+				}
+			}
+			$buf .= "</small>";
+		}
+		$buf .= "</div>\n"; //Field End
+		$buf .= "</div>\n"; //Row end
+
+		return $buf;
+	}
+
+	public function RadioElement(RadioElement $field)
+	{
+
+		$field->addClass('row');
+		$buf = '';
+		$classes = $field->getClassString();
+
+		$buf .= "<div $classes>\n"; //Row Start
+		$buf .= "<div class=\"small-12 columns\">\n"; //Label Start
 
 
-        if(count($field->getErrors()) != 0)
-        {
-            $buf .= "<label for=\"".$this->escape($field->getId())."\" class=\"error\">";
-        }
-        else
-        {
-            $buf .= "<label for=\"".$this->escape($field->getId())."\">";
-        }
+		if (count($field->getErrors()) != 0)
+		{
+			$buf .= "<label for=\"" . $this->escape($field->getId()) . "\" class=\"error\">";
+		}
+		else
+		{
+			$buf .= "<label for=\"" . $this->escape($field->getId()) . "\">";
+		}
 
-        if($field->isRequired() == 1)
-        {
-            $buf .= "<b>";
-            $buf .= $field->getLabel();
-            $buf .= "</b> <small>(<i>Required</i>)</small>";
-        }
-        else
-        {
-            $buf .= $field->getLabel();
-        }
+		if ($field->isRequired() == 1)
+		{
+			$buf .= "<b>";
+			$buf .= $field->getLabel();
+			$buf .= "</b> <small>(<i>Required</i>)</small>";
+		}
+		else
+		{
+			$buf .= $field->getLabel();
+		}
 
-        $buf .= "</label>\n";
+		$buf .= "</label>\n";
 
-        $buf .= "</div>\n"; //Label End
+		$buf .= "</div>\n"; //Label End
 
-        if(strlen($field->getInstructions()) >= 1)
-        {
-            $buf .= "<div class=\"small-12 columns\">\n"; //Instructions Start
-            $buf .= $field->getInstructions();
-            $buf .= "</div>\n"; //Instructions End
-        }
+		if (strlen($field->getInstructions()) >= 1)
+		{
+			$buf .= "<div class=\"small-12 columns\">\n"; //Instructions Start
+			$buf .= $field->getInstructions();
+			$buf .= "</div>\n"; //Instructions End
+		}
 
-        $buf .= "<div class=\"small-12 columns\">\n"; //Field Start
-        if(count($field->getErrors()) != 0)
-        {
-            $buf .= "<label class=\"error\">";
-        }
+		$buf .= "<div class=\"small-12 columns\">\n"; //Field Start
+		if (count($field->getErrors()) != 0)
+		{
+			$buf .= "<label class=\"error\">";
+		}
 
-        $buf .= $field->field();
-        $buf .= $field->getInstructions();
+		$buf .= $field->field();
 
-        if(count($field->getErrors()) != 0)
-        {
-            $buf .= "</label>";
-            $buf .= "<small class=\"error\">";
-            foreach($field->getErrors() as $error)
-            {
-                foreach($error as $message)
-                {
-                    $buf .= "- $message<br>\n";
-                }
-            }
-            $buf .= "</small>";
-        }
-        $buf .= "</div>\n"; //Field End
-        $buf .= "</div>\n"; //Row end
+		if (count($field->getErrors()) != 0)
+		{
+			$buf .= "</label>";
+			$buf .= "<small class=\"error\">";
+			foreach ($field->getErrors() as $error)
+			{
+				foreach ($error as $message)
+				{
+					$buf .= "- $message<br>\n";
+				}
+			}
+			$buf .= "</small>";
+		}
+		$buf .= "</div>\n"; //Field End
+		$buf .= "</div>\n"; //Row end
 
-        return $buf;
-    }
+		return $buf;
+	}
 
-    public function SubmitElement(SubmitElement $field)
-    {
-        $field->addClass('button');
-        $buf = '<div class="row">';
-        $buf .= '<div class="small-12 columns">';
-        if(isset($this->label))
-        {
-            $buf .= "<label for=\"".$this->escape($this->id)."\"".$this->getClassString().">".$this->label."</label>\n";
-        }
-        $buf .= $field->field();
-        $buf .= "</div>"; //End column
-        $buf .= "</div>"; //End Row
-        return $buf;
-    }
 
-    public function ButtonElement (ButtonElement $field)
-    {
-        $field->addClass('button');
-        $buf = '<div class="row">';
-        $buf .= '<div class="small-12 columns">';
-        if(isset($this->label))
-        {
-            $buf .= "<label for=\"".$this->escape($this->id)."\"".$this->getClassString().">".$field->label."</label>\n";
-        }
-        $buf .= $field->field();
-        $buf .= "</div>";
-        $buf .= "</div>";
-        return $buf;
-    }
+	public function FileElement(FileElement $field)
+	{
+		$field->addClass('');
 
-    public function ImageElement(ImageElement $field)
-    {
-        $buf = '';
+		$buf = "<div class=\"row\">\n"; //Row Start
+		$buf .= "<div class=\"small-12 columns\">\n"; //Label Start
 
-        $classes = $field->getClassString();
-        $buf .= '<div class="' .$classes. ' row">\n';
-        $buf .= '<div class="small-12 columns">\n';
-        if(isset($this->label))
-        {
-            $buf .= "<label for=\"".$this->escape($this->id)."\"".$this->getClassString().">".$this->label."</label>\n";
-        }
-        $buf .= $field->field();
-        $buf .= "</div>\n";
 
-        return $buf;
-    }
+		if (count($field->getErrors()) != 0)
+		{
+			$buf .= "<label for=\"" . $this->escape($field->getId()) . "\" class=\"error\">";
+		}
+		else
+		{
+			$buf .= "<label for=\"" . $this->escape($field->getId()) . "\">";
+		}
+
+		if ($field->isRequired() == 1)
+		{
+			$buf .= "<b>";
+			$buf .= $field->getLabel();
+			$buf .= "</b> <small>(<i>Required</i>)</small>";
+		}
+		else
+		{
+			$buf .= $field->getLabel();
+		}
+
+		$buf .= "</label>\n";
+
+		$buf .= "</div>\n"; //Label End
+
+		if (strlen($field->getInstructions()) >= 1)
+		{
+			$buf .= "<div class=\"small-12 columns\">\n"; //Instructions Start
+			$buf .= $field->getInstructions();
+			$buf .= "</div>\n"; //Instructions End
+		}
+
+		$buf .= "<div class=\"small-12 columns\">\n"; //Field Start
+		if (count($field->getErrors()) != 0)
+		{
+			$buf .= "<label class=\"error\">";
+		}
+
+		$buf .= $field->field();
+		$buf .= $field->getInstructions();
+
+		if (count($field->getErrors()) != 0)
+		{
+			$buf .= "</label>";
+			$buf .= "<small class=\"error\">";
+			foreach ($field->getErrors() as $error)
+			{
+				foreach ($error as $message)
+				{
+					$buf .= "- $message<br>\n";
+				}
+			}
+			$buf .= "</small>";
+		}
+		$buf .= "</div>\n"; //Field End
+		$buf .= "</div>\n"; //Row end
+
+		return $buf;
+	}
+
+	public function SubmitElement(SubmitElement $field)
+	{
+		$field->addClass('button');
+		$buf = '<div class="row">';
+		$buf .= '<div class="small-12 columns">';
+		if (isset($this->label))
+		{
+			$buf .= "<label for=\"" . $this->escape($field->getId()) . "\"" . $field->getClassString() . ">" . $field->getLabel() . "</label>\n";
+		}
+		$buf .= $field->field();
+		$buf .= "</div>"; //End column
+		$buf .= "</div>"; //End Row
+		return $buf;
+	}
+
+	public function ButtonElement(ButtonElement $field)
+	{
+		$field->addClass('button');
+		$buf = '<div class="row">';
+		$buf .= '<div class="small-12 columns">';
+		if (isset($this->label))
+		{
+			$buf .= "<label for=\"" . $this->escape($field->getId()) . "\"" . $field->getClassString() . ">" . $field->getLabel() . "</label>\n";
+		}
+		$buf .= $field->field();
+		$buf .= "</div>";
+		$buf .= "</div>";
+		return $buf;
+	}
+
+	public function ImageElement(ImageElement $field)
+	{
+		$buf = '';
+
+		$classes = $field->getClassString();
+		$buf .= '<div class="' . $classes . ' row">\n';
+		$buf .= '<div class="small-12 columns">\n';
+		if (isset($this->label))
+		{
+			$buf .= "<label for=\"" . $this->escape($field->getId()) . "\"" . $field->getClassString() . ">" . $field->getLabel() . "</label>\n";
+		}
+		$buf .= $field->field();
+		$buf .= "</div>\n";
+
+		return $buf;
+	}
 
 }

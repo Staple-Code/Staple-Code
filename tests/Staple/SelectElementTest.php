@@ -1,6 +1,6 @@
 <?php
 /**
- * Test Cases for Pager Class
+ * Test Cases for SelectElement Class
  *
  * @author Ironpilot
  * @copyright Copyright (c) 2011, STAPLE CODE
@@ -24,26 +24,32 @@
 
 namespace Staple\Tests;
 
-
-use Staple\Form\TextElement;
+use Staple\Form\SelectElement;
 use Staple\Form\Validate\AlnumValidator;
 use Staple\Form\Validate\DateValidator;
 use Staple\Form\Validate\EmailValidator;
+use Staple\Form\Validate\InArrayValidator;
 use Staple\Form\Validate\LengthValidator;
 use Staple\Form\ViewAdapters\BootstrapViewAdapter;
 use Staple\Form\ViewAdapters\FoundationViewAdapter;
 
-class TextElementTest extends \PHPUnit_Framework_TestCase
+class SelectElementTest extends \PHPUnit_Framework_TestCase
 {
-	const STANDARD_BUILD = "<div  class=\"form_element element_text\" id=\"TestTextElement_element\">\n\t<label for=\"TestTextElement\" class=\"form_element element_text\">My Test Text Element</label>\n\t<input type=\"text\" id=\"TestTextElement\" name=\"TestTextElement\" value=\"\" class=\"form_element element_text\">\n</div>\n";
-	const FOUNDATION_BUILD = "\n<div class=\"row\">\n<div class=\"small-12 columns\">\n<label for=\"TestTextElement\">My Test Text Element</label>\n</div>\n<div class=\"small-12 columns\">\n\t<input type=\"text\" id=\"TestTextElement\" name=\"TestTextElement\" value=\"\">\n</div>\n</div>\n";
-	const BOOTSTRAP_BUILD = "\n<div class=\"form-group\">\n\t<label class=\"control-label\">My Test Text Element</label>\n\t<input type=\"text\" id=\"TestTextElement\" name=\"TestTextElement\" value=\"\" class=\"form-control\">\n</div>";
+	const STANDARD_BUILD = "<div class=\"form_element element_select\" id=\"TestSelectElement_element\">\n\t<label for=\"TestSelectElement\" class=\"form_element element_select\">My Test Select Element</label>\n\t<select name=\"TestSelectElement\" id=\"TestSelectElement\" class=\"form_element element_select\">\n\t\t<option value=\"1\">Las Vegas</option>\n\t\t<option value=\"2\">New York</option>\n\t\t<option value=\"3\">Atlanta</option>\n\t\t<option value=\"4\">Orlando</option>\n\t</select>\n</div>\n";
+	const FOUNDATION_BUILD = "<div class=\"row\">\n<div class=\"small-12 columns\">\n<label for=\"TestSelectElement\">My Test Select Element</label>\n</div>\n<div class=\"small-12 columns\">\n\t<select name=\"TestSelectElement\" id=\"TestSelectElement\">\n\t\t<option value=\"1\">Las Vegas</option>\n\t\t<option value=\"2\">New York</option>\n\t\t<option value=\"3\">Atlanta</option>\n\t\t<option value=\"4\">Orlando</option>\n\t</select>\n</div>\n</div>\n";
+	const BOOTSTRAP_BUILD = "\n<div class=\"form-group\">\n\t<label class=\"control-label\">My Test Select Element</label>\n\t<select name=\"TestSelectElement\" id=\"TestSelectElement\" class=\"form-control\">\n\t\t<option value=\"1\">Las Vegas</option>\n\t\t<option value=\"2\">New York</option>\n\t\t<option value=\"3\">Atlanta</option>\n\t\t<option value=\"4\">Orlando</option>\n\t</select>\n</div>";
 	/**
-	 * @return TextElement
+	 * @return SelectElement
 	 */
-	private function getTestTextElement()
+	private function getTestSelectElement()
 	{
-		return TextElement::create('TestTextElement','My Test Text Element');
+		return SelectElement::create('TestSelectElement','My Test Select Element')
+				->addOptionsArray([
+					'1'	=>	'Las Vegas',
+					'2'	=>	'New York',
+					'3'	=>	'Atlanta',
+					'4'	=>	'Orlando'
+				]);
 	}
 
 	private function getFoundationViewAdapter()
@@ -62,7 +68,7 @@ class TextElementTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testStandardBuild()
 	{
-		$element = $this->getTestTextElement();
+		$element = $this->getTestSelectElement();
 
 		ob_start();
 		echo $element->build();
@@ -78,7 +84,7 @@ class TextElementTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testFoundationBuild()
 	{
-		$element = $this->getTestTextElement();
+		$element = $this->getTestSelectElement();
 		$element->setElementViewAdapter($this->getFoundationViewAdapter());
 
 		ob_start();
@@ -95,7 +101,7 @@ class TextElementTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testBootstrapBuild()
 	{
-		$element = $this->getTestTextElement();
+		$element = $this->getTestSelectElement();
 		$element->setElementViewAdapter($this->getBootstrapViewAdapter());
 
 		ob_start();
@@ -113,11 +119,11 @@ class TextElementTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testValueSetAndRetrieve()
 	{
-		$element = $this->getTestTextElement();
+		$element = $this->getTestSelectElement();
 
-		$element->setValue('TestValue');
+		$element->setValue('4');
 
-		$this->assertEquals('TestValue',$element->getValue());
+		$this->assertEquals('4',$element->getValue());
 	}
 
 	/**
@@ -126,13 +132,13 @@ class TextElementTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testBaseValidator()
 	{
-		$element = $this->getTestTextElement();
+		$element = $this->getTestSelectElement();
 
 		//An element with no validators should individually assert true when asked if valid, no content and not required.
 		$this->assertTrue($element->isValid());
 		$element->setRequired(true);
 		$this->assertFalse($element->isValid());
-		$element->setValue('Value');
+		$element->setValue('3');
 		$this->assertTrue($element->isValid());
 		$element->setRequired(false);
 	}
@@ -144,7 +150,7 @@ class TextElementTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testLengthValidator()
 	{
-		$element = $this->getTestTextElement();
+		$element = $this->getTestSelectElement();
 
 		//Validate Length
 		$element->addValidator(LengthValidator::Create(10));
@@ -154,9 +160,12 @@ class TextElementTest extends \PHPUnit_Framework_TestCase
 		$this->assertTrue($element->isValid());
 	}
 
+	/**
+	 * @test
+	 */
 	public function testAlphanumericValidator()
 	{
-		$element = $this->getTestTextElement();
+		$element = $this->getTestSelectElement();
 
 		//Validate Alphanumeric
 		$element->addValidator(AlnumValidator::Create());
@@ -166,9 +175,12 @@ class TextElementTest extends \PHPUnit_Framework_TestCase
 		$this->assertTrue($element->isValid());
 	}
 
+	/**
+	 * @test
+	 */
 	public function testDateValidator()
 	{
-		$element = $this->getTestTextElement();
+		$element = $this->getTestSelectElement();
 
 		//Validate Dates
 		$element->addValidator(DateValidator::Create());
@@ -184,9 +196,12 @@ class TextElementTest extends \PHPUnit_Framework_TestCase
 		$this->assertTrue($element->isValid());
 	}
 
+	/**
+	 * @test
+	 */
 	public function testEmailValidator()
 	{
-		$element = $this->getTestTextElement();
+		$element = $this->getTestSelectElement();
 
 		//Validate Email Address
 		$element->addValidator(EmailValidator::Create());
@@ -194,5 +209,32 @@ class TextElementTest extends \PHPUnit_Framework_TestCase
 		$this->assertFalse($element->isValid());
 		$element->setValue('Thisemail@works.com');
 		$this->assertTrue($element->isValid());
+	}
+
+	/**
+	 * Test the InArrayValidator applied to the SelectElement object
+	 * @test
+	 */
+	public function testInArrayValidator()
+	{
+		$element = $this->getTestSelectElement();
+
+		$array = [
+			'1'	=>	'Las Vegas',
+			'2'	=>	'New York',
+			'3'	=>	'Atlanta',
+			'4'	=>	'Orlando'
+		];
+
+		//Validate In Array
+		$element->addValidator(InArrayValidator::Create(array_keys($array)));
+		$element->setValue(4);
+		$this->assertTrue($element->isValid());
+		$element->setValue('2');
+		$this->assertTrue($element->isValid());
+		$element->setValue('New York');
+		$this->assertFalse($element->isValid());
+		$element->setValue(0);
+		$this->assertFalse($element->isValid());
 	}
 }

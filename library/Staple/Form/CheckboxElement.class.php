@@ -77,6 +77,20 @@ class CheckboxElement extends FieldElement
 	{
 		return (bool)$this->isChecked();
 	}
+
+	/**
+	 * Override isValid() for the checkbox special requirements.
+	 * @return bool
+	 */
+	public function isValid()
+	{
+		if($this->isChecked() === true)
+			return true;
+		elseif ($this->isRequired() === false && $this->isChecked() === false)
+			return true;
+		else
+			return false;
+	}
 	
 	/* (non-PHPdoc)
 	 * @see Staple_Form_Element::field()
@@ -88,7 +102,7 @@ class CheckboxElement extends FieldElement
 		{
 			$checked = ' checked';
 		}
-		return '	<input type="checkbox" id="'.$this->escape($this->id).'" name="'.$this->escape($this->name).'" value="'.$this->escape($this->value).'"'.$checked.$this->getAttribString('input').'>';
+		return '	<input type="checkbox" id="'.$this->escape($this->id).'" name="'.$this->escape($this->name).'" value="'.$this->escape($this->value).'"'.$checked.$this->getAttribString('input').'>'."\n";
 	}
 
 	/* (non-PHPdoc)
@@ -96,7 +110,7 @@ class CheckboxElement extends FieldElement
 	 */
 	public function label()
 	{
-		return '	<label for="'.$this->escape($this->id).'"'.$this->getClassString('label').'>'.$this->label.'</label>';
+		return '	<label for="'.$this->escape($this->id).'"'.$this->getClassString('label').'>'.$this->label.'</label>'."\n";
 	}
 
 	public function build($fieldView = NULL)

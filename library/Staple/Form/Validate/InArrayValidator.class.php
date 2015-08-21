@@ -69,7 +69,7 @@ class InArrayValidator extends FieldValidator
 	 */
 	public function check($data)
 	{
-		if(in_array($data, $this->arrayvalues) === true)
+		if(in_array($data, $this->arrayvalues, false) === true)
 		{
 			return true;
 		}
