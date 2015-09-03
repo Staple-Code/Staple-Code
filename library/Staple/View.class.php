@@ -332,7 +332,8 @@ class View
 			else
 			{
 				//Load the view from the default loader
-				$view = Main::get()->getLoader()->loadView($this->_controller, $this->_view);
+				$controller = isset($this->_controller) ? $this->_controller : Main::get()->getRoute()->getController();
+				$view = Main::get()->getLoader()->loadView($controller, $this->getView());
 				if (strlen($view) >= 1 && $view !== false)
 				{
 					//Initialize the view model, if set
