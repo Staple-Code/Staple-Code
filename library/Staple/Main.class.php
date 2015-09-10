@@ -301,7 +301,10 @@ class Main
 		//First determine which routing information to use
 		if(!is_null($route))								//Use the supplied Route
 		{
-			$initialRoute = new Route($route);
+			if($route instanceof Route)
+				$initialRoute = $route;
+			else
+				$initialRoute = new Route($route);
 		}
 		elseif(array_key_exists('REQUEST_URI', $_SERVER))		//Use the URI route
 		{
@@ -318,7 +321,7 @@ class Main
 		
 		//Run the route through the router.
 		$this->setRoute($initialRoute);
-		$this->executeRoute();
+		return $this->executeRoute();
 	}
 	
 	/**
