@@ -48,11 +48,11 @@ class BootstrapViewAdapter extends ElementViewAdapter
 		//Build field buffer to be returned.
 		if (count($field->getErrors()) > 0)
 		{
-			$buf = "\n<div class=\"form-group has-error\">"; //Start Form-Group
+			$buf = "<div class=\"form-group has-error\">"; //Start Form-Group
 		}
 		else
 		{
-			$buf = "\n<div class=\"form-group\">"; //Start Form-Group
+			$buf = "<div class=\"form-group\">"; //Start Form-Group
 		}
 
 		//Field Label
@@ -91,7 +91,7 @@ class BootstrapViewAdapter extends ElementViewAdapter
 			}
 		}
 
-		$buf .= "</div>"; //End Form-Group
+		$buf .= "</div>\n"; //End Form-Group
 
 		return $buf;
 	}
@@ -104,11 +104,11 @@ class BootstrapViewAdapter extends ElementViewAdapter
 		//Build field buffer to be returned.
 		if (count($field->getErrors()) > 0)
 		{
-			$buf = "\n<div class=\"form-group has-error\">"; //Start Form-Group
+			$buf = "<div class=\"form-group has-error\">"; //Start Form-Group
 		}
 		else
 		{
-			$buf = "\n<div class=\"form-group\">"; //Start Form-Group
+			$buf = "<div class=\"form-group\">"; //Start Form-Group
 		}
 
 		//Field Label
@@ -147,7 +147,7 @@ class BootstrapViewAdapter extends ElementViewAdapter
 			}
 		}
 
-		$buf .= "</div>"; //End Form-Group
+		$buf .= "</div>\n"; //End Form-Group
 
 		return $buf;
 	}
@@ -160,11 +160,11 @@ class BootstrapViewAdapter extends ElementViewAdapter
 		//Build field buffer to be returned.
 		if (count($field->getErrors()) > 0)
 		{
-			$buf = "\n<div class=\"form-group has-error\">"; //Start Form-Group
+			$buf = "<div class=\"form-group has-error\">"; //Start Form-Group
 		}
 		else
 		{
-			$buf = "\n<div class=\"form-group\">"; //Start Form-Group
+			$buf = "<div class=\"form-group\">"; //Start Form-Group
 		}
 
 		//Field Label
@@ -203,7 +203,7 @@ class BootstrapViewAdapter extends ElementViewAdapter
 			}
 		}
 
-		$buf .= "</div>"; //End Form-Group
+		$buf .= "</div>\n"; //End Form-Group
 
 		return $buf;
 	}
@@ -211,9 +211,9 @@ class BootstrapViewAdapter extends ElementViewAdapter
 	function HiddenElement(HiddenElement $field)
 	{
 		$field->addClass('form-control');
-		$buf = "\n<div class=\"form-group\">\n"; //Start Form-Group
+		$buf = "<div class=\"form-group\">\n"; //Start Form-Group
 		$buf .= $field->field();
-		$buf .= "\n</div>"; //End Form-Group
+		$buf .= "</div>\n"; //End Form-Group
 		return $buf;
 	}
 
@@ -225,11 +225,11 @@ class BootstrapViewAdapter extends ElementViewAdapter
 		//Build field buffer to be returned.
 		if (count($field->getErrors()) > 0)
 		{
-			$buf = "\n<div class=\"form-group has-error\">"; //Start Form-Group
+			$buf = "<div class=\"form-group has-error\">"; //Start Form-Group
 		}
 		else
 		{
-			$buf = "\n<div class=\"form-group\">"; //Start Form-Group
+			$buf = "<div class=\"form-group\">"; //Start Form-Group
 		}
 
 		//Field Label
@@ -268,7 +268,7 @@ class BootstrapViewAdapter extends ElementViewAdapter
 			}
 		}
 
-		$buf .= "</div>"; //End Form-Group
+		$buf .= "</div>\n"; //End Form-Group
 
 		return $buf;
 	}
@@ -281,11 +281,11 @@ class BootstrapViewAdapter extends ElementViewAdapter
 		//Build field buffer to be returned.
 		if (count($field->getErrors()) > 0)
 		{
-			$buf = "\n<div class=\"form-group has-error\">"; //Start Form-Group
+			$buf = "<div class=\"form-group has-error\">"; //Start Form-Group
 		}
 		else
 		{
-			$buf = "\n<div class=\"form-group\">"; //Start Form-Group
+			$buf = "<div class=\"form-group\">"; //Start Form-Group
 		}
 
 		//Field Label
@@ -324,7 +324,7 @@ class BootstrapViewAdapter extends ElementViewAdapter
 			}
 		}
 
-		$buf .= "</div>"; //End Form-Group
+		$buf .= "</div>\n"; //End Form-Group
 
 		return $buf;
 	}
@@ -386,11 +386,11 @@ class BootstrapViewAdapter extends ElementViewAdapter
 		//Build field buffer to be returned.
 		if (count($field->getErrors()) > 0)
 		{
-			$buf = "\n<div class=\"form-group has-error\">"; //Start Form-Group
+			$buf = "<div class=\"form-group has-error\">"; //Start Form-Group
 		}
 		else
 		{
-			$buf = "\n<div class=\"form-group\">"; //Start Form-Group
+			$buf = "<div class=\"form-group\">"; //Start Form-Group
 		}
 
 		//Field Label
@@ -429,7 +429,7 @@ class BootstrapViewAdapter extends ElementViewAdapter
 			}
 		}
 
-		$buf .= "</div>"; //End Form-Group
+		$buf .= "</div>\n"; //End Form-Group
 
 		return $buf;
 	}
@@ -442,11 +442,11 @@ class BootstrapViewAdapter extends ElementViewAdapter
 		//Build field buffer to be returned.
 		if (count($field->getErrors()) > 0)
 		{
-			$buf = "\n<div class=\"form-group has-error\">"; //Start Form-Group
+			$buf = "<div class=\"form-group has-error\">"; //Start Form-Group
 		}
 		else
 		{
-			$buf = "\n<div class=\"form-group\">"; //Start Form-Group
+			$buf = "<div class=\"form-group\">"; //Start Form-Group
 		}
 
 		//Field Label
@@ -485,7 +485,7 @@ class BootstrapViewAdapter extends ElementViewAdapter
 			}
 		}
 
-		$buf .= "</div>"; //End Form-Group
+		$buf .= "</div>\n"; //End Form-Group
 
 		return $buf;
 	}
@@ -493,9 +493,9 @@ class BootstrapViewAdapter extends ElementViewAdapter
 	function SubmitElement(SubmitElement $field)
 	{
 		$field->addClass('btn');
-		$buf = "\n<div class=\"form-group\">\n"; //Start Form-Group
+		$buf = "<div class=\"form-group\">\n"; //Start Form-Group
 		$buf .= $field->field();
-		$buf .= "</div>"; //End Form-Group
+		$buf .= "</div>\n"; //End Form-Group
 		return $buf;
 	}
 
@@ -507,11 +507,11 @@ class BootstrapViewAdapter extends ElementViewAdapter
 		//Build field buffer to be returned.
 		if (count($field->getErrors()) > 0)
 		{
-			$buf = "\n<div class=\"form-group has-error\">"; //Start Form-Group
+			$buf = "<div class=\"form-group has-error\">"; //Start Form-Group
 		}
 		else
 		{
-			$buf = "\n<div class=\"form-group\">"; //Start Form-Group
+			$buf = "<div class=\"form-group\">"; //Start Form-Group
 		}
 
 		//Field Label
@@ -550,7 +550,7 @@ class BootstrapViewAdapter extends ElementViewAdapter
 			}
 		}
 
-		$buf .= "</div>"; //End Form-Group
+		$buf .= "</div>\n"; //End Form-Group
 
 		return $buf;
 	}
@@ -563,11 +563,11 @@ class BootstrapViewAdapter extends ElementViewAdapter
 		//Build field buffer to be returned.
 		if (count($field->getErrors()) > 0)
 		{
-			$buf = "\n<div class=\"form-group has-error\">"; //Start Form-Group
+			$buf = "<div class=\"form-group has-error\">"; //Start Form-Group
 		}
 		else
 		{
-			$buf = "\n<div class=\"form-group\">"; //Start Form-Group
+			$buf = "<div class=\"form-group\">"; //Start Form-Group
 		}
 
 		//Field Label
@@ -606,10 +606,8 @@ class BootstrapViewAdapter extends ElementViewAdapter
 			}
 		}
 
-		$buf .= "</div>"; //End Form-Group
+		$buf .= "</div>\n"; //End Form-Group
 
 		return $buf;
 	}
-
-
 }

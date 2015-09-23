@@ -36,8 +36,8 @@ use Staple\Form\ViewAdapters\FoundationViewAdapter;
 class TextElementTest extends \PHPUnit_Framework_TestCase
 {
 	const STANDARD_BUILD = "<div  class=\"form_element element_text\" id=\"TestTextElement_element\">\n\t<label for=\"TestTextElement\" class=\"form_element element_text\">My Test Text Element</label>\n\t<input type=\"text\" id=\"TestTextElement\" name=\"TestTextElement\" value=\"\" class=\"form_element element_text\">\n</div>\n";
-	const FOUNDATION_BUILD = "\n<div class=\"row\">\n<div class=\"small-12 columns\">\n<label for=\"TestTextElement\">My Test Text Element</label>\n</div>\n<div class=\"small-12 columns\">\n\t<input type=\"text\" id=\"TestTextElement\" name=\"TestTextElement\" value=\"\">\n</div>\n</div>\n";
-	const BOOTSTRAP_BUILD = "\n<div class=\"form-group\">\n\t<label class=\"control-label\">My Test Text Element</label>\n\t<input type=\"text\" id=\"TestTextElement\" name=\"TestTextElement\" value=\"\" class=\"form-control\">\n</div>";
+	const FOUNDATION_BUILD = "<div class=\"row\">\n<div class=\"small-12 columns\">\n<label for=\"TestTextElement\">My Test Text Element</label>\n</div>\n<div class=\"small-12 columns\">\n\t<input type=\"text\" id=\"TestTextElement\" name=\"TestTextElement\" value=\"\">\n</div>\n</div>\n";
+	const BOOTSTRAP_BUILD = "<div class=\"form-group\">\n\t<label class=\"control-label\">My Test Text Element</label>\n\t<input type=\"text\" id=\"TestTextElement\" name=\"TestTextElement\" value=\"\" class=\"form-control\">\n</div>\n";
 	/**
 	 * @return TextElement
 	 */

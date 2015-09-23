@@ -45,7 +45,7 @@ class FoundationViewAdapter extends ElementViewAdapter
 		//@todo add the class string in to this element.
 		$classes = $field->getClassString();
 
-		$buf = "\n<div class=\"row\">\n<div class=\"small-12 columns\">\n"; //Label Start
+		$buf = "<div class=\"row\">\n<div class=\"small-12 columns\">\n"; //Label Start
 
 		if (count($field->getErrors()) != 0)
 		{
@@ -448,17 +448,17 @@ class FoundationViewAdapter extends ElementViewAdapter
 		$buf = '';
 		$classes = $field->getClassString();
 
-		$buf .= "<div $classes>\n"; //Row Start
-		$buf .= "<div class=\"small-12 columns\">\n"; //Label Start
+		$buf .= "<div$classes>\n"; //Row Start
+		$buf .= "\t<div class=\"small-12 columns\">\n"; //Label Start
 
 
 		if (count($field->getErrors()) != 0)
 		{
-			$buf .= "<label for=\"" . $this->escape($field->getId()) . "\" class=\"error\">";
+			$buf .= "\t\t<label for=\"" . $this->escape($field->getId()) . "\" class=\"error\">";
 		}
 		else
 		{
-			$buf .= "<label for=\"" . $this->escape($field->getId()) . "\">";
+			$buf .= "\t\t<label for=\"" . $this->escape($field->getId()) . "\">";
 		}
 
 		if ($field->isRequired() == 1)
@@ -474,7 +474,7 @@ class FoundationViewAdapter extends ElementViewAdapter
 
 		$buf .= "</label>\n";
 
-		$buf .= "</div>\n"; //Label End
+		$buf .= "\t</div>\n"; //Label End
 
 		if (strlen($field->getInstructions()) >= 1)
 		{
@@ -483,7 +483,7 @@ class FoundationViewAdapter extends ElementViewAdapter
 			$buf .= "</div>\n"; //Instructions End
 		}
 
-		$buf .= "<div class=\"small-12 columns\">\n"; //Field Start
+		$buf .= "\n<div class=\"small-12 columns\">\n"; //Field Start
 		if (count($field->getErrors()) != 0)
 		{
 			$buf .= "<label class=\"error\">";
@@ -504,7 +504,7 @@ class FoundationViewAdapter extends ElementViewAdapter
 			}
 			$buf .= "</small>";
 		}
-		$buf .= "</div>\n"; //Field End
+		$buf .= "\t</div>\n"; //Field End
 		$buf .= "</div>\n"; //Row end
 
 		return $buf;
@@ -597,13 +597,13 @@ class FoundationViewAdapter extends ElementViewAdapter
 	{
 		$field->addClass('button');
 		$buf = '<div class="row">';
-		$buf .= '<div class="small-12 columns">';
+		$buf .= "\t<div class=\"small-12 columns\">";
 		if (isset($this->label))
 		{
-			$buf .= "<label for=\"" . $this->escape($field->getId()) . "\"" . $field->getClassString() . ">" . $field->getLabel() . "</label>\n";
+			$buf .= "\t\t<label for=\"" . $this->escape($field->getId()) . "\"" . $field->getClassString() . ">" . $field->getLabel() . "</label>\n";
 		}
 		$buf .= $field->field();
-		$buf .= "</div>";
+		$buf .= "\t</div>";
 		$buf .= "</div>";
 		return $buf;
 	}
