@@ -85,5 +85,3 @@ class AlnumValidator extends FieldValidator
 		return $script;
 	}
 }
-
-?>

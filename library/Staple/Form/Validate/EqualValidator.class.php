@@ -39,11 +39,8 @@ class EqualValidator extends FieldValidator
 	}
 
 	/**
-	 * 
 	 * @param  mixed $data
- 
 	 * @return  bool
-	  
 	 * @see Staple_Form_Validator::check()
 	 */
 	public function check($data)
@@ -72,10 +69,11 @@ class EqualValidator extends FieldValidator
 		}
 		return false;
 	}
-	
+
 	/**
-	 * (non-PHPdoc)
-	 * @see Staple_Form_Validator::clientJQuery()
+	 * @param string $fieldType
+	 * @param FieldElement $field
+	 * @return string
 	 */
 	public function clientJQuery($fieldType, FieldElement $field)
 	{
@@ -109,5 +107,3 @@ class EqualValidator extends FieldValidator
 		return $script;
 	}
 }
-
-?>

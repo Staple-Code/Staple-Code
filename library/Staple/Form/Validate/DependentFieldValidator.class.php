@@ -31,9 +31,14 @@ class DependentFieldValidator extends FieldValidator
 	 * @var FieldElement
 	 */
 	protected $field;
-	
-	public function __construct(FieldElement $field)
+
+	/**
+	 * @param FieldElement $field
+	 * @param string $userMsg
+	 */
+	public function __construct(FieldElement $field, $userMsg = NULL)
 	{
+		parent::__construct($userMsg);
 		$this->setField($field);
 	}
 
@@ -58,9 +63,7 @@ class DependentFieldValidator extends FieldValidator
 	/**
 	 * 
 	 * @param  mixed $data
- 
 	 * @return  bool
-	  
 	 * @see Staple_Form_Validator::check()
 	 */
 	public function check($data)

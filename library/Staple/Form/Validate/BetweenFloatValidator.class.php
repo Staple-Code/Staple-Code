@@ -43,8 +43,9 @@ class BetweenFloatValidator extends FieldValidator
 	 * Mathematical between function. Requires a maximum value and a minimum value.
 	 * Comparison occurs with float math.
 	 * 
-	 * @param float $max
-	 * @param float $min
+	 * @param float $limit1
+	 * @param float $limit2
+	 * @param string $usermsg
 	 */
 	public function __construct($limit1, $limit2, $usermsg = NULL)
 	{
@@ -65,7 +66,7 @@ class BetweenFloatValidator extends FieldValidator
 	}
 	
 	/**
-	 * @return the $min
+	 * @return float $min
 	 */
 	public function getMin()
 	{
@@ -73,7 +74,7 @@ class BetweenFloatValidator extends FieldValidator
 	}
 
 	/**
-	 * @return the $max
+	 * @return float $max
 	 */
 	public function getMax()
 	{
@@ -82,6 +83,7 @@ class BetweenFloatValidator extends FieldValidator
 
 	/**
 	 * @param int $min
+	 * @return $this
 	 */
 	public function setMin($min)
 	{
@@ -91,6 +93,7 @@ class BetweenFloatValidator extends FieldValidator
 
 	/**
 	 * @param int $max
+	 * @return $this
 	 */
 	public function setMax($max)
 	{
@@ -153,5 +156,3 @@ class BetweenFloatValidator extends FieldValidator
 		return $script;
 	}
 }
-
-?>

@@ -30,10 +30,15 @@ class IdenticalFieldValidator extends FieldValidator
 	protected $strict = false;
 	/**
 	 * The form element to validate against.
-	 * @var Staple_Form_Element
+	 * @var FieldElement
 	 */
 	protected $field;
-	
+
+	/**
+	 * @param FieldElement $field
+	 * @param bool $strict
+	 * @param string $usermsg
+	 */
 	public function __construct(FieldElement $field = NULL, $strict = false, $usermsg = NULL)
 	{
 		if(isset($field))
@@ -45,11 +50,8 @@ class IdenticalFieldValidator extends FieldValidator
 	}
 
 	/**
-	 * 
 	 * @param  mixed $data
- 
 	 * @return  bool
-	  
 	 * @see Staple_Form_Validator::check()
 	 */
 	public function check($data)
@@ -80,7 +82,7 @@ class IdenticalFieldValidator extends FieldValidator
 	}
 	
 	/**
-	 * @return the $strict
+	 * @return bool $strict
 	 */
 	public function getStrict()
 	{
@@ -88,7 +90,7 @@ class IdenticalFieldValidator extends FieldValidator
 	}
 
 	/**
-	 * @return Staple_Form_Element $field
+	 * @return FieldElement $field
 	 */
 	public function getField()
 	{
@@ -96,7 +98,8 @@ class IdenticalFieldValidator extends FieldValidator
 	}
 
 	/**
-	 * @param boolean $strict
+	 * @param bool $strict
+	 * @return $this
 	 */
 	public function setStrict($strict)
 	{
@@ -105,7 +108,8 @@ class IdenticalFieldValidator extends FieldValidator
 	}
 
 	/**
-	 * @param Staple_Form_Element $field
+	 * @param FieldElement $field
+	 * @return $this
 	 */
 	public function setField(FieldElement $field)
 	{
@@ -114,8 +118,9 @@ class IdenticalFieldValidator extends FieldValidator
 	}
 
 	/**
-	 * (non-PHPdoc)
-	 * @see Staple_Form_Validator::clientJQuery()
+	 * @param string $fieldType
+	 * @param FieldElement $field
+	 * @return string
 	 */
 	public function clientJQuery($fieldType, FieldElement $field)
 	{
@@ -164,5 +169,3 @@ class IdenticalFieldValidator extends FieldValidator
 		return $script;
 	}
 }
-
-?>

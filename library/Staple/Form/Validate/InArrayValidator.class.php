@@ -79,9 +79,11 @@ class InArrayValidator extends FieldValidator
 		}
 		return false;
 	}
-	
+
 	/**
-	 * @see Staple_Form_Validator::clientJQuery()
+	 * @param string $fieldType
+	 * @param FieldElement $field
+	 * @return string
 	 */
 	public function clientJQuery($fieldType, FieldElement $field)
 	{
@@ -124,16 +126,4 @@ class InArrayValidator extends FieldValidator
 		
 		return $script;
 	}
-
-	/**
-	 * @see Staple_Form_Validator::clientJS()
-	 */
-	public function clientJS($fieldType, FieldElement $field)
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
 }
-
-?>
