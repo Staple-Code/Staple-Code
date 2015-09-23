@@ -18,7 +18,7 @@ trait Helpers
 	 * @param array $get
 	 * @return string
 	 */
-	protected function link($route, array $get = array())
+	public function link($route, array $get = array())
 	{
 		return Link::get($route,$get);
 	}
@@ -30,7 +30,7 @@ trait Helpers
 	 * @param bool $strip
 	 * @return string
 	 */
-	protected function escape($str, $strip = false)
+	public function escape($str, $strip = false)
 	{
 		if($str instanceof DateTime)
 		{
@@ -51,15 +51,13 @@ trait Helpers
 	 * @param stdClass $obj
 	 * @return stdClass
 	 */
-	protected function with(stdClass $obj)
+	public function with(stdClass $obj)
 	{
 		return $obj;
 	} 
 	
-	protected function dump()
+	public function dump()
 	{
 	    Dev::Dump(func_get_args());
 	}
 }
-
-?>

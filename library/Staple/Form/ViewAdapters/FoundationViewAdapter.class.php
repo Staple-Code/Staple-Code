@@ -24,6 +24,7 @@
 
 namespace Staple\Form\ViewAdapters;
 
+use Staple\Form\FieldElement;
 use Staple\Form\TextElement;
 use Staple\Form\TextareaElement;
 use Staple\Form\SubmitElement;
@@ -42,32 +43,8 @@ class FoundationViewAdapter extends ElementViewAdapter
 
 	public function TextElement(TextElement $field)
 	{
-		//@todo add the class string in to this element.
-		$classes = $field->getClassString();
-
 		$buf = "<div class=\"row\">\n<div class=\"small-12 columns\">\n"; //Label Start
-
-		if (count($field->getErrors()) != 0)
-		{
-			$buf .= "<label for=\"" . $this->escape($field->getId()) . "\" class=\"error\">";
-		}
-		else
-		{
-			$buf .= "<label for=\"" . $this->escape($field->getId()) . "\">";
-		}
-
-		if ($field->isRequired() == 1)
-		{
-			$buf .= "<b>";
-			$buf .= $field->getLabel();
-			$buf .= "</b> <small>(<i>Required</i>)</small>";
-		}
-		else
-		{
-			$buf .= $field->getLabel();
-		}
-
-		$buf .= "</label>\n";
+		$buf .= $field->label();
 		$buf .= "</div>\n"; //Label End
 
 		if (strlen($field->getInstructions()) >= 1)
@@ -78,25 +55,12 @@ class FoundationViewAdapter extends ElementViewAdapter
 		}
 
 		$buf .= "<div class=\"small-12 columns\">\n"; //Field Start
-		if (count($field->getErrors()) != 0)
-		{
-			$buf .= "<label class=\"error\">";
-		}
 
 		$buf .= $field->field();
 
 		if (count($field->getErrors()) != 0)
 		{
-			$buf .= "</label>";
-			$buf .= "<small class=\"error\">";
-			foreach ($field->getErrors() as $error)
-			{
-				foreach ($error as $message)
-				{
-					$buf .= "- $message<br>\n";
-				}
-			}
-			$buf .= "</small>";
+			$buf .= $this->getErrorBuffer($field);
 		}
 		$buf .= "</div>\n"; //Field End
 		$buf .= "</div>\n"; //Row End
@@ -107,29 +71,7 @@ class FoundationViewAdapter extends ElementViewAdapter
 	{
 		$buf = "<div class=\"row\">\n"; //Row Start
 		$buf .= "<div class=\"small-12 columns\">\n"; //Label Start
-
-		if (count($field->getErrors()) != 0)
-		{
-			$buf .= "<label for=\"" . $this->escape($field->getId()) . "\" class=\"error\">";
-		}
-		else
-		{
-			$buf .= "<label for=\"" . $this->escape($field->getId()) . "\">";
-		}
-
-		if ($field->isRequired() == 1)
-		{
-			$buf .= "<b>";
-			$buf .= $field->getLabel();
-			$buf .= "</b> <small>(<i>Required</i>)</small>";
-		}
-		else
-		{
-			$buf .= $field->getLabel();
-		}
-
-		$buf .= "</label>\n";
-
+		$buf .= $field->label();
 		$buf .= "</div>\n"; //Label End
 
 		if (strlen($field->getInstructions()) >= 1)
@@ -140,25 +82,12 @@ class FoundationViewAdapter extends ElementViewAdapter
 		}
 
 		$buf .= "<div class=\"small-12 columns\">\n"; //Field Start
-		if (count($field->getErrors()) != 0)
-		{
-			$buf .= "<label class=\"error\">";
-		}
 
 		$buf .= $field->field();
 
 		if (count($field->getErrors()) != 0)
 		{
-			$buf .= "</label>";
-			$buf .= "<small class=\"error\">";
-			foreach ($field->getErrors() as $error)
-			{
-				foreach ($error as $message)
-				{
-					$buf .= "- $message<br>\n";
-				}
-			}
-			$buf .= "</small>";
+			$buf .= $this->getErrorBuffer($field);
 		}
 		$buf .= "</div>\n"; //Field End
 		$buf .= "</div>\n"; //Row End
@@ -169,30 +98,7 @@ class FoundationViewAdapter extends ElementViewAdapter
 	{
 		$buf = "<div class=\"row\">\n"; //Row Start
 		$buf .= "<div class=\"small-12 columns\">\n"; //Label Start
-
-
-		if (count($field->getErrors()) != 0)
-		{
-			$buf .= "<label for=\"" . $this->escape($field->getId()) . "\" class=\"error\">";
-		}
-		else
-		{
-			$buf .= "<label for=\"" . $this->escape($field->getId()) . "\">";
-		}
-
-		if ($field->isRequired() == 1)
-		{
-			$buf .= "<b>";
-			$buf .= $field->getLabel();
-			$buf .= "</b> <small>(<i>Required</i>)</small>";
-		}
-		else
-		{
-			$buf .= $field->getLabel();
-		}
-
-		$buf .= "</label>\n";
-
+		$buf .= $field->label();
 		$buf .= "</div>\n"; //Label End
 
 		if (strlen($field->getInstructions()) >= 1)
@@ -203,25 +109,12 @@ class FoundationViewAdapter extends ElementViewAdapter
 		}
 
 		$buf .= "<div class=\"small-12 columns\">\n"; //Field Start
-		if (count($field->getErrors()) != 0)
-		{
-			$buf .= "<label class=\"error\">";
-		}
 
 		$buf .= $field->field();
 
 		if (count($field->getErrors()) != 0)
 		{
-			$buf .= "</label>";
-			$buf .= "<small class=\"error\">";
-			foreach ($field->getErrors() as $error)
-			{
-				foreach ($error as $message)
-				{
-					$buf .= "- $message<br>\n";
-				}
-			}
-			$buf .= "</small>";
+			$buf .= $this->getErrorBuffer($field);
 		}
 		$buf .= "</div>\n"; //Field End
 		$buf .= "</div>\n"; //Row end
@@ -231,11 +124,7 @@ class FoundationViewAdapter extends ElementViewAdapter
 
 	public function HiddenElement(HiddenElement $field)
 	{
-		$buf = "<div class=\"row hide\">\n"; //Row Start
-		$buf .= "<div class=\"small-12 columns\">\n"; //Field Start
-		$buf .= $field->field();
-		$buf .= "</div>\n"; //Field End
-		$buf .= "</div>\n"; //Row end
+		$buf = $field->field();
 		return $buf;
 	}
 
@@ -243,29 +132,7 @@ class FoundationViewAdapter extends ElementViewAdapter
 	{
 		$buf = "<div class=\"row\">\n"; //Row Start
 		$buf .= "<div class=\"small-12 columns\">\n"; //Label Start
-
-		if (count($field->getErrors()) != 0)
-		{
-			$buf .= "<label for=\"" . $this->escape($field->getId()) . "\" class=\"error\">";
-		}
-		else
-		{
-			$buf .= "<label for=\"" . $this->escape($field->getId()) . "\">";
-		}
-
-		if ($field->isRequired() == 1)
-		{
-			$buf .= "<b>";
-			$buf .= $field->getLabel();
-			$buf .= "</b> <small>(<i>Required</i>)</small>";
-		}
-		else
-		{
-			$buf .= $field->getLabel();
-		}
-
-		$buf .= "</label>\n";
-
+		$buf .= $field->label();
 		$buf .= "</div>\n"; //Label End
 
 		if (strlen($field->getInstructions()) >= 1)
@@ -276,25 +143,12 @@ class FoundationViewAdapter extends ElementViewAdapter
 		}
 
 		$buf .= "<div class=\"small-12 columns\">\n"; //Field Start
-		if (count($field->getErrors()) != 0)
-		{
-			$buf .= "<label class=\"error\">";
-		}
 
 		$buf .= $field->field();
 
 		if (count($field->getErrors()) != 0)
 		{
-			$buf .= "</label>";
-			$buf .= "<small class=\"error\">";
-			foreach ($field->getErrors() as $error)
-			{
-				foreach ($error as $message)
-				{
-					$buf .= "- $message<br>\n";
-				}
-			}
-			$buf .= "</small>";
+			$buf .= $this->getErrorBuffer($field);
 		}
 		$buf .= "</div>\n"; //Field End
 		$buf .= "</div>\n"; //Row End
@@ -310,29 +164,7 @@ class FoundationViewAdapter extends ElementViewAdapter
 
 		$buf = "<div$classes>\n"; //Row Start
 		$buf .= "<div class=\"small-12 columns\">\n"; //Label Start
-
-		if (count($field->getErrors()) != 0)
-		{
-			$buf .= "\t<label for=\"" . $this->escape($field->getId()) . "\" class=\"error\">";
-		}
-		else
-		{
-			$buf .= "\t<label for=\"" . $this->escape($field->getId()) . "\">";
-		}
-
-		if ($field->isRequired() == 1)
-		{
-			$buf .= "<b>";
-			$buf .= $field->getLabel();
-			$buf .= "</b> <small>(<i>Required</i>)</small>";
-		}
-		else
-		{
-			$buf .= $field->getLabel();
-		}
-
-		$buf .= "</label>\n";
-
+		$buf .= $field->label();
 		$buf .= "</div>\n"; //Label End
 
 		if (strlen($field->getInstructions()) >= 1)
@@ -342,27 +174,13 @@ class FoundationViewAdapter extends ElementViewAdapter
 			$buf .= "</div>\n"; //Instructions End
 		}
 
-
 		$buf .= "<div class=\"small-12 columns\">\n"; //Field Start
-		if (count($field->getErrors()) != 0)
-		{
-			$buf .= "<label class=\"error\">";
-		}
 
 		$buf .= $field->field();
 
 		if (count($field->getErrors()) != 0)
 		{
-			$buf .= "</label>";
-			$buf .= "<small class=\"error\">";
-			foreach ($field->getErrors() as $error)
-			{
-				foreach ($error as $message)
-				{
-					$buf .= "- $message<br>\n";
-				}
-			}
-			$buf .= "</small>";
+			$buf .= $this->getErrorBuffer($field);
 		}
 		$buf .= "</div>\n"; //Field End
 		$buf .= "</div>\n"; //Row end
@@ -380,30 +198,7 @@ class FoundationViewAdapter extends ElementViewAdapter
 
 		$buf .= "<div $classes>\n"; //Row Start
 		$buf .= "<div class=\"small-12 columns\">\n"; //Label Start
-
-
-		if (count($field->getErrors()) != 0)
-		{
-			$buf .= "<label for=\"" . $this->escape($field->getId()) . "\" class=\"error\">";
-		}
-		else
-		{
-			$buf .= "<label for=\"" . $this->escape($field->getId()) . "\">";
-		}
-
-		if ($field->isRequired() == 1)
-		{
-			$buf .= "<b>";
-			$buf .= $field->getLabel();
-			$buf .= "</b> <small>(<i>Required</i>)</small>";
-		}
-		else
-		{
-			$buf .= $field->getLabel();
-		}
-
-		$buf .= "</label>\n";
-
+		$buf .= $field->label();
 		$buf .= "</div>\n"; //Label End
 
 		if (strlen($field->getInstructions()) >= 1)
@@ -414,26 +209,13 @@ class FoundationViewAdapter extends ElementViewAdapter
 		}
 
 		$buf .= "<div class=\"small-12 columns\">\n"; //Field Start
-		if (count($field->getErrors()) != 0)
-		{
-			$buf .= "<label class=\"error\">";
-		}
 
 		$buf .= $field->field();
 		$buf .= $field->getInstructions();
 
 		if (count($field->getErrors()) != 0)
 		{
-			$buf .= "</label>";
-			$buf .= "<small class=\"error\">";
-			foreach ($field->getErrors() as $error)
-			{
-				foreach ($error as $message)
-				{
-					$buf .= "- $message<br>\n";
-				}
-			}
-			$buf .= "</small>";
+			$buf .= $this->getErrorBuffer($field);
 		}
 		$buf .= "</div>\n"; //Field End
 		$buf .= "</div>\n"; //Row end
@@ -450,30 +232,7 @@ class FoundationViewAdapter extends ElementViewAdapter
 
 		$buf .= "<div$classes>\n"; //Row Start
 		$buf .= "\t<div class=\"small-12 columns\">\n"; //Label Start
-
-
-		if (count($field->getErrors()) != 0)
-		{
-			$buf .= "\t\t<label for=\"" . $this->escape($field->getId()) . "\" class=\"error\">";
-		}
-		else
-		{
-			$buf .= "\t\t<label for=\"" . $this->escape($field->getId()) . "\">";
-		}
-
-		if ($field->isRequired() == 1)
-		{
-			$buf .= "<b>";
-			$buf .= $field->getLabel();
-			$buf .= "</b> <small>(<i>Required</i>)</small>";
-		}
-		else
-		{
-			$buf .= $field->getLabel();
-		}
-
-		$buf .= "</label>\n";
-
+		$buf .= $field->label();
 		$buf .= "\t</div>\n"; //Label End
 
 		if (strlen($field->getInstructions()) >= 1)
@@ -484,25 +243,12 @@ class FoundationViewAdapter extends ElementViewAdapter
 		}
 
 		$buf .= "\n<div class=\"small-12 columns\">\n"; //Field Start
-		if (count($field->getErrors()) != 0)
-		{
-			$buf .= "<label class=\"error\">";
-		}
 
 		$buf .= $field->field();
 
 		if (count($field->getErrors()) != 0)
 		{
-			$buf .= "</label>";
-			$buf .= "<small class=\"error\">";
-			foreach ($field->getErrors() as $error)
-			{
-				foreach ($error as $message)
-				{
-					$buf .= "- $message<br>\n";
-				}
-			}
-			$buf .= "</small>";
+			$buf .= $this->getErrorBuffer($field);
 		}
 		$buf .= "\t</div>\n"; //Field End
 		$buf .= "</div>\n"; //Row end
@@ -516,63 +262,27 @@ class FoundationViewAdapter extends ElementViewAdapter
 		$field->addClass('');
 
 		$buf = "<div class=\"row\">\n"; //Row Start
-		$buf .= "<div class=\"small-12 columns\">\n"; //Label Start
-
-
-		if (count($field->getErrors()) != 0)
-		{
-			$buf .= "<label for=\"" . $this->escape($field->getId()) . "\" class=\"error\">";
-		}
-		else
-		{
-			$buf .= "<label for=\"" . $this->escape($field->getId()) . "\">";
-		}
-
-		if ($field->isRequired() == 1)
-		{
-			$buf .= "<b>";
-			$buf .= $field->getLabel();
-			$buf .= "</b> <small>(<i>Required</i>)</small>";
-		}
-		else
-		{
-			$buf .= $field->getLabel();
-		}
-
-		$buf .= "</label>\n";
-
-		$buf .= "</div>\n"; //Label End
+		$buf .= "\t<div class=\"small-12 columns\">\n"; //Label Start
+		$buf .= $field->label();
+		$buf .= "\t</div>\n"; //Label End
 
 		if (strlen($field->getInstructions()) >= 1)
 		{
-			$buf .= "<div class=\"small-12 columns\">\n"; //Instructions Start
+			$buf .= "\t<div class=\"small-12 columns\">\n\t\t"; //Instructions Start
 			$buf .= $field->getInstructions();
-			$buf .= "</div>\n"; //Instructions End
+			$buf .= "\t</div>\n"; //Instructions End
 		}
 
-		$buf .= "<div class=\"small-12 columns\">\n"; //Field Start
-		if (count($field->getErrors()) != 0)
-		{
-			$buf .= "<label class=\"error\">";
-		}
+		$buf .= "\t<div class=\"small-12 columns\">\n"; //Field Start
 
 		$buf .= $field->field();
 		$buf .= $field->getInstructions();
 
 		if (count($field->getErrors()) != 0)
 		{
-			$buf .= "</label>";
-			$buf .= "<small class=\"error\">";
-			foreach ($field->getErrors() as $error)
-			{
-				foreach ($error as $message)
-				{
-					$buf .= "- $message<br>\n";
-				}
-			}
-			$buf .= "</small>";
+			$buf .= $this->getErrorBuffer($field);
 		}
-		$buf .= "</div>\n"; //Field End
+		$buf .= "\t</div>\n"; //Field End
 		$buf .= "</div>\n"; //Row end
 
 		return $buf;
@@ -581,15 +291,15 @@ class FoundationViewAdapter extends ElementViewAdapter
 	public function SubmitElement(SubmitElement $field)
 	{
 		$field->addClass('button');
-		$buf = '<div class="row">';
-		$buf .= '<div class="small-12 columns">';
+		$buf = "<div class=\"row\">\n";
+		$buf .= "\t<div class=\"small-12 columns\">\n";
 		if (isset($this->label))
 		{
-			$buf .= "<label for=\"" . $this->escape($field->getId()) . "\"" . $field->getClassString() . ">" . $field->getLabel() . "</label>\n";
+			$buf .= "\t\t<label for=\"" . $this->escape($field->getId()) . "\"" . $field->getClassString() . ">" . $field->getLabel() . "</label>\n";
 		}
 		$buf .= $field->field();
-		$buf .= "</div>"; //End column
-		$buf .= "</div>"; //End Row
+		$buf .= "\t</div>\n"; //End column
+		$buf .= "</div>\n"; //End Row
 		return $buf;
 	}
 
@@ -613,16 +323,36 @@ class FoundationViewAdapter extends ElementViewAdapter
 		$buf = '';
 
 		$classes = $field->getClassString();
-		$buf .= '<div class="' . $classes . ' row">\n';
-		$buf .= '<div class="small-12 columns">\n';
+		$buf .= "<div class=\"' . $classes . ' row\">\n";
+		$buf .= "\t<div class=\"small-12 columns\">\n";
 		if (isset($this->label))
 		{
-			$buf .= "<label for=\"" . $this->escape($field->getId()) . "\"" . $field->getClassString() . ">" . $field->getLabel() . "</label>\n";
+			$buf .= "\t\t<label for=\"" . $this->escape($field->getId()) . "\"" . $field->getClassString() . ">" . $field->getLabel() . "</label>\n";
 		}
 		$buf .= $field->field();
+		$buf .= "\t</div>\n";
 		$buf .= "</div>\n";
 
 		return $buf;
 	}
 
+	/**
+	 * Returns the error buffer string.
+	 * @param FieldElement $field
+	 * @return string
+	 */
+	private function getErrorBuffer(FieldElement $field)
+	{
+		$buf = "\t<small class=\"error\">\n";
+		foreach ($field->getErrors() as $error)
+		{
+			foreach ($error as $message)
+			{
+				$buf .= "\t\t- $message<br>\n";
+			}
+		}
+		$buf .= "\t</small>\n";
+
+		return $buf;
+	}
 }

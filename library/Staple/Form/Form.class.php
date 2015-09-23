@@ -202,13 +202,17 @@ class Form
 	}
 	
 	/**
-	 * Retrieves a stored property.
+	 * Retrieves a stored field element object or property.
 	 * @param string $key
-	 * @return mixed
+	 * @return FieldElement|mixed
 	 */
 	public function __get($key)
 	{
-		if(array_key_exists($key,$this->_store))
+		if(array_key_exists($key,$this->fields))
+		{
+			return $this->fields[$key];
+		}
+		elseif(array_key_exists($key,$this->_store))
 		{
 			return $this->_store[$key];
 		}
@@ -362,6 +366,10 @@ class Form
 	private function fieldData(array $start)
 	{
 		$data = array();
+		/**
+		 * @var string $name
+		 * @var FieldElement|array $field
+		 */
 		foreach($start as $name=>$field)
 		{
 			if(is_array($field))
