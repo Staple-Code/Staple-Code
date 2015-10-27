@@ -2,9 +2,8 @@
 RewriteEngine on
 
 #Checks for existing files -f and directories -d and disables rewrite
-RewriteCond %{DOCUMENT_ROOT}/%{REQUEST_FILENAME} !-f
-RewriteCond %{DOCUMENT_ROOT}/%{REQUEST_FILENAME} !-d
-
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
 
 #Rewrite Rule - Will not append info to index.php. Upadated for use with GoDaddy as well. 
 RewriteRule ^(.[a-zA-Z0-9\/-]*)$ /index.php/$1 [PT,QSA,L]
