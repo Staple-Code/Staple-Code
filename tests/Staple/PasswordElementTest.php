@@ -64,10 +64,7 @@ class PasswordElementTest extends \PHPUnit_Framework_TestCase
 	{
 		$element = $this->getTestTextElement();
 
-		ob_start();
-		echo $element->build();
-		$buf = ob_get_contents();
-		ob_end_clean();
+		$buf =  $element->build();
 
 		$this->assertEquals(self::STANDARD_BUILD,$buf);
 	}
@@ -81,10 +78,7 @@ class PasswordElementTest extends \PHPUnit_Framework_TestCase
 		$element = $this->getTestTextElement();
 		$element->setElementViewAdapter($this->getFoundationViewAdapter());
 
-		ob_start();
-		echo $element->build();
-		$buf = ob_get_contents();
-		ob_end_clean();
+		$buf =  $element->build();
 
 		$this->assertEquals(self::FOUNDATION_BUILD,$buf);
 	}
@@ -98,10 +92,7 @@ class PasswordElementTest extends \PHPUnit_Framework_TestCase
 		$element = $this->getTestTextElement();
 		$element->setElementViewAdapter($this->getBootstrapViewAdapter());
 
-		ob_start();
-		echo $element->build();
-		$buf = ob_get_contents();
-		ob_end_clean();
+		$buf =  $element->build();
 
 		$this->assertEquals(self::BOOTSTRAP_BUILD,$buf);
 	}

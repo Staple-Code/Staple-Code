@@ -306,15 +306,15 @@ class FoundationViewAdapter extends ElementViewAdapter
 	public function ButtonElement(ButtonElement $field)
 	{
 		$field->addClass('button');
-		$buf = '<div class="row">';
-		$buf .= "\t<div class=\"small-12 columns\">";
+		$buf = "<div class=\"row\">\n";
+		$buf .= "\t<div class=\"small-12 columns\">\n";
 		if (isset($this->label))
 		{
-			$buf .= "\t\t<label for=\"" . $this->escape($field->getId()) . "\"" . $field->getClassString() . ">" . $field->getLabel() . "</label>\n";
+			$buf .= "\n\t\t<label for=\"" . $this->escape($field->getId()) . "\"" . $field->getClassString() . ">" . $field->getLabel() . "</label>\n";
 		}
 		$buf .= $field->field();
-		$buf .= "\t</div>";
-		$buf .= "</div>";
+		$buf .= "\t</div>\n";
+		$buf .= "</div>\n";
 		return $buf;
 	}
 

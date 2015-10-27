@@ -501,57 +501,10 @@ class BootstrapViewAdapter extends ElementViewAdapter
 
 	function ButtonElement(ButtonElement $field)
 	{
-		//Add form-control class for optimal element positioning.
 		$field->addClass('btn');
-
-		//Build field buffer to be returned.
-		if (count($field->getErrors()) > 0)
-		{
-			$buf = "<div class=\"form-group has-error\">"; //Start Form-Group
-		}
-		else
-		{
-			$buf = "<div class=\"form-group\">"; //Start Form-Group
-		}
-
-		//Field Label
-		$buf .= "\n\t<label class=\"control-label\" for=\"".$this->escape($field->getId()).'">';
-		$buf .= $field->getLabel();
-
-		//Check if field is required
-		if ($field->isRequired())
-		{
-			$buf .= " <small>(Required)</small>";
-		}
-		$buf .= "</label>\n";
-
-		//Add field instructions
-		if (count($field->getInstructions()) > 0)
-		{
-			$buf .= "\n<p class=\"text-muted\">";
-			$buf .= "\n" . $field->getInstructions();
-			$buf .= "\n</p>";
-		}
-
-		//Add field to buffer
+		$buf = "<div class=\"form-group\">\n"; //Start Form-Group
 		$buf .= $field->field();
-
-		//Generate error messages to be displayed below field.
-		if (count($field->getErrors()) > 0)
-		{
-			foreach ($field->getErrors() as $error)
-			{
-				$buf .= "<ul class=\"list-group\">";
-				foreach ($error as $message)
-				{
-					$buf .= "<li class=\"list-group-item list-group-item-danger\"><span class=\"glyphicon glyphicon-exclamation-sign\"></span> $message</li>";
-				}
-				$buf .= "</ul>";
-			}
-		}
-
 		$buf .= "</div>\n"; //End Form-Group
-
 		return $buf;
 	}
 

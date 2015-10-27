@@ -64,10 +64,7 @@ class TextElementTest extends \PHPUnit_Framework_TestCase
 	{
 		$element = $this->getTestTextElement();
 
-		ob_start();
-		echo $element->build();
-		$buf = ob_get_contents();
-		ob_end_clean();
+		$buf = $element->build();
 
 		$this->assertEquals(self::STANDARD_BUILD,$buf);
 	}

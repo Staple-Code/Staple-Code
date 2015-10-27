@@ -25,22 +25,22 @@
 namespace Staple\Tests;
 
 
-use Staple\Form\SubmitElement;
+use Staple\Form\ButtonElement;
 use Staple\Form\Validate\EqualValidator;
 use Staple\Form\ViewAdapters\BootstrapViewAdapter;
 use Staple\Form\ViewAdapters\FoundationViewAdapter;
 
-class SubmitElementTest extends \PHPUnit_Framework_TestCase
+class ButtonElementTest extends \PHPUnit_Framework_TestCase
 {
-	const STANDARD_BUILD = "<div class=\"form_element element_submit\" id=\"SubmitElement_element\">\n\t<label for=\"SubmitElement\" class=\"form_element element_submit\"></label>\n\t<input type=\"submit\" id=\"SubmitElement\" name=\"SubmitElement\" value=\"Submit Form\" class=\"form_element element_submit\">\n</div>\n";
-	const FOUNDATION_BUILD = "<div class=\"row\">\n\t<div class=\"small-12 columns\">\n\t<input type=\"submit\" id=\"SubmitElement\" name=\"SubmitElement\" value=\"Submit Form\" class=\"button\">\n\t</div>\n</div>\n";
-	const BOOTSTRAP_BUILD = "<div class=\"form-group\">\n\t<input type=\"submit\" id=\"SubmitElement\" name=\"SubmitElement\" value=\"Submit Form\" class=\"btn\">\n</div>\n";
+	const STANDARD_BUILD = "<div class=\"form_element element_button\" id=\"ButtonElement_element\">\n\t<label for=\"ButtonElement\" class=\"form_element element_button\"></label>\n\t<input type=\"button\" id=\"ButtonElement\" name=\"ButtonElement\" value=\"My Button\" class=\"form_element element_button\">\n</div>\n";
+	const FOUNDATION_BUILD = "<div class=\"row\">\n\t<div class=\"small-12 columns\">\n\t<input type=\"button\" id=\"ButtonElement\" name=\"ButtonElement\" value=\"My Button\" class=\"button\">\n\t</div>\n</div>\n";
+	const BOOTSTRAP_BUILD = "<div class=\"form-group\">\n\t<input type=\"button\" id=\"ButtonElement\" name=\"ButtonElement\" value=\"My Button\" class=\"btn\">\n</div>\n";
 	/**
-	 * @return SubmitElement
+	 * @return ButtonElement
 	 */
 	private function getTestElement()
 	{
-		return SubmitElement::create('SubmitElement','Submit Form');
+		return ButtonElement::create('ButtonElement','My Button');
 	}
 
 	private function getFoundationViewAdapter()
