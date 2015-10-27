@@ -22,11 +22,12 @@
  */
 namespace Staple\Form;
 
+use Staple\Exception\FormBuildException;
 use Staple\Form\ViewAdapters\ElementViewAdapter;
 
 class SubmitElement extends FieldElement
 {
-	public function __construct($name, $value=NULL, $label = NULL, $id = NULL, array $attrib = array())
+	public function __construct($name, $value = NULL, $id = NULL, array $attrib = array(), $label = NULL)
 	{
 		parent::__construct($name,$label,$id,$attrib);
 		if(isset($value))
@@ -70,7 +71,7 @@ class SubmitElement extends FieldElement
 			$this->addClass('form_element');
 			$this->addClass('element_submit');
 			$classes = $this->getClassString('div');
-			$buf .= "<div$classes id=\"".$this->escape($this->id)."_element\">\n";
+			$buf .= "<div$classes id=\"".$this->escape($this->getId())."_element\">\n";
 			if(isset($this->label))
 			{
 				$buf .= $this->label(); 
@@ -79,5 +80,16 @@ class SubmitElement extends FieldElement
 			$buf .= "</div>\n";
 		}
 		return $buf;
+	}
+
+	/**
+	 * Throws an exception because validators are not allowed on this element.
+	 * @param FieldValidator $validator
+	 * @return $this
+	 * @throws FormBuildException
+	 */
+	public function addValidator(FieldValidator $validator)
+	{
+		throw new FormBuildException('Submit elements do not have validators.');
 	}
 }

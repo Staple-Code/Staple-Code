@@ -25,7 +25,7 @@ namespace Staple\Form;
 
 class ButtonElement extends FieldElement
 {
-	public function __construct($name, $value=NULL, $label = NULL, $id = NULL, array $attrib = array())
+	public function __construct($name, $value = NULL, $id = NULL, array $attrib = array(), $label = NULL)
 	{
 		parent::__construct($name,$label,$id,$attrib);
 		if(isset($value))

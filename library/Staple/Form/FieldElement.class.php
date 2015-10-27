@@ -213,14 +213,14 @@ abstract class FieldElement
 	 * A factory function to create form fields.
 	 * 
 	 * @param string $name
-	 * @param string $label
+	 * @param string $labelOrValue
 	 * @param string $id
-	 * @param array $attrib
+	 * @param array $attributes
 	 * @return $this
 	 */
-	public static function create($name, $label = NULL, $id = NULL, array $attrib = array())
+	public static function create($name, $labelOrValue = NULL, $id = NULL, array $attributes = array())
 	{
-		return new static($name, $label, $id, $attrib);
+		return new static($name, $labelOrValue, $id, $attributes);
 	}
 	
 	/*

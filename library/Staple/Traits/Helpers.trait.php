@@ -40,6 +40,10 @@ trait Helpers
 		{
 			return htmlentities(strip_tags($str));
 		}
+		elseif(is_array($str))
+		{
+			return implode('',$str);
+		}
 		else
 		{
 			return htmlentities($str);
