@@ -56,7 +56,7 @@ class BootstrapViewAdapter extends ElementViewAdapter
 		}
 
 		//Field Label
-		$buf .= "\n\t<label class=\"control-label\">";
+		$buf .= "\n\t<label class=\"control-label\" for=\"".$this->escape($field->getId()).'">';
 		$buf .= $field->getLabel();
 
 		//Check if field is required
@@ -112,7 +112,7 @@ class BootstrapViewAdapter extends ElementViewAdapter
 		}
 
 		//Field Label
-		$buf .= "\n\t<label class=\"control-label\">";
+		$buf .= "\n\t<label class=\"control-label\" for=\"".$this->escape($field->getId()).'">';
 		$buf .= $field->getLabel();
 
 		//Check if field is required
@@ -168,7 +168,7 @@ class BootstrapViewAdapter extends ElementViewAdapter
 		}
 
 		//Field Label
-		$buf .= "\n\t<label class=\"control-label\">";
+		$buf .= "\n\t<label class=\"control-label\" for=\"".$this->escape($field->getId()).'">';
 		$buf .= $field->getLabel();
 
 		//Check if field is required
@@ -233,7 +233,7 @@ class BootstrapViewAdapter extends ElementViewAdapter
 		}
 
 		//Field Label
-		$buf .= "\n\t<label class=\"control-label\">";
+		$buf .= "\n\t<label class=\"control-label\" for=\"".$this->escape($field->getId()).'">';
 		$buf .= $field->getLabel();
 
 		//Check if field is required
@@ -350,7 +350,7 @@ class BootstrapViewAdapter extends ElementViewAdapter
 		}
 
 		//Field Label
-		$buf .= "\t<label class=\"control-label\">\n";
+		$buf .= "\t<label class=\"control-label\" for=\"".$this->escape($field->getId()).'">'."\n";
 		//Add field to buffer
 		$buf .= $field->field();
 		$buf .= "\t" . $field->getLabel();
@@ -450,7 +450,7 @@ class BootstrapViewAdapter extends ElementViewAdapter
 		}
 
 		//Field Label
-		$buf .= "\n\t<label class=\"control-label\">";
+		$buf .= "\n\t<label class=\"control-label\" for=\"".$this->escape($field->getId()).'">';
 		$buf .= $field->getLabel();
 
 		//Check if field is required
@@ -515,7 +515,7 @@ class BootstrapViewAdapter extends ElementViewAdapter
 		}
 
 		//Field Label
-		$buf .= "\n\t<label class=\"control-label\">";
+		$buf .= "\n\t<label class=\"control-label\" for=\"".$this->escape($field->getId()).'">';
 		$buf .= $field->getLabel();
 
 		//Check if field is required
@@ -570,16 +570,20 @@ class BootstrapViewAdapter extends ElementViewAdapter
 			$buf = "<div class=\"form-group\">"; //Start Form-Group
 		}
 
-		//Field Label
-		$buf .= "\n\t<label class=\"control-label\">";
-		$buf .= $field->getLabel();
-
-		//Check if field is required
-		if ($field->isRequired())
+		//Label is optional for this field.
+		if(strlen($field->getLabel()) >= 1)
 		{
-			$buf .= " <small>(Required)</small>";
+			//Field Label
+			$buf .= "\n\t<label class=\"control-label\" for=\"" . $this->escape($field->getId()) . '">';
+			$buf .= $field->getLabel();
+
+			//Check if field is required
+			if ($field->isRequired())
+			{
+				$buf .= " <small>(Required)</small>";
+			}
+			$buf .= "</label>\n";
 		}
-		$buf .= "</label>\n";
 
 		//Add field instructions
 		if (count($field->getInstructions()) > 0)

@@ -131,7 +131,7 @@ class TextElement extends FieldElement
 			$this->addClass('form_element');
 			$this->addClass('element_text');
 			$classes = $this->getClassString('div');
-			$buf .= "<div $classes id=\"".$this->escape($this->id)."_element\">\n";
+			$buf .= "<div$classes id=\"".$this->escape($this->id)."_element\">\n";
 			$buf .= $this->label();
             		$buf .= $this->instructions();
 			$buf .= $this->field();

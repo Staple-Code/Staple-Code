@@ -32,7 +32,7 @@ class CheckboxElementTest extends \PHPUnit_Framework_TestCase
 {
 	const STANDARD_BUILD = "<div class=\"form_element element_checkbox\" id=\"TestCheckboxElement_element\">\n\t<input type=\"checkbox\" id=\"TestCheckboxElement\" name=\"TestCheckboxElement\" value=\"1\" class=\"form_element element_checkbox\">\n\t<label for=\"TestCheckboxElement\" class=\"form_element element_checkbox\">My Test Checkbox Element</label>\n</div>";
 	const FOUNDATION_BUILD = "<div class=\"row\">\n<div class=\"small-12 columns\">\n\t<label for=\"TestCheckboxElement\" class=\"row\">My Test Checkbox Element</label>\n</div>\n<div class=\"small-12 columns\">\n\t<input type=\"checkbox\" id=\"TestCheckboxElement\" name=\"TestCheckboxElement\" value=\"1\" class=\"row\">\n</div>\n</div>\n";
-	const BOOTSTRAP_BUILD = "<div class=\"checkbox\">\n\t<label class=\"control-label\">\n\t<input type=\"checkbox\" id=\"TestCheckboxElement\" name=\"TestCheckboxElement\" value=\"1\">\n\tMy Test Checkbox Element</label>\n</div>\n";
+	const BOOTSTRAP_BUILD = "<div class=\"checkbox\">\n\t<label class=\"control-label\" for=\"TestCheckboxElement\">\n\t<input type=\"checkbox\" id=\"TestCheckboxElement\" name=\"TestCheckboxElement\" value=\"1\">\n\tMy Test Checkbox Element</label>\n</div>\n";
 	/**
 	 * @return CheckboxElement
 	 */

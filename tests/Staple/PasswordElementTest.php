@@ -25,6 +25,7 @@
 namespace Staple\Tests;
 
 
+use Staple\Form\PasswordElement;
 use Staple\Form\TextElement;
 use Staple\Form\Validate\AlnumValidator;
 use Staple\Form\Validate\DateValidator;
@@ -33,17 +34,17 @@ use Staple\Form\Validate\LengthValidator;
 use Staple\Form\ViewAdapters\BootstrapViewAdapter;
 use Staple\Form\ViewAdapters\FoundationViewAdapter;
 
-class TextElementTest extends \PHPUnit_Framework_TestCase
+class PasswordElementTest extends \PHPUnit_Framework_TestCase
 {
-	const STANDARD_BUILD = "<div class=\"form_element element_text\" id=\"TestTextElement_element\">\n\t<label for=\"TestTextElement\" class=\"form_element element_text\">My Test Text Element</label>\n\t<input type=\"text\" id=\"TestTextElement\" name=\"TestTextElement\" value=\"\" class=\"form_element element_text\">\n</div>\n";
-	const FOUNDATION_BUILD = "<div class=\"row\">\n<div class=\"small-12 columns\">\n\t<label for=\"TestTextElement\">My Test Text Element</label>\n</div>\n<div class=\"small-12 columns\">\n\t<input type=\"text\" id=\"TestTextElement\" name=\"TestTextElement\" value=\"\">\n</div>\n</div>\n";
-	const BOOTSTRAP_BUILD = "<div class=\"form-group\">\n\t<label class=\"control-label\" for=\"TestTextElement\">My Test Text Element</label>\n\t<input type=\"text\" id=\"TestTextElement\" name=\"TestTextElement\" value=\"\" class=\"form-control\">\n</div>\n";
+	const STANDARD_BUILD = "<div class=\"form_element element_password\" id=\"MyPassword_element\">\n\t<label for=\"MyPassword\" class=\"form_element element_password\">Enter Your Password</label>\n\t<input type=\"password\" id=\"MyPassword\" name=\"MyPassword\" value=\"\" class=\"form_element element_password\">\n</div>\n";
+	const FOUNDATION_BUILD = "<div class=\"row\">\n<div class=\"small-12 columns\">\n\t<label for=\"MyPassword\">Enter Your Password</label>\n</div>\n<div class=\"small-12 columns\">\n\t<input type=\"password\" id=\"MyPassword\" name=\"MyPassword\" value=\"\">\n</div>\n</div>\n";
+	const BOOTSTRAP_BUILD = "<div class=\"form-group\">\n\t<label class=\"control-label\" for=\"MyPassword\">Enter Your Password</label>\n\t<input type=\"password\" id=\"MyPassword\" name=\"MyPassword\" value=\"\" class=\"form-control\">\n</div>\n";
 	/**
 	 * @return TextElement
 	 */
 	private function getTestTextElement()
 	{
-		return TextElement::create('TestTextElement','My Test Text Element');
+		return PasswordElement::create('MyPassword','Enter Your Password');
 	}
 
 	private function getFoundationViewAdapter()
