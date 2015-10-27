@@ -25,7 +25,7 @@
 namespace Staple\Tests;
 
 
-use Staple\Form\PasswordElement;
+use Staple\Form\TextareaElement;
 use Staple\Form\Validate\AlnumValidator;
 use Staple\Form\Validate\DateValidator;
 use Staple\Form\Validate\EmailValidator;
@@ -33,17 +33,17 @@ use Staple\Form\Validate\LengthValidator;
 use Staple\Form\ViewAdapters\BootstrapViewAdapter;
 use Staple\Form\ViewAdapters\FoundationViewAdapter;
 
-class PasswordElementTest extends \PHPUnit_Framework_TestCase
+class TextAreaElementTest extends \PHPUnit_Framework_TestCase
 {
-	const STANDARD_BUILD = "<div class=\"form_element element_password\" id=\"MyPassword_element\">\n\t<label for=\"MyPassword\" class=\"form_element element_password\">Enter Your Password</label>\n\t<input type=\"password\" id=\"MyPassword\" name=\"MyPassword\" value=\"\" class=\"form_element element_password\">\n</div>\n";
-	const FOUNDATION_BUILD = "<div class=\"row\">\n<div class=\"small-12 columns\">\n\t<label for=\"MyPassword\">Enter Your Password</label>\n</div>\n<div class=\"small-12 columns\">\n\t<input type=\"password\" id=\"MyPassword\" name=\"MyPassword\" value=\"\">\n</div>\n</div>\n";
-	const BOOTSTRAP_BUILD = "<div class=\"form-group\">\n\t<label class=\"control-label\" for=\"MyPassword\">Enter Your Password</label>\n\t<input type=\"password\" id=\"MyPassword\" name=\"MyPassword\" value=\"\" class=\"form-control\">\n</div>\n";
+	const STANDARD_BUILD = "<div class=\"form_element element_textarea\" id=\"TestTextAreaElement_element\">\n\t<label for=\"TestTextAreaElement\" class=\"form_element element_textarea\">Enter Some Text</label>\n\t<textarea rows=\"5\" cols=\"40\" id=\"TestTextAreaElement\" name=\"TestTextAreaElement\" class=\"form_element element_textarea\">Textarea Text.</textarea>\n</div>\n";
+	const FOUNDATION_BUILD = "<div class=\"row\">\n<div class=\"small-12 columns\">\n\t<label for=\"TestTextAreaElement\">Enter Some Text</label>\n</div>\n<div class=\"small-12 columns\">\n\t<textarea rows=\"5\" cols=\"40\" id=\"TestTextAreaElement\" name=\"TestTextAreaElement\">Textarea Text.</textarea>\n</div>\n</div>\n";
+	const BOOTSTRAP_BUILD = "<div class=\"form-group\">\n\t<label class=\"control-label\" for=\"TestTextAreaElement\">Enter Some Text</label>\n\t<textarea rows=\"5\" cols=\"40\" id=\"TestTextAreaElement\" name=\"TestTextAreaElement\" class=\"form-control\">Textarea Text.</textarea>\n</div>\n";
 	/**
-	 * @return PasswordElement
+	 * @return TextAreaElement
 	 */
 	private function getTestTextElement()
 	{
-		return PasswordElement::create('MyPassword','Enter Your Password');
+		return TextareaElement::create('TestTextAreaElement','Enter Some Text')->setValue('Textarea Text.')->setRows(5)->setCols(40);
 	}
 
 	private function getFoundationViewAdapter()
@@ -127,6 +127,7 @@ class PasswordElementTest extends \PHPUnit_Framework_TestCase
 	public function testBaseValidator()
 	{
 		$element = $this->getTestTextElement();
+		$element->setValue(NULL);
 
 		//An element with no validators should individually assert true when asked if valid, no content and not required.
 		$this->assertTrue($element->isValid());
