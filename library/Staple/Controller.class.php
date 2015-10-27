@@ -355,7 +355,7 @@ abstract class Controller
 	 * This function accepts a routing string to redirect the application internally. A
 	 * redirect of this sort clears the output buffer and redraws the header, proceeding
 	 * as if the redirected controller/action was called directly. 
-	 * @param mixed $to
+	 * @param mixed $tos
 	 */
 	protected function _redirect($to)
 	{
@@ -368,6 +368,7 @@ abstract class Controller
 	 * supplied, a file link is specified.
 	 * @param string | array $link
 	 * @param array $get
+	 * @return string
 	 */
 	protected function _link($link,array $get = array())
 	{
@@ -375,9 +376,11 @@ abstract class Controller
 	}
 	
 	/**
+	 * Backwards compatible helper method.
 	 * @see View::escape()
 	 * @param string $estring
 	 * @param boolean $strip
+	 * @return string
 	 */
 	public function _escape($estring, $strip = false)
 	{
