@@ -28,8 +28,8 @@ use Staple\Form\FieldValidator;
 class LengthValidator extends FieldValidator
 {
 	const DEFAULT_ERROR = 'Field does not meet length requirements.';
-	const MIN_LENGTH_ERROR = 'Minimum Length Not Met';
-	const MAX_LENGTH_ERROR = 'Maximum Length Exceeded';
+	const MIN_LENGTH_ERROR = 'Minimum length not met.';
+	const MAX_LENGTH_ERROR = 'Maximum length exceeded.';
 	protected $min = 0;
 	protected $max;
 	
@@ -39,7 +39,7 @@ class LengthValidator extends FieldValidator
 	 * order to make more logical sense.
 	 * 
 	 * @param int $limit1
-	 * @param int #limit2
+	 * @param int $limit2
 	 * @param string $usermsg
 	 */
 	public function __construct($limit1, $limit2 = NULL, $usermsg = NULL)
@@ -123,15 +123,14 @@ class LengthValidator extends FieldValidator
 		{
 			$this->addError(self::MIN_LENGTH_ERROR);
 		}
-		
-		//Additionally Add the default error message.
-		$this->addError();
+
 		return false;
 	}
-	
+
 	/**
-	 * (non-PHPdoc)
-	 * @see Staple_Form_Validator::clientJQuery()
+	 * @param string $fieldType
+	 * @param FieldElement $field
+	 * @return string
 	 */
 	public function clientJQuery($fieldType, FieldElement $field)
 	{
@@ -165,5 +164,3 @@ class LengthValidator extends FieldValidator
 		return $script;
 	}
 }
-
-?>

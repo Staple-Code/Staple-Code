@@ -32,9 +32,33 @@ class DateValidator extends FieldValidator
 	const DEFAULT_ERROR = 'Field must be a valid date.';
 
 	/**
+	 * Match list
+	 * @var array
+	 */
+	private $matches;
+
+	/**
+	 * @return array
+	 */
+	public function getMatches()
+	{
+		return $this->matches;
+	}
+
+	/**
+	 * @param array $matches
+	 * @return $this
+	 */
+	protected function setMatches(array $matches)
+	{
+		$this->matches = $matches;
+		return $this;
+	}
+
+	/**
 	 * @param  mixed $data
 	 * @return  bool
-	 * @see Staple_Form_Validator::check()
+	 * @see FieldValidator::check()
 	 */
 	public function check($data)
 	{
@@ -51,7 +75,7 @@ class DateValidator extends FieldValidator
 	
 	/**
 	 * (non-PHPdoc)
-	 * @see Staple_Form_Validator::clientJQuery()
+	 * @see FieldValidator::clientJQuery()
 	 */
 	public function clientJQuery($fieldType, FieldElement $field)
 	{
@@ -85,5 +109,3 @@ class DateValidator extends FieldValidator
 		return $script;
 	}
 }
-
-?>

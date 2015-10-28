@@ -25,6 +25,7 @@ namespace Staple\Form;
 
 use \Staple\Error;
 use \Exception;
+use Staple\Form\ViewAdapters\ElementViewAdapter;
 
 abstract class FieldElement
 {
@@ -88,7 +89,7 @@ abstract class FieldElement
 	protected $filters = array();
 	/**
 	 * An array that holds the validator objects assigned to the form field.
-	 * @var array
+	 * @var FieldValidator[]
 	 */
 	protected $validators = array();
 	/**
@@ -98,10 +99,10 @@ abstract class FieldElement
 	protected $errors = array();
 
 	/**
-	 *
-	 * @var FormViewAdapter
+	 * Contains instance of ElementViewAdapter handed down from Form
+	 * @var ElementViewAdapter
 	 */
-	protected $viewAdapter;
+	protected $elementViewAdapter;
 	
 	/**
 	 * Form field constructor. Requires a name, has an optional label, id and attribute array.
@@ -207,29 +208,19 @@ abstract class FieldElement
 		}
 		$this->filters = $filts;
 	}
-
-    /**
-     * Returns a string with all html entities replaced.
-     * @param string $text
-     * @return string
-     */
-	protected function escape($text)
-	{
-		return htmlentities($text);
-	}
 	
 	/**
 	 * A factory function to create form fields.
 	 * 
 	 * @param string $name
-	 * @param string $label
+	 * @param string $labelOrValue
 	 * @param string $id
-	 * @param array $attrib
+	 * @param array $attributes
 	 * @return $this
 	 */
-	public static function create($name, $label = NULL, $id = NULL, array $attrib = array())
+	public static function create($name, $labelOrValue = NULL, $id = NULL, array $attributes = array())
 	{
-		return new static($name, $label, $id, $attrib);
+		return new static($name, $labelOrValue, $id, $attributes);
 	}
 	
 	/*
@@ -310,6 +301,16 @@ abstract class FieldElement
 	{
 		return $this->errors;
 	}
+
+	/**
+	 * Clears the error list on the field element.
+	 * @return $this
+	 */
+	protected function clearErrors()
+	{
+		$this->errors = [];
+		return $this;
+	}
 	
 	/**
 	 * Checks the form field against any validators to confirm valid data was entered into the form.
@@ -318,27 +319,18 @@ abstract class FieldElement
 	 * into the field for it to be valid, even with no validators.
 	 * 
 	 * @return boolean
-	 * @throws Exception
 	 */
 	public function isValid()
 	{
 		foreach($this->validators as $val)
 		{
-			if($val instanceof FieldValidator)
+			$val->clearErrors();
+			$this->clearErrors();
+			if(!$val->check($this->value))
 			{
-				$val->clearErrors();
-				if(!$val->check($this->Value))
-				{
-					$this->errors[$val->getName()] = $val->getErrors();
-				}
-			}
-			else
-			{
-				throw new Exception('Validation Error', Error::VALIDATION_ERROR);
+				$this->errors[$val->getName()] = $val->getErrors();
 			}
 		}
-		
-		//@todo check for field content if not validators present.
 		
 		if(count($this->errors) == 0)
 		{
@@ -366,6 +358,7 @@ abstract class FieldElement
 	
 	/**
 	 * This function queries all of the validators for javascript to verify their data.
+	 * @throws Exception
 	 * @return string
 	 */
 	public function clientJQuery()
@@ -397,7 +390,7 @@ abstract class FieldElement
 		{
 			if($val instanceof FieldValidator)
 			{
-				$script .= $val->clientJS(get_class($this), $this->id);
+				$script .= $val->clientJS(get_class($this), $this);
 			}
 			else
 			{
@@ -527,6 +520,37 @@ abstract class FieldElement
 	{
 		$this->instructions = $instructions;
 		return $this;
+	}
+
+    /**
+     * Alias for setInstructions Method
+     * @param string $instructions
+     * @return $this
+     */
+    public function addInstructions($instructions)
+    {
+        $this->setInstructions($instructions);
+        return $this;
+    }
+
+	/**
+	 * Set instance passed from Form into element
+	 * @param ElementViewAdapter $adapter
+	 * @return $this
+	 */
+	public function setElementViewAdapter(ElementViewAdapter $adapter)
+	{
+		$this->elementViewAdapter = $adapter;
+		return $this;
+	}
+
+	/**
+	 * Return instance of elementView adapter contained in $elementViewAdapter
+	 * @return ElementViewAdapter
+	 */
+	public function getElementViewAdapter()
+	{
+		return $this->elementViewAdapter;
 	}
 	
 	/**
@@ -749,4 +773,8 @@ abstract class FieldElement
 	 * Build the field using a layout, or with the default build.
 	 */
 	abstract public function build($fieldView = NULL);
+
+	/*
+ * @todo add method to add custom field view and add property to hold field view name
+ */
 }

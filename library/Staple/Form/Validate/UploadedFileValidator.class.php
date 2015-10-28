@@ -28,8 +28,9 @@ use \finfo;
 
 class UploadedFileValidator extends FieldValidator
 {
-	const DEFAULT_ERROR = 'File is not valid';
-	
+	const DEFAULT_ERROR = 'File is not valid.';
+
+	/** @var string $mimeCheck */
 	protected $mimeCheck = NULL;
 	
 	public function __construct($mimetype = NULL, $usermsg = NULL)
@@ -45,7 +46,7 @@ class UploadedFileValidator extends FieldValidator
 	}
 
 	/**
-	 * @return the $mimeCheck
+	 * @return string $mimeCheck
 	 */
 	public function getMimeCheck()
 	{
@@ -53,7 +54,8 @@ class UploadedFileValidator extends FieldValidator
 	}
 
 	/**
-	 * @param field_type $mimeCheck
+	 * @param string $mimeCheck
+	 * @return $this
 	 */
 	public function setMimeCheck($mimeCheck)
 	{
@@ -62,11 +64,9 @@ class UploadedFileValidator extends FieldValidator
 	}
 
 	/**
-	 * 
+	 * Run the validation
 	 * @param  mixed $data
- 
 	 * @return  bool
-	  
 	 * @see Staple_Form_Validator::check()
 	 */
 	public function check($data)
@@ -100,5 +100,3 @@ class UploadedFileValidator extends FieldValidator
 		return false;
 	}
 }
-
-?>

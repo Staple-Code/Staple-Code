@@ -26,6 +26,7 @@
 namespace Staple;
 
 use \Exception;
+use Staple\Form\Form;
 
 class View 
 {
@@ -59,6 +60,11 @@ class View
 	 * @var Model
 	 */
 	protected $_viewModel;
+	/**
+	 * A form that is linked with this view.
+	 * @var Form
+	 */
+	protected $_viewForm;
 	/**
 	 * The static view to be used for the view.
 	 * @var string
@@ -231,6 +237,24 @@ class View
 	}
 
 	/**
+	 * @return Form
+	 */
+	public function getViewForm()
+	{
+		return $this->_viewForm;
+	}
+
+	/**
+	 * @param Form $viewForm
+	 * @return $this
+	 */
+	public function setViewForm(Form $viewForm)
+	{
+		$this->_viewForm = $viewForm;
+		return $this;
+	}
+
+	/**
 	 * @return string
 	 */
 	public function getStaticView()
@@ -279,6 +303,21 @@ class View
 			return $this->setViewModel($model);
 		else
 			return $this->getViewModel();
+	}
+
+	/**
+	 * When a form is provided, the form is bound to the view and the View object is returned.
+	 * With no parameters set, the bound Form object is returned.
+	 * @param Form $form
+	 * @return Form|View|NULL
+	 */
+	public function form(Form $form = NULL)
+	{
+		//Set or get the model depending upon the parameters
+		if(isset($form))
+			return $this->setViewForm($form);
+		else
+			return $this->getViewForm();
 	}
 
 	/**
@@ -339,6 +378,10 @@ class View
 					//Initialize the view model, if set
 					if (isset($this->_viewModel))
 						$model = $this->_viewModel;
+
+					//Setup local $form variable, if set
+					if(isset($this->_viewForm))
+						$form = $this->_viewForm;
 
 					//include the view
 					include $view;

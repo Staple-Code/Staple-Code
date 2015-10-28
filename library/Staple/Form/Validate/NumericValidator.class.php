@@ -30,11 +30,8 @@ class NumericValidator extends FieldValidator
 	const DEFAULT_ERROR = 'Field value must be numeric.';
 
 	/**
-	 * 
 	 * @param  mixed $data
- 
 	 * @return  bool
-	  
 	 * @see Staple_Form_Validator::check()
 	 */
 	public function check($data)
@@ -49,10 +46,11 @@ class NumericValidator extends FieldValidator
 		}
 		return false;
 	}
-	
+
 	/**
-	 * (non-PHPdoc)
-	 * @see Staple_Form_Validator::clientJQuery()
+	 * @param string $fieldType
+	 * @param FieldElement $field
+	 * @return string
 	 */
 	public function clientJQuery($fieldType, FieldElement $field)
 	{
@@ -86,5 +84,3 @@ class NumericValidator extends FieldValidator
 		return $script;
 	}
 }
-
-?>
