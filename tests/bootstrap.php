@@ -47,6 +47,7 @@ defined('STAPLE_ROOT')
 
 require_once LIBRARY_ROOT.'Staple/Alias.class.php';
 require_once LIBRARY_ROOT.'Staple/Autoload.class.php';
+require_once VENDOR_ROOT.'autoload.php';
 
 $loader = new \Staple\Autoload();
 $loader->setThrowOnFailure(false);
