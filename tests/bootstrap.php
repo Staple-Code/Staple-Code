@@ -48,9 +48,12 @@ defined('STAPLE_ROOT')
 require_once LIBRARY_ROOT.'Staple/Alias.class.php';
 require_once LIBRARY_ROOT.'Staple/Autoload.class.php';
 
-//Apparently Travis CI can't load files properly. Let's try this:
-include VENDOR_ROOT.'twig/twig/lib/Twig/Loader/Array.php';
+// For some reason Travis CI can't fully load Twig through composer
+// @todo remove this once Travis CI starts acting properly.
+require_once VENDOR_ROOT.'twig/twig/lib/Twig/Autoloader.php';
+Twig_Autoloader::register();
 
+//Staple AutoLoader
 $loader = new \Staple\Autoload();
 $loader->setThrowOnFailure(false);
 
