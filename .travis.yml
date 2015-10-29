@@ -7,6 +7,9 @@ php:
   - 7.0
   - hhvm
 
+sudo:
+  required
+
 before_script:
   - composer install
 
