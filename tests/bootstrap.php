@@ -47,7 +47,6 @@ defined('STAPLE_ROOT')
 
 require_once LIBRARY_ROOT.'Staple/Alias.class.php';
 require_once LIBRARY_ROOT.'Staple/Autoload.class.php';
-require_once VENDOR_ROOT.'autoload.php';
 
 //Apparently Travis CI can't load files properly. Let's try this:
 include VENDOR_ROOT.'twig/twig/lib/Twig/Loader/Array.php';
