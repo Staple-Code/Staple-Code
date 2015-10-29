@@ -17,6 +17,8 @@ defined('TEST_ROOT')
 defined('MODULES_ROOT')
 || define('MODULES_ROOT', FOLDER_ROOT . '/modules/');
 
+defined('VENDOR_ROOT')
+|| define('VENDOR_ROOT', FOLDER_ROOT . DIRECTORY_SEPARATOR . 'vendor'. DIRECTORY_SEPARATOR);
 
 //Setup STAPLE Constants
 defined('CONFIG_ROOT')
