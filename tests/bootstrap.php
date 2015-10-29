@@ -35,7 +35,7 @@ defined('CONTROLLER_ROOT')
 || define('CONTROLLER_ROOT', APPLICATION_ROOT . 'controllers/');
 
 defined('VIEW_ROOT')
-|| define('VIEW_ROOT', TEST_ROOT . 'views/');
+|| define('VIEW_ROOT', TEST_ROOT . 'Staple/views/');
 
 defined('SCRIPT_ROOT')
 || define('SCRIPT_ROOT',APPLICATION_ROOT . 'scripts/');

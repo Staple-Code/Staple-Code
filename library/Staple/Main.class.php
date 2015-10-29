@@ -155,7 +155,8 @@ class Main
 		$this->setErrorHandler(new Error());
 		
 		//Create a session
-		session_start();
+		if(php_sapi_name() != 'cli')
+			session_start();
 		
 		//Turn on the timer 
 		if(Config::getValue('errors', 'enable_timer') == 1)
