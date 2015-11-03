@@ -59,7 +59,7 @@ abstract class FieldValidator
 	 * @param string $usermsg
 	 * @return static
 	 */
-	public static function Create($usermsg = NULL)
+	public static function create($usermsg = NULL)
 	{
 		return new static($usermsg);
 	}
