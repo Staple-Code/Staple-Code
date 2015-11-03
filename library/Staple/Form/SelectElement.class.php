@@ -81,6 +81,7 @@ class SelectElement extends FieldElement
 	/**
 	 * Set the multiple attribute of the select element.
 	 * @param bool $bool
+	 * @return $this
 	 */
 	public function setMultiple($bool = true)
 	{
@@ -102,6 +103,7 @@ class SelectElement extends FieldElement
 	/**
 	 * Sets the size of the select element
 	 * @param int $size
+	 * @return $this
 	 */
 	public function setSize($size)
 	{
@@ -124,6 +126,7 @@ class SelectElement extends FieldElement
 	 * @param mixed $value
 	 * @param string $label
 	 * @throws Exception
+	 * @return $this
 	 */
 	public function addOption($value,$label = NULL)
 	{
@@ -153,6 +156,7 @@ class SelectElement extends FieldElement
 	 * @param array $options
 	 * @param boolean $labelvalues
 	 * @throws Exception
+	 * @return $this
 	 */
 	public function addOptionsArray(array $options, $labelvalues = FALSE)
 	{
@@ -198,6 +202,7 @@ class SelectElement extends FieldElement
 	/**
 	 * Sorts the options list based on a set of preset sorts.
 	 * @param int $how
+	 * @return $this
 	 */
 	public function sortOptions($how)
 	{
@@ -216,8 +221,9 @@ class SelectElement extends FieldElement
 		return $this;
 	}
 	
-	/* (non-PHPdoc)
+	/**
 	 * @see Staple_Form_Element::field()
+	 * @return string
 	 */
 	public function field()
 	{
@@ -245,8 +251,9 @@ class SelectElement extends FieldElement
 		return $buf;
 	}
 
-	/* (non-PHPdoc)
+	/**
 	 * @see Staple_Form_Element::label()
+	 * @return string
 	 */
 	public function label()
 	{
@@ -257,6 +264,8 @@ class SelectElement extends FieldElement
 	 * Builds the select list form element.
 	 * 
 	 * @see Staple_Form_Element::build()
+	 * @param string $fieldView
+	 * @return string
 	 */
 	public function build($fieldView = NULL)
 	{
