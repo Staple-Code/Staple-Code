@@ -42,7 +42,7 @@ class NumericValidator extends FieldValidator
 		}
 		else
 		{
-			$this->addError(self::DEFAULT_ERROR);
+			$this->addError();
 		}
 		return false;
 	}
