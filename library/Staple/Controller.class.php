@@ -26,7 +26,7 @@ use \Exception;
 
 abstract class Controller
 {
-	use \Staple\Traits\Helpers;
+	use Traits\Helpers;
 	
 	protected $openMethods = array();
 	protected $accessLevels = array();
@@ -129,6 +129,7 @@ abstract class Controller
 	 * before being dispatched from the front controller.
 	 * @param string $method
 	 * @return bool
+	 * @throws Exception
 	 */
 	public function _auth($method)
 	{
@@ -168,6 +169,7 @@ abstract class Controller
 	 * Returns the access level required for this method.
 	 * @param string | array $method
 	 * @throws Exception
+	 * @return int
 	 */
 	public function _authLevel($method)
 	{
@@ -196,7 +198,6 @@ abstract class Controller
 				throw new Exception('Authentication Validation Error: Method Not Found', Error::AUTH_ERROR);
 			}
 		}
-		return 1;
 	}
 	
 	/**
@@ -355,12 +356,11 @@ abstract class Controller
 	 * This function accepts a routing string to redirect the application internally. A
 	 * redirect of this sort clears the output buffer and redraws the header, proceeding
 	 * as if the redirected controller/action was called directly. 
-	 * @param mixed $tos
+	 * @param mixed $to
 	 */
 	protected function _redirect($to)
 	{
 		Main::get()->redirect($to);
-		$this->view->noRender();
 	} 
 	/**
 	 * 

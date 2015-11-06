@@ -539,13 +539,15 @@ JS;
 	public function validate()
 	{
 		$this->clearErrors();
-		$errors = [];
 		
 		//Process validation callbacks.
-		$errors = array_merge($errors,$this->validateCallbacks($this->callbacks));
+		$valErrors = $this->validateCallbacks($this->callbacks);
 		
 		//Process all validation fields.
-		$errors = array_merge($errors,$this->validateFields($this->fields));
+		$fieldErrors = $this->validateFields($this->fields);
+
+		//Merge all of the errors together
+		$errors = array_merge($this->errors, $valErrors, $fieldErrors);
 
 		//Set the validation errors
 		$this->setErrors($errors);

@@ -64,7 +64,6 @@ class DependentFieldValidator extends FieldValidator
 	 * 
 	 * @param  mixed $data
 	 * @return  bool
-	 * @see Staple_Form_Validator::check()
 	 */
 	public function check($data)
 	{
