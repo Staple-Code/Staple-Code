@@ -75,7 +75,6 @@ class HiddenElement extends FieldElement
 
 	public function build($fieldView = NULL)
 	{
-		$buf = '';
 		$view = FORMS_ROOT.'/fields/HiddenElement.phtml';
 		if(file_exists($view))
 		{
