@@ -156,14 +156,14 @@ class DBAuthAdapter implements AuthAdapter
 				return 1;
 			}
 		}
-		
+		return 0;
 	}
 
 	/**
-	 * 
 	 * Checks the configuration fields for validity
 	 * @param array $config
 	 * @throws Exception
+	 * @return bool
 	 */
 	protected function checkConfig(array $config)
 	{
@@ -174,10 +174,6 @@ class DBAuthAdapter implements AuthAdapter
 			{
 				throw new Exception('Staple_DBAuthAdapter configuration error.',Error::AUTH_ERROR);
 			}
-		}
-		if($config['adapter'] != get_class($this))
-		{
-			throw new Exception('Staple_DBAuthAdapter configuration error.',Error::AUTH_ERROR);
 		}
 		return true;
 	}

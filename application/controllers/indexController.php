@@ -28,6 +28,22 @@ class indexController extends Controller
 	
 	public function index()
 	{
-		return View::create('index');
+		$form = new testForm();
+        if($form->wasSubmitted())
+        {
+            $form->addData($_POST);
+            if($form->validate())
+            {
+                echo "Form is valid!";
+            }
+            else
+            {
+                $this->view->form = $form;
+            }
+        }
+        else
+        {
+            $this->view->form = $form;
+        }
 	}
 }

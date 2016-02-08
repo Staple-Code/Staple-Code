@@ -63,6 +63,7 @@ class RegexValidator extends FieldValidator
 	/**
 	 * Set the regex to validate against.
 	 * @param string $regex
+	 * @return $this
 	 */
 	public function setRegex($regex)
 	{
@@ -72,7 +73,7 @@ class RegexValidator extends FieldValidator
 	
 	/**
 	 * Returns the regex value
-	 * @return the $regex
+	 * @return string $regex
 	 */
 	public function getRegex()
 	{
@@ -88,11 +89,8 @@ class RegexValidator extends FieldValidator
 	}
 
 	/**
-	 * 
 	 * @param  mixed $data
- 
 	 * @return  bool
-	  
 	 * @see Staple_Form_Validator::check()
 	 */
 	public function check($data)
@@ -107,10 +105,11 @@ class RegexValidator extends FieldValidator
 			return false;
 		}
 	}
-	
+
 	/**
-	 * (non-PHPdoc)
-	 * @see Staple_Form_Validator::clientJQuery()
+	 * @param string $fieldType
+	 * @param FieldElement $field
+	 * @return string
 	 */
 	public function clientJQuery($fieldType, FieldElement $field)
 	{
@@ -144,5 +143,3 @@ class RegexValidator extends FieldValidator
 		return $script;
 	}
 }
-
-?>

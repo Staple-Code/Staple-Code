@@ -86,6 +86,10 @@ class FileElement extends FieldElement
 			$buf = ob_get_contents();
 			ob_end_clean();
 		}
+	        elseif(isset($this->elementViewAdapter))
+	        {
+	            $buf = $this->getElementViewAdapter()->FileElement($this);
+	        }
 		else
 		{
 			$this->addClass('form_element');

@@ -178,6 +178,10 @@ class CheckboxGroupElement extends FieldElement
 			$buf = ob_get_contents();
 			ob_end_clean();
 		}
+	        elseif(isset($this->elementViewAdapter))
+	        {
+	            $buf = $this->getElementViewAdapter()->CheckboxGroupElement($this);
+	        }
 		else 
 		{
 			$this->addClass('form_element');

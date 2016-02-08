@@ -24,6 +24,8 @@
 namespace Staple\Tests;
 
 
+use Staple\Form\Form;
+use Staple\Link;
 use Staple\Model;
 use Staple\View;
 
@@ -207,6 +209,31 @@ class ViewTest extends \PHPUnit_Framework_TestCase
 		$this->assertInstanceOf('Staple\Tests\viewModel',$view->getViewModel());
 		$this->assertEquals('MyView',$view->model()->viewName);
 		$this->assertEquals('MyController',$view->model()->controller);
+	}
+
+	/**
+	 * Test that a model can be properly bound to a model
+	 * @test
+	 */
+	public function testFormBinding()
+	{
+		//Get objects
+		$view = $this->getTestObject();
+		$form = new Form();
+		$form->setName('MyForm')
+			->setAction(Link::get(array('form','submit')));
+
+		//Make sure we start with nothing
+		$this->assertNull($view->form());
+
+		//Attach the model to the view, and assert that a view object is returned at the same time
+		$this->assertInstanceOf('Staple\View',$view->form($form));
+
+		//Assert
+		$this->assertInstanceOf('Staple\Form\Form',$view->form());
+		$this->assertInstanceOf('Staple\Form\Form',$view->getViewForm());
+		$this->assertEquals('MyForm',$view->form()->getName());
+		$this->assertEquals('/form/submit',$view->form()->getAction());
 	}
 
 	/*public function testBuild()

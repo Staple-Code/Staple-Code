@@ -36,7 +36,7 @@ class EncryptTest extends \PHPUnit_Framework_TestCase
 	{
 		$string = 'Blah encrypted string.';
 
-		$encrypted = Encrypt::AES_encrypt($string, $this->key, $this->salt, $this->pepper);
+		$encrypted = Encrypt::encrypt($string, $this->key, MCRYPT_RIJNDAEL_128, $this->salt, $this->pepper);
 
 		$this->assertEquals('5be2da124b05f90210a061b7553b72c7be235ec7c6aace4c739aa0f8cb602b327d8c0104c0017b37450b8032a47da639',bin2hex($encrypted));
 	}
@@ -45,7 +45,7 @@ class EncryptTest extends \PHPUnit_Framework_TestCase
 	{
 		$string = '5be2da124b05f90210a061b7553b72c7be235ec7c6aace4c739aa0f8cb602b327d8c0104c0017b37450b8032a47da639';
 
-		$decrypted = Encrypt::AES_decrypt(hex2bin($string), $this->key, $this->salt, $this->pepper);
+		$decrypted = Encrypt::decrypt(hex2bin($string), $this->key, MCRYPT_RIJNDAEL_128, $this->salt, $this->pepper);
 
 		$this->assertEquals('Blah encrypted string.',$decrypted);
 	}

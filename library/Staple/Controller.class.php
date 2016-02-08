@@ -26,7 +26,7 @@ use \Exception;
 
 abstract class Controller
 {
-	use \Staple\Traits\Helpers;
+	use Traits\Helpers;
 	
 	protected $openMethods = array();
 	protected $accessLevels = array();
@@ -129,6 +129,7 @@ abstract class Controller
 	 * before being dispatched from the front controller.
 	 * @param string $method
 	 * @return bool
+	 * @throws Exception
 	 */
 	public function _auth($method)
 	{
@@ -168,6 +169,7 @@ abstract class Controller
 	 * Returns the access level required for this method.
 	 * @param string | array $method
 	 * @throws Exception
+	 * @return int
 	 */
 	public function _authLevel($method)
 	{
@@ -196,7 +198,6 @@ abstract class Controller
 				throw new Exception('Authentication Validation Error: Method Not Found', Error::AUTH_ERROR);
 			}
 		}
-		return 1;
 	}
 	
 	/**
@@ -360,7 +361,6 @@ abstract class Controller
 	protected function _redirect($to)
 	{
 		Main::get()->redirect($to);
-		$this->view->noRender();
 	} 
 	/**
 	 * 
@@ -368,6 +368,7 @@ abstract class Controller
 	 * supplied, a file link is specified.
 	 * @param string | array $link
 	 * @param array $get
+	 * @return string
 	 */
 	protected function _link($link,array $get = array())
 	{
@@ -375,9 +376,11 @@ abstract class Controller
 	}
 	
 	/**
+	 * Backwards compatible helper method.
 	 * @see View::escape()
 	 * @param string $estring
 	 * @param boolean $strip
+	 * @return string
 	 */
 	public function _escape($estring, $strip = false)
 	{

@@ -29,11 +29,8 @@ class ZipValidator extends FieldValidator
 	const REGEX = '/^\d{5}([\-]\d{4})?$/';
 
 	/**
-	 * 
 	 * @param  mixed $data
- 
 	 * @return  bool
-	  
 	 * @see Staple_Form_Validator::check()
 	 */
 	public function check($data)
@@ -48,7 +45,12 @@ class ZipValidator extends FieldValidator
 			return false;
 		}
 	}
-	
+
+	/**
+	 * @param string $fieldType
+	 * @param FieldElement $field
+	 * @return string
+	 */
 	public function clientJQuery($fieldType, FieldElement $field)
 	{
 		switch ($fieldType)
@@ -81,5 +83,3 @@ class ZipValidator extends FieldValidator
 		return $script;
 	}
 }
-
-?>
