@@ -168,7 +168,8 @@ class Main
 		}
 
 		//Include the boot file.
-		include_once APPLICATION_ROOT.'boot.php';
+		if(file_exists(APPLICATION_ROOT.'boot.php'))
+			include_once APPLICATION_ROOT.'boot.php';
 	}
 	
 	/**
@@ -291,9 +292,9 @@ class Main
 	}
 	
 	/**
-	 * 
 	 * Executes the application process.
 	 * @param Route | string $route
+	 * @return bool
 	 */
 	public function run($route = NULL)
 	{
