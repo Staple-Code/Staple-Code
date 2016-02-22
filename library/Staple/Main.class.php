@@ -166,6 +166,9 @@ class Main
 		{
 			Dev::startTimer();
 		}
+
+		//Include the boot file.
+		include_once APPLICATION_ROOT.'boot.php';
 	}
 	
 	/**
@@ -294,9 +297,6 @@ class Main
 	 */
 	public function run($route = NULL)
 	{
-		//Include the boot file.
-		include_once APPLICATION_ROOT.'boot.php';
-		
 		//Load the controllers from the session.
 		if(isset($_SESSION['Staple']['Controllers']))
 			if(is_array($_SESSION['Staple']['Controllers']))
