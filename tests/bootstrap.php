@@ -37,10 +37,10 @@ defined('CONTROLLER_ROOT')
 || define('CONTROLLER_ROOT', APPLICATION_ROOT . 'controllers' . DIRECTORY_SEPARATOR);
 
 defined('VIEW_ROOT')
-|| define('VIEW_ROOT', TEST_ROOT . 'Staple/views/');
+|| define('VIEW_ROOT', TEST_ROOT . 'Staple' . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR);
 
 defined('SCRIPT_ROOT')
-|| define('SCRIPT_ROOT' , FOLDER_ROOT . 'scripts/' . DIRECTORY_SEPARATOR);
+|| define('SCRIPT_ROOT' , FOLDER_ROOT . 'scripts' . DIRECTORY_SEPARATOR);
 
 defined('STAPLE_ROOT')
 || define('STAPLE_ROOT' , LIBRARY_ROOT . 'Staple' . DIRECTORY_SEPARATOR);

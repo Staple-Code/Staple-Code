@@ -54,6 +54,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
 		$route = $this->getTestObject('test/foo');
 		$route->execute();
 
+		$this->markTestIncomplete();
 	}
 
 	public function testStaticRouteRegistration()
