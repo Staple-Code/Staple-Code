@@ -338,11 +338,6 @@ class Route
 
 	}
 
-	protected function dispatchProvider(Provider $provider)
-	{
-
-	}
-
 	/**
 	 * Function executes a controller action passing parameters using call_user_func_array().
 	 * It also builds the view for the route.
