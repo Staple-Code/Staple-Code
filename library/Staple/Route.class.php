@@ -253,13 +253,14 @@ class Route
 		$method = $this->getAction();
 		
 		//The class name for the controller
-		$dispatchClass = $class.'Controller';
-	
-		//Check for the controller existence
-		if(class_exists($dispatchClass))
+		$dispatchController = $class.'Controller';
+		$dispatchProvider = $class.'Provider';
+
+		//Controllers take first precedence
+		if(class_exists($dispatchController))
 		{
 			//Check for the action existence
-			if(method_exists($dispatchClass, $method))
+			if(method_exists($dispatchController, $method))
 			{
 				//If the controller has not been created yet, create an instance and store it in the front controller
 				if(($controller = Main::controller($class)) == NULL)
@@ -267,7 +268,7 @@ class Route
 					/**
 					 * @var Controller $controller
 					 */
-					$controller = new $dispatchClass();
+					$controller = new $dispatchController();
 					$controller->_start();
 					
 					//Store the controller object
@@ -306,6 +307,25 @@ class Route
 					//Return true so that we don't hit the exception.
 					return true;
 				}
+			}
+		}
+		elseif(class_exists($dispatchProvider)) //If no controller, check for the provider existence
+		{
+			/**
+			 * Create the Provider instance. Providers are not stored in the session.
+			 * @var Provider $provider
+			 */
+			$provider = new $dispatchProvider();
+
+			//Verify that an instance of the provider class exists and is of the right type
+			if($provider instanceof Provider)
+			{
+				//Get the request verb used.
+				$requestMethod = isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : static::VERB_GET;
+
+				//Dispatch directly to the provider itself.
+				//@todo catch NotAuthorized and PageNotFound Exceptions
+				return $provider->dispatch($method, $requestMethod);
 			}
 		}
 		
@@ -676,5 +696,3 @@ class Route
 			->setType(self::ROUTE_MVC);
 	}
 }
-
-?>

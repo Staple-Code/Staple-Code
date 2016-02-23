@@ -23,6 +23,8 @@
 
 namespace Staple\Tests;
 
+use Staple\Exception\PageNotFoundException;
+use Staple\Main;
 use Staple\Provider;
 
 class TestProvider extends Provider
@@ -61,5 +63,50 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
 
 		$this->assertEquals(1,$provider->auth('getFoo'));
 		//$this->assertEquals(0,$provider->auth('postFoo'));
+	}
+
+	/**
+	 * Test that we can successfully route to a provider, that it returns an not found on a bad route, and that we cannot route to auth objects.
+	 * @test
+	 * @throws \Exception
+	 */
+	public function testRouteToProvider()
+	{
+		ob_start();
+		Main::get()->run('service/test');
+		$bufferWorking = ob_get_contents();
+		ob_end_clean();
+
+		$this->assertEquals('Test',$bufferWorking);
+
+		try
+		{
+			Main::get()->run('service/not-found');
+			throw new \Exception('Test Failed.');
+		}
+		catch (PageNotFoundException $e)
+		{
+			$this->assertInstanceOf('PageNotFoundException',$e);
+		}
+
+		try
+		{
+			Main::get()->run('service/auth');
+			throw new \Exception('Test Failed.');
+		}
+		catch (PageNotFoundException $e)
+		{
+			$this->assertInstanceOf('PageNotFoundException',$e);
+		}
+	}
+
+	public function testReturnJson()
+	{
+		ob_start();
+		Main::get()->run('service/return-json');
+		$bufferWorking = ob_get_contents();
+		ob_end_clean();
+
+		$this->assertEquals('{"state":"California","city":"Sacramento"}',$bufferWorking);
 	}
 }

@@ -22,7 +22,10 @@
  */
 namespace Staple;
 
+use Staple\Exception\NotAuthorizedException;
+use Staple\Exception\PageNotFoundException;
 use Staple\Exception\ProviderException;
+use \ReflectionMethod, \ReflectionClass;
 
 abstract class Provider
 {
@@ -255,5 +258,110 @@ abstract class Provider
 			}
 		}
 		$this->open = true;
+	}
+
+	public function dispatch($action, $verb, array $params = [])
+	{
+		$method = strtolower($verb).$action;
+
+		//Check for the action existence
+		if(method_exists($this, $method) && strlen($verb) > 0 && !in_array($method,['auth','authLevel','dispatch']))
+		{
+			//Check if global Auth is enabled.
+			if(Config::getValue('auth', 'enabled') != 0)
+			{
+				//Check the sub-controller for access to the method
+				if($this->auth($method) === true)
+				{
+					//Everything went well, dispatch the controller.
+					$this->exec($action, $verb, $params);
+				}
+				else
+				{
+					//No Authentication, throw exception.
+					throw new NotAuthorizedException();
+				}
+			}
+			else
+			{
+				//No authentication needed, dispatch the controller
+				$this->exec($action, $verb, $params);
+			}
+
+			//Return true so that we don't hit the exception.
+			return true;
+		}
+		else
+		{
+			throw new PageNotFoundException('Page Not Found',Error::PAGE_NOT_FOUND);
+		}
+	}
+
+	protected function exec($action, $verb, array $parameters = [])
+	{
+		//Create the method name
+		$method = strtolower($verb).$action;
+
+		//Call the controller action
+		$actionMethod = new ReflectionMethod($this, $method);
+		$return = $actionMethod->invokeArgs($this, $parameters);
+
+		if($return instanceof View)		//Check for a returned View object
+		{
+			//If the view does not have a controller name set, set it to the currently executing controller.
+			if(!$return->hasController())
+			{
+				$loader = Main::get()->getLoader();
+				$conString = get_class($method);
+
+				$return->setController(substr($conString,0,strlen($conString)-strlen($loader::PROVIDER_SUFFIX)));
+			}
+
+			//If the view doesn't have a view set, use the route's action.
+			if(!$return->hasView())
+			{
+				$return->setView($action);
+			}
+
+			//Build the view
+			$return->build();
+		}
+		elseif ($return instanceof Json)	//Check for a Json object to be coverted and echoed.
+		{
+			echo json_encode($return);
+		}
+		elseif ($return instanceof Route)	//Allow a controller to return a route to redirect the program execution to.
+		{
+			Main::get()->run($return);
+		}
+		elseif (is_object($return))		//Check for another object type
+		{
+			//If the object is stringable, covert it to a string and output it.
+			$class = new ReflectionClass($return);
+			if ($class->implementsInterface('JsonSerializable'))
+			{
+				echo json_encode($return);
+			}
+			//If the object is stringable, covert to a string and output it.
+			elseif((!is_array($return)) &&
+				((!is_object($return) && settype($return, 'string') !== false) ||
+					(is_object($return) && method_exists($return, '__toString'))))
+			{
+				echo (string)$return;
+			}
+			//If nothing else works, echo the object through the dump method.
+			else
+			{
+				Dev::Dump($return);
+			}
+		}
+		elseif(is_string($return))		//If the return value was simply a string, echo it out.
+		{
+			echo $return;
+		}
+		else
+		{
+			//Apparently nothing was returned that matched any catches.
+		}
 	}
 }

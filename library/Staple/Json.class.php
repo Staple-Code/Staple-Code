@@ -23,13 +23,105 @@
 
 namespace Staple;
 
+use \stdClass;
 
-class Json
+class Json implements \JsonSerializable
 {
 	const SUCCESS = 'success';
 	const ERROR = 'error';
-	public function Jsend($status, $data, $message, $code)
+	const FAILURE = 'fail';
+	/**
+	 * The Json data.
+	 * @var mixed
+	 */
+	private $data;
+	/**
+	 * HTTP status code of the return.
+	 * @var int
+	 */
+	protected $code;
+	/**
+	 * Message for JSend
+	 * @var string
+	 */
+	protected $message;
+	/**
+	 * JSend status message
+	 * @var string
+	 */
+	protected $status;
+
+	/**
+	 * Specify data which should be serialized to JSON
+	 *
+	 * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
+	 * @return mixed data which can be serialized by <b>json_encode</b>,
+	 * which is a value of any type other than a resource.
+	 * @since 5.4.0
+	 */
+	public function jsonSerialize()
+	{
+		return $this->getData();
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getData()
+	{
+		return $this->data;
+	}
+
+	/**
+	 * @param mixed $data
+	 */
+	public function setData($data)
+	{
+		$this->data = $data;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getCode()
+	{
+		return $this->code;
+	}
+
+	/**
+	 * @param int $code
+	 */
+	public function setCode($code)
+	{
+		$this->code = $code;
+	}
+
+	/**
+	 * @return Json
+	 */
+	public static function make()
+	{
+		return new static();
+	}
+
+	public function jsend($status, $data, $message, $responseCode)
 	{
 
+	}
+
+	public static function error($message, $responseCode)
+	{
+
+	}
+
+	/**
+	 * @param stdClass $object
+	 * @return Json
+	 */
+	public static function object(stdClass $object)
+	{
+		$json = self::make();
+		$json->setData($object);
+		return $json;
 	}
 } 

@@ -49,6 +49,7 @@ class Alias
 		'Main'							=>	'\\Staple\\Main',
 		'Model'							=>	'\\Staple\\Model',
 		'Pager'							=>	'\\Staple\\Pager',
+		'Provider'						=>	'\\Staple\\Provider',
 		'Registry'						=>	'\\Staple\\Registry',
 		'Request'						=>	'\\Staple\\Request',
 		'Route'							=>	'\\Staple\\Route',
