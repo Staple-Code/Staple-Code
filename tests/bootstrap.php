@@ -59,3 +59,6 @@ $loader->setThrowOnFailure(false);
 
 //Register the Autoload class
 spl_autoload_register(array($loader, 'load'));
+
+error_reporting(1);
+ini_set('display_errors',1);

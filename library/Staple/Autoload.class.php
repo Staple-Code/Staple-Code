@@ -30,6 +30,7 @@ class Autoload
 {
     const STAPLE_NAMESPACE = 'Staple';
 	const CONTROLLER_SUFFIX = 'Controller';
+	const PROVIDER_SUFFIX = 'Provider';
 	const FORM_SUFFIX = 'Form';
 	const MODEL_SUFFIX = 'Model';
 	const PHP_FILE_EXTENSION = '.php';
@@ -43,10 +44,20 @@ class Autoload
 	 */
 	protected $controllerSuffix;
 	/**
+	 * Provider Class Suffix Value
+	 * @var string
+	 */
+	protected $providerSuffix;
+	/**
 	 * Array of search directories for the models
 	 * @var array[string]
 	 */
 	protected $controllerSearchDirectories = array();
+	/**
+	 * Array of search directories for the models
+	 * @var array[string]
+	 */
+	protected $providerSearchDirectories = array();
 	/**
 	 * Form Class Suffix Value
 	 * @var string
@@ -94,6 +105,9 @@ class Autoload
 		//Add the default controller location
 		$this->addControllerSearchDirectory(CONTROLLER_ROOT,false);
 		$this->setControllerSuffix(self::CONTROLLER_SUFFIX);
+
+		$this->addProviderSearchDirectory(PROVIDER_ROOT,false);
+		$this->setProviderSuffix(self::PROVIDER_SUFFIX);
 		
 		//Add the default form location
 		$this->addFormSearchDirectory(FORMS_ROOT,false);
@@ -127,6 +141,11 @@ class Autoload
 			&& strlen($class_name) != strlen($this->getControllerSuffix()))				//Look for Controllers
 		{
 			return $this->loadController($class_name);
+		}
+		elseif(substr($class_name,strlen($class_name)-strlen($this->getProviderSuffix()),strlen($this->getProviderSuffix())) == $this->getProviderSuffix()
+			&& strlen($class_name) != strlen($this->getProviderSuffix()))				//Look for Controllers
+		{
+			return $this->loadProvider($class_name);
 		}
 		elseif(substr($class_name,strlen($class_name)-strlen($this->getModelSuffix()),strlen($this->getModelSuffix())) == $this->getModelSuffix()
 			&& strlen($class_name) != strlen($this->getModelSuffix()))					//Look for Models
@@ -247,6 +266,27 @@ class Autoload
 	protected function loadController($class_name)
 	{
 		$include = CONTROLLER_ROOT.$class_name.static::PHP_FILE_EXTENSION;
+		if(file_exists($include))
+		{
+			require_once $include;
+		}
+		else
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Load a provider object into the application
+	 * @param string $class_name
+	 * @throws Exception
+	 * @return bool
+	 */
+	protected function loadProvider($class_name)
+	{
+		$include = PROVIDER_ROOT.$class_name.static::PHP_FILE_EXTENSION;
 		if(file_exists($include))
 		{
 			require_once $include;
@@ -393,6 +433,14 @@ class Autoload
 	}
 
 	/**
+	 * @return string $providerSuffix
+	 */
+	public function getProviderSuffix()
+	{
+		return $this->providerSuffix;
+	}
+
+	/**
 	 * @return string $formSuffix
 	 */
 	public function getFormSuffix()
@@ -415,6 +463,16 @@ class Autoload
 	private function setControllerSuffix($controllerSuffix)
 	{
 		$this->controllerSuffix = $controllerSuffix;
+		return $this;
+	}
+
+	/**
+	 * @param string $providerSuffix
+	 * @return $this
+	 */
+	private function setProviderSuffix($providerSuffix)
+	{
+		$this->providerSuffix = $providerSuffix;
 		return $this;
 	}
 
@@ -455,6 +513,26 @@ class Autoload
 		else
 		{
 			array_push($this->controllerSearchDirectories, $dir);
+		}
+		return $this;
+	}
+
+	/**
+	 * Add a search directory for the application to look for provider class files. The second parameter will make the new directory take precedence
+	 * over any previous directories. It is the default to add new directories as the primary directory.
+	 * @param string $dir
+	 * @param bool $primary
+	 * @return $this
+	 */
+	public function addProviderSearchDirectory($dir, $primary = true)
+	{
+		if($primary === true)
+		{
+			array_unshift($this->providerSearchDirectories, $dir);
+		}
+		else
+		{
+			array_push($this->providerSearchDirectories, $dir);
 		}
 		return $this;
 	}

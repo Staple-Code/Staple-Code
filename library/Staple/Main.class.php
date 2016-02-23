@@ -105,6 +105,9 @@ class Main
 		defined('CONTROLLER_ROOT')
 			|| define('CONTROLLER_ROOT', APPLICATION_ROOT . 'controllers' . DIRECTORY_SEPARATOR);
 
+		defined('PROVIDER_ROOT')
+		|| define('PROVIDER_ROOT', APPLICATION_ROOT . 'providers' . DIRECTORY_SEPARATOR);
+
 		defined('STATIC_ROOT')
 			|| define('STATIC_ROOT', APPLICATION_ROOT . 'static' . DIRECTORY_SEPARATOR);
 
