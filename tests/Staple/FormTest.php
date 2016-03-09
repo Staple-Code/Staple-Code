@@ -23,6 +23,7 @@
 
 namespace Staple\Tests;
 
+use Staple\Config;
 use Staple\Form\ButtonElement;
 use Staple\Form\CheckboxElement;
 use Staple\Form\CheckboxGroupElement;
@@ -109,6 +110,12 @@ class MyViewAdapter extends ElementViewAdapter
 
 class FormTest extends \PHPUnit_Framework_TestCase
 {
+	protected function setUp()
+	{
+		parent::setUp();
+		Config::getInstance()->setConfigSet(Config::DEFAULT_CONFIG_SET);
+	}
+
 	private function getCustomViewAdapter()
 	{
 		return new MyViewAdapter();

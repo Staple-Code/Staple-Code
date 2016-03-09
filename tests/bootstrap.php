@@ -22,7 +22,7 @@ defined('VENDOR_ROOT')
 
 //Setup STAPLE Constants
 defined('CONFIG_ROOT')
-|| define('CONFIG_ROOT', APPLICATION_ROOT . 'config/');
+|| define('CONFIG_ROOT', TEST_ROOT . 'Staple/config/');
 
 defined('LAYOUT_ROOT')
 || define('LAYOUT_ROOT', APPLICATION_ROOT . 'layouts/');
