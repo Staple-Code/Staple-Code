@@ -1,6 +1,8 @@
 <?php
 /** 
  * A container to reference config settings without having to re-read the config file.
+ * Options are to use a INI or PHP format configuration file. When using a PHP configuration
+ * the file must return an array.
  * 
  * @author Ironpilot
  * @copyright Copyright (c) 2011, STAPLE CODE
@@ -35,6 +37,8 @@ require_once STAPLE_ROOT.'Exception'.DIRECTORY_SEPARATOR.'ConfigurationException
 class Config
 {
 	use \Staple\Traits\Singleton;
+
+	const DEFAULT_CONFIG_SET = 'application';
 	
 	/**
 	 * Variable to specify whether the config has already been read from the filesystem.
@@ -43,10 +47,10 @@ class Config
 	protected $read = false;
 	
 	/**
-	 * The name of the configset to load.
+	 * The name of the config set to load.
 	 * @var string
 	 */
-	protected $configSet = 'application';
+	protected $configSet;
 	
 	/**
 	 * The configuration set store.
@@ -56,6 +60,7 @@ class Config
 	
 	/**
 	 * Disable construction of this object.
+	 * @param string $configName
 	 */
 	public function __construct($configName = NULL)
 	{
@@ -73,7 +78,7 @@ class Config
 	 */
 	public function __get($name)
 	{
-		if(!$this->$read)
+		if(!$this->read)
 		{
 			$this->read();
 		}
@@ -100,7 +105,6 @@ class Config
 	
 	/**
 	 * Get a config set by header.
-	 * @todo this doesn't really work as a static method and needs to be refactored.
 	 * @param string $name
 	 * @param bool $getAsObject
 	 * @throws ConfigurationException
@@ -232,39 +236,69 @@ class Config
 	 * @param mixed $value
 	 * @return bool
 	 */
-	/*public static function setValue($set,$key,$value)
+	public static function setValue($set,$key,$value)
 	{
-		if(!self::$read)
+		//Get the config instance
+		$inst = static::getInstance();
+
+		//Check that the config file has been read.
+		if(!$inst->read)
 		{
-			self::read();
+			$inst->read();
 		}
-		if(array_key_exists($set, self::$store))
+
+		if(array_key_exists($set, $inst->store))
 		{
-			if(array_key_exists($key, self::$store[$set]))
+			if(array_key_exists($key, $inst->store[$set]))
 			{
-				self::$store[$set][$key] = $value;
+				$inst->store[$set][$key] = $value;
 				return true;
 			}
 		}
 		return false;
-	}*/
+	}
 	
 	/**
-	 * Read and store the application.ini config file.
+	 * Read and store the application.ini or application.php config file.
 	 */
 	private function read()
 	{
-		if($this->read == false)
+		if(defined('CONFIG_ROOT'))
 		{
-			if(defined('CONFIG_ROOT'))
+			//Get the Config Set
+			if(!is_null($this->configSet))
+				$configSet = $this->configSet;
+			else
+				$configSet = self::DEFAULT_CONFIG_SET;
+
+			//Attempt to load the config
+			if(file_exists(CONFIG_ROOT . $configSet . '.php'))
 			{
-				if(file_exists(CONFIG_ROOT.$this->getConfigSet().'.ini'))
+				$config = (include CONFIG_ROOT . $configSet . '.php');
+				if(isset($config))
 				{
-					$this->store = parse_ini_file(CONFIG_ROOT.$this->getConfigSet().'.ini',true);
+					if(is_array($config))
+					{
+						$this->store = $config;
+						$this->read = true;
+						return true;
+					}
+					else
+					{
+						throw new ConfigurationException('Configuration is not an array.');
+					}
 				}
 			}
-			$this->read = true;
+			elseif(file_exists(CONFIG_ROOT . $configSet . '.ini'))
+			{
+				$this->store = parse_ini_file(CONFIG_ROOT . $configSet . '.ini', true);
+				$this->read = true;
+				return true;
+			}
+			throw new ConfigurationException('No configuration file found.');
 		}
+		$this->read = false;
+		return false;
 	}
 	
 	/**
@@ -276,12 +310,15 @@ class Config
 	}
 
 	/**
+	 * Change config sets.
 	 * @param string $configSet
 	 * @return $this
 	 */
 	public function setConfigSet($configSet)
 	{
-		$this->configSet = $configSet;
+		$this->configSet = (string)$configSet;
+		if($this->read === true)
+			$this->read();
 		return $this;
 	}
 
