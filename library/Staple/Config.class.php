@@ -314,12 +314,25 @@ class Config
 	 * @param string $configSet
 	 * @return $this
 	 */
-	public function setConfigSet($configSet)
+	protected function setConfigSet($configSet)
 	{
 		$this->configSet = (string)$configSet;
 		if($this->read === true)
 			$this->read();
 		return $this;
+	}
+
+	/**
+	 * Change the configuration file in use by the application.
+	 * @param $configSet
+	 * @return $this
+	 */
+	public static function changeEnvironment($configSet)
+	{
+		//Get the config instance
+		$inst = static::getInstance();
+
+		return $inst->setConfigSet($configSet);
 	}
 
 }

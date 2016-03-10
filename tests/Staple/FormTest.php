@@ -113,7 +113,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
 	protected function setUp()
 	{
 		parent::setUp();
-		Config::getInstance()->setConfigSet(Config::DEFAULT_CONFIG_SET);
+		Config::changeEnvironment(Config::DEFAULT_CONFIG_SET);
 	}
 
 	private function getCustomViewAdapter()
