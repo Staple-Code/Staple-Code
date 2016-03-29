@@ -27,9 +27,9 @@ class HiddenElement extends FieldElement
 	/* (non-PHPdoc)
 	 * @see Staple_Form_Element::Create()
 	 */
-	public static function Create($name, $value = NULL, $id = NULL, array $attrib = array()) 
+	public static function create($name, $value = NULL, $id = NULL, array $attrib = array())
 	{
-		$result = parent::Create($name, NULL, $id, $attrib);
+		$result = parent::create($name, NULL, $id, $attrib);
 		if(isset($value))
 		{
 			$result->setValue($value);
