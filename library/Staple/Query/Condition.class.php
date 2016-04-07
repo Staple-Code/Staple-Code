@@ -364,6 +364,24 @@ class Condition
 
 	/**
 	 * @param $column
+	 * @param $value
+	 * @param bool $columnJoin
+	 * @return static
+	 */
+	public static function notlike($column, $value, $columnJoin = NULL)
+	{
+		/** @var Condition $obj */
+		$obj = new static();
+		$obj->setColumn($column)
+			->setOperator('NOT LIKE')
+			->setValue($value);
+		if(isset($columnJoin))
+			$obj->setColumnJoin($columnJoin);
+		return $obj;
+	}
+
+	/**
+	 * @param $column
 	 * @return static
 	 */
 	public static function null($column)
