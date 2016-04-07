@@ -281,7 +281,7 @@ abstract class Query
 	 */
 	public function whereNotLike($column, $value)
 	{
-		$this->addWhere(Condition::notlike($column, $value));
+		$this->addWhere(Condition::notLike($column, $value));
 		return $this;
 	}
 	

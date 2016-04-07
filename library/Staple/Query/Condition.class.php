@@ -368,7 +368,7 @@ class Condition
 	 * @param bool $columnJoin
 	 * @return static
 	 */
-	public static function notlike($column, $value, $columnJoin = NULL)
+	public static function notLike($column, $value, $columnJoin = NULL)
 	{
 		/** @var Condition $obj */
 		$obj = new static();
