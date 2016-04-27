@@ -83,8 +83,11 @@ class Main
 		defined('MODULES_ROOT')
 			|| define('MODULES_ROOT', FOLDER_ROOT . DIRECTORY_SEPARATOR . 'modules' . DIRECTORY_SEPARATOR);
 
+		defined('TEST_ROOT')
+		|| define('TEST_ROOT', FOLDER_ROOT . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR);
+
 		defined('VENDOR_ROOT')
-			|| define('VENDOR_ROOT', FOLDER_ROOT . DIRECTORY_SEPARATOR . 'vendor'. DIRECTORY_SEPARATOR);
+			|| define('VENDOR_ROOT', FOLDER_ROOT . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR);
 		
 		//Setup STAPLE Constants
 		defined('CONFIG_ROOT')
