@@ -14,12 +14,12 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 {
 	protected function setUp()
 	{
-		Config::getInstance()->setConfigSet(Config::DEFAULT_CONFIG_SET);
+		Config::changeEnvironment(Config::DEFAULT_CONFIG_SET);
 	}
 
 	protected function tearDown()
 	{
-		Config::getInstance()->setConfigSet(Config::DEFAULT_CONFIG_SET);
+		Config::changeEnvironment(Config::DEFAULT_CONFIG_SET);
 	}
 
 	public function testConfigRead()
@@ -32,14 +32,14 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 
 	public function testEnvironmentConfig()
 	{
-		Config::getInstance()->setConfigSet('dev');
+		Config::changeEnvironment('dev');
 
 		$this->assertCount(2,Config::get('application'));
 		$this->assertArrayHasKey('host',Config::get('db'));
 		$this->assertEquals('BootstrapViewAdapter',Config::getValue('forms','elementViewAdapter'));
 		$this->assertEquals(1,Config::getValue('errors','enable_timer'));
 
-		Config::getInstance()->setConfigSet('test');
+		Config::changeEnvironment('test');
 
 		$this->assertCount(2,Config::get('application'));
 		$this->assertArrayHasKey('host',Config::get('db'));
