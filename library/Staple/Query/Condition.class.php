@@ -410,7 +410,7 @@ class Condition
 		$obj->setColumn($column)
 			->setOperator(self::IN)
 			->setValue($values);
-		if(isset($columnJoin))
+		if(isset($columnJoin)) 
 			$obj->setColumnJoin($columnJoin);
 		return $obj;
 	}
