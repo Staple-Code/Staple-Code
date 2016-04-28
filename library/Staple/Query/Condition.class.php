@@ -38,6 +38,9 @@ class Condition
 	const IS = "IS";
 	const IS_NOT = "IS NOT";
 	const BETWEEN = "BETWEEN";
+	const LIKE = "LIKE";
+	const NOTLIKE = "NOT LIKE";
+
 	/**
 	 * The column for the where
 	 * @var string
@@ -355,7 +358,7 @@ class Condition
 		/** @var Condition $obj */
 		$obj = new static();
 		$obj->setColumn($column)
-			->setOperator('LIKE')
+			->setOperator(self::LIKE)
 			->setValue($value);
 		if(isset($columnJoin))
 			$obj->setColumnJoin($columnJoin);
@@ -373,7 +376,7 @@ class Condition
 		/** @var Condition $obj */
 		$obj = new static();
 		$obj->setColumn($column)
-			->setOperator('NOT LIKE')
+			->setOperator(self::NOTLIKE)
 			->setValue($value);
 		if(isset($columnJoin))
 			$obj->setColumnJoin($columnJoin);
@@ -389,7 +392,7 @@ class Condition
 		/** @var Condition $obj */
 		$obj = new static();
 		$obj->setColumn($column)
-			->setOperator('IS')
+			->setOperator(self::IS)
 			->setValue(NULL);
 		return $obj;
 	}
