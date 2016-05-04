@@ -1,5 +1,6 @@
 <?php
-use Staple\DB;
+use Staple\Controller;
+
 /**
  * @author Ironpilot
  * @copyright Copyright (c) 2011, STAPLE CODE
@@ -23,27 +24,11 @@ class indexController extends Controller
 {
 	public function _start()
 	{
-		$this->_openAll();
+		// Controller Startup Code
 	}
 	
 	public function index()
 	{
-		$form = new testForm();
-        if($form->wasSubmitted())
-        {
-            $form->addData($_POST);
-            if($form->validate())
-            {
-                echo "Form is valid!";
-            }
-            else
-            {
-                $this->view->form = $form;
-            }
-        }
-        else
-        {
-            $this->view->form = $form;
-        }
+		// Index Action Code Goes Here.
 	}
 }
