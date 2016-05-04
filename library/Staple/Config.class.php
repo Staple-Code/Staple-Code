@@ -280,7 +280,7 @@ class Config
 	/**
 	 * Read and store the application.ini or application.php config file.
 	 */
-	private function read()
+	protected function read()
 	{
 		if(defined('CONFIG_ROOT'))
 		{
