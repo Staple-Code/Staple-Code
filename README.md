@@ -16,6 +16,18 @@ You will need a few things for the server to be able to process your site:
 Both IIS (web.config) and Apache (.htaccess) rewrite rules are included in the repository. For nginx, you will
 have to add the following in your server configuration for nginx:
 
+```
+location / {
+   index  index.php index.html index.htm;
+   try_files $uri $uri/ @staple;
+}
+
+location @staple
+{
+    rewrite ^(.*)$ /index.php last;
+}
+```
+
 ## Composer
 
 STAPLE also has support for composer. It has no dependencies out of the gate, so composer is an optional feature
