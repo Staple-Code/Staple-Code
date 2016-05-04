@@ -37,11 +37,8 @@ class NotEqualValidator extends FieldValidator
 	}
 
 	/**
-	 * 
 	 * @param  mixed $data
- 
 	 * @return  bool
-	  
 	 * @see Staple_Form_Validator::check()
 	 */
 	public function check($data)
@@ -56,10 +53,11 @@ class NotEqualValidator extends FieldValidator
 		}
 		return false;
 	}
-	
+
 	/**
-	 * (non-PHPdoc)
-	 * @see Staple_Form_Validator::clientJQuery()
+	 * @param string $fieldType
+	 * @param FieldElement $field
+	 * @return string
 	 */
 	public function clientJQuery($fieldType, FieldElement $field)
 	{
@@ -93,5 +91,3 @@ class NotEqualValidator extends FieldValidator
 		return $script;
 	}
 }
-
-?>

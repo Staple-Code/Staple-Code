@@ -1,6 +1,6 @@
 <?php
 /**
- * An adapter to format the form elements.
+ * Mock Connection object for Staple Tests
  *
  * @author Ironpilot
  * @copyright Copyright (c) 2011, STAPLE CODE
@@ -19,16 +19,40 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
+namespace Staple\Tests;
 
-namespace Staple\Form\View;
+use Staple\Query\Connection;
+use PDO;
 
-
-class Foundation extends ElementViewAdapter
+class MockConnection extends Connection
 {
-	public function textElement()
-	{
-		// TODO: Implement textElement() method.
-	}
+    public function __construct($driver = NULL)
+    {
+        if(isset($driver))
+            $this->setDriver($driver);
+    }
+
+    public function query($sql)
+    {
+        return true;
+    }
+
+    /**
+     * Mock quote method
+     * @todo add more types and escaping features here.
+     * @param string $input
+     * @param int $parameter_type
+     * @return string
+     */
+    public function quote($input,$parameter_type = PDO::PARAM_STR)
+    {
+        switch($this->getDriver())
+        {
+            case Connection::DRIVER_MYSQL:
+                return '\''.$input.'\'';
+            default:
+                return $input;
+        }
+    }
 }

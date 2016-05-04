@@ -17,10 +17,12 @@ defined('TEST_ROOT')
 defined('MODULES_ROOT')
 || define('MODULES_ROOT', FOLDER_ROOT . '/modules/');
 
+defined('VENDOR_ROOT')
+|| define('VENDOR_ROOT', FOLDER_ROOT . DIRECTORY_SEPARATOR . 'vendor'. DIRECTORY_SEPARATOR);
 
 //Setup STAPLE Constants
 defined('CONFIG_ROOT')
-|| define('CONFIG_ROOT', APPLICATION_ROOT . 'config/');
+|| define('CONFIG_ROOT', TEST_ROOT . 'Staple/config/');
 
 defined('LAYOUT_ROOT')
 || define('LAYOUT_ROOT', APPLICATION_ROOT . 'layouts/');
@@ -35,7 +37,7 @@ defined('CONTROLLER_ROOT')
 || define('CONTROLLER_ROOT', APPLICATION_ROOT . 'controllers/');
 
 defined('VIEW_ROOT')
-|| define('VIEW_ROOT', TEST_ROOT . 'views/');
+|| define('VIEW_ROOT', TEST_ROOT . 'Staple/views/');
 
 defined('SCRIPT_ROOT')
 || define('SCRIPT_ROOT',APPLICATION_ROOT . 'scripts/');
@@ -46,6 +48,12 @@ defined('STAPLE_ROOT')
 require_once LIBRARY_ROOT.'Staple/Alias.class.php';
 require_once LIBRARY_ROOT.'Staple/Autoload.class.php';
 
+// For some reason Travis CI can't fully load Twig through composer
+// @todo remove this once Travis CI starts acting properly.
+require_once VENDOR_ROOT.'twig/twig/lib/Twig/Autoloader.php';
+Twig_Autoloader::register();
+
+//Staple AutoLoader
 $loader = new \Staple\Autoload();
 $loader->setThrowOnFailure(false);
 

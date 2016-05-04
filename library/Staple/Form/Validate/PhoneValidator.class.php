@@ -31,11 +31,8 @@ class PhoneValidator extends FieldValidator
 	const REGEX = '/^(\d{0,4})?[\.\-\/ ]?\(?(\d{3})\)?[\.\-\/ ]?(\d{3})[\.\-\/ ]?(\d{4})$/';
 
 	/**
-	 * 
 	 * @param  mixed $data
- 
 	 * @return  bool
-	  
 	 * @see Staple_Form_Validator::check()
 	 */
 	public function check($data)
@@ -50,7 +47,12 @@ class PhoneValidator extends FieldValidator
 			return false;
 		}
 	}
-	
+
+	/**
+	 * @param string $fieldType
+	 * @param FieldElement $field
+	 * @return string
+	 */
 	public function clientJQuery($fieldType, FieldElement $field)
 	{
 		switch ($fieldType)
@@ -83,5 +85,3 @@ class PhoneValidator extends FieldValidator
 		return $script;
 	}
 }
-
-?>

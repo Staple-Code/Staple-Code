@@ -22,41 +22,11 @@
  */
 
 namespace Staple\Tests;
+
 use Staple\Query\Connection;
 use Staple\Query\Query;
-use PDO;
 
-class MockConnection extends Connection
-{
-	public function __construct($driver = NULL)
-	{
-		if(isset($driver))
-			$this->setDriver($driver);
-	}
-
-	public function query($sql)
-	{
-		return true;
-	}
-
-	/**
-	 * Mock quote method
-	 * @todo add more types and escaping features here.
-	 * @param string $input
-	 * @param int $parameter_type
-	 * @return string
-	 */
-	public function quote($input,$parameter_type = PDO::PARAM_STR)
-	{
-		switch($this->getDriver())
-		{
-			case Connection::DRIVER_MYSQL:
-				return '\''.$input.'\'';
-			default:
-				return $input;
-		}
-	}
-}
+require_once 'Mocks/MockConnection.php';
 
 class QueryTest extends \PHPUnit_Framework_TestCase
 {

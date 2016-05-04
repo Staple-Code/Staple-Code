@@ -1,5 +1,6 @@
 <?php
-use Staple\DB;
+use Staple\Controller;
+
 /**
  * @author Ironpilot
  * @copyright Copyright (c) 2011, STAPLE CODE
@@ -23,11 +24,11 @@ class indexController extends Controller
 {
 	public function _start()
 	{
-		$this->_openAll();
+		// Controller Startup Code
 	}
 	
 	public function index()
 	{
-		return View::create('index');
+		// Index Action Code Goes Here.
 	}
 }

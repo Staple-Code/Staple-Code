@@ -23,70 +23,54 @@
 
 namespace Staple\Tests;
 
-use Staple\Dev;
+use Staple\Query\Query;
 use Staple\Query\Select;
+
+require_once 'Mocks/MockConnection.php';
 
 class SelectTest extends \PHPUnit_Framework_TestCase
 {
-	//@todo refactor this
+	const TABLE_NAME = 'customers';
+
+	private function getMockConnection()
+	{
+		return new MockConnection();
+	}
+
+	public function testBuildSelectObject()
+	{
+		$conn = $this->getMockConnection();
+
+		//Act
+		$obj1 = Query::select(self::TABLE_NAME,NULL,$conn);
+		$obj2 = Select::select(self::TABLE_NAME,NULL,$conn);
+		$obj3 = new Select(self::TABLE_NAME,NULL,$conn);
+
+		//Assert
+		$this->assertInstanceOf('\\Staple\\Query\\Select',$obj1);
+		$this->assertInstanceOf('\\Staple\\Query\\Select',$obj2);
+		$this->assertInstanceOf('\\Staple\\Query\\Select',$obj3);
+	}
+
 	public function testQuery()
 	{
-		$this->markTestIncomplete();
+		//Setup
+		$conn = $this->getMockConnection();
 
-		//Show me errors for dev purposes.
-		ini_set('display_errors', 1);
+		//Act
+		$columns = [
+			'first_name',
+			'last_name',
+			'address',
+			'city',
+			'state',
+			'zip'
+		];
+		$query = Query::select(self::TABLE_NAME,$columns,$conn)
+			->innerJoin('orders','orders.customer_id = customers.id');
 
-		echo '<h1>Query Test</h1>';
-
-		//Setup the database
-		//@todo use a mock here
-
-
-		$p = new Select();
-		$p->addColumn('name')
-			->setTable('table')
-			->whereEqual('id', 'articles.cat', true);
-
-		//Create the Query
-		$q = new Select();
-		$q
-			->setTable('articles')
-			->whereIn('articles.id', array(1,2,3,4,5))
-			->orderBy(array('articles.name','summary'))
-			->limit(3,1)
-			->innerJoin('article_categories','articles.cat=article_categories.id');
-
-		echo "<p><h3>Query:</h3> ".$q->build()."</p>";
-
-		//Execute the Query
-		$result = $q->execute();
-
-		echo '<h3>Results:</h3><table border="1" cellspacing="0" cellpadding="5">';
-		$first = true;
-		if($result instanceof \mysqli_result)
-		{
-			while($myrow = $result->fetch_assoc())
-			{
-				if($first)
-				{
-					echo '<tr>';
-					foreach($myrow as $name=>$value)
-					{
-						echo "<th>$name</th>";
-					}
-					echo '<tr>';
-				}
-				echo '<tr>';
-				foreach($myrow as $value)
-				{
-					echo "<td>$value</td>";
-				}
-				$first = false;
-				echo '</tr>';
-			}
-		}
-		echo "</table><h3>Object Dump:</h3><h4>Query:</h4>";
-
-		Dev::Dump($q);
+		//Assert
+		$expected = "SELECT\nfirst_name, last_name, address, city, state, zip \nFROM customers\nINNER JOIN orders ON orders.customer_id = customers.id";
+		$this->assertEquals($expected,(string)$query);
 	}
 }

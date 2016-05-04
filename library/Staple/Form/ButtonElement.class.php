@@ -23,9 +23,11 @@
 
 namespace Staple\Form;
 
+use Staple\Exception\FormBuildException;
+
 class ButtonElement extends FieldElement
 {
-	public function __construct($name, $value=NULL, $label = NULL, $id = NULL, array $attrib = array())
+	public function __construct($name, $value = NULL, $id = NULL, array $attrib = array(), $label = NULL)
 	{
 		parent::__construct($name,$label,$id,$attrib);
 		if(isset($value))
@@ -49,6 +51,10 @@ class ButtonElement extends FieldElement
 		return "	<label for=\"".$this->escape($this->id)."\"".$this->getClassString('label').">".$this->label."</label>\n";
 	}
 
+	/**
+	 * @param null $fieldView
+	 * @return string
+	 */
 	public function build($fieldView = NULL)
 	{
 		$buf = '';
@@ -60,6 +66,10 @@ class ButtonElement extends FieldElement
 			$buf = ob_get_contents();
 			ob_end_clean();
 		}
+	        elseif(isset($this->elementViewAdapter))
+	        {
+	            $buf = $this->getElementViewAdapter()->ButtonElement($this);
+	        }
 		else 
 		{
 			$this->addClass('form_element');
@@ -74,5 +84,16 @@ class ButtonElement extends FieldElement
 			$buf .= "</div>\n";
 		}
 		return $buf;
+	}
+
+	/**
+	 * Throws an exception because validators are not allowed on this element.
+	 * @param FieldValidator $validator
+	 * @return $this
+	 * @throws FormBuildException
+	 */
+	public function addValidator(FieldValidator $validator)
+	{
+		throw new FormBuildException('Submit elements do not have validators.');
 	}
 }

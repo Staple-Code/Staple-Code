@@ -301,6 +301,15 @@ class Union
 		$this->queries[] = $query;
 		return $this;
 	}
+
+	/**
+	 * Return the array of select query objects.
+	 * @return Select[]
+	 */
+	public function getQueries()
+	{
+		return $this->queries;
+	}
 	
 	/**
 	 * Remove a query from the UNION

@@ -1,4 +1,6 @@
 <?php
+use Staple\Auth;
+use Staple\AuthController;
 
 /** 
  * @author Ironpilot

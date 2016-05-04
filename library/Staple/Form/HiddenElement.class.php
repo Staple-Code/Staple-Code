@@ -27,9 +27,9 @@ class HiddenElement extends FieldElement
 	/* (non-PHPdoc)
 	 * @see Staple_Form_Element::Create()
 	 */
-	public static function Create($name, $value = NULL, $id = NULL, array $attrib = array()) 
+	public static function create($name, $value = NULL, $id = NULL, array $attrib = array())
 	{
-		$result = parent::Create($name, NULL, $id, $attrib);
+		$result = parent::create($name, NULL, $id, $attrib);
 		if(isset($value))
 		{
 			$result->setValue($value);
@@ -75,7 +75,6 @@ class HiddenElement extends FieldElement
 
 	public function build($fieldView = NULL)
 	{
-		$buf = '';
 		$view = FORMS_ROOT.'/fields/HiddenElement.phtml';
 		if(file_exists($view))
 		{
@@ -84,6 +83,10 @@ class HiddenElement extends FieldElement
 			$buf = ob_get_contents();
 			ob_end_clean();
 		}
+	        elseif(isset($this->elementViewAdapter))
+	        {
+	            $buf = $this->getElementViewAdapter()->HiddenElement($this);
+	        }
 		else
 		{
 			$buf = $this->field();

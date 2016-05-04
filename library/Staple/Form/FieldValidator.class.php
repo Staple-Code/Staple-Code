@@ -57,8 +57,9 @@ abstract class FieldValidator
 	/**
 	 * Factory function to create objects.
 	 * @param string $usermsg
+	 * @return static
 	 */
-	public static function Create($usermsg = NULL)
+	public static function create($usermsg = NULL)
 	{
 		return new static($usermsg);
 	}
@@ -159,6 +160,7 @@ abstract class FieldValidator
 	 * Function for client side form checking. Must be overridden in the child class.
 	 * @param string $fieldType
 	 * @param FieldElement $field
+	 * @return string
 	 */
 	public function clientJS($fieldType, FieldElement $field)
 	{
@@ -169,6 +171,7 @@ abstract class FieldValidator
 	 * Function for client side form checking. Must be overridden in the child class. This one is specific to JQuery.
 	 * @param string $fieldType
 	 * @param FieldElement $field
+	 * @return string
 	 */
 	public function clientJQuery($fieldType, FieldElement $field)
 	{

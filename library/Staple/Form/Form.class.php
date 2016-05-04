@@ -29,7 +29,7 @@ use \Staple\Error;
 use \Staple\Config;
 use \Staple\Encrypt;
 use Staple\Exception\FormBuildException;
-use Staple\Form\View\ElementViewAdapter;
+use \Staple\Form\ViewAdapters\ElementViewAdapter;
 
 class Form
 {
@@ -39,7 +39,8 @@ class Form
 	const METHOD_POST = 'POST';
 	const ENC_APP = 'application/x-www-form-urlencoded';
 	const ENC_FILE = 'multipart/form-data';
-	const ENC_TEXT = 'text/plain'; 
+	const ENC_TEXT = 'text/plain';
+
 	/**
 	 * The action (form submittal) location.
 	 * @var string
@@ -132,7 +133,7 @@ class Form
 	 * @var array
 	 */
 	protected $_store = array();
-	
+
 	/**
 	 * @param string $name
 	 * @param string $action
@@ -140,6 +141,7 @@ class Form
 	public function __construct($name = NULL, $action = NULL)
 	{
 		$this->_start();
+
 		if(isset($name))
 		{
 			$this->name = $name;
@@ -153,28 +155,26 @@ class Form
 			//check that the form was submitted.
 			if(isset($_SESSION['Staple']['Forms'][$this->name]))
 			{
-				if(array_key_exists('ident', $_SESSION['Staple']['Forms'][$this->name]))
+				if(array_key_exists('ident', $_SESSION['Staple']['Forms'][$this->name]) && array_key_exists('ident', $_REQUEST))
 				{
-					if(array_key_exists('ident', $_REQUEST))
+					if($_SESSION['Staple']['Forms'][$this->name]['ident'] == $_REQUEST['ident'])
 					{
-						if($_SESSION['Staple']['Forms'][$this->name]['ident'] == $_REQUEST['ident'])
-						{
-							$this->submitted = true;
-						}
+						$this->submitted = true;
 					}
 				}
 			}
 		}
 
 		/**
-		 * @Todo Add Check for Adapter in .ini
+		 * Loads selected elementViewAdapter from application.ini and verify given adapter is a class before loading
 		 */
-
-		//Repopulate data from the session -- I might add this.....
-		//if($this->wasSubmitted())
-		//{
-			
-		//}
+		if(Config::getValue('forms','elementViewAdapter', false) != '')
+		{
+			if(class_exists(Config::getValue('forms','elementViewAdapter')))
+			{
+				$this->makeElementViewAdapter(Config::getValue('forms','elementViewAdapter'));
+			}
+		}
 		
 		//create the form's identity field.
 		if($this->createIdent === true)
@@ -202,13 +202,17 @@ class Form
 	}
 	
 	/**
-	 * Retrieves a stored property.
+	 * Retrieves a stored field element object or property.
 	 * @param string $key
-	 * @return mixed
+	 * @return FieldElement|mixed
 	 */
 	public function __get($key)
 	{
-		if(array_key_exists($key,$this->_store))
+		if(array_key_exists($key,$this->fields))
+		{
+			return $this->fields[$key];
+		}
+		elseif(array_key_exists($key,$this->_store))
 		{
 			return $this->_store[$key];
 		}
@@ -266,20 +270,6 @@ class Form
 	}
 	
 	/**
-	 * A factory function to encapsulate the creation of form objects.
-	 * @param string $name
-	 * @param string $action
-	 * @param string $method
-	 * @return Form
-	 */
-	public static function create($name, $action=NULL, $method="POST")
-	{
-		$inst = new self($name,$action);
-		$inst->setMethod($method);
-		return $inst;
-	}
-	
-	/**
 	 * Adds a field to the form from an already instantiated form element.
 	 * @param FieldElement $field
 	 * @return $this
@@ -296,7 +286,12 @@ class Form
 			if($newField instanceof FieldElement)
 			{
 				$this->fields[$newField->getName()] = $newField;
+		                if(isset($this->elementViewAdapter))
+		                {
+		                    $this->fields[$newField->getName()]->setElementViewAdapter($this->getElementViewAdapter());
+		                }
 			}
+
 		}
 		return $this;
 	}
@@ -315,7 +310,7 @@ class Form
 
 	/**
 	 * @param array $data
-	 * @param FieldElement | array $target
+	 * @param FieldElement[] | array $target
 	 */
 	private function addDataToTarget(array $data, $target)
 	{
@@ -371,6 +366,10 @@ class Form
 	private function fieldData(array $start)
 	{
 		$data = array();
+		/**
+		 * @var string $name
+		 * @var FieldElement|array $field
+		 */
 		foreach($start as $name=>$field)
 		{
 			if(is_array($field))
@@ -540,13 +539,15 @@ JS;
 	public function validate()
 	{
 		$this->clearErrors();
-		$errors = [];
 		
 		//Process validation callbacks.
-		$errors = array_merge($errors,$this->validateCallbacks($this->callbacks));
+		$valErrors = $this->validateCallbacks($this->callbacks);
 		
 		//Process all validation fields.
-		$errors = array_merge($errors,$this->validateFields($this->fields));
+		$fieldErrors = $this->validateFields($this->fields);
+
+		//Merge all of the errors together
+		$errors = array_merge($this->errors, $valErrors, $fieldErrors);
 
 		//Set the validation errors
 		$this->setErrors($errors);
@@ -826,6 +827,7 @@ JS;
 
 	/**
 	 * @param string $layout
+	 * @return $this
 	 */
 	public function setLayout($layout)
 	{
@@ -842,11 +844,43 @@ JS;
 	}
 
 	/**
+	* Make a view adapter from the string name
+	* @param $viewAdapterString
+	* @return $this
+	*/
+	protected function makeElementViewAdapter($viewAdapterString)
+	{
+		$obj = new $viewAdapterString();
+		if($obj instanceof ElementViewAdapter)
+		{
+		    $this->setElementViewAdapter($obj);
+		}
+
+		//Attach to all of the fields in the object
+		foreach($this->fields as $field)
+		{
+			$field->setElementViewAdapter($obj);
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Set the view adapter to use when building the form.
 	 * @param ElementViewAdapter $elementViewAdapter
+	 * @return $this
 	 */
 	public function setElementViewAdapter(ElementViewAdapter $elementViewAdapter)
 	{
 		$this->elementViewAdapter = $elementViewAdapter;
+
+		//Attach to all of the fields in the object
+		foreach($this->fields as $field)
+		{
+			$field->setElementViewAdapter($elementViewAdapter);
+		}
+
+		return $this;
 	}
 
 	/**
@@ -906,19 +940,23 @@ JS;
 		if(count($this->classes) > 0)
 		{
 			$buf .= ' class="';
-			$cstring = '';
+			$classString = '';
 			foreach($this->classes as $class)
 			{
-				$cstring .= $class.' ';
+				$classString .= $class.' ';
 			}
-			$buf .= trim($cstring);
+			$buf .= trim($classString);
 			$buf .= '"';
 		}
+	        else
+	        {
+	            $classString = '';
+	        }
 		$buf .= ">\n";
 		$buf .= "<div id=\"{$this->name}_div\"";
 		if(count($this->classes) > 0)
 		{
-			$buf .= ' class="'.trim($cstring).'"';
+			$buf .= ' class="'.trim($classString).'"';
 		}
 		$buf .= ">\n";
 		return $buf;
@@ -958,7 +996,7 @@ JS;
 		}
 		return $buf;
 	}
-	
+
 	/**
 	 * Constructs and echos the HTML for the form and all of its elements.
 	 */
@@ -989,4 +1027,163 @@ JS;
 		}
 		return $buf;
 	}
+
+    /*---------------------------------------SHORT FORM CREATION METHODS---------------------------------------*/
+
+    /**
+     * A factory function to encapsulate the creation of form objects.
+     * @param string $name
+     * @param string $action
+     * @param string $method
+     * @return Form
+     */
+    public static function create($name, $action = NULL, $method = self::METHOD_POST)
+    {
+        $inst = new self($name,$action);
+        $inst->setMethod($method);
+        return $inst;
+    }
+
+    /**
+     * Short method for creating a text element.
+     * @param string $name
+     * @param string $label
+     * @param string $id
+     * @param array $attributes
+     * @return TextElement
+     */
+    public static function textElement($name, $label = NULL, $id = NULL, array $attributes = array())
+    {
+        return new TextElement($name, $label, $id, $attributes);
+    }
+
+    /**
+     * Short method for creating a text element.
+     * @param string $name
+     * @param string $label
+     * @param string $id
+     * @param array $attributes
+     * @return TextElement
+     */
+    public static function passwordElement($name, $label = NULL, $id = NULL, array $attributes = array())
+    {
+        return new PasswordElement($name, $label, $id, $attributes);
+    }
+
+    /**
+     * Short method for creating a textarea element.
+     * @param string $name
+     * @param string $label
+     * @param string $id
+     * @param array $attributes
+     * @return TextareaElement
+     */
+    public static function textareaElement($name, $label = NULL, $id = NULL, array $attributes = array())
+    {
+        return new TextareaElement($name, $label, $id, $attributes);
+    }
+
+    /**
+     * Short method for creating a radio element.
+     * @param string $name
+     * @param string $label
+     * @param string $id
+     * @param array $attributes
+     * @return RadioElement
+     */
+    public static function radioElement($name, $label = NULL, $id = NULL, array $attributes = array())
+    {
+        return new RadioElement($name, $label, $id, $attributes);
+    }
+
+    /**
+     * Short method for creating a select element.
+     * @param string $name
+     * @param string $label
+     * @param string $id
+     * @param array $attributes
+     * @return SelectElement
+     */
+    public static function selectElement($name, $label = NULL, $id = NULL, array $attributes = array())
+    {
+        return new SelectElement($name, $label, $id, $attributes);
+    }
+
+    /**
+     * Short method for creating a checkbox element.
+     * @param string $name
+     * @param string $label
+     * @param string $id
+     * @param array $attributes
+     * @return CheckboxElement
+     */
+    public static function checkboxElement($name, $label = NULL, $id = NULL, array $attributes = array())
+    {
+        return new CheckboxElement($name, $label, $id, $attributes);
+    }
+
+    /**
+     * Short method for creating a select element.
+     * @param string $name
+     * @param string $label
+     * @param string $id
+     * @param array $attributes
+     * @return SubmitElement
+     */
+    public static function submitElement($name, $label = NULL, $id = NULL, array $attributes = array())
+    {
+        return new SubmitElement($name, $label, $id, $attributes);
+    }
+
+    /**
+     * Short method for creating a button element.
+     * @param string $name
+     * @param string $value
+     * @param string $id
+     * @param array $attributes
+     * @return ButtonElement
+     */
+    public static function buttonElement($name, $value = NULL, $id = NULL, array $attributes = array())
+    {
+        return new ButtonElement($name, $value, $id, $attributes);
+    }
+
+    /**
+     * Short method for creating a file element.
+     * @param string $name
+     * @param string $label
+     * @param string $id
+     * @param array $attributes
+     * @return FileElement
+     */
+    public static function fileElement($name, $label = NULL, $id = NULL, array $attributes = array())
+    {
+        return new FileElement($name, $label, $id, $attributes);
+    }
+
+    /**
+     * Short method for creating a hidden element.
+     * @param string $name
+     * @param string $value
+     * @param string $id
+     * @param array $attributes
+     * @return HiddenElement
+     */
+    public static function hiddenElement($name, $value = NULL, $id = NULL, array $attributes = array())
+    {
+        return new HiddenElement($name, $value, $id, $attributes);
+    }
+
+    /**
+     * Short method for creating a image element.
+     * @param string $name
+     * @param string $label
+     * @param string $id
+     * @param array $attributes
+     * @return ImageElement
+     */
+    public static function imageElement($name, $label = NULL, $id = NULL, array $attributes = array())
+    {
+        return new ImageElement($name, $label, $id, $attributes);
+    }
 }

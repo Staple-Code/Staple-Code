@@ -226,6 +226,10 @@ class Route
 			{
 				echo json_encode($return);
 			}
+			elseif ($return instanceof Route)	//Allow a controller to return a route to redirect the program execution to.
+			{
+				Main::get()->run($return);
+			}
 			elseif (is_object($return))		//Check for another object type
 			{
 				//If the object is stringable, covert it to a string and output it.

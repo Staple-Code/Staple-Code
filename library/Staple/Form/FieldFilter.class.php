@@ -47,5 +47,3 @@ abstract class FieldFilter
 		return new static();
 	}
 }
-
-?>

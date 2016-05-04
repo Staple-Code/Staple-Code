@@ -195,7 +195,7 @@ class Connection extends PDO implements SplSubject
 		//Look for connection options from the configuration
 		if(isset($config['options']))
 		{
-			if(is_array($config['$options']))
+			if(is_array($config['options']))
 			{
 				$options = $config['options'];
 			}

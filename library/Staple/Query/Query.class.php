@@ -273,6 +273,17 @@ abstract class Query
 		$this->addWhere(Condition::like($column, $value));
 		return $this;
 	}
+
+	/**
+	 * SQL NOT LIKE Clause
+	 * @param string $column
+	 * @param mixed $value
+	 */
+	public function whereNotLike($column, $value)
+	{
+		$this->addWhere(Condition::notLike($column, $value));
+		return $this;
+	}
 	
 	/**
 	 * SQL IS NULL Clause

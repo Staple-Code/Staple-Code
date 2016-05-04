@@ -118,7 +118,8 @@ class Auth
 	 */
 	public function __destruct()
 	{
-		$_SESSION['Staple']['auth'] = self::$instance;
+		if(isset(self::$instance))
+			$_SESSION['Staple']['auth'] = self::$instance;
 	}
 	
 	/**
@@ -292,6 +293,7 @@ class Auth
 			if (method_exists($controllerClass, $action))
 			{
 				//Create and Start the Auth Controller
+				/** @var AuthController $controller */
 				$controller = new $controllerClass();
 				$controller->_start();
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * The base class for all Form View Adapters in the framework
+ * Unit Tests for \Staple\Form\Filter\PhoneFormatFilter object
  *
  * @author Ironpilot
  * @copyright Copyright (c) 2011, STAPLE CODE
@@ -19,33 +19,22 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
-
-namespace Staple\Form\View;
-
-
-abstract class ElementViewAdapter
+namespace Staple\Tests;
+use Staple\Form\Filter\PhoneFormatFilter;
+class PhoneFormatFilterTest extends \PHPUnit_Framework_TestCase
 {
-	abstract function textElement();
-
-	abstract function textareaElement();
-
-	abstract function submitElement();
-
-	abstract function selectElement();
-
-	abstract function radiogroupElement();
-
-	abstract function passwordElement();
-
-	abstract function imageElement();
-
-	abstract function hiddenElement();
-
-	abstract function fileElement();
-
-	abstract function checkboxgroupElement();
-
-	abstract function checkboxElement();
+    private function getTestObject()
+    {
+        return new PhoneFormatFilter();
+    }
+    /**
+     * Test the ability to format a phone number
+     */
+    public function testPhoneFilter()
+    {
+        $number = '1.123.456.7890';
+        $format = $this->getTestObject();
+        $this->assertEquals('1 (123) 456-7890',$format->filter($number));
+    }
 }

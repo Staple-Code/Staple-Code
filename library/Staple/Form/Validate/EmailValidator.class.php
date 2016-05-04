@@ -29,11 +29,9 @@ class EmailValidator extends FieldValidator
 	const REGEX = '/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,7})+$/';
 
 	/**
-	 * 
+	 * Run the validator algorithm
 	 * @param  mixed $data
- 
 	 * @return  bool
-	  
 	 * @see Staple_Form_Validator::check()
 	 */
 	public function check($data)
@@ -48,7 +46,12 @@ class EmailValidator extends FieldValidator
 			return false;
 		}
 	}
-	
+
+	/**
+	 * @param string $fieldType
+	 * @param FieldElement $field
+	 * @return string
+	 */
 	public function clientJQuery($fieldType, FieldElement $field)
 	{
 		switch ($fieldType)
@@ -81,5 +84,3 @@ class EmailValidator extends FieldValidator
 		return $script;
 	}
 }
-
-?>
