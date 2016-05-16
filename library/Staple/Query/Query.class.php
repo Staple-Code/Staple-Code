@@ -267,6 +267,7 @@ abstract class Query
 	 * SQL LIKE Clause
 	 * @param string $column
 	 * @param mixed $value
+	 * @return $this
 	 */
 	public function whereLike($column, $value)
 	{
@@ -278,6 +279,7 @@ abstract class Query
 	 * SQL NOT LIKE Clause
 	 * @param string $column
 	 * @param mixed $value
+	 * @return $this
 	 */
 	public function whereNotLike($column, $value)
 	{
@@ -288,6 +290,7 @@ abstract class Query
 	/**
 	 * SQL IS NULL Clause
 	 * @param string $column
+	 * @return $this
 	 */
 	public function whereNull($column)
 	{
@@ -316,7 +319,7 @@ abstract class Query
 	 */
 	public function whereBetween($column, $start, $end)
 	{
-		$this->addWhere(Condition::between($column, $start, $end, $this->getConnection()));
+		$this->addWhere(Condition::between($column, $start, $end));
 		return $this;
 	}
 	
