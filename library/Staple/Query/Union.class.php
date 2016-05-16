@@ -446,10 +446,10 @@ class Union
 		
 		return $stmt;
 	}
-	
+
 	/**
-	 * Alias of setOrder()
-	 * @see self::setOrder()
+	 * @param array|string $order
+	 * @return Union
 	 */
 	public function orderBy($order)
 	{
