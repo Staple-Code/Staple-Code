@@ -528,7 +528,7 @@ class Select extends Query
 	 */
 	public function havingBetween($column, $start, $end)
 	{
-		$this->addHaving(Condition::between($column, $start, $end, $this->getConnection()));
+		$this->addHaving(Condition::between($column, $start, $end));
 		return $this;
 	}
 	
