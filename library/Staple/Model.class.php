@@ -525,17 +525,89 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 
 	public static function findWhereNull($column, $limit = NULL, Connection $connection = NULL)
 	{
-		//@todo incomplete function
+		//Make a model instance
+		$model = static::make();
+
+		//Create the query
+		$query = Query::select($model->_getTable())->whereEqual($column,$value);
+
+		//Change connection if needed
+		if(isset($connection)) $query->setConnection($connection);
+
+		//Execute the query
+		$result = $query->execute();
+		if($result instanceof IStatement)
+		{
+			//If more than one record was returned return the array of results.
+			$models = array();
+			while($row = $result->fetch(PDO::FETCH_ASSOC))
+			{
+				$model = static::make();
+				$model->_data = $row;
+				$models[] = $model;
+			}
+			return $models;
+		}
+		else
+			return false;		//Return false on query failure
 	}
 
 	public static function findWhereIn($column, array $values, $limit = NULL, Connection $connection = NULL)
 	{
-		//@todo incomplete function
+		//Make a model instance
+		$model = static::make();
+
+		//Create the query
+		$query = Query::select($model->_getTable())->whereNull($column);
+
+		//Change connection if needed
+		if(isset($connection)) $query->setConnection($connection);
+
+		//Execute the query
+		$result = $query->execute();
+		if($result instanceof IStatement)
+		{
+			//If more than one record was returned return the array of results.
+			$models = array();
+			while($row = $result->fetch(PDO::FETCH_ASSOC))
+			{
+				$model = static::make();
+				$model->_data = $row;
+				$models[] = $model;
+			}
+			return $models;
+		}
+		else
+			return false;		//Return false on query failure
 	}
 
 	public static function findWhereStatement($statement, $limit = NULL, Connection $connection = NULL)
 	{
-		//@todo incomplete function
+		//Make a model instance
+		$model = static::make();
+
+		//Create the query
+		$query = Query::select($model->_getTable())->whereIn($column,$values);
+
+		//Change connection if needed
+		if(isset($connection)) $query->setConnection($connection);
+
+		//Execute the query
+		$result = $query->execute();
+		if($result instanceof IStatement)
+		{
+			//If more than one record was returned return the array of results.
+			$models = array();
+			while($row = $result->fetch(PDO::FETCH_ASSOC))
+			{
+				$model = static::make();
+				$model->_data = $row;
+				$models[] = $model;
+			}
+			return $models;
+		}
+		else
+			return false;		//Return false on query failure
 	}
 
 	/**
