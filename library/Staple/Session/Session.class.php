@@ -23,8 +23,13 @@
 
 namespace Staple\Session;
 
+use Staple\Config;
+use Staple\Exception\SessionException;
+use Staple\Traits\Singleton;
+
 class Session
 {
+	use Singleton;
 	/**
 	 * @var Handler
 	 */
@@ -38,9 +43,17 @@ class Session
 	public function __construct(Handler $handler = NULL)
 	{
 		if(isset($handler))
+		{
 			$this->setHandler($handler);
+		}
+		elseif (($configHandler = Config::getValue('session','handler',false)) != NULL)
+		{
+			$this->setHandler(new $configHandler());
+		}
 		else
+		{
 			$this->setHandler(new FileHandler());
+		}
 
 		//Setup session handler functions
 		session_set_save_handler($this->handler, true);
@@ -91,11 +104,23 @@ class Session
 	/**
 	 * Start the session.
 	 * @param string $sessionId
+	 * @param bool $suppressThrow
 	 * @return $this
+	 * @throws SessionException
 	 */
-	public function start($sessionId = NULL)
+	public static function start($sessionId = NULL, $suppressThrow = false)
 	{
-		if(isset($sessionId)) session_id($sessionId);
-		session_start();
+		$session = self::getInstance();
+		if(!headers_sent())
+		{
+			if (isset($sessionId)) session_id($sessionId);
+			session_start();
+		}
+		else
+		{
+			if(!$suppressThrow)
+				throw new SessionException('Session headers have already been sent by output.');
+		}
+		return $session;
 	}
 }
