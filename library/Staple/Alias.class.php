@@ -224,9 +224,13 @@ class Alias
 		'Singleton'						=>	'\\Staple\\Traits\\Singleton',
 
 		//Form Element View Adapters
-		'ViewAdapter'                   => '\\Staple\\Form\\ViewAdapters',
-        	'FoundationViewAdapter'			=> '\\Staple\\Form\\ViewAdapters\\FoundationViewAdapter',
-        	'BootstrapViewAdapter'			=> '\\Staple\\Form\\ViewAdapters\\BootstrapViewAdapter'
+		'FormViewAdapter'               => '\\Staple\\Form\\ViewAdapters\\ElementViewAdapter',
+		'FoundationViewAdapter'			=> '\\Staple\\Form\\ViewAdapters\\FoundationViewAdapter',
+		'BootstrapViewAdapter'			=> '\\Staple\\Form\\ViewAdapters\\BootstrapViewAdapter',
+
+		//Session Classes
+		'Session'						=>	'\\Staple\\Session\\Session',
+		'SessionHandler'				=>	'\\Staple\\Session\\Handler',
 
 	);
 	
