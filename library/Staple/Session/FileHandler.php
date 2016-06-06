@@ -75,7 +75,7 @@ class FileHandler extends Handler
 	 */
 	public function close()
 	{
-		// TODO: Implement close() method.
+		return true;
 	}
 
 	/**
@@ -91,7 +91,13 @@ class FileHandler extends Handler
 	 */
 	public function destroy($session_id)
 	{
-		// TODO: Implement destroy() method.
+		$file = $this->fileLocation.DIRECTORY_SEPARATOR.'session_'.$session_id;
+		if (file_exists($file))
+		{
+			unlink($file);
+		}
+
+		return true;
 	}
 
 	/**
@@ -110,7 +116,15 @@ class FileHandler extends Handler
 	 */
 	public function gc($maxlifetime)
 	{
-		// TODO: Implement gc() method.
+		foreach (glob($this->fileLocation.DIRECTORY_SEPARATOR.'session_*') as $file)
+		{
+			if (filemtime($file) + $maxlifetime < time() && file_exists($file))
+			{
+				unlink($file);
+			}
+		}
+
+		return true;
 	}
 
 	/**
@@ -127,8 +141,8 @@ class FileHandler extends Handler
 	 */
 	public function open($save_path, $session_id)
 	{
-		$this->fileLocation = $save_path;
-		if (!is_dir($this->fileLocation)) {
+		if (!is_dir($this->fileLocation))
+		{
 			mkdir($this->fileLocation, 0777);
 		}
 
@@ -149,7 +163,7 @@ class FileHandler extends Handler
 	 */
 	public function read($session_id)
 	{
-		// TODO: Implement read() method.
+		return (string)@file_get_contents($this->fileLocation.DIRECTORY_SEPARATOR.'session_'.$session_id);
 	}
 
 	/**
@@ -172,6 +186,6 @@ class FileHandler extends Handler
 	 */
 	public function write($session_id, $session_data)
 	{
-		// TODO: Implement write() method.
+		return file_put_contents($this->fileLocation.DIRECTORY_SEPARATOR.'session_'.$session_id, $session_data) === false ? false : true;
 	}
 }
