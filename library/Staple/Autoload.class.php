@@ -115,14 +115,15 @@ class Autoload
 	 * Load a class into the application
 	 * @param string $class_name
 	 * @throws Exception
+	 * @return bool
 	 */
 	public function load($class_name)
 	{
-		//Check for an aliased classname
-    	if(!is_null($namespacedClass = Alias::checkAlias($class_name)))					//Look for aliased classes
-    	{
-    		return $this->loadLibraryClass($namespacedClass, $class_name);
-    	}
+		//Check for an aliased class name
+		if(!is_null($namespacedClass = Alias::checkAlias($class_name)))					//Look for aliased classes
+		{
+    			return $this->loadLibraryClass($namespacedClass, $class_name);
+		}
 		elseif(substr($class_name,strlen($class_name)-strlen($this->getControllerSuffix()),strlen($this->getControllerSuffix())) == $this->getControllerSuffix() 
 			&& strlen($class_name) != strlen($this->getControllerSuffix()))				//Look for Controllers
 		{
@@ -171,7 +172,10 @@ class Autoload
 			}
 		}
 
-		return true;
+		if(class_exists($class_name))
+			return true;
+		else
+			throw new Exception("Class Not Found: ".$class_name,Error::LOADER_ERROR);
 	}
 	
 	/**

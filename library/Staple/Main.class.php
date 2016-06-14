@@ -93,7 +93,7 @@ class Main
 		defined('CONFIG_ROOT')
 	    	|| define('CONFIG_ROOT', APPLICATION_ROOT . 'config' . DIRECTORY_SEPARATOR);
 
-	    defined('LAYOUT_ROOT')
+		defined('LAYOUT_ROOT')
 			|| define('LAYOUT_ROOT', APPLICATION_ROOT . 'layouts' . DIRECTORY_SEPARATOR);
 		
 		defined('FORMS_ROOT')
@@ -161,8 +161,8 @@ class Main
 		$this->setErrorHandler(new Error());
 		
 		//Create a session
-		if(php_sapi_name() != 'cli')
-			session_start();
+		if(php_sapi_name() != 'cli' && (bool)Config::getValue('session','auto_create', false) == true)
+			Session::start();
 		
 		//Turn on the timer 
 		if(Config::getValue('errors', 'enable_timer') == 1)

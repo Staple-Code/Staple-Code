@@ -2,6 +2,9 @@
 /**
  * Basic session file handler class.
  *
+ * Configuration Options [session]:
+ * file_location = ''		The location of the session files on the server.
+ *
  * @author Ironpilot
  * @copyright Copyright (c) 2016, STAPLE CODE
  *
@@ -23,6 +26,8 @@
 
 namespace Staple\Session;
 
+use Staple\Config;
+
 class FileHandler extends Handler
 {
 	/**
@@ -40,6 +45,8 @@ class FileHandler extends Handler
 	{
 		if(isset($location))
 			$this->setFileLocation($location);
+		elseif(Config::exists('session','file_location'))
+			$this->setFileLocation(Config::getValue('session','file_location'));
 		else
 			$this->setFileLocation(session_save_path());
 	}

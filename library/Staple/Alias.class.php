@@ -231,7 +231,8 @@ class Alias
 		//Session Classes
 		'Session'						=>	'\\Staple\\Session\\Session',
 		'SessionHandler'				=>	'\\Staple\\Session\\Handler',
-
+		'FileHandler'					=>	'\\Staple\\Session\\FileHandler',
+		'DatabaseHandler'				=>	'\\Staple\\Session\\DatabaseHandler',
 	);
 	
 	/**

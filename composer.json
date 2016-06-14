@@ -1,6 +1,7 @@
 {
   "require": {
     "twig/twig":"~1.0",
-    "phpunit/phpunit": "4.8.*"
+    "phpunit/phpunit": "4.8.*",
+    "predis/predis":"1.1.*@dev"
   }
 }

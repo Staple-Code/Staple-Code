@@ -1,6 +1,11 @@
 <?php
 /**
- * Basic session file handler class.
+ * Database session handler class.
+ *
+ * Configuration options [session]:
+ * connection = ''			The named connection to use
+ * table = 'sessions'		Session table name
+ * encrypt_key = ''			Encryption key to encrypt sessions at rest in the database.
  *
  * @author Ironpilot
  * @copyright Copyright (c) 2016, STAPLE CODE
@@ -23,43 +28,99 @@
 
 namespace Staple\Session;
 
+use Staple\Config;
+use Staple\Encrypt;
+use Staple\Exception\ConfigurationException;
+use Staple\Exception\SessionException;
+use Staple\Query\Condition;
+use Staple\Query\Connection;
+use Staple\Query\Query;
+use PDO;
+
 class DatabaseHandler extends Handler
 {
 	/**
 	 * The location where the session files will be stored.
+	 * @var Connection
+	 */
+	private $connection;
+	/**
 	 * @var string
 	 */
-	private $fileLocation;
+	private $table;
 
 	/**
-	 * FileHandler constructor.
+	 * DatabaseHandler constructor.
 	 *
-	 * @param string $location
+	 * @param Connection $connection
+	 * @param string $table
 	 */
-	public function __construct($location = NULL)
+	public function __construct(Connection $connection = NULL, $table = NULL)
 	{
-		if(isset($location))
-			$this->setFileLocation($location);
-		else
-			$this->setFileLocation(session_save_path());
+		try
+		{
+			//Set the database connection
+			if (isset($connection))
+				$this->setConnection($connection);
+			elseif (Config::exists('session', 'connection'))
+				$this->setConnection(Connection::getNamedConnection(Config::getValue('session', 'connection')));
+			else
+				$this->setConnection(Connection::get());
+		}
+		catch (ConfigurationException $e)
+		{
+			$this->setConnection(Connection::get());
+		}
+
+		//Set the database table.
+		try
+		{
+			if (isset($table))
+				$this->setTable($table);
+			else
+				$this->setTable(Config::getValue('session', 'table'));
+		}
+		catch (ConfigurationException $e)
+		{
+			$this->setTable('sessions');
+		}
+	}
+
+	/**
+	 * Return the database connection object
+	 * @return string
+	 */
+	public function getConnection()
+	{
+		return $this->connection;
+	}
+
+	/**
+	 * Set the database connection for the session store.
+	 * @param Connection $connection
+	 * @return $this
+	 */
+	protected function setConnection(Connection $connection)
+	{
+		$this->connection = $connection;
+		return $this;
 	}
 
 	/**
 	 * @return string
 	 */
-	public function getFileLocation()
+	public function getTable()
 	{
-		return $this->fileLocation;
+		return $this->table;
 	}
 
 	/**
-	 * Set the file location for the session store.
-	 * @param string $fileLocation
+	 * @param string $table
 	 * @return $this
 	 */
-	protected function setFileLocation($fileLocation)
+	public function setTable($table)
 	{
-		$this->fileLocation = $fileLocation;
+		$this->table = $table;
 		return $this;
 	}
 
@@ -91,40 +152,35 @@ class DatabaseHandler extends Handler
 	 */
 	public function destroy($session_id)
 	{
-		$file = $this->fileLocation.DIRECTORY_SEPARATOR.'session_'.$session_id;
-		if (file_exists($file))
-		{
-			unlink($file);
-		}
+		$query = Query::delete($this->getTable())
+			->whereEqual('id',$session_id);
 
-		return true;
+		if($query->execute() !== false)
+			return true;
+		else
+			return false;
 	}
 
 	/**
 	 * Cleanup old sessions
 	 *
 	 * @link http://php.net/manual/en/sessionhandlerinterface.gc.php
-	 * @param int $maxlifetime <p>
-	 * Sessions that have not updated for
-	 * the last maxlifetime seconds will be removed.
-	 * </p>
-	 * @return bool <p>
+	 * @param int $php_maxLifetime
+	 * @return bool
 	 * The return value (usually TRUE on success, FALSE on failure).
 	 * Note this value is returned internally to PHP for processing.
-	 * </p>
 	 * @since 5.4.0
 	 */
-	public function gc($maxlifetime)
+	public function gc($php_maxLifetime)
 	{
-		foreach (glob($this->fileLocation.DIRECTORY_SEPARATOR.'session_*') as $file)
-		{
-			if (filemtime($file) + $maxlifetime < time() && file_exists($file))
-			{
-				unlink($file);
-			}
-		}
+		$sessionMaxLifeTime = Session::getInstance()->getMaxLifetime();
+		$query = Query::delete($this->getTable(),$this->getConnection())
+			->whereCondition('last_activity',Condition::GREATER, time() - ($sessionMaxLifeTime));
 
-		return true;
+		if($query->execute() !== false)
+			return true;
+		else
+			return false;
 	}
 
 	/**
@@ -132,21 +188,15 @@ class DatabaseHandler extends Handler
 	 *
 	 * @link http://php.net/manual/en/sessionhandlerinterface.open.php
 	 * @param string $save_path The path where to store/retrieve the session.
-	 * @param string $session_id The session id.
-	 * @return bool <p>
+	 * @param string $session_name The session name.
+	 * @return bool
 	 * The return value (usually TRUE on success, FALSE on failure).
 	 * Note this value is returned internally to PHP for processing.
-	 * </p>
 	 * @since 5.4.0
 	 */
-	public function open($save_path, $session_id)
+	public function open($save_path, $session_name)
 	{
-		if (!is_dir($this->fileLocation))
-		{
-			mkdir($this->fileLocation, 0777);
-		}
-
-		return true;
+		return ($this->getConnection() instanceof Connection) ? true : false;
 	}
 
 	/**
@@ -154,16 +204,30 @@ class DatabaseHandler extends Handler
 	 *
 	 * @link http://php.net/manual/en/sessionhandlerinterface.read.php
 	 * @param string $session_id The session id to read data for.
-	 * @return string <p>
+	 * @return string
 	 * Returns an encoded string of the read data.
 	 * If nothing was read, it must return an empty string.
 	 * Note this value is returned internally to PHP for processing.
-	 * </p>
 	 * @since 5.4.0
 	 */
 	public function read($session_id)
 	{
-		return (string)@file_get_contents($this->fileLocation.DIRECTORY_SEPARATOR.'session_'.$session_id);
+		$query = Query::select($this->getTable(),['payload'],$this->getConnection())
+			->whereEqual('id',$session_id);
+
+		if(($result = $query->execute()) !== false)
+		{
+			if($result->rowCount() == 1)
+			{
+				$record = $result->fetch(PDO::FETCH_OBJ);
+
+				if (Config::exists('session', 'encrypt_key'))
+					return Encrypt::decrypt(base64_decode($record->payload), Config::getValue('session', 'encrypt_key'));
+				else
+					return $record->payload;
+			}
+		}
+		return '';
 	}
 
 	/**
@@ -183,9 +247,42 @@ class DatabaseHandler extends Handler
 	 * Note this value is returned internally to PHP for processing.
 	 * </p>
 	 * @since 5.4.0
+	 * @throws SessionException
 	 */
 	public function write($session_id, $session_data)
 	{
-		return file_put_contents($this->fileLocation.DIRECTORY_SEPARATOR.'session_'.$session_id, $session_data) === false ? false : true;
+		if(Config::exists('session','encrypt_key'))
+			$payload = base64_encode(Encrypt::encrypt($session_data,Config::getValue('session','encrypt_key')));
+		else
+			$payload = $session_data;
+
+		//Session Data
+		$data = [
+			'id'			=>	$session_id,
+			'payload'		=>	$payload,
+			'last_activity'	=>	time(),
+		];
+
+		//Find Query
+		$queryFind = Query::select($this->getTable(),['payload'],$this->getConnection())
+			->whereEqual('id',$session_id);
+
+		//Write Query
+		$query = Query::insert($this->getTable(),$data,$this->getConnection());
+
+		if(($resultFind = $queryFind->execute()) !== false)
+		{
+			if($resultFind->rowCount() >= 1)
+			{
+				$query = Query::update($this->getTable(),$data,$this->getConnection())
+					->whereEqual('id',$session_id);
+			}
+		}
+
+		//Execute the write
+		if($query->execute() !== false)
+			return true;
+		else
+			throw new SessionException('Failed to write session data.');
 	}
 }
