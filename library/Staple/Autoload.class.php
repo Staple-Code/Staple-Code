@@ -172,10 +172,7 @@ class Autoload
 			}
 		}
 
-		if(class_exists($class_name))
-			return true;
-		else
-			throw new Exception("Class Not Found: ".$class_name,Error::LOADER_ERROR);
+		return true;
 	}
 	
 	/**
