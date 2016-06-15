@@ -2,6 +2,15 @@
 /**
  * Redis session handler class.
  * Note: Requires the Predis package for Redis session handling functionality.
+ * 
+ * Configuration Options:
+ * ;handler = 'Staple\Session\RedisHandler'
+ * scheme = 'tcp'			Method of connection to the Redis server
+ * host = 'localhost'		Redis cache server hostname
+ * port = '6379'			Redis server port number
+ * password = ''			Password for use to authenticate to the server.
+ * encrypt_key = ''			Encryption key to encrypt sessions at rest in the cache.
+ * prefix = 'session:'		The prefix for the Redis keys
  *
  * @author Ironpilot
  * @copyright Copyright (c) 2016, STAPLE CODE
@@ -27,10 +36,12 @@ namespace Staple\Session;
 use Predis\Autoloader;
 use Predis\Client;
 use Staple\Config;
+use Staple\Encrypt;
 use Staple\Exception\ConfigurationException;
 
 class RedisHandler extends Handler
 {
+	const DEFAULT_PREFIX = 'session:';
 	/**
 	 * @var Client
 	 */
@@ -46,7 +57,7 @@ class RedisHandler extends Handler
 	 * @param Client $client
 	 * @param string $prefix
 	 */
-	public function __construct(Client $client = NULL, $prefix = 'session:')
+	public function __construct(Client $client = NULL, $prefix = NULL)
 	{
 		//@todo For some reason Predis does not load properly through composer. Remove this once this problem is solved.
 		require_once VENDOR_ROOT.'predis/predis/src/Autoloader.php';
@@ -61,11 +72,16 @@ class RedisHandler extends Handler
 			Autoloader::register(true);
 			try
 			{
-				$client = new Client([
+				$options = [
 					'scheme' => Config::getValue('session', 'scheme'),
 					'host'   => Config::getValue('session', 'host'),
 					'port'   => Config::getValue('session', 'port'),
-				]);
+				];
+
+				if(strlen(Config::getValue('session','password',false)) >= 1)
+					$options['password'] = Config::getValue('session','password');
+
+				$client = new Client($options);
 
 				//Create a new Predis Client object with values from the configuration file.
 				$this->setRedis($client);
@@ -76,7 +92,14 @@ class RedisHandler extends Handler
 				$this->setRedis(new Client());
 			}
 		}
-		$this->setPrefix($prefix);
+
+		//Set the Redis key prefix
+		if(isset($prefix))
+			$this->setPrefix($prefix);
+		elseif(Config::exists('session','prefix'))
+			$this->setPrefix(Config::getValue('session','prefix'));
+		else
+			$this->setPrefix(self::DEFAULT_PREFIX);
 	}
 
 	/**
@@ -204,8 +227,12 @@ class RedisHandler extends Handler
 		$sessionData = $this->redis->get($sessionId);
 		//Reset the Expiration
 		$this->redis->expire($sessionId, Session::getInstance()->getMaxLifetime());
+		
 		//Return Session Data to PHP
-		return $sessionData;
+		if (Config::exists('session', 'encrypt_key'))
+			return Encrypt::decrypt(base64_decode($sessionData), Config::getValue('session', 'encrypt_key'));
+		else
+			return $sessionData;
 	}
 
 	/**
@@ -228,10 +255,15 @@ class RedisHandler extends Handler
 	 */
 	public function write($session_id, $session_data)
 	{
+		if(Config::exists('session','encrypt_key'))
+			$payload = base64_encode(Encrypt::encrypt($session_data,Config::getValue('session','encrypt_key')));
+		else
+			$payload = $session_data;
+
 		//Setup Redis Key
 		$sessionId = $this->getPrefix().$session_id;
 		//Write the session data to Redis.
-		$this->redis->set($sessionId, $session_data);
+		$this->redis->set($sessionId, $payload);
 		//Set the Expiration
 		$this->redis->expire($sessionId, Session::getInstance()->getMaxLifetime());
 		//Let PHP know that it succeeded.
