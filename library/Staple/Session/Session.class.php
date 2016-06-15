@@ -55,6 +55,11 @@ class Session
 	 * @var int
 	 */
 	protected $maxLifetime = 1440;
+	/**
+	 * Booleon value to signify if the session has already been started or not.
+	 * @var bool
+	 */
+	protected $sessionStarted = false;
 
 	/**
 	 * Session constructor. Optional session handler object parameter.
@@ -98,6 +103,11 @@ class Session
 			throw new SessionException('Failed to setup session save handler: '.get_class($this->handler));
 	}
 
+	public function __wakeup()
+	{
+		$this->setSessionStarted(false);
+	}
+
 	/**
 	 * Get the session handler object
 	 * @return Handler | FileHandler
@@ -128,10 +138,12 @@ class Session
 
 	/**
 	 * @param string $sessionId
+	 * @return $this
 	 */
 	public function setSessionId($sessionId)
 	{
 		$this->sessionId = $sessionId;
+		return $this;
 	}
 
 	/**
@@ -176,7 +188,23 @@ class Session
 		return $this;
 	}
 
+	/**
+	 * @return boolean
+	 */
+	public function isSessionStarted()
+	{
+		return $this->sessionStarted;
+	}
 
+	/**
+	 * @param boolean $sessionStarted
+	 * @return $this
+	 */
+	protected function setSessionStarted($sessionStarted)
+	{
+		$this->sessionStarted = (bool)$sessionStarted;
+		return $this;
+	}
 
 	/**
 	 * Set a session variable value.
@@ -212,24 +240,31 @@ class Session
 	public static function start($sessionId = NULL, $suppressThrow = false)
 	{
 		$session = self::getInstance();
-		if(!headers_sent())
+		if($session->isSessionStarted() == false)
 		{
-			if (isset($sessionId))
+			if (!headers_sent())
 			{
-				session_id($sessionId);
-				$session->setSessionId($sessionId);
-				if(!session_start()) throw new SessionException('Failed to start session.');
+				if (isset($sessionId))
+				{
+					session_id($sessionId);
+					$session->setSessionId($sessionId)
+						->setSessionStarted(true);
+					if (!session_start())
+						throw new SessionException('Failed to start session.');
+				}
+				else
+				{
+					if (!session_start())
+						throw new SessionException('Failed to start session.');
+					$session->setSessionId(session_id())
+						->setSessionStarted(true);
+				}
 			}
 			else
 			{
-				if(!session_start()) throw new SessionException('Failed to start session.');
-				$session->setSessionId(session_id());
+				if (!$suppressThrow)
+					throw new SessionException('Session headers have already been sent by output.');
 			}
-		}
-		else
-		{
-			if(!$suppressThrow)
-				throw new SessionException('Session headers have already been sent by output.');
 		}
 		return $session;
 	}

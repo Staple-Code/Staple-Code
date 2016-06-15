@@ -25,6 +25,8 @@
  */
 namespace Staple;
 
+use Staple\Session\Session;
+
 class Main
 {
 	/**
@@ -297,8 +299,8 @@ class Main
 	 */
 	public function run($route = NULL)
 	{
-		//Include the boot file.
-		include_once APPLICATION_ROOT.'boot.php';
+		//Call the bootstrapper
+		$this->boot();
 		
 		//Load the controllers from the session.
 		if(isset($_SESSION['Staple']['Controllers']))
@@ -329,6 +331,15 @@ class Main
 		//Run the route through the router.
 		$this->setRoute($initialRoute);
 		return $this->executeRoute();
+	}
+
+	/**
+	 * Include the bootstrap file.
+	 */
+	private function boot()
+	{
+		//Include the boot file.
+		include_once APPLICATION_ROOT.'boot.php';
 	}
 	
 	/**

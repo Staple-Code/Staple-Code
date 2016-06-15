@@ -28,6 +28,7 @@ use \ReflectionMethod;
 use \ReflectionClass;
 use Staple\Exception\PageNotFoundException;
 use Staple\Exception\AuthException;
+use Staple\Session\Session;
 
 class Auth
 {
@@ -154,9 +155,14 @@ class Auth
 	{			
 		if(!(self::$instance instanceof Auth))
 		{
-			if(array_key_exists('Staple', $_SESSION))
-				if(array_key_exists('auth', $_SESSION['Staple']))
-					self::$instance = $_SESSION['Staple']['auth'];
+			//Start session if not already done.
+			if(Session::getInstance()->isSessionStarted() == false)
+				Session::start();
+
+			//Restore the Auth session, if exists.
+			self::restoreAuthSession();
+
+			//If none, make a new auth instance.
 			if(!(self::$instance instanceof Auth))
 				self::$instance = new Auth();
 		}
@@ -219,11 +225,12 @@ class Auth
 		//Check Auth against the adapter
 		if($this->adapter->getAuth($credentials) === true)
 		{
-			session_regenerate_id();
+			Session::getInstance()->regenerate(true);
 			$this->authed = true;
 			$this->userId = $this->adapter->getUserId();
 			$this->authLevel = $this->adapter->getLevel($this->userId);
 			$this->message = "Authentication Successful";
+			self::writeSession();
 			return true;
 		}
 		else
@@ -232,8 +239,9 @@ class Auth
 			$this->userId = null;
 			$this->authLevel = 0;
 			$this->message = "Authentication Failed";
+			self::writeSession();
+			return false;
 		}
-		return false;
 	}
 	
 	/**
@@ -276,6 +284,7 @@ class Auth
 	 * not extend Staple_AuthController.
 	 * @param Route $previousRoute
 	 * @throws Exception
+	 * @return bool
 	 */
 	private function dispatchAuthController($previousRoute = NULL)
 	{
@@ -369,7 +378,7 @@ class Auth
 						//If nothing else works, echo the object through the dump method.
 						else
 						{
-							Dev::Dump($return);
+							Dev::dump($return);
 
 							//Object was dumped to the browser
 							return true;
@@ -407,5 +416,31 @@ class Auth
 
 		//Throw an exception if the auth page cannot be found
 		throw new PageNotFoundException('Page Not Found.', Error::PAGE_NOT_FOUND);
+	}
+
+	/**
+	 * Write the auth object to the session
+	 */
+	private static function writeSession()
+	{
+		//Start session if not already done.
+		if(Session::getInstance()->isSessionStarted() == false)
+			Session::start();
+
+		$_SESSION['Staple']['auth'] = self::$instance;
+	}
+
+	/**
+	 * Restore the session to the instance static variable.
+	 * @return self
+	 */
+	private static function restoreAuthSession()
+	{
+		//Restore the auth object from the session.
+		if(array_key_exists('Staple', $_SESSION))
+			if(array_key_exists('auth', $_SESSION['Staple']))
+				self::$instance = $_SESSION['Staple']['auth'];
+
+		return self::$instance;
 	}
 }

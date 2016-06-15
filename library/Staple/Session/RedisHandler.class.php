@@ -128,7 +128,6 @@ class RedisHandler extends Handler
 	public function close()
 	{
 		$this->redis->disconnect();
-		unset($this->redis);
 		return true;
 	}
 
