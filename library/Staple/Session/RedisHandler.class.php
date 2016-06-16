@@ -39,7 +39,7 @@ use Staple\Config;
 use Staple\Encrypt;
 use Staple\Exception\ConfigurationException;
 
-class RedisHandler extends Handler
+class RedisHandler implements Handler
 {
 	const DEFAULT_PREFIX = 'session:';
 	/**

@@ -37,7 +37,7 @@ use Staple\Query\Connection;
 use Staple\Query\Query;
 use PDO;
 
-class DatabaseHandler extends Handler
+class DatabaseHandler implements Handler
 {
 	/**
 	 * The location where the session files will be stored.

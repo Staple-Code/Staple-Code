@@ -28,7 +28,7 @@ namespace Staple\Session;
 
 use Staple\Config;
 
-class FileHandler extends Handler
+class FileHandler implements Handler
 {
 	/**
 	 * The location where the session files will be stored.
