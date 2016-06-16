@@ -158,7 +158,10 @@ class Main
 		
 		//Register the Autoload class
 		spl_autoload_register(array($this->loader, 'load'));
-			
+
+		//Call the bootstrapper
+		$this->boot();
+		
 		// Setup Error Handlers
 		$this->setErrorHandler(new Error());
 		
@@ -299,9 +302,6 @@ class Main
 	 */
 	public function run($route = NULL)
 	{
-		//Call the bootstrapper
-		$this->boot();
-		
 		//Load the controllers from the session.
 		if(isset($_SESSION['Staple']['Controllers']))
 			if(is_array($_SESSION['Staple']['Controllers']))
