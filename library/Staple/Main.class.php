@@ -204,14 +204,6 @@ class Main
 	{
 	    return (bool)Config::getValue('errors', 'devmode');
 	}
-
-	/**
-	 * The application destructor stored controllers in the session to preserve their state
-	 */
-	public function __destruct()
-	{
-		$_SESSION['Staple']['Controllers'] = $this->controllers;		//Store the controllers in the session
-	}
 	
 	/**
 	 * 
@@ -341,6 +333,16 @@ class Main
 		//Include the boot file.
 		include_once APPLICATION_ROOT.'boot.php';
 	}
+
+	/**
+	 * Save the controller info to the session.
+	 * @return $this
+	 */
+	private function saveSession()
+	{
+		$_SESSION['Staple']['Controllers'] = $this->controllers;		//Store the controllers in the session
+		return $this;
+	}
 	
 	/**
 	 * Execute the current route
@@ -381,6 +383,7 @@ class Main
 		{
 			$this->controllers[$class_name] = $controller;
 		}
+		$this->saveSession();
 		return $controller;
 	}
 	/**

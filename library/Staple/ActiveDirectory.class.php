@@ -42,7 +42,7 @@ class ActiveDirectory
 	/**
 	 * 
 	 * Holds the singleton instance for the object.
-	 * @var Staple_AD
+	 * @var ActiveDirectory
 	 * @static
 	 */
 	protected static $conn;
@@ -89,12 +89,12 @@ class ActiveDirectory
 	/**
 	 * 
 	 * Holds the connection identifier to the Active Directory server
-	 * @var LDAPConn
+	 * @var resource
 	 */
 	protected $LDAPConn;
 	
 	/**
-	 * @return the $host
+	 * @return string $host
 	 */
 	public function getHost()
 	{
@@ -103,6 +103,7 @@ class ActiveDirectory
 
 	/**
 	 * @param string $host
+	 * @return $this
 	 */
 	public function setHost($host)
 	{
@@ -111,7 +112,7 @@ class ActiveDirectory
 	}
 
 	/**
-	 * @return the $username
+	 * @return string $username
 	 */
 	public function getUsername()
 	{
@@ -120,6 +121,7 @@ class ActiveDirectory
 
 	/**
 	 * @param string $username
+	 * @return $this
 	 */
 	public function setUsername($username)
 	{
@@ -128,7 +130,7 @@ class ActiveDirectory
 	}
 
 	/**
-	 * @return the $domain
+	 * @return string $domain
 	 */
 	public function getDomain()
 	{
@@ -136,7 +138,7 @@ class ActiveDirectory
 	}
 	
 	/**
-	 * @return the $baseDN
+	 * @return string $baseDN
 	 */
 	public function getbaseDN()
 	{
@@ -150,15 +152,16 @@ class ActiveDirectory
 	}
 
 	/**
-	 * @return the $LDAPSenabled
+	 * @return string $LDAPSenabled
 	 */
 	public function getLDAPSenabled()
 	{
-		return $this->domain;
+		return $this->LDAPSenabled;
 	}
 	
 	/**
 	 * @param string $LDAPSenabled
+	 * @return $this
 	 */
 	public function setLDAPSenabled($LDAPSenabled)
 	{
@@ -168,10 +171,11 @@ class ActiveDirectory
 	
 	/**
 	 * @param string $domain
+	 * @return $this
 	 */
-	public function setDomain($db)
+	public function setDomain($domain)
 	{
-		$this->db = $db;
+		$this->domain = $domain;
 		return $this;
 	}
 
@@ -239,8 +243,8 @@ class ActiveDirectory
 	
     /**
      * 
-     * Creates a singlton instance of the Staple_AD object.
-     * @return Staple_AD
+     * Creates a singleton instance of the ActiveDirectory object.
+     * @return ActiveDirectory
      */
 	public static function get()
 	{
@@ -254,7 +258,8 @@ class ActiveDirectory
 	/** 
 	 * 
 	 * Returns the full user login name for the specified username
-	 * @returns $usrlogin
+	 * @param string $username
+	 * @return string
 	 * @static
 	 */
 	public function usrlogin($username)
@@ -264,7 +269,6 @@ class ActiveDirectory
 	}
 	
 	/**
-	 * 
 	 * Establishes bind to ldap server with management credentials
 	 */	
 	protected function mgmtbind()
@@ -287,10 +291,10 @@ class ActiveDirectory
 	}
 	
 	/**
-	 * 
 	 * Checks the configuration file to make sure that all required keys exist.
 	 * @param array $config
 	 * @throws Exception
+	 * @return bool
 	 */
 	protected function checkConfig(array $config)
 	{
@@ -309,6 +313,7 @@ class ActiveDirectory
 	 * 
 	 * Checks the supplied value for invalid chars, returns TRUE if string is valid
 	 * @param $value
+	 * @return bool
 	 */
 	public static function validchars($value)
 	{
@@ -323,12 +328,12 @@ class ActiveDirectory
 	 * 
 	 * Unicodes the supplied password
 	 * @param $password
+	 * @return string
 	 */
 	public static function unicodePwd($password)
 	{	
 		$uniPword = "";
 		$Pword = "\"$password\"";
-		$Plength = strlen($Pword);
 		for($i=0; $i<10; $i++)
 		{
 			$uniPword .= "{$Pword{$i}}\000";	
@@ -340,8 +345,9 @@ class ActiveDirectory
 	 * 
 	 * Verifies user credentials based on username and password provided, then resestablishes
 	 * management user connection to Active Directory.
-	 * @param $uname
-	 * @param $pword
+	 * @param string $uname
+	 * @param string $pword
+	 * @return bool
 	 */
 	public function bind($uname, $pword)
 	{
@@ -369,6 +375,7 @@ class ActiveDirectory
 	 * 
 	 * Returns an array containing the first and last name for the given username
 	 * @param $username
+	 * @return array | bool
 	 */
 	public function firstlast($username)
 	{
@@ -395,7 +402,7 @@ class ActiveDirectory
 	 * user input. 
 	 * 
 	 * @param $value
-	 * 
+	 * @todo incomplete function
 	 */
 	
 	public function ldapescape($value)
@@ -449,10 +456,11 @@ class ActiveDirectory
 	/**
 	 * 
 	 * This method allows for the disabling of a user. Will return True if disabled and False if failes to disable
+	 * @param string $username
 	 */
 	public function UsrDisable($username)
 	{
-		
+		//@todo incomplete method
 	}
 	
 	/**
@@ -462,7 +470,7 @@ class ActiveDirectory
 	 */
 	public function UserEnable($username)
 	{
-		
+		//@todo incomplete method
 	}
 	
 	/**
@@ -471,7 +479,7 @@ class ActiveDirectory
 	 */
 	public function UserCreate()
 	{
-		
+		//@todo incomplete method
 	}
 	
 	/**
@@ -480,10 +488,12 @@ class ActiveDirectory
 	 * as well how you want the returned array sorted. Attributes can be only those items you want to search, and limit
 	 * is how many entries you want returned. returns multi-dimensional array
 	 * 
-	 * @param $searchterm - Also known as filter
-	 * @param $sortby
-	 * @param $attributes - Entries to return
-	 * @param $limit
+	 * @param string $searchterm - Also known as filter
+	 * @param string $sortby
+	 * @param array $attributes - Entries to return
+	 * @param string $location
+	 * @param int $limit - unused
+	 * @return array
 	 */
 	public function search($searchterm, $sortby, $attributes = array(), $location = null, $limit = 0)
 	{
@@ -515,6 +525,7 @@ class ActiveDirectory
 	 * 
 	 * @param $sortby - can be sorted by sn, givenName, samAccountName
 	 * @param $location - Detail DN excluding BaseDN
+	 * @return array
 	 */
 	
 	public function listusers($sortby, $location = null)
@@ -542,11 +553,10 @@ class ActiveDirectory
 		
 	}
 	/**
-	 * 
 	 * Verifies the existance of the provided user in Active Directory
 	 * 
 	 * @param $username 
-	 * 
+	 * @return bool
 	 */
 	public function userexit($username)
 	{
@@ -569,9 +579,9 @@ class ActiveDirectory
 	}
 	
 	/**
-	 * 
 	 * Returns the user DN for the given username.
 	 * @param $username
+	 * @return string
 	 */
 	public function userDN($username)
 	{
