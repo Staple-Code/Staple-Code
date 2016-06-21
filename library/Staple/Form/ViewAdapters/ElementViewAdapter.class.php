@@ -52,7 +52,7 @@ abstract class ElementViewAdapter
 
     abstract function SelectElement(SelectElement $field);
 
-	abstract function CheckboxgroupElement(CheckboxGroupElement $field);
+	abstract function CheckboxGroupElement(CheckboxGroupElement $field);
 
 	abstract function CheckboxElement(CheckboxElement $field);
 
