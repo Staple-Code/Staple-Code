@@ -7,6 +7,11 @@
  * table = 'sessions'		Session table name
  * encrypt_key = ''			Encryption key to encrypt sessions at rest in the database.
  *
+ * Database table structure:
+ *  - id VARCHAR
+ *  - payload TEXT
+ *  - last_activity INT/TIMESTAMP
+ *
  * @author Ironpilot
  * @copyright Copyright (c) 2016, STAPLE CODE
  *
