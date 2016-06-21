@@ -56,7 +56,7 @@ class Registry
 	/**
 	 * Store a value or object in the registry.
 	 * @param string $key
-	 * @return multitype:|NULL
+	 * @return mixed|NULL
 	 */
 	public static function get($key)
 	{
@@ -122,5 +122,3 @@ class Registry
         throw new Exception('Clone is not allowed.');
     }
 }
-
-?>

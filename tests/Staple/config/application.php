@@ -27,8 +27,8 @@ return [
 	],
 
 	'db'	=>	[
-		'dsn'		=>	NULL,   		//Use this option to create a custom DSN for your database connection
-		'driver'	=>	'mysql',    	//specify the database connection type
+		'dsn'		=>	'sqlite::memory:',   		//Use this option to create a custom DSN for your database connection
+		'driver'	=>	'sqlite',    	//specify the database connection type
 		'host'		=> 	'localhost',
 		'username'	=>	NULL,
 		'password'	=>	NULL,

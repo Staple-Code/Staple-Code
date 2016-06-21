@@ -34,6 +34,11 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 	{
 		return new MockConnection($driver);
 	}
+	private function getInMemorySqlite()
+	{
+		return new Connection('sqlite::memory:');
+	}
+
 	public function testMySQLQueryCreation()
 	{
 		//Setup
@@ -54,5 +59,15 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 		$this->assertEquals("UPDATE  customers\nSET  name='Larry'",(string)$update);
 		$this->assertInstanceOf('\Staple\Query\Delete',$delete);
 		$this->assertEquals("DELETE FROM customers",(string)$delete);
+	}
+
+	public function testMakeSQLiteInMemoryDatabase()
+	{
+		//Setup
+		$connection = $this->getInMemorySqlite();
+
+		//Assert
+		$this->assertInstanceOf('Staple\Query\Connection',$connection);
+		$this->assertEquals(Connection::DRIVER_SQLITE,$connection->getDriver());
 	}
 }

@@ -122,7 +122,7 @@ class Error implements SplSubject
 	 */
 	public function handleException(Exception $ex)
 	{
-	    //handle the error
+		//handle the error
 		$this->setLastException($ex);
 		
 		//Notify observers

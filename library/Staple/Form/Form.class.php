@@ -30,10 +30,11 @@ use \Staple\Config;
 use \Staple\Encrypt;
 use Staple\Exception\FormBuildException;
 use \Staple\Form\ViewAdapters\ElementViewAdapter;
+use Staple\Traits\Helpers;
 
 class Form
 {
-	use \Staple\Traits\Helpers;
+	use Helpers;
 	
 	const METHOD_GET = 'GET';
 	const METHOD_POST = 'POST';
@@ -183,14 +184,6 @@ class Form
 		}
 	}
 	
-	public function __destruct()
-	{
-		if(isset($this->name) && $this->createIdent === TRUE)
-		{
-			$_SESSION['Staple']['Forms'][$this->name]['ident'] = $this->identifier;
-		}
-	}
-	
 	/**
 	 * Overloaded __set allows for dynamic addition of properties.
 	 * @param string | int $key
@@ -221,7 +214,43 @@ class Form
 			return NULL;
 		}
 	}
-	
+
+	/**
+	 * When sleeping in the session, do not save the current value of the submitted property.
+	 * @return array
+	 */
+	public function __sleep()
+	{
+		return array_diff(array_keys(get_object_vars($this)), array('submitted'));
+	}
+
+	/**
+	 * Upon wakeup, check to see if the form was submitted.
+	 */
+	public function __wakeup()
+	{
+		$this->checkSubmitted();
+	}
+
+	/**
+	 * The toString magic method calls the forms build function to output the form to the website.
+	 */
+	public function __toString()
+	{
+		try {
+			return $this->build();
+		}
+		catch (Exception $e)
+		{
+			$msg = '<p class=\"formerror\">Form Error....</p>';
+			if(Config::getValue('errors', 'devmode'))
+			{
+				$msg .= '<p>'.$e->getMessage().'</p>';
+			}
+			return $msg;
+		}
+	}
+
 	/**
 	 * Boot function for initialization of forms that extend this class.
 	 */
@@ -241,32 +270,34 @@ class Form
 		$ident->setValue($this->identifier)
 			->setReadOnly();
 		$this->addField($ident);
+
+		//Set the identifier into the session.
+		$_SESSION['Staple']['Forms'][$this->name]['ident'] = $this->identifier;
 	}
+
+	/**
+	 * Remove the identifier from the form.
+	 * @return $this
+	 */
 	public function disableIdentifier()
 	{
-		unset($this->identifier);
+		//Unset the ident variable, if set
+		if(isset($this->identifier))
+			unset($this->identifier);
+
+		//Set createIdent to false.
 		$this->createIdent = false;
-		unset($this->fields['ident']);
+
+		//Remove from the field list, if exists.
+		if(isset($this->fields['ident']))
+			unset($this->fields['ident']);
+
+		//Remove from the session, if set.
+		if(isset($_SESSION['Staple']['Forms'][$this->name]['ident']))
+			unset($_SESSION['Staple']['Forms'][$this->name]['ident']);
+
+		//Return current object
 		return $this;
-	}
-	
-	/**
-	 * The toString magic method calls the forms build function to output the form to the website.
-	 */
-	public function __toString()
-	{
-		try {
-			return $this->build();
-		}
-		catch (Exception $e)
-		{
-			$msg = '<p class=\"formerror\">Form Error....</p>';
-			if(Config::getValue('errors', 'devmode'))
-			{
-				$msg .= '<p>'.$e->getMessage().'</p>';
-			}
-			return $msg;
-		}
 	}
 	
 	/**
@@ -386,22 +417,33 @@ class Form
 	 */
 	public function wasSubmitted()
 	{
-		if(isset($this->name) && isset($_SESSION['Staple']['Forms'][$this->name]['ident']) && isset($_REQUEST['ident']))
+		if($this->submitted == false)
 		{
-			if($_SESSION['Staple']['Forms'][$this->name]['ident'] == $_REQUEST['ident'])
+			return $this->checkSubmitted();
+		}
+		return $this->submitted;
+	}
+
+	/**
+	 * Checks for the flags for form submission
+	 * @return bool
+	 */
+	private function checkSubmitted()
+	{
+		if (isset($this->name) && isset($_SESSION['Staple']['Forms'][$this->name]['ident']) && isset($_REQUEST['ident']))
+		{
+			if ($_SESSION['Staple']['Forms'][$this->name]['ident'] == $_REQUEST['ident'])
 			{
 				$this->submitted = true;
-				return true;
 			}
 		}
-		$this->submitted = false;
-		return false;
-		//return $this->submitted;
+		return $this->submitted;
 	}
 	
 	/**
 	 * Adds an HTML class to the form.
 	 * @param string $class
+	 * @return $this
 	 */
 	public function addClass($class)
 	{
@@ -794,7 +836,9 @@ JS;
 	}
 
 	/**
+	 * Sets the ENCTYPE attribute value for this form.
 	 * @param string $enctype
+	 * @return $this
 	 */
 	public function setEnctype($enctype)
 	{
@@ -911,24 +955,33 @@ JS;
 		return $this;
 	}
 
-	public function getFieldValue($fieldname)
+	/**
+	 * Returns the value for the names field.
+	 * @param $fieldName
+	 * @return array|bool|null|string
+	 */
+	public function getFieldValue($fieldName)
 	{
-		if(array_key_exists($fieldname,$this->fields))
+		if(array_key_exists($fieldName,$this->fields))
 		{
-			if($this->fields[$fieldname] instanceof FieldElement)
+			if($this->fields[$fieldName] instanceof FieldElement)
 			{
-				return $this->fields[$fieldname]->getValue();
+				return $this->fields[$fieldName]->getValue();
 			}
 		}
 		return NULL;
 	}
 	
 	/*----------------------------------------Builders----------------------------------------*/
-	
+
+	/**
+	 * Returns a string containing the form start and structure tags.
+	 * @return string
+	 */
 	public function formstart()
 	{
 		$buf = '';
-		$buf .= "\n<form name=\"{$this->name}\" id=\"{$this->name}_form\" action=\"{$this->action}\" method=\"{$this->method}\"";
+		$buf .= "\n".'<form name="'.$this->name.'" id="'.$this->name.'_form" action="'.$this->action.'" method="'.$this->method.'"';
 		if(isset($this->enctype))
 		{
 			$buf .= ' enctype="'.$this->enctype.'"';
@@ -953,7 +1006,7 @@ JS;
 	            $classString = '';
 	        }
 		$buf .= ">\n";
-		$buf .= "<div id=\"{$this->name}_div\"";
+		$buf .= '<div id="'.$this->name.'_div"';
 		if(count($this->classes) > 0)
 		{
 			$buf .= ' class="'.trim($classString).'"';
@@ -961,6 +1014,11 @@ JS;
 		$buf .= ">\n";
 		return $buf;
 	}
+
+	/**
+	 * Returns a string containing the form end tags and the identifier field.
+	 * @return string
+	 */
 	public function formend()
 	{
 		$buf = "\n";
@@ -983,7 +1041,11 @@ JS;
 	{
 		return $this->title;
 	}
-	
+
+	/**
+	 * Build out all of the form fields, excluding the identifier field.
+	 * @return string
+	 */
 	public function fields()
 	{
 		$buf = '';
@@ -999,17 +1061,19 @@ JS;
 
 	/**
 	 * Constructs and echos the HTML for the form and all of its elements.
+	 * @return string
+	 * @throws Exception
 	 */
 	public function build()
 	{
 		$buf = '';
 		if(isset($this->layout))
 		{
-			$layoutloc = FORMS_ROOT.'layouts/'.basename($this->layout).'.phtml';
-			if(file_exists($layoutloc))
+			$layoutLocation = FORMS_ROOT.'layouts/'.basename($this->layout).'.phtml';
+			if(file_exists($layoutLocation))
 			{
 				ob_start();
-				include $layoutloc;
+				include $layoutLocation;
 				$buf = ob_get_contents();
 				ob_end_clean();
 			}
