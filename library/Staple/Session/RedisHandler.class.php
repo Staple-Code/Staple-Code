@@ -78,8 +78,19 @@ class RedisHandler implements Handler
 					'port'   => Config::getValue('session', 'port'),
 				];
 
+				//Check for encryption password
 				if(strlen(Config::getValue('session','password',false)) >= 1)
 					$options['password'] = Config::getValue('session','password');
+
+				//Check for SSL Configuration
+				if(strlen(Config::getValue('session','cafile',false)) >= 1)
+				{
+					$options['scheme'] = 'tls';
+					$options['ssl'] = [
+						'cafile' => Config::getValue('session', 'cafile'),
+						'verify_peer' => true
+					];
+				}
 
 				$client = new Client($options);
 

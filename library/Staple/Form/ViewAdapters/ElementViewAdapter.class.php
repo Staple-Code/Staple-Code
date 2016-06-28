@@ -40,7 +40,7 @@ use Staple\Form\ButtonElement;
 
 abstract class ElementViewAdapter
 {
-    use \Staple\Traits\Helpers;
+	use \Staple\Traits\Helpers;
 
 	abstract function TextElement(TextElement $field);
 
@@ -50,19 +50,19 @@ abstract class ElementViewAdapter
 
 	abstract function HiddenElement(HiddenElement $field);
 
-    abstract function SelectElement(SelectElement $field);
+	abstract function SelectElement(SelectElement $field);
 
 	abstract function CheckboxGroupElement(CheckboxGroupElement $field);
 
 	abstract function CheckboxElement(CheckboxElement $field);
 
-    abstract function RadioElement(RadioElement $field);
+	abstract function RadioElement(RadioElement $field);
 
-    abstract function FileElement(FileElement $field);
+	abstract function FileElement(FileElement $field);
 
-    abstract function SubmitElement(SubmitElement $field);
+	abstract function SubmitElement(SubmitElement $field);
 
-    abstract function ButtonElement(ButtonElement $field);
+	abstract function ButtonElement(ButtonElement $field);
 
-    abstract function ImageElement(ImageElement $field);
+	abstract function ImageElement(ImageElement $field);
 }
