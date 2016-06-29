@@ -170,7 +170,15 @@ class FileHandler implements Handler
 	 */
 	public function read($session_id)
 	{
-		return (string)@file_get_contents($this->fileLocation.DIRECTORY_SEPARATOR.'session_'.$session_id);
+		$session_file = $this->fileLocation.DIRECTORY_SEPARATOR.'session_'.$session_id;
+		if(file_exists($session_file))
+		{
+			return (string)@file_get_contents($session_file);
+		}
+		else
+		{
+			return null;
+		}
 	}
 
 	/**
