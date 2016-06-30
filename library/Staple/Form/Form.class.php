@@ -366,6 +366,10 @@ class Form
 					{
 						$chk->setValue($data[$chk->getName()]);
 					}
+					else
+					{
+						$chk->setValue(0);
+					}
 				}
 			}
 			else
