@@ -265,14 +265,25 @@ class Form
 	 */
 	protected function createIdentifier()
 	{
-		$this->identifier = Encrypt::genHex(32);
-		$ident = new HiddenElement('ident');
-		$ident->setValue($this->identifier)
-			->setReadOnly();
-		$this->addField($ident);
+		if(isset($this->name))
+		{
+			$this->identifier = Encrypt::genHex(32);
+			$ident = new HiddenElement('ident');
+			$ident->setValue($this->identifier)
+				->setReadOnly();
+			$this->addField($ident);
 
-		//Set the identifier into the session.
-		$_SESSION['Staple']['Forms'][$this->name]['ident'] = $this->identifier;
+			//Check for form submission
+			if(isset($_REQUEST['ident']))
+				if($_REQUEST['ident'] == $_SESSION['Staple']['Forms'][$this->getName()]['ident'])
+					$this->submitted = true;
+
+			//Set the identifier into the session.
+			$_SESSION['Staple']['Forms'][$this->getName()]['ident'] = $this->identifier;
+
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -819,6 +830,7 @@ JS;
 	public function setName($name)
 	{
 		$this->name = str_replace(' ','_',$name);
+		$this->createIdentifier();
 		return $this;
 	}
 	
