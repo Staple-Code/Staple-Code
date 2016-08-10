@@ -84,23 +84,29 @@ class UploadedFileValidator extends FieldValidator
 				}
 				else
 				{
-					//Check that FileInfo Extension is enabled
-					if(class_exists('finfo'))
+					if(array_key_exists('tmp_name',$data))
 					{
-						$finfo = new finfo(FILEINFO_MIME_TYPE);
-						$mime = $this->getMimeCheck();
-						if(is_array($mime))
+						if(is_uploaded_file($data['tmp_name']))
 						{
-							if(in_array($finfo->file($data['tmp_name']),$mime))
+							//Check that FileInfo Extension is enabled
+							if (class_exists('finfo'))
 							{
-								return true;
-							}
-						}
-						else
-						{
-							if($finfo->file($data['tmp_name']) == $mime)
-							{
-								return true;
+								$finfo = new finfo(FILEINFO_MIME_TYPE);
+								$mime = $this->getMimeCheck();
+								if (is_array($mime))
+								{
+									if (in_array($finfo->file($data['tmp_name']), $mime))
+									{
+										return true;
+									}
+								}
+								else
+								{
+									if ($finfo->file($data['tmp_name']) == $mime)
+									{
+										return true;
+									}
+								}
 							}
 						}
 					}
