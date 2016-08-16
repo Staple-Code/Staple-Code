@@ -11,6 +11,15 @@ return [
 		'title' 	=>	'STAPLE Code - A PHP 5 Model-View-Controller Framework for Rapid Application Development',
 	],
 
+	'session'	=>	[
+		//automatically create a session on every call to the framework.
+		'auto_create'	=>	1,
+		'max_lifetime'	=>	1440,
+
+		//Array Session Handler
+		'handler' 		=>	'Staple\Session\ArrayHandler',
+	],
+
 	'layout'	=>	[
 		'default' 			=>	'bootstrap',
 		'scripts'			=>	[

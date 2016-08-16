@@ -14,10 +14,9 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 {
 	public function testSessionStart()
 	{
-		$this->markTestIncomplete();
-
 		//Setup
 		Session::start(NULL,true);
+		session_id('sessionid');
 
 		//Act
 		$id = session_id();
