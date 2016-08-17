@@ -522,7 +522,7 @@ class Connection extends PDO implements SplSubject
 
 	/**
 	 * @param string $statement
-	 * @return PDOStatement | boolean
+	 * @return Statement | boolean
 	 */
 	public function exec($statement)
 	{
