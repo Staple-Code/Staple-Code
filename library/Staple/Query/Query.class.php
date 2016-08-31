@@ -30,6 +30,8 @@ use \Exception;
 use \Staple\Error;
 use \DateTime;
 use Staple\Pager;
+use \PDO;
+use \PDOStatement;
 
 abstract class Query
 {
@@ -489,5 +491,95 @@ abstract class Query
             return $connection->query($statement);
         else
             return Connection::get()->query($statement);
+	}
+
+	/**
+	 * Create a prepared statement for a stored procedure call.
+	 * @param $name
+	 * @param array $parameters
+	 * @param Connection $connection
+	 * @param array $driverOptions
+	 * @return PDOStatement
+	 * @throws QueryException
+	 */
+	public static function procedure($name, array $parameters = NULL, Connection $connection = NULL, array $driverOptions = [])
+	{
+		if(isset($connection))
+		{
+			$myConn = $connection;
+		}
+		else
+		{
+			$myConn = Connection::get();
+		}
+
+		if(isset($parameters))
+		{
+			$params = '(';
+
+			$numericKeys = false;
+			foreach ($parameters as $key=>$value)
+			{
+				if (is_int($key))
+				{
+					$numericKeys = true;
+				}
+				elseif(substr($key,0,1) != ':')
+				{
+					unset($parameters[$key]);
+					$parameters[':'.$key] = $value;
+				}
+				else
+				{
+					if ($numericKeys == true)
+					{
+						throw new QueryException('You cannot mix numeric and named parameter keys.');
+					}
+				}
+			}
+
+			$keys = array_keys($parameters);
+			if($numericKeys == true)
+			{
+				for($i = 0; $i<count($keys); $i++)
+				{
+					$params .= '?, ';
+				}
+			}
+			else
+				$params .= implode(', ',$keys);
+
+			$params .= ')';
+		}
+		else
+		{
+			$params = '()';
+		}
+
+		$driverOptions[PDO::FETCH_CLASS] = '\Staple\Query\Statement';
+
+		//Prepare Statement
+		$stmt = $myConn->prepare('CALL '.$name.$params, $driverOptions);
+
+		//Bind Values
+		if(isset($parameters))
+		{
+			foreach ($parameters as $key => $value)
+			{
+				//Figure out data type
+				if (is_int($value))
+					$type = PDO::PARAM_INT;
+				elseif (is_bool($value))
+					$type = PDO::PARAM_BOOL;
+				elseif (is_null($value))
+					$type = PDO::PARAM_NULL;
+				else
+					$type = PDO::PARAM_STR;
+
+				$stmt->bindValue($key, $value, $type);
+			}
+		}
+
+		return $stmt;
 	}
 }
