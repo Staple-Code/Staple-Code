@@ -167,7 +167,7 @@ class Form
 		}
 
 		/**
-		 * Loads selected elementViewAdapter from application.ini and verify given adapter is a class before loading
+		 * Loads selected elementViewAdapter from configuration and verify given adapter is a class before loading.
 		 */
 		if(Config::getValue('forms','elementViewAdapter', false) != '')
 		{
@@ -1143,7 +1143,7 @@ JS;
      * @param string $label
      * @param string $id
      * @param array $attributes
-     * @return TextElement
+     * @return PasswordElement
      */
     public static function passwordElement($name, $label = NULL, $id = NULL, array $attributes = array())
     {

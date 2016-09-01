@@ -1,7 +1,7 @@
 <?php
 /** 
  * This is the packaged database authorization adapter. This adapter requires the following
- * settings to be included in the application.ini or the auth.ini file:
+ * settings to be included in the configuration file:
  * 
  * enabled - Set to 1 or 0 to enable or disable authentication. 1 is the default setting, if excluded.
  * adapter - Tells the Staple_Main class which AuthAdapter to load.

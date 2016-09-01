@@ -92,20 +92,12 @@ class Auth
 	private function __construct()
 	{
 		$this->authed = false;
-		if(file_exists(CONFIG_ROOT.'auth.ini'))
+		if(Config::exists('auth'))
 		{
-			$curConfig = parse_ini_file(CONFIG_ROOT.'auth.ini');
+			$curConfig = Config::get('auth');
 			if($this->checkConfig($curConfig))
 			{
 				$this->_settings = $curConfig;
-			}
-		}
-		elseif(file_exists(CONFIG_ROOT.'application.ini'))
-		{
-			$curConfig = parse_ini_file(CONFIG_ROOT.'application.ini',true);
-			if($this->checkConfig($curConfig['auth']))
-			{
-				$this->_settings = $curConfig['auth'];
 			}
 		}
 		else

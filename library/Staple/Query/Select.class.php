@@ -579,19 +579,40 @@ class Select extends Query
 		}
 		return false;
 	}
-	
+
+	/**
+	 * Join to another table using an outer join.
+	 * @param string $table
+	 * @param string $condition
+	 * @param string|null $alias
+	 * @return $this
+	 */
 	public function leftJoin($table, $condition, $alias = NULL)
 	{
 		$this->addJoin(Join::left($table, $condition,$alias));
 		return $this;
 	}
-	
+
+	/**
+	 * Join to another table using an inner join.
+	 * @param string $table
+	 * @param string $condition
+	 * @param string|null $alias
+	 * @return $this
+	 */
 	public function innerJoin($table, $condition, $alias = NULL)
 	{
 		$this->addJoin(Join::inner($table, $condition,$alias));
 		return $this;
 	}
 
+	/**
+	 * Join to another table using an inner join.
+	 * @param string $table
+	 * @param string $condition
+	 * @param string|null $alias
+	 * @return $this
+	 */
 	public function join($table, $condition, $alias = NULL)
 	{
 		$this->addJoin(Join::inner($table,$condition,$alias));
@@ -600,7 +621,7 @@ class Select extends Query
 	
 	/**
 	 * Returns the joins array
-	 * @return array[Staple_Query_Join]
+	 * @return Join[]
 	 */
 	public function getJoins()
 	{
@@ -610,8 +631,9 @@ class Select extends Query
 	/*-----------------------------------------------BUILD FUNCTION-----------------------------------------------*/
 	
 	/**
-	 * 
+	 * Builds the query and returns the string.
 	 * @see Staple_Query::build()
+	 * @return string
 	 */
 	function build()
 	{

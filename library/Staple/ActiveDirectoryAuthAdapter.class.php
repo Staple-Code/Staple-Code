@@ -1,12 +1,12 @@
 <?php
 /** 
  * This is the packaged Active Directory authorization adapter. This adapter requires the following
- * settings to be included in the application.ini or the auth.ini file:
+ * settings to be included in the configuration file:
  * 
  * enabled - Set to 1 or 0 to enable or disable authentication. 1 is the default setting, if excluded.
  * adapter - Tells the Staple_Main class which AuthAdapter to load.
  * authtable - (optional) Specifies the database table where auth credentials reside.
- * uidfield - (optional) Defines the username or user identifer field.
+ * uidfield - (optional) Defines the username or user identifier field.
  * 
  * 
  * @author Hans Heeling
@@ -56,17 +56,9 @@ class ActiveDirectoryAuthAdapter implements AuthAdapter
 	 */
 	public function __construct()
 	{
-		if(file_exists(CONFIG_ROOT.'application.ini'))
+		if(Config::exists('auth'))
 		{
-			$curConfig = parse_ini_file(CONFIG_ROOT.'application.ini',true);
-			if($this->checkConfig($curConfig['auth']))
-			{
-				$this->_settings = $curConfig['auth'];
-			}
-		}
-		elseif(file_exists(CONFIG_ROOT.'auth.ini'))
-		{
-			$curConfig = parse_ini_file(CONFIG_ROOT.'auth.ini');
+			$curConfig = Config::get('auth');
 			if($this->checkConfig($curConfig))
 			{
 				$this->_settings = $curConfig;
