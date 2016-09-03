@@ -280,6 +280,7 @@ class Main
 	 */
 	public function getController($class)
 	{
+		$class = strtolower($class);
 		if(isset($this->controllers[$class]))
 		{
 			return $this->controllers[$class];
@@ -378,7 +379,7 @@ class Main
 	 */
 	public function registerController(Controller $controller)
 	{
-		$class_name = substr(get_class($controller),0,strlen(get_class($controller))-10);
+		$class_name = strtolower(substr(get_class($controller),0,strlen(get_class($controller))-10));
 		if(!array_key_exists($class_name, $this->controllers))
 		{
 			$this->controllers[$class_name] = $controller;

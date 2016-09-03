@@ -97,8 +97,19 @@ class Route
 	 * Create and return an instance of the object.
 	 * @param string $link
 	 * @return static
+	 * @deprecated
 	 */
 	public static function make($link = NULL)
+	{
+		return new static($link);
+	}
+
+	/**
+	 * Create and return an instance of the object.
+	 * @param string $link
+	 * @return static
+	 */
+	public static function create($link = NULL)
 	{
 		return new static($link);
 	}
@@ -113,8 +124,8 @@ class Route
 		$method = $this->getAction();
 		
 		//The class name for the controller
-		$dispatchClass = $class.'Controller';
-	
+		$dispatchClass = $class.self::CONTROLLER_SUFFIX;
+
 		//Check for the controller existence
 		if(class_exists($dispatchClass))
 		{
@@ -230,6 +241,10 @@ class Route
 			{
 				Main::get()->run($return);
 			}
+			elseif ($return instanceof Link)	//Redirect to a link location.
+			{
+				header('Location: '.$return);
+			}
 			elseif (is_object($return))		//Check for another object type
 			{
 				//If the object is stringable, covert it to a string and output it.
@@ -248,7 +263,7 @@ class Route
 				//If nothing else works, echo the object through the dump method.
 				else
 				{
-					Dev::Dump($return);
+					Dev::dump($return);
 				}
 			}
 			elseif(is_string($return))		//If the return value was simply a string, echo it out.

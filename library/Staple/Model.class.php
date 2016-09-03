@@ -25,6 +25,7 @@ namespace Staple;
 
 use \Exception;
 use \PDO;
+use Staple\Exception\QueryException;
 use Staple\Query\Connection;
 use Staple\Query\Insert;
 use Staple\Query\Query;
@@ -376,10 +377,10 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	/**
 	 * Return an instance of the model from the primary key.
 	 * @param int $id
-	 * @param PDO $connection
+	 * @param Connection $connection
 	 * @return $this | bool
 	 */
-	public static function find($id,PDO $connection = NULL)
+	public static function find($id, Connection $connection = NULL)
 	{
 		//Make a model instance
 		$model = static::make();
@@ -423,10 +424,56 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	{
 		//@todo incomplete function
 	}
-	
-	public static function findWhereEqual($column, $value)
+
+	/**
+	 * @param string $column
+	 * @param mixed $value
+	 * @param int $limit
+	 * @param Connection $connection
+	 * @return array|bool|static
+	 * @throws QueryException
+	 */
+	public static function findWhereEqual($column, $value, $limit = NULL, Connection $connection = NULL)
 	{
-		//@todo incomplete function
+		//Make a model instance
+		$model = static::make();
+
+		//Create the query
+		$query = Select::table($model->_getTable())->whereEqual($column,$value);
+
+		//Change connection if needed
+		if(isset($connection)) $query->setConnection($connection);
+
+		//Set limit
+		if(isset($limit)) $query->limit($limit);
+
+		//Execute the query
+		$result = $query->execute();
+		if($result instanceof Statement)
+		{
+			if($result->rowCount() == 1)
+			{
+				//Load the result data
+				$model->_data = $result->fetch(PDO::FETCH_ASSOC);
+				return $model;
+			}
+			elseif($result->rowCount() >= 1)
+			{
+				//If more than one record was returned return the array of results.
+				$models = array();
+				while($row = $result->fetch(PDO::FETCH_ASSOC))
+				{
+					$model = static::make();
+					$model->_data = $row;
+					$models[] = $model;
+				}
+				return $models;
+			}
+			else
+				return false;
+		}
+		else
+			return false;		//Return false on query failure
 	}
 	
 	public static function findWhereNull($column)

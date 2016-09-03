@@ -197,11 +197,11 @@ class Auth
 	 * Attempts authorization, accepting credentials and forwarding them to the AuthAdapter.
 	 * Throws and Exception if the AuthAdapter is not implemented from Staple_AuthAdapter. 
 	 * Returns a boolean to signify if authorization succeeded.
-	 * @param array $credentials
+	 * @param mixed $credentials
 	 * @throws Exception
 	 * @return bool
 	 */
-	public function doAuth(array $credentials)
+	public function doAuth($credentials)
 	{
 		//Make sure an adapter is loaded.
 		if(!($this->adapter instanceof AuthAdapter))
@@ -281,7 +281,7 @@ class Auth
 	private function dispatchAuthController($previousRoute = NULL)
 	{
 		//Get and Construct the Auth Controller
-		$controllerClass = Config::getValue('auth','controller'); //$this->_settings['controller'];
+		$controllerClass = Config::getValue('auth','controller');
 		$class = substr($controllerClass, 0, strlen($controllerClass)-10);
 
 		//Setup the action to call
@@ -302,7 +302,6 @@ class Auth
 				Main::controller($controllerClass);
 
 				//If the controller
-				//@todo Add support for AuthProviders here as well
 				if ($controller instanceof AuthController)
 				{
 					//Set the view's controller to match the route
@@ -317,6 +316,7 @@ class Auth
 
 					if ($return instanceof View)        //Check for a returned View object
 					{
+
 						//If the view does not have a controller name set, set it to the currently executing controller.
 						if ($return->hasController() == false)
 						{
@@ -324,6 +324,12 @@ class Auth
 							$conString = get_class($controller);
 
 							$return->setController(substr($conString, 0, strlen($conString) - strlen($loader::CONTROLLER_SUFFIX)));
+						}
+
+						//If the view doesn't have a view set, use the route's action.
+						if(!$return->hasView())
+						{
+							$return->setView($action);
 						}
 
 						//Check for a controller layout and build it.
@@ -335,16 +341,10 @@ class Auth
 						{
 							$return->build();
 						}
-
-						//The view has been built return true
-						return true;
 					}
 					elseif ($return instanceof Json)    //Check for a Json object to be coverted and echoed.
 					{
 						echo json_encode($return);
-
-						//JSON echoed return true
-						return true;
 					}
 					elseif (is_object($return))        //Check for another object type
 					{
@@ -353,9 +353,6 @@ class Auth
 						if ($class->implementsInterface('JsonSerializable'))
 						{
 							echo json_encode($return);
-
-							//Object successfully converted to JSON
-							return true;
 						}
 						//If the object is stringable, covert to a string and output it.
 						elseif ((!is_array($return)) &&
@@ -363,25 +360,16 @@ class Auth
 								(is_object($return) && method_exists($return, '__toString'))))
 						{
 							echo (string)$return;
-
-							//Object stringified successfully
-							return true;
 						}
 						//If nothing else works, echo the object through the dump method.
 						else
 						{
 							Dev::dump($return);
-
-							//Object was dumped to the browser
-							return true;
 						}
 					}
 					elseif (is_string($return))        //If the return value was simply a string, echo it out.
 					{
 						echo $return;
-
-						//String sent to the browser
-						return true;
 					}
 					else
 					{
@@ -394,10 +382,8 @@ class Auth
 						{
 							$controller->view->build();
 						}
-
-						//The legacy view has been built return true
-						return true;
 					}
+					return true;
 				}
 				else
 				{

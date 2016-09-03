@@ -177,7 +177,7 @@ class FileHandler implements Handler
 		}
 		else
 		{
-			return null;
+			return (string)'';
 		}
 	}
 

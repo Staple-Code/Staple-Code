@@ -253,7 +253,12 @@ class Autoload
 		}
 		else
 		{
-			if($this->throwOnFailure === true)
+			$include = CONTROLLER_ROOT.ucfirst($class_name).static::PHP_FILE_EXTENSION;
+			if(file_exists($include))
+			{
+				require_once $include;
+			}
+			elseif($this->throwOnFailure === true)
 			{
 				throw new PageNotFoundException('Page Not Found',Error::PAGE_NOT_FOUND);
 			}
