@@ -1117,10 +1117,11 @@ JS;
      * @param string $method
      * @return Form
      */
-    public static function create($name, $action = NULL, $method = self::METHOD_POST)
+    public static function create($name = NULL, $action = NULL, $method = self::METHOD_POST)
     {
         $inst = new self($name,$action);
-        $inst->setMethod($method);
+		if(isset($method))
+        	$inst->setMethod($method);
         return $inst;
     }
 
