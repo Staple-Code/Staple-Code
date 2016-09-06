@@ -232,7 +232,7 @@ class DatabaseHandler implements Handler
 					return $record->payload;
 			}
 		}
-		return '';
+		return (string)'';
 	}
 
 	/**
