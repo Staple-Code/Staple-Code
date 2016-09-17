@@ -1,6 +1,6 @@
 <?php
 /** 
- * Validates against object method
+ * Validates against callback
  * 
  * @author Hans Heeling
  * @copyright Copyright (c) 2011, STAPLE CODE
@@ -28,11 +28,14 @@ use \Staple\Form\FieldElement;
 class CallbackValidator extends FieldValidator
 {
 	const DEFAULT_ERROR = 'Field Error';
-	protected $callback;
-
 
 	/**
-	 * Callback validator used to call method of an object to use for field validation
+	 * @var callable
+	 */
+	protected $callback;
+
+	/**
+	 * Callback validator for field validation
 	 * 
 	 * @param callable $callback
 	 * @param string $usermsg
@@ -42,11 +45,9 @@ class CallbackValidator extends FieldValidator
 		$this->callback = $callback;
 		parent::__construct($usermsg);
 	}
-	
-
 
 	/**
-	 * Check for Data Validity using given callback.
+	 * Check for data validity using given callback.
 	 * @param mixed $data
 	 * @return boolean
 	 */
