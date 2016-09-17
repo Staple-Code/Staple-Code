@@ -46,7 +46,7 @@ class CallbackValidator extends FieldValidator
 
 
 	/**
-	 * Check for Data Length Validity.
+	 * Check for Data Validity using given callback.
 	 * @param mixed $data
 	 * @return boolean
 	 */
