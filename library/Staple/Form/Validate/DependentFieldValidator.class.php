@@ -81,6 +81,11 @@ class DependentFieldValidator extends FieldValidator
 		return $this;
 	}
 
+	public function getFieldvalue()
+	{
+		return $this->field->getValue();
+	}
+
 	/**
 	 * @return mixed
 	 */
@@ -210,7 +215,7 @@ class DependentFieldValidator extends FieldValidator
 	 */
 	private function equalComparison($data)
 	{
-		if($data == $this->field->getValue())
+		if($data == $this->getFieldvalue())
 		{
 			return TRUE;
 		}
@@ -228,14 +233,14 @@ class DependentFieldValidator extends FieldValidator
 	{
 		if(is_numeric($data))
 		{
-			if($data < $this->field->getValue())
+			if($data < $this->getFieldvalue())
 			{
 				return TRUE;
 			}
 		}
 		else
 		{
-			if(strlen($data) < strlen($this->field->getValue()))
+			if(strlen($data) < strlen($this->getFieldvalue()))
 			{
 				return TRUE;
 			}
@@ -254,14 +259,14 @@ class DependentFieldValidator extends FieldValidator
 	{
 		if(is_numeric($data))
 		{
-			if($data > $this->field->getValue())
+			if($data > $this->getFieldvalue())
 			{
 				return TRUE;
 			}
 		}
 		else
 		{
-			if(strlen($data) > strlen($this->field->getValue()))
+			if(strlen($data) > strlen($this->getFieldvalue()))
 			{
 				return TRUE;
 			}
@@ -280,14 +285,14 @@ class DependentFieldValidator extends FieldValidator
 	{
 		if(is_numeric($data))
 		{
-			if($data <= $this->field->getValue())
+			if($data <= $this->getFieldvalue())
 			{
 				return TRUE;
 			}
 		}
 		else
 		{
-			if(strlen($data) <= strlen($this->field->getValue()))
+			if(strlen($data) <= strlen($this->getFieldvalue()))
 			{
 				return TRUE;
 			}
@@ -306,14 +311,14 @@ class DependentFieldValidator extends FieldValidator
 	{
 		if(is_numeric($data))
 		{
-			if($data >= $this->field->getValue())
+			if($data >= $this->getFieldvalue())
 			{
 				return TRUE;
 			}
 		}
 		else
 		{
-			if(strlen($data) >= strlen($this->field->getValue()))
+			if(strlen($data) >= strlen($this->getFieldvalue()))
 			{
 				return TRUE;
 			}
