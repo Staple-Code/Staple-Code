@@ -92,7 +92,7 @@ class SelectElement extends FieldElement
 	/**
 	 * Sets the value for the select box
 	 * @param boolean $val
-	 * @return $this
+	 * @return FieldElement
 	 */
 	public function setValue($val)
 	{
@@ -183,6 +183,7 @@ class SelectElement extends FieldElement
 	
 	/**
 	 * Removes all the options from the select list.
+	 * @return $this
 	 */
 	public function clearOptionList()
 	{
