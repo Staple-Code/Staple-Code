@@ -163,7 +163,7 @@ class DependentFieldValidatorTest extends \PHPUnit_Framework_TestCase
 	/*
 	 * Test equal to functionality
 	 */
-	public function testEqaulFunctionalityEqualValues()
+	public function testEqualFunctionalityEqualValues()
 	{
 		$testfield = TextElement::create('TestField');
 		$testfield2 = TextElement::create('TestField2');
@@ -173,12 +173,9 @@ class DependentFieldValidatorTest extends \PHPUnit_Framework_TestCase
 
 		$dependentFieldValidator = DependentFieldValidator::equal($testfield);
 		$this->assertTrue($dependentFieldValidator->check($testfield2->getValue()));
-
-		$testfield2->setValue(3);
-		$this->assertFalse($dependentFieldValidator->check($testfield2->getValue()));
 	}
 
-	public function testEqaulFunctionalityUnEqualValues()
+	public function testEqualFunctionalityUnEqualValues()
 	{
 		$testfield = TextElement::create('TestField');
 		$testfield2 = TextElement::create('TestField2');
