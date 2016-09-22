@@ -81,7 +81,7 @@ class DependentFieldValidator extends FieldValidator
 		return $this;
 	}
 
-	public function getFieldvalue()
+	public function getFieldValue()
 	{
 		return $this->field->getValue();
 	}
@@ -110,7 +110,7 @@ class DependentFieldValidator extends FieldValidator
 
 	/**
 	 * @param FieldElement $field
-	 * @param null $userMsg
+	 * @param string|null $userMsg
 	 * @return DependentFieldValidator
 	 *
 	 * Instantiates DependentFieldValidator for an equal to comparison between fields
@@ -121,8 +121,8 @@ class DependentFieldValidator extends FieldValidator
 	}
 
 	/**
-	 * @param FieldElement $feild
-	 * @param null $userMsg
+	 * @param FieldElement $field
+	 * @param string|null $userMsg
 	 * @return DependentFieldValidator
 	 *
 	 * Instantiates DependentFieldValidator for a less than comparison between two fields. Compares strings by string length.
@@ -133,8 +133,8 @@ class DependentFieldValidator extends FieldValidator
 	}
 
 	/**
-	 * @param FieldElement $feild
-	 * @param null $userMsg
+	 * @param FieldElement $field
+	 * @param string|null $userMsg
 	 * @return DependentFieldValidator
 	 *
 	 * Instantiates DependentFieldValidator for a greater than comparison between two fields. Compares strings by string length.
@@ -145,8 +145,8 @@ class DependentFieldValidator extends FieldValidator
 	}
 
 	/**
-	 * @param FieldElement $feild
-	 * @param null $userMsg
+	 * @param FieldElement $field
+	 * @param string|null $userMsg
 	 * @return DependentFieldValidator
 	 *
 	 * Instantiates DependentFieldValidator for a less than or equal to comparison between two fields. Compares strings by string length.
@@ -157,8 +157,8 @@ class DependentFieldValidator extends FieldValidator
 	}
 
 	/**
-	 * @param FieldElement $feild
-	 * @param null $userMsg
+	 * @param FieldElement $field
+	 * @param string|null $userMsg
 	 * @return DependentFieldValidator
 	 *
 	 * Instantiates DependentFieldValidator for a greater than or equal to comparison between two fields. Compares strings by string length.
@@ -215,7 +215,7 @@ class DependentFieldValidator extends FieldValidator
 	 */
 	private function equalComparison($data)
 	{
-		if($data == $this->getFieldvalue())
+		if($data == $this->getFieldValue())
 		{
 			return TRUE;
 		}
@@ -233,14 +233,14 @@ class DependentFieldValidator extends FieldValidator
 	{
 		if(is_numeric($data))
 		{
-			if($data < $this->getFieldvalue())
+			if($data < $this->getFieldValue())
 			{
 				return TRUE;
 			}
 		}
 		else
 		{
-			if(strlen($data) < strlen($this->getFieldvalue()))
+			if(strlen($data) < strlen($this->getFieldValue()))
 			{
 				return TRUE;
 			}
@@ -259,14 +259,14 @@ class DependentFieldValidator extends FieldValidator
 	{
 		if(is_numeric($data))
 		{
-			if($data > $this->getFieldvalue())
+			if($data > $this->getFieldValue())
 			{
 				return TRUE;
 			}
 		}
 		else
 		{
-			if(strlen($data) > strlen($this->getFieldvalue()))
+			if(strlen($data) > strlen($this->getFieldValue()))
 			{
 				return TRUE;
 			}
@@ -285,14 +285,14 @@ class DependentFieldValidator extends FieldValidator
 	{
 		if(is_numeric($data))
 		{
-			if($data <= $this->getFieldvalue())
+			if($data <= $this->getFieldValue())
 			{
 				return TRUE;
 			}
 		}
 		else
 		{
-			if(strlen($data) <= strlen($this->getFieldvalue()))
+			if(strlen($data) <= strlen($this->getFieldValue()))
 			{
 				return TRUE;
 			}
@@ -311,14 +311,14 @@ class DependentFieldValidator extends FieldValidator
 	{
 		if(is_numeric($data))
 		{
-			if($data >= $this->getFieldvalue())
+			if($data >= $this->getFieldValue())
 			{
 				return TRUE;
 			}
 		}
 		else
 		{
-			if(strlen($data) >= strlen($this->getFieldvalue()))
+			if(strlen($data) >= strlen($this->getFieldValue()))
 			{
 				return TRUE;
 			}
