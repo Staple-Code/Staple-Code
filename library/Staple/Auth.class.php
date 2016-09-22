@@ -316,7 +316,6 @@ class Auth
 
 					if ($return instanceof View)        //Check for a returned View object
 					{
-
 						//If the view does not have a controller name set, set it to the currently executing controller.
 						if ($return->hasController() == false)
 						{
