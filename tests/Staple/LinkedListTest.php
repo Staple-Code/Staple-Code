@@ -33,7 +33,7 @@ class LinkedListTest extends \PHPUnit_Framework_TestCase
 	 */
 	private function getPopulatedTestObject()
 	{
-		$list = new LinkedList();
+		$list = new LinkedList('Numbers');
 		$list->add('One');
 		$list->add('Two');
 		$list->add('Three');
@@ -111,5 +111,39 @@ class LinkedListTest extends \PHPUnit_Framework_TestCase
 		$this->assertEquals('Three',$list[2]);
 		$this->assertEquals('Five',$list[4]);
 		$this->assertEquals('Eight',$list[7]);
+	}
+
+	public function testConvertToString()
+	{
+		//Setup
+		$list = $this->getPopulatedTestObject();
+		$expectedList = "One\nTwo\nThree\nFour\nFive\nSix\nSeven\nEight\nNine\n";
+		$expectedListVerbose = "Name: Numbers \nSize: 9 \n".$expectedList;
+
+		//Act
+		$stringList = (string)$list;
+		$stringListVerbose = $list->getListString(true);
+
+		//Assert
+		$this->assertEquals($expectedList,$stringList);
+		$this->assertEquals($expectedListVerbose,$stringListVerbose);
+	}
+
+	public function testConvertToArray()
+	{
+		//Setup
+		$list = $this->getPopulatedTestObject();
+		$expectedList = ['One','Two','Three','Four','Five','Six','Seven','Eight','Nine'];
+		$expectedListVerbose = $expectedList;
+		$expectedListVerbose[-2] = 'Numbers';
+		$expectedListVerbose[-1] = 9;
+
+		//Act
+		$arrayList = $list->getListArray();
+		$arrayListVerbose = $list->getListArray(true);
+
+		//Assert
+		$this->assertEquals($expectedList,$arrayList);
+		$this->assertEquals($expectedListVerbose,$arrayListVerbose);
 	}
 }
