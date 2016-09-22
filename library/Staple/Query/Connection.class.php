@@ -115,6 +115,8 @@ class Connection extends PDO implements SplSubject
 
 		parent::__construct($dsn,$username,$password,$options);
 
+		if(!isset($this->driver)) $this->setDriver(self::getDriverFromDsn($dsn));
+
 		$this->setAttribute(PDO::ATTR_STATEMENT_CLASS,array('\Staple\Query\Statement'));
 
 		if(isset($username))
@@ -291,6 +293,17 @@ class Connection extends PDO implements SplSubject
 
 		return $dsn;
 	}
+	
+	protected function getDriverFromDsn($dsn)
+	{
+		$dsnString = explode(':',$dsn);
+		$driverList = $this->getAvailableDrivers();
+		if(($driverKey = array_search($dsnString[0],$driverList)) !== false)
+		{
+			return $driverList[$driverKey];
+		}
+		return NULL;
+	}
 
 	/**
 	 * Get the default database instance.
@@ -346,7 +359,25 @@ class Connection extends PDO implements SplSubject
 	 */
 	public function setDriver($driver)
 	{
-		$this->driver = $driver;
+		switch($driver)
+		{
+			case self::DRIVER_4D:
+			case self::DRIVER_CUBRID:
+			case self::DRIVER_DBLIB:
+			case self::DRIVER_FIREBIRD:
+			case self::DRIVER_IBM:
+			case self::DRIVER_INFORMIX:
+			case self::DRIVER_MSSQL:
+			case self::DRIVER_MYSQL:
+			case self::DRIVER_OCI:
+			case self::DRIVER_ODBC:
+			case self::DRIVER_PGSQL:
+			case self::DRIVER_SQLITE:
+			case self::DRIVER_SQLSRV:
+			case self::DRIVER_SYBASE:
+				$this->driver = (string)$driver;
+				break;
+		}
 		return $this;
 	}
 

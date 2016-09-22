@@ -115,7 +115,7 @@ class Encrypt
 		}
 
 		//To correctly detect string length we trim the output.
-		$decryptString = trim(mcrypt_decrypt($cypher, $key, $decrypt, MCRYPT_MODE_ECB, $iv));
+		$decryptString = rtrim(mcrypt_decrypt($cypher, $key, $decrypt, MCRYPT_MODE_ECB, $iv),"\0");
 
 		//Remove salt and pepper
 		$start = strlen($pepper);

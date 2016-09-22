@@ -108,7 +108,7 @@ class Config
 	 * @param string $name
 	 * @param bool $getAsObject
 	 * @throws ConfigurationException
-	 * @return array
+	 * @return array|stdClass
 	 */
 	public static function get($name, $getAsObject = false)
 	{
@@ -259,7 +259,7 @@ class Config
 	}
 	
 	/**
-	 * Read and store the application.ini or application.php config file.
+	 * Read and store the application.ini, application.php or specified config file.
 	 */
 	private function read()
 	{

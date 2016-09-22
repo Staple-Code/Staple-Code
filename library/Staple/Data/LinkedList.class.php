@@ -30,17 +30,17 @@ class LinkedList implements \Iterator, \Countable, \ArrayAccess
 {
 	/**
 	 * Pointer to the starting list node
-	 * @var Staple_Data_LinkedListNode
+	 * @var LinkedListNode
 	 */
 	protected $first;
 	/**
 	 * Pointer to the current list node
-	 * @var Staple_Data_LinkedListNode
+	 * @var LinkedListNode
 	 */
 	protected $current;
 	/**
 	 * Pointer to the ending list node
-	 * @var Staple_Data_LinkedListNode
+	 * @var LinkedListNode
 	 */
 	protected $last;
 	/**
@@ -56,7 +56,7 @@ class LinkedList implements \Iterator, \Countable, \ArrayAccess
 	
 	/**
 	 * Constructs the list and allows an optional list name to be set.
-	 * @param unknown_type $name
+	 * @param string $name
 	 */
 	public function __construct($name = NULL)
 	{
@@ -129,6 +129,8 @@ class LinkedList implements \Iterator, \Countable, \ArrayAccess
 
 	/**
 	 * Array Access. Checks for a valid offset.
+	 * @var $offset
+	 * @return bool
 	 */
 	public function offsetExists($offset)
 	{
@@ -137,6 +139,8 @@ class LinkedList implements \Iterator, \Countable, \ArrayAccess
 
 	/**
 	 * Array Access. Returns the data for a specified offset.
+	 * @var $offset
+	 * @return mixed
 	 */
 	public function offsetGet($offset)
 	{
@@ -145,6 +149,8 @@ class LinkedList implements \Iterator, \Countable, \ArrayAccess
 
 	/**
 	 * Array Access. Set the data for a specified offset.
+	 * @var $offset
+	 * @var $value
 	 */
 	public function offsetSet($offset, $value)
 	{
@@ -157,6 +163,7 @@ class LinkedList implements \Iterator, \Countable, \ArrayAccess
 
 	/**
 	 * Array Access. Removes the node for a specified offset
+	 * @var $offset
 	 */
 	public function offsetUnset($offset)
 	{
@@ -168,6 +175,7 @@ class LinkedList implements \Iterator, \Countable, \ArrayAccess
 	/**
 	 * Alias of addBack()
 	 * @param mixed $data
+	 * @return LinkedList
 	 */
 	public function add($data)
 	{
@@ -177,6 +185,7 @@ class LinkedList implements \Iterator, \Countable, \ArrayAccess
 	/**
 	 * Add a node to the beginning of the list.
 	 * @param mixed $data
+	 * @return LinkedList
 	 */
 	public function addFront($data)
 	{
@@ -202,6 +211,7 @@ class LinkedList implements \Iterator, \Countable, \ArrayAccess
 	/**
 	 * Add a node to the end of the list
 	 * @param mixed $data
+	 * @return LinkedList
 	 */
 	public function addBack($data)
 	{
@@ -227,7 +237,7 @@ class LinkedList implements \Iterator, \Countable, \ArrayAccess
 	
 	/**
 	 * Alias of removeBack()
-	 * @return Staple_Data_LinkedListNode | false
+	 * @return LinkedListNode | false
 	 */
 	public function remove()
 	{
@@ -286,6 +296,8 @@ class LinkedList implements \Iterator, \Countable, \ArrayAccess
 				$current = $current->next;
 			}
 			$this->last = $current;
+
+			/** @var LinkedListNode $node */
 			$node = $current->next;
 			$this->last->next = null;
 			
@@ -324,6 +336,7 @@ class LinkedList implements \Iterator, \Countable, \ArrayAccess
 	/**
 	 * Sets the optional Name of the list
 	 * @param string $name
+	 * @return static
 	 */
 	public function setName($name)
 	{
@@ -350,6 +363,7 @@ class LinkedList implements \Iterator, \Countable, \ArrayAccess
 
 	/**
 	 * Alias of getSize()
+	 * @return int
 	 */
 	public function length()
 	{
@@ -362,6 +376,7 @@ class LinkedList implements \Iterator, \Countable, \ArrayAccess
 	 * @todo convert this to Iterator
 	 * @param bool $verbose
 	 * @throws Exception
+	 * @return string
 	 */
 	public function getListString($verbose = false)
 	{
@@ -376,9 +391,16 @@ class LinkedList implements \Iterator, \Countable, \ArrayAccess
 			if(is_array($current->data))
 				$lstring .= implode(",",$current->data)." \n";
 			elseif(is_object($current->data))
-				throw new Exception("Cannot interpret object as a string"); //Replace with Flat_Exception when created.
+				if(method_exists($current->data, '__toString'))
+				{
+					$lstring .= (string)$current->data;
+				}
+				else
+				{
+					throw new Exception("Cannot interpret object as a string");
+				}
 			else
-				$lstring .= $current->data." \n";
+				$lstring .= $current->data."\n";
 			$current = $current->next;
 		}
 		return $lstring;
@@ -388,6 +410,7 @@ class LinkedList implements \Iterator, \Countable, \ArrayAccess
 	 * The Verbose option will also list the name of the list and its size.
 	 * @todo convert this to Iterator
 	 * @param bool $verbose
+	 * @return array
 	 */
 	public function getListArray($verbose = false)
 	{
@@ -397,11 +420,9 @@ class LinkedList implements \Iterator, \Countable, \ArrayAccess
 			$larray[-2] = $this->name;
 			$larray[-1] = $this->size;
 		}
-		$current = $this->first;
-		while($current != null)
+		foreach($this as $key=>$value)
 		{
-			$larray[] = $current->data;
-			$current = $current->next;
+			$larray[] = $value;
 		}
 		return $larray;
 	}
@@ -423,7 +444,8 @@ class LinkedList implements \Iterator, \Countable, \ArrayAccess
 	
 	/**
 	 * Returns the key for a specified node
-	 * @param Staple_Data_LinkedListNode $item
+	 * @param LinkedListNode $item
+	 * @return int
 	 */
 	private function findKey(LinkedListNode $item)
 	{
@@ -440,7 +462,7 @@ class LinkedList implements \Iterator, \Countable, \ArrayAccess
 	/**
 	 * Returns the node for a specific key
 	 * @param int $key
-	 * @return Staple_Data_LinkedListNode
+	 * @return LinkedListNode
 	 */
 	private function findItemByKey($key)
 	{

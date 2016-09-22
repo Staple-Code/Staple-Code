@@ -8,7 +8,7 @@
  */
 namespace Staple\Traits;
 
-use \DateTime, \stdClass, Staple, Staple\Link, Staple\Dev;
+use \DateTime, Staple, Staple\Link, Staple\Dev;
 
 trait Helpers
 {
@@ -52,16 +52,16 @@ trait Helpers
 	
 	/**
 	 * Encapsulate object instantiation to enable chaining. Given a class this function simply returns the class reference.
-	 * @param stdClass $obj
-	 * @return stdClass
+	 * @param object $obj
+	 * @return object
 	 */
-	public function with(stdClass $obj)
+	public static function with($obj)
 	{
 		return $obj;
 	} 
 	
-	public function dump()
+	public static function dump()
 	{
-	    Dev::Dump(func_get_args());
+	    Dev::dump(func_get_args());
 	}
 }

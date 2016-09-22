@@ -619,8 +619,13 @@ abstract class FieldElement
 			//Loop through each tag in the $onlyTags array
 			foreach ($onlyTags as $tag)
 			{
-				//Check if the class already exists.
-				if (in_array($class, $this->classes[$tag]) === false)
+				//Check if the tag even exists.
+				if (!isset($this->classes[$tag]))
+				{
+					//Add the class to its own array for the tag.
+					$this->classes[$tag][] = $class;
+				}
+				elseif (in_array($class, $this->classes[$tag]) === false)	//Check if the class already exists.
 				{
 					//Add the class to its own array for the tag.
 					$this->classes[$tag][] = $class;
@@ -685,7 +690,7 @@ abstract class FieldElement
 					foreach ($class as $subClass)
 					{
 						//Apply tag only classes
-						$classTemp .= $this->escape($subClass);
+						$classTemp .= $this->escape($subClass) . ' ';
 					}
 				}
 			}

@@ -40,12 +40,22 @@ class Link
 			$this->link = self::get($route,$get);
 		}
 	}
-	
+
+	/**
+	 * Convert object to a string.
+	 * @return string
+	 */
 	public function __toString()
 	{
 		return $this->link;
 	}
-	
+
+	/**
+	 * Create a Link object.
+	 * @param string|array $route
+	 * @param array $get
+	 * @return static
+	 */
 	public static function create($route, array $get = array())
 	{
 		return new static($route, $get);
@@ -203,5 +213,3 @@ class Link
 		return $getString;
 	}
 }
-
-?>

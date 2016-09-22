@@ -25,6 +25,8 @@
  */
 namespace Staple;
 
+use Staple\Session\Session;
+
 class Main
 {
 	/**
@@ -93,7 +95,7 @@ class Main
 		defined('CONFIG_ROOT')
 	    	|| define('CONFIG_ROOT', APPLICATION_ROOT . 'config' . DIRECTORY_SEPARATOR);
 
-	    defined('LAYOUT_ROOT')
+		defined('LAYOUT_ROOT')
 			|| define('LAYOUT_ROOT', APPLICATION_ROOT . 'layouts' . DIRECTORY_SEPARATOR);
 		
 		defined('FORMS_ROOT')
@@ -156,13 +158,16 @@ class Main
 		
 		//Register the Autoload class
 		spl_autoload_register(array($this->loader, 'load'));
-			
+
+		//Call the bootstrapper
+		$this->boot();
+		
 		// Setup Error Handlers
 		$this->setErrorHandler(new Error());
 		
 		//Create a session
-		if(php_sapi_name() != 'cli')
-			session_start();
+		if(php_sapi_name() != 'cli' && (bool)Config::getValue('session','auto_create', false) == true)
+			Session::start();
 		
 		//Turn on the timer 
 		if(Config::getValue('errors', 'enable_timer') == 1)
@@ -198,14 +203,6 @@ class Main
 	public function inDevMode()
 	{
 	    return (bool)Config::getValue('errors', 'devmode');
-	}
-
-	/**
-	 * The application destructor stored controllers in the session to preserve their state
-	 */
-	public function __destruct()
-	{
-		$_SESSION['Staple']['Controllers'] = $this->controllers;		//Store the controllers in the session
 	}
 	
 	/**
@@ -283,6 +280,7 @@ class Main
 	 */
 	public function getController($class)
 	{
+		$class = strtolower($class);
 		if(isset($this->controllers[$class]))
 		{
 			return $this->controllers[$class];
@@ -297,9 +295,6 @@ class Main
 	 */
 	public function run($route = NULL)
 	{
-		//Include the boot file.
-		include_once APPLICATION_ROOT.'boot.php';
-		
 		//Load the controllers from the session.
 		if(isset($_SESSION['Staple']['Controllers']))
 			if(is_array($_SESSION['Staple']['Controllers']))
@@ -329,6 +324,25 @@ class Main
 		//Run the route through the router.
 		$this->setRoute($initialRoute);
 		return $this->executeRoute();
+	}
+
+	/**
+	 * Include the bootstrap file.
+	 */
+	private function boot()
+	{
+		//Include the boot file.
+		include_once APPLICATION_ROOT.'boot.php';
+	}
+
+	/**
+	 * Save the controller info to the session.
+	 * @return $this
+	 */
+	private function saveSession()
+	{
+		$_SESSION['Staple']['Controllers'] = $this->controllers;		//Store the controllers in the session
+		return $this;
 	}
 	
 	/**
@@ -365,11 +379,12 @@ class Main
 	 */
 	public function registerController(Controller $controller)
 	{
-		$class_name = substr(get_class($controller),0,strlen(get_class($controller))-10);
+		$class_name = strtolower(substr(get_class($controller),0,strlen(get_class($controller))-10));
 		if(!array_key_exists($class_name, $this->controllers))
 		{
 			$this->controllers[$class_name] = $controller;
 		}
+		$this->saveSession();
 		return $controller;
 	}
 	/**

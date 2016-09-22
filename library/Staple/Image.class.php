@@ -27,7 +27,6 @@
  */
 namespace Staple;
 
-use \Staple\Error;
 use \Exception;
 
 class Image
@@ -88,6 +87,11 @@ class Image
 	 * @var int
 	 */
 	protected $quality = 100;
+	/**
+	 * Compression level of PNG image. Range from 0 (no compression) to 9.
+	 * @var int
+	 */
+	protected $compression = 0;
 	
 	/**
 	 * Preserve the aspect ratio of the image.
@@ -276,6 +280,26 @@ class Image
 	public function setQuality($quality)
 	{
 		$this->quality = (int)$quality;
+		return $this;
+	}
+
+	/**
+	 * Get the set compression level for a PNG image.
+	 * @return int
+	 */
+	public function getCompression()
+	{
+		return $this->compression;
+	}
+
+	/**
+	 * Set the compression level for a PNG image.
+	 * @param int $compression
+	 * @return Image
+	 */
+	public function setCompression($compression)
+	{
+		$this->compression = $compression;
 		return $this;
 	}
 
@@ -495,7 +519,7 @@ class Image
 					$success = imagegif($this->getImage(), $this->getDestination());
 					break;
 				case self::MIME_PNG:
-					$success = imagepng($this->getImage(), $this->getDestination(), $this->getQuality());
+					$success = imagepng($this->getImage(), $this->getDestination(), $this->getCompression());
 					break;
 			}
 			if($success === true)

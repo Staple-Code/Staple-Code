@@ -256,6 +256,7 @@ class Insert
 	 * Adds a literal value to the dataset without conversion.
 	 * @param string $column
 	 * @param string $value
+	 * @return $this
 	 */
 	public function addLiteralColumn($column, $value)
 	{
@@ -381,6 +382,7 @@ class Insert
 
 	/**
 	 * @param string $priority
+	 * @return $this
 	 */
 	public function setPriority($priority)
 	{
@@ -402,6 +404,7 @@ class Insert
 
 	/**
 	 * @param boolean $ignore
+	 * @return $this
 	 */
 	public function setIgnore($ignore)
 	{
@@ -411,6 +414,7 @@ class Insert
 
 	/**
 	 * @param string $table
+	 * @return $this
 	 */
 	public function setTable($table)
 	{
@@ -420,6 +424,7 @@ class Insert
 
 	/**
 	 * @param bool $updateOnDuplicate
+	 * @return $this
 	 */
 	public function setUpdateOnDuplicate($updateOnDuplicate)
 	{
@@ -429,6 +434,7 @@ class Insert
 
 	/**
 	 * @param array[string] $updateColumns
+	 * @return $this
 	 */
 	public function setUpdateColumns(array $updateColumns)
 	{
@@ -439,6 +445,7 @@ class Insert
 	/**
 	 * Setup On Duplicate Key Update Syntax
 	 * @param bool $bool
+	 * @return $this
 	 */
 	public function onDuplicateKeyUpdate($bool = true)
 	{

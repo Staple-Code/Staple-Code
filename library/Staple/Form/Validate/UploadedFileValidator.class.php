@@ -30,7 +30,7 @@ class UploadedFileValidator extends FieldValidator
 {
 	const DEFAULT_ERROR = 'File is not valid.';
 
-	/** @var string $mimeCheck */
+	/** @var string|string[] $mimeCheck */
 	protected $mimeCheck = NULL;
 	
 	public function __construct($mimetype = NULL, $usermsg = NULL)
@@ -84,19 +84,36 @@ class UploadedFileValidator extends FieldValidator
 				}
 				else
 				{
-					//Check that FileInfo Extention is enabled
-					if(class_exists('finfo'))
+					if(array_key_exists('tmp_name',$data))
 					{
-						$finfo = new finfo(FILEINFO_MIME_TYPE);
-						if($finfo->file($data['tmp_name']) == $this->getMimeCheck())
+						if(is_uploaded_file($data['tmp_name']))
 						{
-							return true;
+							//Check that FileInfo Extension is enabled
+							if (class_exists('finfo'))
+							{
+								$finfo = new finfo(FILEINFO_MIME_TYPE);
+								$mime = $this->getMimeCheck();
+								if (is_array($mime))
+								{
+									if (in_array($finfo->file($data['tmp_name']), $mime))
+									{
+										return true;
+									}
+								}
+								else
+								{
+									if ($finfo->file($data['tmp_name']) == $mime)
+									{
+										return true;
+									}
+								}
+							}
 						}
 					}
 				}
 			}
 		}
-		$this->addError(self::DEFAULT_ERROR);
+		$this->addError();
 		return false;
 	}
 }

@@ -38,7 +38,7 @@ class accountController extends AuthController
 	{
 		$username = $_POST['user'];
 		$password = $_POST['pass'];
-		var_dump($username,$password);
+		
 		$auth = Auth::get();
 		$granted = $auth->doAuth(array(
 				'username'=>$username,

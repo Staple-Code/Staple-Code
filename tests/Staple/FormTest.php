@@ -71,7 +71,7 @@ class MyViewAdapter extends ElementViewAdapter
 		// TODO: Implement SelectElement() method.
 	}
 
-	function CheckboxgroupElement(CheckboxGroupElement $field)
+	function CheckboxGroupElement(CheckboxGroupElement $field)
 	{
 		// TODO: Implement CheckboxgroupElement() method.
 	}

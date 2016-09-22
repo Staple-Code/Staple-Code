@@ -30,10 +30,11 @@ use \Staple\Config;
 use \Staple\Encrypt;
 use Staple\Exception\FormBuildException;
 use \Staple\Form\ViewAdapters\ElementViewAdapter;
+use Staple\Traits\Helpers;
 
 class Form
 {
-	use \Staple\Traits\Helpers;
+	use Helpers;
 	
 	const METHOD_GET = 'GET';
 	const METHOD_POST = 'POST';
@@ -166,7 +167,7 @@ class Form
 		}
 
 		/**
-		 * Loads selected elementViewAdapter from application.ini and verify given adapter is a class before loading
+		 * Loads selected elementViewAdapter from configuration and verify given adapter is a class before loading.
 		 */
 		if(Config::getValue('forms','elementViewAdapter', false) != '')
 		{
@@ -180,14 +181,6 @@ class Form
 		if($this->createIdent === true)
 		{
 			$this->createIdentifier();
-		}
-	}
-	
-	public function __destruct()
-	{
-		if(isset($this->name) && $this->createIdent === TRUE)
-		{
-			$_SESSION['Staple']['Forms'][$this->name]['ident'] = $this->identifier;
 		}
 	}
 	
@@ -221,35 +214,24 @@ class Form
 			return NULL;
 		}
 	}
-	
+
 	/**
-	 * Boot function for initialization of forms that extend this class.
+	 * When sleeping in the session, do not save the current value of the submitted property.
+	 * @return array
 	 */
-	public function _start()
+	public function __sleep()
 	{
-		
+		return array_diff(array_keys(get_object_vars($this)), array('submitted'));
 	}
-	
+
 	/**
-	 * Creates the ident field, adds it to the form and save the value in the session. This is used
-	 * to verify the form has been submitted and also aids in preventing CSRF form attacks.
+	 * Upon wakeup, check to see if the form was submitted.
 	 */
-	protected function createIdentifier()
+	public function __wakeup()
 	{
-		$this->identifier = Encrypt::genHex(32);
-		$ident = new HiddenElement('ident');
-		$ident->setValue($this->identifier)
-			->setReadOnly();
-		$this->addField($ident);
+		$this->checkSubmitted();
 	}
-	public function disableIdentifier()
-	{
-		unset($this->identifier);
-		$this->createIdent = false;
-		unset($this->fields['ident']);
-		return $this;
-	}
-	
+
 	/**
 	 * The toString magic method calls the forms build function to output the form to the website.
 	 */
@@ -267,6 +249,66 @@ class Form
 			}
 			return $msg;
 		}
+	}
+
+	/**
+	 * Boot function for initialization of forms that extend this class.
+	 */
+	public function _start()
+	{
+		
+	}
+	
+	/**
+	 * Creates the ident field, adds it to the form and save the value in the session. This is used
+	 * to verify the form has been submitted and also aids in preventing CSRF form attacks.
+	 */
+	protected function createIdentifier()
+	{
+		if(isset($this->name))
+		{
+			$this->identifier = Encrypt::genHex(32);
+			$ident = new HiddenElement('ident');
+			$ident->setValue($this->identifier)
+				->setReadOnly();
+			$this->addField($ident);
+
+			//Check for form submission
+			if(isset($_REQUEST['ident']))
+				if($_REQUEST['ident'] == $_SESSION['Staple']['Forms'][$this->getName()]['ident'])
+					$this->submitted = true;
+
+			//Set the identifier into the session.
+			$_SESSION['Staple']['Forms'][$this->getName()]['ident'] = $this->identifier;
+
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Remove the identifier from the form.
+	 * @return $this
+	 */
+	public function disableIdentifier()
+	{
+		//Unset the ident variable, if set
+		if(isset($this->identifier))
+			unset($this->identifier);
+
+		//Set createIdent to false.
+		$this->createIdent = false;
+
+		//Remove from the field list, if exists.
+		if(isset($this->fields['ident']))
+			unset($this->fields['ident']);
+
+		//Remove from the session, if set.
+		if(isset($_SESSION['Staple']['Forms'][$this->name]['ident']))
+			unset($_SESSION['Staple']['Forms'][$this->name]['ident']);
+
+		//Return current object
+		return $this;
 	}
 	
 	/**
@@ -335,6 +377,10 @@ class Form
 					{
 						$chk->setValue($data[$chk->getName()]);
 					}
+					else
+					{
+						$chk->setValue(0);
+					}
 				}
 			}
 			else
@@ -386,22 +432,33 @@ class Form
 	 */
 	public function wasSubmitted()
 	{
-		if(isset($this->name) && isset($_SESSION['Staple']['Forms'][$this->name]['ident']) && isset($_REQUEST['ident']))
+		if($this->submitted == false)
 		{
-			if($_SESSION['Staple']['Forms'][$this->name]['ident'] == $_REQUEST['ident'])
+			return $this->checkSubmitted();
+		}
+		return $this->submitted;
+	}
+
+	/**
+	 * Checks for the flags for form submission
+	 * @return bool
+	 */
+	private function checkSubmitted()
+	{
+		if (isset($this->name) && isset($_SESSION['Staple']['Forms'][$this->name]['ident']) && isset($_REQUEST['ident']))
+		{
+			if ($_SESSION['Staple']['Forms'][$this->name]['ident'] == $_REQUEST['ident'])
 			{
 				$this->submitted = true;
-				return true;
 			}
 		}
-		$this->submitted = false;
-		return false;
-		//return $this->submitted;
+		return $this->submitted;
 	}
 	
 	/**
 	 * Adds an HTML class to the form.
 	 * @param string $class
+	 * @return $this
 	 */
 	public function addClass($class)
 	{
@@ -773,6 +830,7 @@ JS;
 	public function setName($name)
 	{
 		$this->name = str_replace(' ','_',$name);
+		$this->createIdentifier();
 		return $this;
 	}
 	
@@ -794,7 +852,9 @@ JS;
 	}
 
 	/**
+	 * Sets the ENCTYPE attribute value for this form.
 	 * @param string $enctype
+	 * @return $this
 	 */
 	public function setEnctype($enctype)
 	{
@@ -911,24 +971,33 @@ JS;
 		return $this;
 	}
 
-	public function getFieldValue($fieldname)
+	/**
+	 * Returns the value for the names field.
+	 * @param $fieldName
+	 * @return array|bool|null|string
+	 */
+	public function getFieldValue($fieldName)
 	{
-		if(array_key_exists($fieldname,$this->fields))
+		if(array_key_exists($fieldName,$this->fields))
 		{
-			if($this->fields[$fieldname] instanceof FieldElement)
+			if($this->fields[$fieldName] instanceof FieldElement)
 			{
-				return $this->fields[$fieldname]->getValue();
+				return $this->fields[$fieldName]->getValue();
 			}
 		}
 		return NULL;
 	}
 	
 	/*----------------------------------------Builders----------------------------------------*/
-	
+
+	/**
+	 * Returns a string containing the form start and structure tags.
+	 * @return string
+	 */
 	public function formstart()
 	{
 		$buf = '';
-		$buf .= "\n<form name=\"{$this->name}\" id=\"{$this->name}_form\" action=\"{$this->action}\" method=\"{$this->method}\"";
+		$buf .= "\n".'<form name="'.$this->name.'" id="'.$this->name.'_form" action="'.$this->action.'" method="'.$this->method.'"';
 		if(isset($this->enctype))
 		{
 			$buf .= ' enctype="'.$this->enctype.'"';
@@ -953,7 +1022,7 @@ JS;
 	            $classString = '';
 	        }
 		$buf .= ">\n";
-		$buf .= "<div id=\"{$this->name}_div\"";
+		$buf .= '<div id="'.$this->name.'_div"';
 		if(count($this->classes) > 0)
 		{
 			$buf .= ' class="'.trim($classString).'"';
@@ -961,6 +1030,11 @@ JS;
 		$buf .= ">\n";
 		return $buf;
 	}
+
+	/**
+	 * Returns a string containing the form end tags and the identifier field.
+	 * @return string
+	 */
 	public function formend()
 	{
 		$buf = "\n";
@@ -983,7 +1057,11 @@ JS;
 	{
 		return $this->title;
 	}
-	
+
+	/**
+	 * Build out all of the form fields, excluding the identifier field.
+	 * @return string
+	 */
 	public function fields()
 	{
 		$buf = '';
@@ -999,17 +1077,19 @@ JS;
 
 	/**
 	 * Constructs and echos the HTML for the form and all of its elements.
+	 * @return string
+	 * @throws Exception
 	 */
 	public function build()
 	{
 		$buf = '';
 		if(isset($this->layout))
 		{
-			$layoutloc = FORMS_ROOT.'layouts/'.basename($this->layout).'.phtml';
-			if(file_exists($layoutloc))
+			$layoutLocation = FORMS_ROOT.'layouts/'.basename($this->layout).'.phtml';
+			if(file_exists($layoutLocation))
 			{
 				ob_start();
-				include $layoutloc;
+				include $layoutLocation;
 				$buf = ob_get_contents();
 				ob_end_clean();
 			}
@@ -1037,10 +1117,11 @@ JS;
      * @param string $method
      * @return Form
      */
-    public static function create($name, $action = NULL, $method = self::METHOD_POST)
+    public static function create($name = NULL, $action = NULL, $method = self::METHOD_POST)
     {
         $inst = new self($name,$action);
-        $inst->setMethod($method);
+		if(isset($method))
+        	$inst->setMethod($method);
         return $inst;
     }
 
@@ -1063,7 +1144,7 @@ JS;
      * @param string $label
      * @param string $id
      * @param array $attributes
-     * @return TextElement
+     * @return PasswordElement
      */
     public static function passwordElement($name, $label = NULL, $id = NULL, array $attributes = array())
     {

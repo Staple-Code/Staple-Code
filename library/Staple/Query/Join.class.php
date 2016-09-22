@@ -233,7 +233,7 @@ class Join
 		//@todo refactor this to support other DB Types
 		if(isset($this->tableAlias))
 		{
-			$join .= '`'.$this->tableAlias.'`';
+			$join .= ' `'.$this->tableAlias.'`';
 		}
 
 		//Setup the Join Condition

@@ -28,6 +28,7 @@ use \ReflectionMethod;
 use \ReflectionClass;
 use Staple\Exception\PageNotFoundException;
 use Staple\Exception\AuthException;
+use Staple\Session\Session;
 
 class Auth
 {
@@ -91,20 +92,12 @@ class Auth
 	private function __construct()
 	{
 		$this->authed = false;
-		if(file_exists(CONFIG_ROOT.'auth.ini'))
+		if(Config::exists('auth'))
 		{
-			$curConfig = parse_ini_file(CONFIG_ROOT.'auth.ini');
+			$curConfig = Config::get('auth');
 			if($this->checkConfig($curConfig))
 			{
 				$this->_settings = $curConfig;
-			}
-		}
-		elseif(file_exists(CONFIG_ROOT.'application.ini'))
-		{
-			$curConfig = parse_ini_file(CONFIG_ROOT.'application.ini',true);
-			if($this->checkConfig($curConfig['auth']))
-			{
-				$this->_settings = $curConfig['auth'];
 			}
 		}
 		else
@@ -154,9 +147,14 @@ class Auth
 	{			
 		if(!(self::$instance instanceof Auth))
 		{
-			if(array_key_exists('Staple', $_SESSION))
-				if(array_key_exists('auth', $_SESSION['Staple']))
-					self::$instance = $_SESSION['Staple']['auth'];
+			//Start session if not already done.
+			if(Session::getInstance()->isSessionStarted() == false)
+				Session::start();
+
+			//Restore the Auth session, if exists.
+			self::restoreAuthSession();
+
+			//If none, make a new auth instance.
 			if(!(self::$instance instanceof Auth))
 				self::$instance = new Auth();
 		}
@@ -199,11 +197,11 @@ class Auth
 	 * Attempts authorization, accepting credentials and forwarding them to the AuthAdapter.
 	 * Throws and Exception if the AuthAdapter is not implemented from Staple_AuthAdapter. 
 	 * Returns a boolean to signify if authorization succeeded.
-	 * @param array $credentials
+	 * @param mixed $credentials
 	 * @throws Exception
 	 * @return bool
 	 */
-	public function doAuth(array $credentials)
+	public function doAuth($credentials)
 	{
 		//Make sure an adapter is loaded.
 		if(!($this->adapter instanceof AuthAdapter))
@@ -219,11 +217,12 @@ class Auth
 		//Check Auth against the adapter
 		if($this->adapter->getAuth($credentials) === true)
 		{
-			session_regenerate_id();
+			Session::getInstance()->regenerate(true);
 			$this->authed = true;
 			$this->userId = $this->adapter->getUserId();
 			$this->authLevel = $this->adapter->getLevel($this->userId);
 			$this->message = "Authentication Successful";
+			self::writeSession();
 			return true;
 		}
 		else
@@ -232,8 +231,9 @@ class Auth
 			$this->userId = null;
 			$this->authLevel = 0;
 			$this->message = "Authentication Failed";
+			self::writeSession();
+			return false;
 		}
-		return false;
 	}
 	
 	/**
@@ -276,11 +276,12 @@ class Auth
 	 * not extend Staple_AuthController.
 	 * @param Route $previousRoute
 	 * @throws Exception
+	 * @return bool
 	 */
 	private function dispatchAuthController($previousRoute = NULL)
 	{
 		//Get and Construct the Auth Controller
-		$controllerClass = Config::getValue('auth','controller'); //$this->_settings['controller'];
+		$controllerClass = Config::getValue('auth','controller');
 		$class = substr($controllerClass, 0, strlen($controllerClass)-10);
 
 		//Setup the action to call
@@ -301,7 +302,6 @@ class Auth
 				Main::controller($controllerClass);
 
 				//If the controller
-				//@todo Add support for AuthProviders here as well
 				if ($controller instanceof AuthController)
 				{
 					//Set the view's controller to match the route
@@ -325,6 +325,12 @@ class Auth
 							$return->setController(substr($conString, 0, strlen($conString) - strlen($loader::CONTROLLER_SUFFIX)));
 						}
 
+						//If the view doesn't have a view set, use the route's action.
+						if(!$return->hasView())
+						{
+							$return->setView($action);
+						}
+
 						//Check for a controller layout and build it.
 						if ($controller->layout instanceof Layout)
 						{
@@ -334,16 +340,10 @@ class Auth
 						{
 							$return->build();
 						}
-
-						//The view has been built return true
-						return true;
 					}
 					elseif ($return instanceof Json)    //Check for a Json object to be coverted and echoed.
 					{
 						echo json_encode($return);
-
-						//JSON echoed return true
-						return true;
 					}
 					elseif (is_object($return))        //Check for another object type
 					{
@@ -352,9 +352,6 @@ class Auth
 						if ($class->implementsInterface('JsonSerializable'))
 						{
 							echo json_encode($return);
-
-							//Object successfully converted to JSON
-							return true;
 						}
 						//If the object is stringable, covert to a string and output it.
 						elseif ((!is_array($return)) &&
@@ -362,25 +359,16 @@ class Auth
 								(is_object($return) && method_exists($return, '__toString'))))
 						{
 							echo (string)$return;
-
-							//Object stringified successfully
-							return true;
 						}
 						//If nothing else works, echo the object through the dump method.
 						else
 						{
-							Dev::Dump($return);
-
-							//Object was dumped to the browser
-							return true;
+							Dev::dump($return);
 						}
 					}
 					elseif (is_string($return))        //If the return value was simply a string, echo it out.
 					{
 						echo $return;
-
-						//String sent to the browser
-						return true;
 					}
 					else
 					{
@@ -393,10 +381,8 @@ class Auth
 						{
 							$controller->view->build();
 						}
-
-						//The legacy view has been built return true
-						return true;
 					}
+					return true;
 				}
 				else
 				{
@@ -407,5 +393,31 @@ class Auth
 
 		//Throw an exception if the auth page cannot be found
 		throw new PageNotFoundException('Page Not Found.', Error::PAGE_NOT_FOUND);
+	}
+
+	/**
+	 * Write the auth object to the session
+	 */
+	private static function writeSession()
+	{
+		//Start session if not already done.
+		if(Session::getInstance()->isSessionStarted() == false)
+			Session::start();
+
+		$_SESSION['Staple']['auth'] = self::$instance;
+	}
+
+	/**
+	 * Restore the session to the instance static variable.
+	 * @return self
+	 */
+	private static function restoreAuthSession()
+	{
+		//Restore the auth object from the session.
+		if(array_key_exists('Staple', $_SESSION))
+			if(array_key_exists('auth', $_SESSION['Staple']))
+				self::$instance = $_SESSION['Staple']['auth'];
+
+		return self::$instance;
 	}
 }
