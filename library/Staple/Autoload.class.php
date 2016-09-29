@@ -159,12 +159,7 @@ class Autoload
 			}
 			else
 			{
-				//Check for a vendor autoload
-				if(file_exists(VENDOR_ROOT.'autoload.php'))
-				{
-					include VENDOR_ROOT.'autoload.php';
-				}
-				elseif($this->throwOnFailure === true)
+				if($this->throwOnFailure === true)
 				{
 					throw new Exception("Class Not Found: ".$class_name,Error::LOADER_ERROR);
 				}
