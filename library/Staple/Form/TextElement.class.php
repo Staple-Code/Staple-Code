@@ -115,14 +115,9 @@ class TextElement extends FieldElement
 		$type = '';
 		$size = '';
 		$max = '';
-		if(isset($this->type))
-		{
-			$type = 'type="'.$this->type.'"';
-		}
-		else
-		{
-			$type = 'type="text"';
-		}
+
+		$type = isset($this->type) ? $this->type : 'text';
+
 		if(isset($this->size))
 		{
 			$size = ' size="'.((int)$this->size).'"';
@@ -131,7 +126,7 @@ class TextElement extends FieldElement
 		{
 			$max = ' maxlength="'.((int)$this->max).'"';
 		}
-		return '	<input '.$type.' id="'.$this->escape($this->id).'" name="'.$this->escape($this->name).'" value="'.$this->escape($this->value).'"'.$size.$max.$this->getAttribString('input').'>'."\n";
+		return ' <input type="'.$type.'" id="'.$this->escape($this->id).'" name="'.$this->escape($this->name).'" value="'.$this->escape($this->value).'"'.$size.$max.$this->getAttribString('input').'>'."\n";
 	}
 
 
