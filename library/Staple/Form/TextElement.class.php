@@ -1,22 +1,22 @@
 <?php
 /**
  * Text element for use on forms.
- * 
+ *
  * @author Ironpilot
  * @copyright Copyright (c) 2011, STAPLE CODE
- * 
+ *
  * This file is part of the STAPLE Framework.
- * 
+ *
  * The STAPLE Framework is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by the 
+ * it under the terms of the GNU Lesser General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or (at your option)
  * any later version.
- * 
- * The STAPLE Framework is distributed in the hope that it will be useful, 
+ *
+ * The STAPLE Framework is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for 
+ * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -28,6 +28,12 @@ use Staple;
 class TextElement extends FieldElement
 {
 	/**
+ 	* HTML5 input type
+ 	* @var string
+ 	*/
+	protected $type;
+
+	/**
 	 * Size of the text field.
 	 * @var int
 	 */
@@ -37,7 +43,15 @@ class TextElement extends FieldElement
 	 * @var int
 	 */
 	protected $max;
-	
+
+	/**
+	 * @return string $type
+ 	 */
+	public function getType()
+	{
+		return $this->type;
+	}
+
 	/**
 	 * @return int $size
 	 */
@@ -55,7 +69,18 @@ class TextElement extends FieldElement
 	}
 
 	/**
+	 * @param string $type
+	 * @return $this
+	 */
+	public function setType($type)
+	{
+		$this->type = $type;
+		return $this;
+	}
+
+	/**
 	 * @param int $size
+	 * @return $this
 	 */
 	public function setSize($size)
 	{
@@ -65,6 +90,7 @@ class TextElement extends FieldElement
 
 	/**
 	 * @param int $max
+	 * @return $this
 	 */
 	public function setMax($max)
 	{
@@ -89,8 +115,12 @@ class TextElement extends FieldElement
 	 */
 	public function field()
 	{
+		$type = '';
 		$size = '';
 		$max = '';
+
+		$type = isset($this->type) ? $this->type : 'text';
+
 		if(isset($this->size))
 		{
 			$size = ' size="'.((int)$this->size).'"';
@@ -99,9 +129,8 @@ class TextElement extends FieldElement
 		{
 			$max = ' maxlength="'.((int)$this->max).'"';
 		}
-		return '	<input type="text" id="'.$this->escape($this->id).'" name="'.$this->escape($this->name).'" value="'.$this->escape($this->value).'"'.$size.$max.$this->getAttribString('input').'>'."\n";
+		return '	<input type="'.$type.'" id="'.$this->escape($this->id).'" name="'.$this->escape($this->name).'" value="'.$this->escape($this->value).'"'.$size.$max.$this->getAttribString('input').'>'."\n";
 	}
-
 
 
 	/**
