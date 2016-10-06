@@ -45,8 +45,8 @@ class TextElement extends FieldElement
 	protected $max;
 
 	/**
- * @return string $type
- */
+	 * @return string $type
+ 	 */
 	public function getType()
 	{
 		return $this->type;
@@ -70,6 +70,7 @@ class TextElement extends FieldElement
 
 	/**
 	 * @param string $type
+	 * @return $this
 	 */
 	public function setType($type)
 	{
@@ -79,6 +80,7 @@ class TextElement extends FieldElement
 
 	/**
 	 * @param int $size
+	 * @return $this
 	 */
 	public function setSize($size)
 	{
@@ -88,6 +90,7 @@ class TextElement extends FieldElement
 
 	/**
 	 * @param int $max
+	 * @return $this
 	 */
 	public function setMax($max)
 	{
@@ -126,7 +129,7 @@ class TextElement extends FieldElement
 		{
 			$max = ' maxlength="'.((int)$this->max).'"';
 		}
-		return ' <input type="'.$type.'" id="'.$this->escape($this->id).'" name="'.$this->escape($this->name).'" value="'.$this->escape($this->value).'"'.$size.$max.$this->getAttribString('input').'>'."\n";
+		return '	<input type="'.$type.'" id="'.$this->escape($this->id).'" name="'.$this->escape($this->name).'" value="'.$this->escape($this->value).'"'.$size.$max.$this->getAttribString('input').'>'."\n";
 	}
 
 
