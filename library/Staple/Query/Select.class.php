@@ -115,7 +115,12 @@ class Select extends Query
 			$this->limit($limit);
 		}
 	}
-	
+
+	/**
+	 * Add a flag to the SQL statement.
+	 * @param $flag
+	 * @return $this
+	 */
 	public function addFlag($flag)
 	{
 		switch($flag)
