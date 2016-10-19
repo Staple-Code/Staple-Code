@@ -108,7 +108,7 @@ class DateValidator extends FieldValidator
 		}
 		
 		$script = "\t//Date Validator for ".addslashes($field->getLabel())."\n";
-		$script .= "\tif(!(".self::REGEX.".test($('$valstring').val())))\n\t{\n";
+		$script .= "\tif(!(".self::REGEX_AMERICAN.".test($('$valstring').val())))\n\t{\n";
 		$script .= "\t\terrors.push('".addslashes($field->getLabel()).": \\n{$this->clientJSError()}\\n');\n";
 		$script .= "\t\t$('$fieldid').addClass('form_error');\n";
 		$script .= "\t}\n";
