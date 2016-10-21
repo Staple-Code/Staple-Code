@@ -20,16 +20,39 @@
  */
 namespace Staple\Form;
 
+use Staple\Form\ViewAdapters\ElementViewAdapter;
+
 class CheckboxGroupElement extends FieldElement
 {
 	/**
 	 * An array that holds the Checkbox elements.
-	 * @var CheckboxGroupElement[]
+	 * @var CheckboxElement[]
 	 */
 	protected $boxes = array();
-	
+
+	/**
+	 * Override the parent set view adapter class to make sure that view adapters are set on all sub elements as well.
+	 * @param ElementViewAdapter $adapter
+	 * @return FieldElement
+	 */
+	public function setElementViewAdapter(ElementViewAdapter $adapter)
+	{
+		foreach($this->boxes as $box)
+		{
+			$box->setElementViewAdapter($adapter);
+		}
+		return parent::setElementViewAdapter($adapter);
+	}
+
+	/**
+	 * Add a checkbox to the group.
+	 * @param CheckboxElement $box
+	 * @return $this
+	 */
 	public function addCheckbox(CheckboxElement $box)
 	{
+		if(isset($this->elementViewAdapter))
+			$box->setElementViewAdapter($this->elementViewAdapter);
 		$this->boxes[] = $box;
 		return $this;
 	}
@@ -121,6 +144,7 @@ class CheckboxGroupElement extends FieldElement
 	 * Comparison function for sorting by names
 	 * @param $this $a
 	 * @param $this $b
+	 * @return int
 	 */
 	private function sortCmpName(CheckboxElement $a, CheckboxElement $b)
 	{
@@ -131,6 +155,7 @@ class CheckboxGroupElement extends FieldElement
 	 * Comparison function for sorting by labels
 	 * @param $this $a
 	 * @param $this $b
+	 * @return int
 	 */
 	private function sortCmpLabel(CheckboxElement $a, CheckboxElement $b)
 	{
@@ -178,10 +203,10 @@ class CheckboxGroupElement extends FieldElement
 			$buf = ob_get_contents();
 			ob_end_clean();
 		}
-	        elseif(isset($this->elementViewAdapter))
-	        {
-	            $buf = $this->getElementViewAdapter()->CheckboxGroupElement($this);
-	        }
+		elseif(isset($this->elementViewAdapter))
+		{
+			$buf = $this->getElementViewAdapter()->CheckboxGroupElement($this);
+		}
 		else 
 		{
 			$this->addClass('form_element');
