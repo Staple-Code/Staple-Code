@@ -40,7 +40,7 @@ More information about composer can be found here: https://getcomposer.org/
 To start your new site, the first file you will want to work with is the included `indexController.php` in
 `/application/controllers`. This file is the default homepage for your website. and it looks like this:
 
-```
+```php
 use Staple\Controller;
 
 /** ... */
@@ -66,7 +66,7 @@ controller action is created by making a public function that only consists of l
 To create a new action on a controller, create a new public method that consists of only letters and numbers
 for the method name.
 
-```
+```php
 class indexController extends Controller
 {
     ...
