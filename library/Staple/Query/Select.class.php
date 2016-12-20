@@ -26,9 +26,12 @@ namespace Staple\Query;
 use \Staple\Exception\QueryException;
 use \Staple\Error;
 use \Staple\Pager;
+use Staple\Traits\Factory;
 
 class Select extends Query
 {
+	use Factory;
+
 	const ALL = 'ALL';
 	const DISTINCT = 'DISTINCT';
 	const DISTINCTROW = 'DISTINCTROW';

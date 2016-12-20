@@ -46,7 +46,7 @@ class Connection extends PDO implements SplSubject
 	 * The object observers. Used to catch and handle or log errors with the database and queries.
 	 * @var SplObjectStorage
 	 */
-	private static $_observers;
+	protected static $_observers;
 
 	/**
 	 * The database driver that is being used

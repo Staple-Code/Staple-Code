@@ -25,8 +25,9 @@ namespace Staple\Tests;
 
 use Staple\Query\Connection;
 use Staple\Query\Query;
+use Staple\Query\MockConnection;
 
-require_once 'Mocks/MockConnection.php';
+//require_once '../Mocks/MockConnection.php';
 
 class QueryTest extends \PHPUnit_Framework_TestCase
 {
@@ -36,13 +37,13 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 	}
 	private function getInMemorySqlite()
 	{
-		return new Connection('sqlite::memory:');
+		return new MockConnection('sqlite::memory:');
 	}
 
 	public function testMySQLQueryCreation()
 	{
 		//Setup
-		$connection = $this->getMockConnection(Connection::DRIVER_MYSQL);
+		$connection = $this->getInMemorySqlite();
 
 		//Act
 		$select = Query::select('customers',NULL, $connection);
