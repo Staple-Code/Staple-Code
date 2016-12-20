@@ -163,26 +163,26 @@ class FoundationViewAdapter extends ElementViewAdapter
 		$classes = $field->getClassString();
 
 		$buf = "<div$classes>\n"; //Row Start
-		$buf .= "<div class=\"small-12 columns\">\n"; //Label Start
-		$buf .= $field->label();
-		$buf .= "</div>\n"; //Label End
+		$buf .= "\t<div class=\"small-12 columns\">\n"; //Label Start
+		$buf .= "\t".$field->label();
+		$buf .= "\t</div>\n"; //Label End
 
 		if (strlen($field->getInstructions()) >= 1)
 		{
-			$buf .= "<div class=\"small-12 columns\">\n"; //Instructions Start
-			$buf .= $field->getInstructions();
-			$buf .= "</div>\n"; //Instructions End
+			$buf .= "\t<div class=\"small-12 columns\">\n"; //Instructions Start
+			$buf .= "\t".$field->getInstructions();
+			$buf .= "\t</div>\n"; //Instructions End
 		}
 
-		$buf .= "<div class=\"small-12 columns\">\n"; //Field Start
+		$buf .= "\t<div class=\"small-12 columns\">\n"; //Field Start
 
-		$buf .= $field->field();
+		$buf .= "\t".$field->field();
 
 		if (count($field->getErrors()) != 0)
 		{
 			$buf .= $this->getErrorBuffer($field);
 		}
-		$buf .= "</div>\n"; //Field End
+		$buf .= "\t</div>\n"; //Field End
 		$buf .= "</div>\n"; //Row end
 
 		return $buf;
@@ -197,27 +197,32 @@ class FoundationViewAdapter extends ElementViewAdapter
 		$classes = $field->getClassString();
 
 		$buf .= "<div $classes>\n"; //Row Start
-		$buf .= "<div class=\"small-12 columns\">\n"; //Label Start
-		$buf .= $field->label();
-		$buf .= "</div>\n"; //Label End
+		$buf .= "\t<div class=\"small-12 columns\">\n"; //Label Start
+		$buf .= "\t".$field->label();
+		$buf .= "\n\t</div>\n"; //Label End
 
 		if (strlen($field->getInstructions()) >= 1)
 		{
-			$buf .= "<div class=\"small-12 columns\">\n"; //Instructions Start
-			$buf .= $field->getInstructions();
-			$buf .= "</div>\n"; //Instructions End
+			$buf .= "\t<div class=\"small-12 columns\">\n"; //Instructions Start
+			$buf .= "\t".$field->getInstructions();
+			$buf .= "\t</div>\n"; //Instructions End
 		}
 
-		$buf .= "<div class=\"small-12 columns\">\n"; //Field Start
+		$buf .= "\t<div class=\"small-12 columns\">\n"; //Field Start
 
-		$buf .= $field->field();
+		$buf .= "\t<div class=\"form_checkboxes\">\n\t";
+		foreach ($field->getBoxes() as $box)
+		{
+			$buf .= str_replace("\n","\n\t",$box->build());
+		}
+		$buf .= "</div>";
 		$buf .= $field->getInstructions();
 
 		if (count($field->getErrors()) != 0)
 		{
 			$buf .= $this->getErrorBuffer($field);
 		}
-		$buf .= "</div>\n"; //Field End
+		$buf .= "\n\t</div>\n"; //Field End
 		$buf .= "</div>\n"; //Row end
 
 		return $buf;

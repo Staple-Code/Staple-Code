@@ -27,16 +27,17 @@ namespace Staple\Tests;
 use Staple\Form\CheckboxElement;
 use Staple\Form\ViewAdapters\BootstrapViewAdapter;
 use Staple\Form\ViewAdapters\FoundationViewAdapter;
+use PHPUnit\Framework\TestCase;
 
-class CheckboxElementTest extends \PHPUnit_Framework_TestCase
+class CheckboxElementTest extends TestCase
 {
 	const STANDARD_BUILD = "<div class=\"form_element element_checkbox\" id=\"TestCheckboxElement_element\">\n\t<input type=\"checkbox\" id=\"TestCheckboxElement\" name=\"TestCheckboxElement\" value=\"1\" class=\"form_element element_checkbox\">\n\t<label for=\"TestCheckboxElement\" class=\"form_element element_checkbox\">My Test Checkbox Element</label>\n</div>";
-	const FOUNDATION_BUILD = "<div class=\"row\">\n<div class=\"small-12 columns\">\n\t<label for=\"TestCheckboxElement\" class=\"row\">My Test Checkbox Element</label>\n</div>\n<div class=\"small-12 columns\">\n\t<input type=\"checkbox\" id=\"TestCheckboxElement\" name=\"TestCheckboxElement\" value=\"1\" class=\"row\">\n</div>\n</div>\n";
+	const FOUNDATION_BUILD = "<div class=\"row\">\n\t<div class=\"small-12 columns\">\n\t\t<label for=\"TestCheckboxElement\" class=\"row\">My Test Checkbox Element</label>\n\t</div>\n\t<div class=\"small-12 columns\">\n\t\t<input type=\"checkbox\" id=\"TestCheckboxElement\" name=\"TestCheckboxElement\" value=\"1\" class=\"row\">\n\t</div>\n</div>\n";
 	const BOOTSTRAP_BUILD = "<div class=\"checkbox\">\n\t<label class=\"control-label\" for=\"TestCheckboxElement\">\n\t<input type=\"checkbox\" id=\"TestCheckboxElement\" name=\"TestCheckboxElement\" value=\"1\">\n\tMy Test Checkbox Element</label>\n</div>\n";
 	/**
 	 * @return CheckboxElement
 	 */
-	private function getTestSelectElement()
+	private function getTestCheckboxElement()
 	{
 		return CheckboxElement::create('TestCheckboxElement','My Test Checkbox Element');
 	}
@@ -57,7 +58,7 @@ class CheckboxElementTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testStandardBuild()
 	{
-		$element = $this->getTestSelectElement();
+		$element = $this->getTestCheckboxElement();
 
 		$buf = $element->build();
 
@@ -70,7 +71,7 @@ class CheckboxElementTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testFoundationBuild()
 	{
-		$element = $this->getTestSelectElement();
+		$element = $this->getTestCheckboxElement();
 		$element->setElementViewAdapter($this->getFoundationViewAdapter());
 
 		$buf = $element->build();
@@ -84,7 +85,7 @@ class CheckboxElementTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testBootstrapBuild()
 	{
-		$element = $this->getTestSelectElement();
+		$element = $this->getTestCheckboxElement();
 		$element->setElementViewAdapter($this->getBootstrapViewAdapter());
 
 		$buf = $element->build();
@@ -99,7 +100,7 @@ class CheckboxElementTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testValueSetAndRetrieve()
 	{
-		$element = $this->getTestSelectElement();
+		$element = $this->getTestCheckboxElement();
 
 		$this->assertFalse($element->isChecked());
 		$element->setChecked(true);
@@ -116,7 +117,7 @@ class CheckboxElementTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testBaseValidator()
 	{
-		$element = $this->getTestSelectElement();
+		$element = $this->getTestCheckboxElement();
 
 		//An element with no validators should individually assert true when asked if valid, no content and not required.
 		$this->assertTrue($element->isValid());

@@ -20,6 +20,7 @@
  */
 namespace Staple\Form;
 
+use Exception;
 use Staple\Form\ViewAdapters\ElementViewAdapter;
 
 class CheckboxGroupElement extends FieldElement
@@ -126,16 +127,23 @@ class CheckboxGroupElement extends FieldElement
 	
 	/**
 	 * This function requires an associative array composed of the form field names, followed by their values.
+	 * @var mixed $inserts
+	 * @throws Exception
 	 * @return $this
 	 */
-	public function setValue(array $inserts)
+	public function setValue($inserts)
 	{
-		foreach($this->boxes as $key=>$value)
+		if(is_array($inserts))
 		{
-			if(array_key_exists($value->getName(), $inserts))
+			foreach($this->boxes as $key => $value)
 			{
-				$this->boxes[$key]->setValue($inserts[$value->getName()]);
+				if(array_key_exists($value->getName(), $inserts))
+				{
+					$this->boxes[$key]->setValue($inserts[$value->getName()]);
+				}
 			}
+		} else {
+			throw new Exception('Values must be supplied as arrays.');
 		}
 		return $this;
 	}
@@ -170,12 +178,12 @@ class CheckboxGroupElement extends FieldElement
 	 */
 	public function field()
 	{
-		$buff = '<div class="form_checkboxes">';
+		$buff = "\n\t<div class=\"form_checkboxes\">\n";
 		foreach ($this->boxes as $box)
 		{
-			$buff .= $box->build();
+			$buff .= "\t\t".str_replace("\n","\n\t\t",$box->build())."\n";
 		}
-		$buff .= '</div>';
+		$buff .= "\t</div>";
 		return $buff;
 	}
 
@@ -185,7 +193,7 @@ class CheckboxGroupElement extends FieldElement
 	 */
 	public function label()
 	{
-		return "<label".$this->getClassString('label').">".$this->escape($this->getLabel())."</label>";
+		return "\t<label".$this->getClassString('label').">".$this->escape($this->getLabel())."</label>";
 	}
 
 	/**
@@ -218,10 +226,8 @@ class CheckboxGroupElement extends FieldElement
 				$buf .= $this->label(); 
 			}
 			$buf .= $this->field();
-			$buf .= "</div>\n";
+			$buf .= "\n</div>\n";
 		}
 		return $buf;
 	}
 }
-
-?>

@@ -79,6 +79,7 @@ class RadioElement extends FieldElement
 	 * @param array $options
 	 * @param boolean $labelvalues
 	 * @throws Exception
+	 * @return $this
 	 */
 	public function addButtonsArray(array $options, $labelvalues = FALSE)
 	{
@@ -142,6 +143,7 @@ class RadioElement extends FieldElement
 	 * Sorts the options list based on a set of preset sorts.
 	 * @param int $how
 	 * @param callback $sortFunction
+	 * @return $this
 	 */
 	public function sortOptions($how, $sortFunction = NULL)
 	{
@@ -163,11 +165,16 @@ class RadioElement extends FieldElement
 		}
 		return $this;
 	}
-	
+
+	/**
+	 * @param mixed $insert
+	 * @return RadioElement
+	 */
 	public function setValue($insert)
 	{
 		$this->checked = true;
-		return parent::setValue($insert);
+		parent::setValue($insert);
+		return $this;
 	}
 	
 	/* (non-PHPdoc)

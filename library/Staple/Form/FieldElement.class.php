@@ -453,7 +453,7 @@ abstract class FieldElement
 
 	/**
 	 * Sets the field value, if field is not read only.
-	 * @param string $insert
+	 * @param mixed $insert
 	 * @throws Exception
 	 * @return $this
 	 */

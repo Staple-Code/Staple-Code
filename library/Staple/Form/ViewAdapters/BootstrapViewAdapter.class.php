@@ -67,7 +67,7 @@ class BootstrapViewAdapter extends ElementViewAdapter
 		$buf .= "</label>\n";
 
 		//Add field instructions
-		if (count($field->getInstructions()) > 0)
+		if (strlen($field->getInstructions()) > 0)
 		{
 			$buf .= "\n<p class=\"text-muted\">";
 			$buf .= "\n" . $field->getInstructions();
@@ -123,7 +123,7 @@ class BootstrapViewAdapter extends ElementViewAdapter
 		$buf .= "</label>\n";
 
 		//Add field instructions
-		if (count($field->getInstructions()) > 0)
+		if (strlen($field->getInstructions()) > 0)
 		{
 			$buf .= "\n<p class=\"text-muted\">";
 			$buf .= "\n" . $field->getInstructions();
@@ -179,7 +179,7 @@ class BootstrapViewAdapter extends ElementViewAdapter
 		$buf .= "</label>\n";
 
 		//Add field instructions
-		if (count($field->getInstructions()) > 0)
+		if (strlen($field->getInstructions()) > 0)
 		{
 			$buf .= "\n<p class=\"text-muted\">";
 			$buf .= "\n" . $field->getInstructions();
@@ -244,7 +244,7 @@ class BootstrapViewAdapter extends ElementViewAdapter
 		$buf .= "</label>\n";
 
 		//Add field instructions
-		if (count($field->getInstructions()) > 0)
+		if (strlen($field->getInstructions()) > 0)
 		{
 			$buf .= "\n<p class=\"text-muted\">";
 			$buf .= "\n" . $field->getInstructions();
@@ -297,10 +297,10 @@ class BootstrapViewAdapter extends ElementViewAdapter
 		{
 			$buf .= " <small>(Required)</small>";
 		}
-		$buf .= "</label>\n";
+		$buf .= "</label>";
 
 		//Add field instructions
-		if (count($field->getInstructions()) > 0)
+		if (strlen($field->getInstructions()) > 0)
 		{
 			$buf .= "\n<p class=\"text-muted\">";
 			$buf .= "\n" . $field->getInstructions();
@@ -324,7 +324,7 @@ class BootstrapViewAdapter extends ElementViewAdapter
 			}
 		}
 
-		$buf .= "</div>\n"; //End Form-Group
+		$buf .= "\n</div>\n"; //End Form-Group
 
 		return $buf;
 	}
@@ -342,7 +342,7 @@ class BootstrapViewAdapter extends ElementViewAdapter
 		}
 
 		//Add field instructions
-		if (count($field->getInstructions()) > 0)
+		if (strlen($field->getInstructions()) > 0)
 		{
 			$buf .= "<p class=\"text-muted\">\n";
 			$buf .= $field->getInstructions() . "\n";
@@ -405,7 +405,7 @@ class BootstrapViewAdapter extends ElementViewAdapter
 		$buf .= "</label>\n";
 
 		//Add field instructions
-		if (count($field->getInstructions()) > 0)
+		if (strlen($field->getInstructions()) > 0)
 		{
 			$buf .= "\n<p class=\"text-muted\">";
 			$buf .= "\n" . $field->getInstructions();
@@ -461,7 +461,7 @@ class BootstrapViewAdapter extends ElementViewAdapter
 		$buf .= "</label>\n";
 
 		//Add field instructions
-		if (count($field->getInstructions()) > 0)
+		if (strlen($field->getInstructions()) > 0)
 		{
 			$buf .= "\n<p class=\"text-muted\">";
 			$buf .= "\n" . $field->getInstructions();
@@ -539,7 +539,7 @@ class BootstrapViewAdapter extends ElementViewAdapter
 		}
 
 		//Add field instructions
-		if (count($field->getInstructions()) > 0)
+		if (strlen($field->getInstructions()) > 0)
 		{
 			$buf .= "\n<p class=\"text-muted\">";
 			$buf .= "\n" . $field->getInstructions();

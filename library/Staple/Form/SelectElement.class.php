@@ -91,13 +91,14 @@ class SelectElement extends FieldElement
 	
 	/**
 	 * Sets the value for the select box
-	 * @param boolean $val
+	 * @param mixed $val
 	 * @return FieldElement
 	 */
 	public function setValue($val)
 	{
 		$this->selected = true;
-		return parent::setValue($val);
+		parent::setValue($val);
+		return $this;
 	}
 	
 	/**
