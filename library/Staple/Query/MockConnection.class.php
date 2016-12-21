@@ -48,21 +48,21 @@ class MockConnection extends Connection
 		try
 		{
 			parent::__construct($dsn, $username, $password, $options);
+
+			if(!isset($this->driver)) $this->setDriver(self::getDriverFromDsn($dsn));
+
+			if(isset($username))
+				$this->setUsername($username);
+			if(isset($password))
+				$this->setPassword($password);
+
+			//Set the options property
+			$this->setOptions($options);
 		}
 		catch(\PDOException $e)
 		{
 			//This is normal. Ignore and move on.
 		}
-
-		if(!isset($this->driver)) $this->setDriver(self::getDriverFromDsn($dsn));
-
-		if(isset($username))
-			$this->setUsername($username);
-		if(isset($password))
-			$this->setPassword($password);
-
-		//Set the options property
-		$this->setOptions($options);
 	}
 
 	/**
