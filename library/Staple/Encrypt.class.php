@@ -2,6 +2,7 @@
 /**
  * Encryption class.
  * Default mode is MYCRYPT__MODE_ECB.
+ * @todo Move to OpenSSL extension
  *
  * @author Ironpilot
  * @copyright Copyright (c) 2011, STAPLE CODE
