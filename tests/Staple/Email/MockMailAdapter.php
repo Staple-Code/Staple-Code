@@ -1,6 +1,6 @@
 <?php
 /**
- * Email Adapter Interface
+ * MockMailAdapter for testing PHP mail() function email adapter.
  *
  * @author Ironpilot
  * @copyright Copyright (c) 2011, STAPLE CODE
@@ -22,28 +22,26 @@
  *
  */
 
-namespace Staple\Email;
+namespace Staple\Tests;
 
+use Staple\Email\MailAdapter;
 
-interface EmailAdapter
+class MockMailAdapter extends MailAdapter
 {
-    public function send();
-    public function addTo($to);
-    public function setTo($to);
-    public function getTo();
-    public function addCc($cc);
-	public function setCc($cc);
-    public function getCc();
-    public function addBcc($bcc);
-	public function setBcc($bcc);
-    public function getBcc();
-    public function setFrom($from,$name=NULL);
-    public function getFrom();
-    public function setSubject($subject);
-    public function getSubject();
-    public function setBody($body);
-    public function getBody();
-    public function addAttachment($attachment,$filename=NULL);
-    public function setAttachments(array $attachments);
-    public function getAttachments();
+	/**
+	 * @param $to
+	 * @param $subject
+	 * @param $body
+	 * @param $headers
+	 * @return \stdClass
+	 */
+	protected function performSend($to, $subject, $body, $headers)
+	{
+		$obj = new \stdClass();
+		$obj->to = $to;
+		$obj->subject = $subject;
+		$obj->body = $body;
+		$obj->headers = $headers;
+		return $obj;
+	}
 }

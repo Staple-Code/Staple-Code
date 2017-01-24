@@ -1,7 +1,7 @@
 <?php
 
 /** 
- * Creates a new Mail object. 
+ * Creates a new Email object.
  * 
  * Template File:
  * In the template file a custom comment <!--STAPLE-EMAIL-BODY--> this is where the body of
@@ -33,11 +33,11 @@ use \Exception;
 use Staple\Config;
 use Staple\Exception\EmailException;
 use Staple\View;
-use Stripe\Email\EmailAdapter;
 
 class Email
 {
-	const ADAPTER_DEFAULT = 'Staple\Email\PhpMailAdapter';
+	const ADAPTER_DEFAULT = 'Staple\Email\MailAdapter';
+	const ADAPTER_PHPMAILER = 'Staple\Email\PhpMailerAdapter';
 	const ADAPTER_SENDGRID = 'Staple\Email\SendGridEmailAdapter';
 
 	const METHOD_MANY = 1;
@@ -70,30 +70,22 @@ class Email
 	protected $emailAdapter;
 	
 	/**
-	 * Default constructor. Accepts optional values for To, From, CC, and BCC and adapter.
-	 * @param string | array $to
-	 * @param string $from
-	 * @param array $cc
-	 * @param array $bcc
+	 * Default constructor. Accepts an optional email adapter.
 	 * @param string $adapter
 	 */
-	public function __construct($to = NULL, $from = NULL, array $cc = array(), array $bcc = array(), $adapter = self::ADAPTER_DEFAULT)
+	public function __construct($adapter = self::ADAPTER_DEFAULT)
 	{
-		//Load the ini settings
-		$settings = Config::get('email');
-		if($settings['from'] != '')
-		{
-			$this->setFrom($settings['from']);
-		}
-		if($settings['bcc'] != '')
-		{
-			$this->addBcc($settings['bcc']);
-		}
-
 		//Setup email adapter
-		if($settings['adapter'] != '')
+		if(Config::exists('email','adapter'))
 		{
-			$this->createEmailAdapter($settings['adapter']);
+			try
+			{
+				$this->createEmailAdapter(Config::getValue('email','adapter'));
+			}
+			catch (EmailException $e)
+			{
+				$this->createEmailAdapter(self::ADAPTER_DEFAULT);
+			}
 		}
 		elseif(isset($adapter))
 		{
@@ -102,51 +94,6 @@ class Email
 		else
 		{
 			$this->createEmailAdapter(self::ADAPTER_DEFAULT);
-		}
-		
-		//Load any Tos
-		if(isset($to))
-		{
-			if(is_array($to))
-			{
-				foreach($to as $email)
-				{
-					$this->addTo($email);
-				}
-			}
-			else
-			{
-				$this->addTo($to);
-			}
-		}
-		//Load the From
-		if(isset($from))
-		{
-			$this->setFrom($from);
-		}
-		//Load any CCs
-		if(isset($cc))
-		{
-			if(is_array($cc))
-			{
-				$this->setCc($cc);
-			}
-			else
-			{
-				$this->setCc(array($cc));
-			}
-		}
-		//Load any BCCs
-		if(isset($bcc))
-		{
-			if(is_array($bcc))
-			{
-				$this->setBcc($bcc);
-			}
-			else
-			{
-				$this->setBcc(array($bcc));
-			}
 		}
 	}
 
@@ -180,7 +127,54 @@ class Email
 	 */
 	public static function create($to = NULL, $from = NULL, array $cc = array(), array $bcc = array(), $adapter = self::ADAPTER_DEFAULT)
 	{
-		return new self($to, $from, $cc, $bcc, $adapter);
+		$inst = new self($adapter);
+
+		//Load any Tos
+		if(isset($to))
+		{
+			if(is_array($to))
+			{
+				foreach($to as $email)
+				{
+					$inst->addTo($email);
+				}
+			}
+			else
+			{
+				$inst->addTo($to);
+			}
+		}
+		//Load the From
+		if(isset($from))
+		{
+			$inst->setFrom($from);
+		}
+		//Load any CCs
+		if(isset($cc))
+		{
+			if(is_array($cc))
+			{
+				$inst->setCc($cc);
+			}
+			else
+			{
+				$inst->setCc(array($cc));
+			}
+		}
+		//Load any BCCs
+		if(isset($bcc))
+		{
+			if(is_array($bcc))
+			{
+				$inst->setBcc($bcc);
+			}
+			else
+			{
+				$inst->setBcc(array($bcc));
+			}
+		}
+
+		return $inst;
 	}
 	
 	/**
@@ -363,7 +357,7 @@ class Email
 	 */
 	public function setCc(array $to)
 	{
-		$this->emailAdapter->addCc($to);
+		$this->emailAdapter->setCc($to);
 		return $this;
 	}
 
@@ -390,7 +384,7 @@ class Email
 	 */
 	public function setBcc(array $to)
 	{
-		$this->emailAdapter->addBcc($to);
+		$this->emailAdapter->setBcc($to);
 		return $this;
 	}
 

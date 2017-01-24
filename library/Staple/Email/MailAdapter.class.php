@@ -1,15 +1,31 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: scott.henscheid
- * Date: 1/12/2017
- * Time: 11:13 AM
+ * PHP Mail Email Adapter class. This class implements emails based on the PHP mail() function.
+ *
+ * @author Ironpilot
+ * @copyright Copyright (c) 2011, STAPLE CODE
+ *
+ * This file is part of the STAPLE Framework.
+ *
+ * The STAPLE Framework is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your option)
+ * any later version.
+ *
+ * The STAPLE Framework is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 
 namespace Staple\Email;
 
 use Staple\Config;
-use Stripe\Email\EmailAdapter;
+use Staple\Exception\EmailException;
 
 class MailAdapter implements EmailAdapter
 {
@@ -62,10 +78,22 @@ class MailAdapter implements EmailAdapter
 
 	public function __construct()
 	{
-		if(Config::exists('email','html'))
+		try
 		{
-			$this->setHtml(Config::getValue('email','html'));
+			if(Config::exists('email', 'from'))
+			{
+				$this->setFrom(Config::getValue('email', 'from'));
+			}
+			if(Config::exists('email', 'bcc'))
+			{
+				$this->addBcc(Config::getValue('email', 'bcc'));
+			}
+			if(Config::exists('email', 'html'))
+			{
+				$this->setHtml(Config::getValue('email', 'html'));
+			}
 		}
+		catch(EmailException $e) {}	//Ignore invalid emails on object creation.
 	}
 
 	public function send()
@@ -117,7 +145,7 @@ class MailAdapter implements EmailAdapter
 			}
 
 			//PHP Mailer Header
-			$headers .= 'X-Mailer: PHP/' . phpversion();
+			$headers .= 'X-Mailer: PHP/' . phpversion() . $rn;
 
 			if($this->hasAttachments())
 			{
@@ -168,24 +196,68 @@ class MailAdapter implements EmailAdapter
 			//Base64 encode the email subject
 			$subject = '=?UTF-8?B?' . base64_encode($this->getSubject()) . '?=';
 
-			//Send Mail
-			return mail($toList, $subject, $body, $headers);
+			//Send the Email
+			return $this->performSend($toList, $subject, $body, $headers);
 		}
 
 		return false;
 	}
 
-	public function addTo($to)
+	/**
+	 * Invoke the mail() function in PHP to send the email.
+	 * @param $to
+	 * @param $subject
+	 * @param $body
+	 * @param $headers
+	 * @return bool
+	 */
+	protected function performSend($to, $subject, $body, $headers)
 	{
-		// TODO: Implement addTo() method.
-	}
-
-	public function setTo($to)
-	{
-		// TODO: Implement setTo() method.
+		return mail($to, $subject, $body, $headers);
 	}
 
 	/**
+	 * Add an email to the list of to email addresses.
+	 * @param $to
+	 * @return $this
+	 * @throws EmailException
+	 */
+	public function addTo($to)
+	{
+		if(Email::checkEmailFormat($to))
+		{
+			if(array_search($to, $this->to) === false)
+				$this->to[] = $to;
+		}
+		else
+		{
+			throw new EmailException('Invalid email format');
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Set the $to array of the object.
+	 * @param $to
+	 * @return $this
+	 * @throws EmailException
+	 */
+	public function setTo($to)
+	{
+		if(is_array($to))
+		{
+			$this->to = [];
+			foreach($to as $email)
+			{
+				$this->addTo($email);
+			}
+		}
+		return $this;
+	}
+
+	/**
+	 * Returns the array of $to email addresses.
 	 * @return \string[]
 	 */
 	public function getTo()
@@ -193,29 +265,122 @@ class MailAdapter implements EmailAdapter
 		return $this->to;
 	}
 
+	/**
+	 * Add and email to the CC list of emails
+	 * @param $cc
+	 * @return $this
+	 * @throws EmailException
+	 */
 	public function addCc($cc)
 	{
-		// TODO: Implement addCc() method.
+		if(Email::checkEmailFormat($cc))
+		{
+			if(array_search($cc, $this->cc) === false)
+				$this->cc[] = $cc;
+		}
+		else
+		{
+			throw new EmailException('Invalid email format');
+		}
+
+		return $this;
 	}
 
+	/**
+	 * Set the $cc array of the object.
+	 * @param $cc
+	 * @return $this
+	 * @throws EmailException
+	 */
+	public function setCc($cc)
+	{
+		if(is_array($cc))
+		{
+			$this->cc = [];
+			foreach($cc as $email)
+			{
+				$this->addCc($email);
+			}
+		}
+		return $this;
+	}
+
+	/**
+	 * Return the CC array
+	 * @return \string[]
+	 */
 	public function getCc()
 	{
 		return $this->cc;
 	}
 
+	/**
+	 * Add an email to the BCC list of emails
+	 * @param $bcc
+	 * @return $this
+	 * @throws EmailException
+	 */
 	public function addBcc($bcc)
 	{
-		// TODO: Implement addBcc() method.
+		if(Email::checkEmailFormat($bcc))
+		{
+			if(array_search($bcc, $this->bcc) === false)
+				$this->bcc[] = $bcc;
+		}
+		else
+		{
+			throw new EmailException('Invalid email format');
+		}
+
+		return $this;
 	}
 
+	/**
+	 * Set the $bcc array of the object.
+	 * @param $bcc
+	 * @return $this
+	 * @throws EmailException
+	 */
+	public function setBcc($bcc)
+	{
+		if(is_array($bcc))
+		{
+			$this->bcc = [];
+			foreach($bcc as $email)
+			{
+				$this->addBcc($email);
+			}
+		}
+		return $this;
+	}
+
+	/**
+	 * Return the BCC array
+	 * @return \string[]
+	 */
 	public function getBcc()
 	{
 		return $this->bcc;
 	}
 
+	/**
+	 * Set the from email. Optional name parameter.
+	 * @param $from
+	 * @param string $name
+	 * @return $this
+	 */
 	public function setFrom($from, $name = null)
 	{
-		// TODO: Implement setFrom() method.
+		if(is_null($name))
+		{
+			$this->from = $from;
+		}
+		else
+		{
+			$this->from = $name . ' <' . $from . '>';
+		}
+
+		return $this;
 	}
 
 	/**
