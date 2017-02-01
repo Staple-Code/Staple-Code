@@ -1,0 +1,14 @@
+<?php
+use Staple\Form\Form;
+use Staple\View;
+/** @var View $this */
+/** @var Form $form */
+?><h2>Your Profile</h2><?php
+echo $form->formstart();
+echo $form->fname;
+echo $form->lname;
+echo $form->bio;
+echo $form->birthyear;
+echo $form->spouse;
+echo $form->send;
+echo $form->formend();

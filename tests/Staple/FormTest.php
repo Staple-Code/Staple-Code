@@ -43,6 +43,7 @@ use Staple\Form\Validate\LengthValidator;
 use Staple\Form\ViewAdapters\BootstrapViewAdapter;
 use Staple\Form\ViewAdapters\ElementViewAdapter;
 use Staple\Form\ViewAdapters\FoundationViewAdapter;
+use Staple\View;
 
 class MyViewAdapter extends ElementViewAdapter
 {
@@ -665,6 +666,64 @@ class FormTest extends \PHPUnit_Framework_TestCase
 			. "\n\t<div class=\"small-12 columns\">"
 			. "\n\t<input type=\"submit\" id=\"send\" name=\"send\" value=\"Send Query\" class=\"button\">"
 			. "\n\t</div>"
+			. "\n</div>\n"
+			. "\n\t<input type=\"hidden\" id=\"ident\" name=\"ident\" value=\"$ident\">\n"
+			. "\n</div>"
+			. "\n</form>\n";
+		$output = $form->build();
+
+		$this->assertEquals($expectedOutput, $output);
+	}
+
+	public function testFormBuildWithView()
+	{
+		$form = $this->getComplexTestForm();
+		$form->setView(View::create('testFormView','form'));
+
+		//Expected Results
+		$ident = $form->fields['ident']->getValue();
+		$expectedOutput = '<h2>Your Profile</h2>'
+			. "\n<form name=\"testform\" id=\"testform_form\" action=\"/test/form\" method=\"GET\">"
+			. "\n<div id=\"testform_div\">"
+			. "\n<div class=\"form_required form_element element_text\" id=\"fname_element\">"
+			. "\n\t<label for=\"fname\" class=\"form_required form_element element_text\">First Name</label>"
+			. "\n\t<input type=\"text\" id=\"fname\" name=\"fname\" value=\"\" class=\"form_required form_element element_text\">"
+			. "\n</div>"
+			. "\n<div class=\"form_required form_element element_text\" id=\"lname_element\">"
+			. "\n\t<label for=\"lname\" class=\"form_required form_element element_text\">Last Name</label>"
+			. "\n\t<input type=\"text\" id=\"lname\" name=\"lname\" value=\"\" class=\"form_required form_element element_text\">"
+			. "\n</div>"
+			. "\n<div class=\"form_element element_textarea\" id=\"bio_element\">"
+			. "\n\t<label for=\"bio\" class=\"form_element element_textarea\">Your Biography</label>"
+			. "\n\t<textarea rows=\"5\" cols=\"40\" id=\"bio\" name=\"bio\" class=\"form_element element_textarea\"></textarea>"
+			. "\n</div>"
+			. "\n<div class=\"form_required form_element element_select\" id=\"birthyear_element\">"
+			. "\n\t<label for=\"birthyear\" class=\"form_required form_element element_select\">Year of Birth</label>"
+			. "\n\t<select name=\"birthyear\" id=\"birthyear\" class=\"form_required form_element element_select\">"
+			. "\n\t\t<option value=\"\"></option>"
+			. "\n\t\t<option value=\"1994\">1994</option>"
+			. "\n\t\t<option value=\"1995\">1995</option>"
+			. "\n\t\t<option value=\"1996\">1996</option>"
+			. "\n\t\t<option value=\"1997\">1997</option>"
+			. "\n\t\t<option value=\"1998\">1998</option>"
+			. "\n\t\t<option value=\"1999\">1999</option>"
+			. "\n\t\t<option value=\"2000\">2000</option>"
+			. "\n\t</select>"
+			. "\n</div>"
+			. "\n<div class=\"form_element element_radiogroup\" id=\"spouse_element\">"
+			. "\n\t<label class=\"form_element element_radiogroup\">I need to add a spouse:</label>"
+			. "\n\t<div class=\"form_radio\" id=\"spouse_0_div\">"
+			. "\n\t\t<input type=\"radio\" name=\"spouse\" id=\"spouse_0\" value=\"0\" class=\"form_element element_radiogroup\">"
+			. "\n\t\t<label for=\"spouse_0\">Yes</label>"
+			. "\n\t</div>"
+			. "\n\t<div class=\"form_radio\" id=\"spouse_1_div\">"
+			. "\n\t\t<input type=\"radio\" name=\"spouse\" id=\"spouse_1\" value=\"1\" checked class=\"form_element element_radiogroup\">"
+			. "\n\t\t<label for=\"spouse_1\">No</label>"
+			. "\n\t</div>"
+			. "\n</div>"
+			. "\n<div class=\"form_element element_submit\" id=\"send_element\">"
+			. "\n\t<label for=\"send\" class=\"form_element element_submit\"></label>"
+			. "\n\t<input type=\"submit\" id=\"send\" name=\"send\" value=\"Send Query\" class=\"form_element element_submit\">"
 			. "\n</div>\n"
 			. "\n\t<input type=\"hidden\" id=\"ident\" name=\"ident\" value=\"$ident\">\n"
 			. "\n</div>"

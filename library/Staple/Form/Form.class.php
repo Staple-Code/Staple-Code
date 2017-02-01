@@ -31,6 +31,7 @@ use \Staple\Encrypt;
 use Staple\Exception\FormBuildException;
 use \Staple\Form\ViewAdapters\ElementViewAdapter;
 use Staple\Traits\Helpers;
+use Staple\View;
 
 class Form
 {
@@ -119,14 +120,21 @@ class Form
 	 * Holds a title for the form.
 	 *
 	 * @var string
+	 * @deprecated
 	 */
 	protected $title;
 	/**
 	 * Holds the form layout name.
 	 *
 	 * @var string
+	 * @deprecated
 	 */
 	protected $layout;
+	/**
+	 * The Form View Object
+	 * @var View
+	 */
+	protected $view;
 	/**
 	 * This holds the ElementViewAdapter object.
 	 *
@@ -143,8 +151,9 @@ class Form
 	/**
 	 * @param string $name
 	 * @param string $action
+	 * @param View $view
 	 */
-	public function __construct($name = null, $action = null)
+	public function __construct($name = null, $action = null, View $view = null)
 	{
 		$this->_start();
 
@@ -171,6 +180,12 @@ class Form
 			}
 		}
 
+		//Set the form view
+		if($view instanceof View)
+		{
+			$this->setView($view);
+		}
+
 		/**
 		 * Loads selected elementViewAdapter from configuration and verify given adapter is a class before loading.
 		 */
@@ -190,14 +205,17 @@ class Form
 	}
 
 	/**
-	 * Overloaded __set allows for dynamic addition of properties.
+	 * Overloaded __set allows for dynamic addition of fields or properties.
 	 *
 	 * @param string | int $key
 	 * @param mixed $value
 	 */
 	public function __set($key, $value)
 	{
-		$this->_store[$key] = $value;
+		if($value instanceof FieldElement)
+			$this->fields[$key] = $value;
+		else
+			$this->_store[$key] = $value;
 	}
 
 	/**
@@ -295,6 +313,25 @@ class Form
 		}
 
 		return false;
+	}
+
+	/**
+	 * @return View
+	 */
+	public function getView()
+	{
+		return $this->view;
+	}
+
+	/**
+	 * @param View $view
+	 * @return Form
+	 */
+	public function setView(View $view)
+	{
+		$view->setViewForm($this);
+		$this->view = $view;
+		return $this;
 	}
 
 	/**
@@ -916,6 +953,7 @@ JS;
 
 	/**
 	 * @return string $title
+	 * @deprecated
 	 */
 	public function getTitle()
 	{
@@ -924,6 +962,7 @@ JS;
 
 	/**
 	 * @return string $layout
+	 * @deprecated
 	 */
 	public function getLayout()
 	{
@@ -1166,7 +1205,16 @@ JS;
 	public function build()
 	{
 		$buf = '';
-		if(isset($this->layout))
+		if(isset($this->view))	//Build the form using a view
+		{
+
+			ob_start();
+			$this->view->setViewForm($this);
+			$this->view->build();
+			$buf = ob_get_contents();
+			ob_end_clean();
+		}
+		elseif(isset($this->layout))
 		{
 			$layoutLocation = FORMS_ROOT . 'layouts/' . basename($this->layout) . '.phtml';
 			if(file_exists($layoutLocation))

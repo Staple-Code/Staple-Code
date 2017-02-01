@@ -1,8 +1,9 @@
 <?php
 return [
 	'application'	=> [
-		'public_location' 	=>	'/',
-		'loader' 			=>	'', //Default value is blank. Used to specify your own autoloader.
+		'public_location'		=>	'/',
+		'loader'			=>	'', //Default value is blank. Used to specify your own autoloader.
+		'throw_on_loader_failure'	=>	false,	//Throws an Exception if the autoloader cannot find a class.
 	],
 
 	'page'	=>	[
@@ -49,8 +50,10 @@ return [
 		'meta_description' 	=>	'',
 	],
 
-	'forms'	=>	[
-		'elementViewAdapter' => NULL,	//BootstrapViewAdapter and FoundationViewAdapter are included with the framework
+	'forms'	=> [
+		'elementViewAdapter'	=> NULL,
+		//'elementViewAdapter' => 'FormBootstrapViewAdapter',
+		//'elementViewAdapter' => 'FormFoundationViewAdapter',
 	],
 
 	'db'	=>	[
@@ -72,8 +75,10 @@ return [
 		'pwfield'			=>	'password',
 		'rolefield'			=>	'accountType',
 		'pwenctype'			=>	'SHA1',
-		'allowedRoute'		=>	['index/index'],
-		//ADDefaultPrivs	=>	'10',
+		'allowedRoute' 		=> [
+			'index/index'
+		],
+		//'ADDefaultPrivs' => '10',
 	],
 
 	'encrypt'	=>	[

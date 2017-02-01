@@ -92,7 +92,7 @@ class SelectElement extends FieldElement
 	/**
 	 * Sets the value for the select box
 	 * @param mixed $val
-	 * @return FieldElement
+	 * @return static
 	 */
 	public function setValue($val)
 	{
