@@ -91,6 +91,12 @@ class Autoload
 	 */
 	public function __construct()
 	{
+		//Set default for loader exception throwing
+		if(Config::exists('application','throw_on_loader_failure'))
+		{
+			$this->setThrowOnFailure(Config::getValue('application','throw_on_loader_failure'));
+		}
+
 		//Add the default controller location
 		$this->addControllerSearchDirectory(CONTROLLER_ROOT,false);
 		$this->setControllerSuffix(self::CONTROLLER_SUFFIX);

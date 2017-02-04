@@ -1,14 +1,15 @@
 <?php
 return [
 	'application'	=> [
-		'public_location' 	=> '/',
-		'loader' 			=> '', //Default value is blank. Used to specify your own autoloader.
+		'public_location'		=>	'/',
+		'loader'			=>	'', //Default value is blank. Used to specify your own autoloader.
+		'throw_on_loader_failure'	=>	true,	//Throws an Exception if the autoloader cannot find a class.
 	],
 
-	'page'	=> [
-		'header' 			=> '', //MODULES_ROOT'header.php'
-		'footer' 			=> '', //MODULES_ROOT'footer.php'
-		'title' 			=> 'STAPLE Code - A PHP 5 Model-View-Controller Framework for Rapid Application Development',
+	'page'	=>	[
+		'header' 	=>	'', //Deprecated - MODULES_ROOT'header.php'
+		'footer' 	=>	'', //Deprecated - MODULES_ROOT'footer.php'
+		'title' 	=>	'STAPLE Code - A PHP 5 Model-View-Controller Framework for Rapid Application Development',
 	],
 
 	'session'	=>	[

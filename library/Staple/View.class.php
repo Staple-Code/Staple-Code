@@ -365,7 +365,7 @@ class View
 				if (file_exists($view))
 				{
 					//include the view
-					include $view;
+					require $view;
 				}
 			}
 			else
@@ -384,7 +384,7 @@ class View
 						$form = $this->_viewForm;
 
 					//include the view
-					include $view;
+					require $view;
 				}
 			}
 		}
