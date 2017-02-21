@@ -25,12 +25,13 @@
 namespace Staple\Tests;
 
 
+use PHPUnit\Framework\TestCase;
 use Staple\Form\ButtonElement;
 use Staple\Form\Validate\EqualValidator;
 use Staple\Form\ViewAdapters\BootstrapViewAdapter;
 use Staple\Form\ViewAdapters\FoundationViewAdapter;
 
-class ButtonElementTest extends \PHPUnit_Framework_TestCase
+class ButtonElementTest extends TestCase
 {
 	const STANDARD_BUILD = "<div class=\"form_element element_button\" id=\"ButtonElement_element\">\n\t<label for=\"ButtonElement\" class=\"form_element element_button\"></label>\n\t<input type=\"button\" id=\"ButtonElement\" name=\"ButtonElement\" value=\"My Button\" class=\"form_element element_button\">\n</div>\n";
 	const FOUNDATION_BUILD = "<div class=\"row\">\n\t<div class=\"small-12 columns\">\n\t<input type=\"button\" id=\"ButtonElement\" name=\"ButtonElement\" value=\"My Button\" class=\"button\">\n\t</div>\n</div>\n";

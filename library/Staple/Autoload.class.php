@@ -87,10 +87,16 @@ class Autoload
 	protected $throwOnFailure = true;
 	/**
 	 * Automatically loads class files for the application.
+	 * @param bool $throwOnLoaderFailure
 	 * @throws Exception
 	 */
-	public function __construct()
+	public function __construct($throwOnLoaderFailure = true)
 	{
+		if($throwOnLoaderFailure === false)
+		{
+			$this->setThrowOnFailure(false);
+		}
+
 		//Set default for loader exception throwing
 		if(Config::exists('application','throw_on_loader_failure'))
 		{

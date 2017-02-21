@@ -23,11 +23,12 @@
 
 namespace Staple\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Staple\Query\Insert;
 use Staple\Query\Select;
 use Staple\Query\MockConnection;
 
-class InsertTest extends \PHPUnit_Framework_TestCase
+class InsertTest extends TestCase
 {
 	const INSERT_IGNORE_STATEMENT = "INSERT HIGH_PRIORITY IGNORE \nINTO table (id,name,summary,rank,cat,created) \nVALUES (1,'Test','This is a test and only a test.','3.14',2,'2010-01-01 00:00:00') ";
 	const INSERT_SELECT_STATEMENT = "INSERT \nINTO categories \nSELECT\nname, summary, rank, category_id AS cat, created \nFROM article_categories\nWHERE id = articles.cat";

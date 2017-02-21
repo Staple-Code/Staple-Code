@@ -24,15 +24,17 @@
 namespace Staple\Tests;
 
 
+use PHPUnit\Framework\TestCase;
 use Staple\Alias;
 use Staple\Form\Form;
 
-class AliasTest extends \PHPUnit_Framework_TestCase
+class AliasTest extends TestCase
 {
 	private $alias;
 
 	public function __construct()
 	{
+		parent::__construct();
 		$this->alias = new Alias();
 	}
 

@@ -25,6 +25,7 @@
 namespace Staple\Tests;
 
 
+use PHPUnit\Framework\TestCase;
 use Staple\Form\TextElement;
 use Staple\Form\Validate\AlnumValidator;
 use Staple\Form\Validate\DateValidator;
@@ -33,7 +34,7 @@ use Staple\Form\Validate\LengthValidator;
 use Staple\Form\ViewAdapters\BootstrapViewAdapter;
 use Staple\Form\ViewAdapters\FoundationViewAdapter;
 
-class TextElementTest extends \PHPUnit_Framework_TestCase
+class TextElementTest extends TestCase
 {
 	const STANDARD_BUILD = "<div class=\"form_element element_text\" id=\"TestTextElement_element\">\n\t<label for=\"TestTextElement\" class=\"form_element element_text\">My Test Text Element</label>\n\t<input type=\"text\" id=\"TestTextElement\" name=\"TestTextElement\" value=\"\" class=\"form_element element_text\">\n</div>\n";
 	const FOUNDATION_BUILD = "<div class=\"row\">\n<div class=\"small-12 columns\">\n\t<label for=\"TestTextElement\">My Test Text Element</label>\n</div>\n<div class=\"small-12 columns\">\n\t<input type=\"text\" id=\"TestTextElement\" name=\"TestTextElement\" value=\"\">\n</div>\n</div>\n";

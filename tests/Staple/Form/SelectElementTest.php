@@ -24,6 +24,7 @@
 
 namespace Staple\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Staple\Form\SelectElement;
 use Staple\Form\Validate\AlnumValidator;
 use Staple\Form\Validate\DateValidator;
@@ -33,7 +34,7 @@ use Staple\Form\Validate\LengthValidator;
 use Staple\Form\ViewAdapters\BootstrapViewAdapter;
 use Staple\Form\ViewAdapters\FoundationViewAdapter;
 
-class SelectElementTest extends \PHPUnit_Framework_TestCase
+class SelectElementTest extends TestCase
 {
 	const STANDARD_BUILD = "<div class=\"form_element element_select\" id=\"TestSelectElement_element\">\n\t<label for=\"TestSelectElement\" class=\"form_element element_select\">My Test Select Element</label>\n\t<select name=\"TestSelectElement\" id=\"TestSelectElement\" class=\"form_element element_select\">\n\t\t<option value=\"1\">Las Vegas</option>\n\t\t<option value=\"2\">New York</option>\n\t\t<option value=\"3\">Atlanta</option>\n\t\t<option value=\"4\">Orlando</option>\n\t</select>\n</div>\n";
 	const FOUNDATION_BUILD = "<div class=\"row\">\n<div class=\"small-12 columns\">\n\t<label for=\"TestSelectElement\">My Test Select Element</label>\n</div>\n<div class=\"small-12 columns\">\n\t<select name=\"TestSelectElement\" id=\"TestSelectElement\">\n\t\t<option value=\"1\">Las Vegas</option>\n\t\t<option value=\"2\">New York</option>\n\t\t<option value=\"3\">Atlanta</option>\n\t\t<option value=\"4\">Orlando</option>\n\t</select>\n</div>\n</div>\n";

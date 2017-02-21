@@ -24,9 +24,10 @@
 namespace Staple\Tests;
 
 
+use PHPUnit\Framework\TestCase;
 use Staple\Encrypt;
 
-class EncryptTest extends \PHPUnit_Framework_TestCase
+class EncryptTest extends TestCase
 {
 	private $key = 'kASMCL^TRB8A<UQwOcgsHDKhgUs[ZtMe';
 	private $salt = 'askdfRIUF';

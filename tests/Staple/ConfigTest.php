@@ -8,9 +8,10 @@
 
 namespace Staple\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Staple\Config;
 
-class ConfigTest extends \PHPUnit_Framework_TestCase
+class ConfigTest extends TestCase
 {
 	protected function setUp()
 	{

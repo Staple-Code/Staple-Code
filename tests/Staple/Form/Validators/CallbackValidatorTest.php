@@ -9,9 +9,10 @@
 namespace Staple\Tests;
 
 
+use PHPUnit\Framework\TestCase;
 use Staple\Form\Validate\CallbackValidator;
 
-class CallbackValidatorTest extends \PHPUnit_Framework_TestCase
+class CallbackValidatorTest extends TestCase
 {
 	/**
 	 * @test

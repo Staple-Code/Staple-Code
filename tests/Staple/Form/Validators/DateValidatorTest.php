@@ -9,9 +9,10 @@
 namespace Staple\Tests;
 
 
+use PHPUnit\Framework\TestCase;
 use Staple\Form\Validate\DateValidator;
 
-class DateValidatorTest extends \PHPUnit_Framework_TestCase
+class DateValidatorTest extends TestCase
 {
 	private function getDateValidator()
 	{

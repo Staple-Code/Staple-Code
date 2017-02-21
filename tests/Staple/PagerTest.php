@@ -25,9 +25,10 @@
 namespace Staple\Tests;
 
 
+use PHPUnit\Framework\TestCase;
 use Staple\Pager;
 
-class PagerTest extends \PHPUnit_Framework_TestCase
+class PagerTest extends TestCase
 {
 	private function getTestObject($itemsPerPage = NULL, $total = NULL, $currentPage = NULL, $pageBuffer = NULL)
 	{

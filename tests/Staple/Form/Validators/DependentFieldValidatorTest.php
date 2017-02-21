@@ -23,11 +23,12 @@
 
 namespace Staple\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Staple\Form\TextareaElement;
 use Staple\Form\TextElement;
 use Staple\Form\Validate\DependentFieldValidator;
 
-class DependentFieldValidatorTest extends \PHPUnit_Framework_TestCase
+class DependentFieldValidatorTest extends TestCase
 {
 
 	/*

@@ -9,6 +9,7 @@
 namespace Staple\Tests;
 
 
+use PHPUnit\Framework\TestCase;
 use Staple\Form\RadioElement;
 use Staple\Form\Validate\AlnumValidator;
 use Staple\Form\Validate\DateValidator;
@@ -18,7 +19,7 @@ use Staple\Form\Validate\LengthValidator;
 use Staple\Form\ViewAdapters\BootstrapViewAdapter;
 use Staple\Form\ViewAdapters\FoundationViewAdapter;
 
-class RadioElementTest extends \PHPUnit_Framework_TestCase
+class RadioElementTest extends TestCase
 {
 	const STANDARD_BUILD = "<div class=\"form_element element_radiogroup\" id=\"TestRadioElement_element\">\n\t<label class=\"form_element element_radiogroup\">Select A City</label>\n\t<div class=\"form_radio\" id=\"TestRadioElement_1_div\">\n\t\t<input type=\"radio\" name=\"TestRadioElement\" id=\"TestRadioElement_1\" value=\"1\" class=\"form_element element_radiogroup\">\n\t\t<label for=\"TestRadioElement_1\">Las Vegas</label>\n\t</div>\n\t<div class=\"form_radio\" id=\"TestRadioElement_2_div\">\n\t\t<input type=\"radio\" name=\"TestRadioElement\" id=\"TestRadioElement_2\" value=\"2\" class=\"form_element element_radiogroup\">\n\t\t<label for=\"TestRadioElement_2\">New York</label>\n\t</div>\n\t<div class=\"form_radio\" id=\"TestRadioElement_3_div\">\n\t\t<input type=\"radio\" name=\"TestRadioElement\" id=\"TestRadioElement_3\" value=\"3\" class=\"form_element element_radiogroup\">\n\t\t<label for=\"TestRadioElement_3\">Atlanta</label>\n\t</div>\n\t<div class=\"form_radio\" id=\"TestRadioElement_4_div\">\n\t\t<input type=\"radio\" name=\"TestRadioElement\" id=\"TestRadioElement_4\" value=\"4\" class=\"form_element element_radiogroup\">\n\t\t<label for=\"TestRadioElement_4\">Orlando</label>\n\t</div>\n</div>\n";
 	const FOUNDATION_BUILD = "<div class=\"row\">\n\t<div class=\"small-12 columns\">\n\t<label class=\"row\">Select A City</label>\n\t</div>\n\n<div class=\"small-12 columns\">\n\t<div class=\"form_radio\" id=\"TestRadioElement_1_div\">\n\t\t<input type=\"radio\" name=\"TestRadioElement\" id=\"TestRadioElement_1\" value=\"1\" class=\"row\">\n\t\t<label for=\"TestRadioElement_1\">Las Vegas</label>\n\t</div>\n\t<div class=\"form_radio\" id=\"TestRadioElement_2_div\">\n\t\t<input type=\"radio\" name=\"TestRadioElement\" id=\"TestRadioElement_2\" value=\"2\" class=\"row\">\n\t\t<label for=\"TestRadioElement_2\">New York</label>\n\t</div>\n\t<div class=\"form_radio\" id=\"TestRadioElement_3_div\">\n\t\t<input type=\"radio\" name=\"TestRadioElement\" id=\"TestRadioElement_3\" value=\"3\" class=\"row\">\n\t\t<label for=\"TestRadioElement_3\">Atlanta</label>\n\t</div>\n\t<div class=\"form_radio\" id=\"TestRadioElement_4_div\">\n\t\t<input type=\"radio\" name=\"TestRadioElement\" id=\"TestRadioElement_4\" value=\"4\" class=\"row\">\n\t\t<label for=\"TestRadioElement_4\">Orlando</label>\n\t</div>\n\t</div>\n</div>\n";

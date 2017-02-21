@@ -23,6 +23,7 @@
 
 namespace Staple\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Staple\Config;
 use Staple\Form\ButtonElement;
 use Staple\Form\CheckboxElement;
@@ -109,7 +110,7 @@ class MyViewAdapter extends ElementViewAdapter
 
 }
 
-class FormTest extends \PHPUnit_Framework_TestCase
+class FormTest extends TestCase
 {
 	protected function setUp()
 	{

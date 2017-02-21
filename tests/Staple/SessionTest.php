@@ -8,9 +8,10 @@
 
 namespace Staple\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Staple\Session\Session;
 
-class SessionTest extends \PHPUnit_Framework_TestCase
+class SessionTest extends TestCase
 {
 	public function testSessionStart()
 	{

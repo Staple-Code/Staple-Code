@@ -51,11 +51,11 @@ require_once LIBRARY_ROOT.'Staple/Autoload.class.php';
 
 // For some reason Travis CI can't fully load Twig through composer
 // @todo remove this once Travis CI starts acting properly.
-require_once VENDOR_ROOT.'twig/twig/lib/Twig/Autoloader.php';
-Twig_Autoloader::register();
+//require_once VENDOR_ROOT.'twig/twig/lib/Twig/Autoloader.php';
+//Twig_Autoloader::register();
 
 //Staple AutoLoader
-$loader = new \Staple\Autoload();
+$loader = new \Staple\Autoload(false);
 
 //Register the Autoload class
 spl_autoload_register(array($loader, 'load'));

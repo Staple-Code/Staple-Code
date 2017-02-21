@@ -24,9 +24,10 @@
 namespace Staple\Tests;
 
 
+use PHPUnit\Framework\TestCase;
 use Staple\Utility;
 
-class UtilityTest extends \PHPUnit_Framework_TestCase
+class UtilityTest extends TestCase
 {
 	/**
 	 * A sentence to test with.

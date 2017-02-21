@@ -25,12 +25,13 @@
 namespace Staple\Tests;
 
 
+use PHPUnit\Framework\TestCase;
 use Staple\Form\SubmitElement;
 use Staple\Form\Validate\EqualValidator;
 use Staple\Form\ViewAdapters\BootstrapViewAdapter;
 use Staple\Form\ViewAdapters\FoundationViewAdapter;
 
-class SubmitElementTest extends \PHPUnit_Framework_TestCase
+class SubmitElementTest extends TestCase
 {
 	const STANDARD_BUILD = "<div class=\"form_element element_submit\" id=\"SubmitElement_element\">\n\t<label for=\"SubmitElement\" class=\"form_element element_submit\"></label>\n\t<input type=\"submit\" id=\"SubmitElement\" name=\"SubmitElement\" value=\"Submit Form\" class=\"form_element element_submit\">\n</div>\n";
 	const FOUNDATION_BUILD = "<div class=\"row\">\n\t<div class=\"small-12 columns\">\n\t<input type=\"submit\" id=\"SubmitElement\" name=\"SubmitElement\" value=\"Submit Form\" class=\"button\">\n\t</div>\n</div>\n";

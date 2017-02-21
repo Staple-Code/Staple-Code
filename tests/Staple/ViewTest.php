@@ -24,6 +24,7 @@
 namespace Staple\Tests;
 
 
+use PHPUnit\Framework\TestCase;
 use Staple\Form\Form;
 use Staple\Link;
 use Staple\Model;
@@ -34,7 +35,7 @@ class viewModel extends Model
 
 }
 
-class ViewTest extends \PHPUnit_Framework_TestCase
+class ViewTest extends TestCase
 {
 	/**
 	 * @return View

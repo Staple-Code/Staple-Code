@@ -24,9 +24,10 @@
 namespace Staple\Tests;
 
 
+use PHPUnit\Framework\TestCase;
 use Staple\Link;
 
-class LinkTest extends \PHPUnit_Framework_TestCase
+class LinkTest extends TestCase
 {
 	public function testLinkCreation()
 	{

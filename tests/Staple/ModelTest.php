@@ -23,6 +23,7 @@
 
 namespace Staple\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Staple\Model;
 
 class userModel extends Model
@@ -41,7 +42,7 @@ class clientModel extends Model
 }
 
 
-class ModelTest extends \PHPUnit_Framework_TestCase
+class ModelTest extends TestCase
 {
 	protected function getTestUserModelObject()
 	{
@@ -116,8 +117,6 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
 	public function testArraySet()
 	{
-		$user = $this->getTestUserModelObject();
-
 		$user = $this->getTestUserModelObject();
 
 		//Check that we can get the data
