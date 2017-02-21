@@ -46,7 +46,7 @@ class Connection extends PDO implements SplSubject
 	 * The object observers. Used to catch and handle or log errors with the database and queries.
 	 * @var SplObjectStorage
 	 */
-	protected static $_observers;
+	private static $_observers;
 
 	/**
 	 * The database driver that is being used
@@ -519,6 +519,25 @@ class Connection extends PDO implements SplSubject
 	}
 
 	/*-------------------------------------------------Query Functions-------------------------------------------------*/
+
+	/**
+	 * Get Driver Specific Options for Prepared Statements
+	 *
+	 * @return array
+	 */
+	public function getDriverOptions()
+	{
+		$options = [];
+		switch($this->getDriver())
+		{
+			case self::DRIVER_SQLSRV:
+				$options[PDO::ATTR_CURSOR] = PDO::CURSOR_SCROLL;
+				$options[PDO::SQLSRV_ATTR_CURSOR_SCROLL_TYPE] = PDO::SQLSRV_CURSOR_STATIC;
+				break;
+		}
+
+		return $options;
+	}
 
 	/**
 	 * @param string $statement

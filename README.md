@@ -1,6 +1,7 @@
 # STAPLE-Code (PHP MVC Framework)
 ![Build Status](https://travis-ci.org/ironpilot/Staple-Code.svg?branch=master)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/41ca2c4097d049e29e1e44a77141f94d)](https://www.codacy.com/app/contact_8/Staple-Code?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ironpilot/Staple-Code&amp;utm_campaign=Badge_Grade)
+[![Dependency Status](https://www.versioneye.com/user/projects/58a20ce36a7781002af203d3/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/58a20ce36a7781002af203d3)
 
 ## Install
 

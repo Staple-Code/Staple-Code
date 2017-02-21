@@ -792,10 +792,10 @@ class Select extends Query
 				$stmt .= $this->order;
 			}
 
-			//SQL Server 2012 Pagination
+			//SQL Server Pagination
 			if($this->getConnection()->getDriver() == Connection::DRIVER_SQLSRV)
 			{
-				if (isset($this->limit) && !isset($sql2005limit) && $this->getLimitOffset() != 0)
+				if (isset($this->limit) && $this->getLimitOffset() != 0)
 				{
 					//Offset
 					$stmt .= "\nOFFSET " . $this->getLimitOffset(). ' ROWS ';

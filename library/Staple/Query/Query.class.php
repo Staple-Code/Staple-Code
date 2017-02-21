@@ -178,7 +178,6 @@ abstract class Query
 			}
 			catch (Exception $e)
 			{
-				//@todo try for a default connection if no staple connection
 				throw new QueryException('No Database Connection', Error::DB_ERROR);
 			}
 			if($this->connection instanceof Connection)
@@ -187,6 +186,58 @@ abstract class Query
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Prepares the query before executing and returns the result.
+	 *
+	 * @param Connection $connection
+	 * @return Statement
+	 * @throws QueryException
+	 * @throws \PDOException
+	 */
+	public function prepareAndExecute(Connection $connection = null)
+	{
+		if(isset($connection))
+			$this->setConnection($connection);
+
+		$driverOptions = $this->connection->getDriverOptions();
+
+		if($this->connection instanceof Connection)
+		{
+			/** @var Statement $stmt */
+			$stmt = $this->connection->prepare($this->build(), $driverOptions);
+			if($stmt !== false)
+				$stmt->execute();
+			else
+				throw new QueryException('Failed to prepare query. Error: ' . serialize($this->connection->errorInfo()));
+
+			return $stmt;
+		}
+		else
+		{
+			try
+			{
+				$this->connection = Connection::get();
+			}
+			catch(Exception $e)
+			{
+				throw new QueryException('No Database Connection', Error::DB_ERROR);
+			}
+			if($this->connection instanceof Connection)
+			{
+				/** @var Statement $stmt */
+				$stmt = $this->connection->prepare($this->build(), $driverOptions);
+				if($stmt !== false)
+					$stmt->execute();
+				else
+					throw new QueryException('Failed to prepare query.');
+
+				return $stmt;
+			}
+		}
+
+		throw new QueryException('No Database Connection', Error::DB_ERROR);
 	}
 
 	/**
