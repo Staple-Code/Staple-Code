@@ -25,6 +25,7 @@ namespace Staple;
 
 use \Exception;
 use \PDO;
+use Staple\Exception\ModelNotFoundException;
 use Staple\Exception\QueryException;
 use Staple\Query\Connection;
 use Staple\Query\Insert;
@@ -378,7 +379,8 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	 * Return an instance of the model from the primary key.
 	 * @param int $id
 	 * @param Connection $connection
-	 * @return $this | bool
+	 * @return $this | $this[]
+	 * @throws ModelNotFoundException
 	 */
 	public static function find($id, Connection $connection = NULL)
 	{
@@ -395,34 +397,65 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 		$result = $query->execute();
 		if($result instanceof Statement)
 		{
-			if($result->rowCount() == 1)
+			$models = array();
+			while($row = $result->fetch(PDO::FETCH_ASSOC))
 			{
-				//Load the result data
-				$model->_data = $result->fetch(PDO::FETCH_ASSOC);
-				return $model;
+				$model = static::make();
+				$model->_data = $row;
+				$models[] = $model;
 			}
-			elseif($result->rowCount() >= 1)
-			{
-				//If more than one record was returned return the array of results.
-				$models = array();
-				while($row = $result->fetch(PDO::FETCH_ASSOC))
-				{
-					$model = static::make();
-					$model->_data = $row;
-					$models[] = $model;
-				}
+			
+			if(count($models) == 1)
+				return array_pop($models);
+			elseif(count($models) > 1)
 				return $models;
-			}
 			else
-				return false;
+				throw new ModelNotFoundException();
 		}
-		else
-			return false;		//Return false on query failure
+		
+		throw new ModelNotFoundException();
 	}
-
-	public static function findAll()
+	
+	/**
+	 * Returns all of the models in an array.
+	 * @param null $limit
+	 * @param Connection|NULL $connection
+	 * @return $this[]
+	 * @throws QueryException
+	 * @throws ModelNotFoundException
+	 */
+	public static function findAll($limit = NULL, Connection $connection = NULL)
 	{
-		//@todo incomplete function
+		//Make a model instance
+		$model = static::make();
+		
+		//Create the query
+		$query = Select::table($model->_getTable());
+		
+		//Change connection if needed
+		if(isset($connection)) $query->setConnection($connection);
+		
+		//Set limit
+		if(isset($limit)) $query->limit($limit);
+		
+		//Execute the query
+		$result = $query->execute();
+		if($result instanceof Statement)
+		{
+			$models = [];
+			while($row = $result->fetch(PDO::FETCH_ASSOC))
+			{
+				$model = static::make();
+				$model->_data = $row;
+				$models[] = $model;
+			}
+			if(count($models) >= 1)
+				return $models;
+			else
+				throw new ModelNotFoundException();
+		}
+		
+		throw new ModelNotFoundException();
 	}
 
 	/**
@@ -430,8 +463,9 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	 * @param mixed $value
 	 * @param int $limit
 	 * @param Connection $connection
-	 * @return array|bool|static
+	 * @return $this[]
 	 * @throws QueryException
+	 * @throws ModelNotFoundException
 	 */
 	public static function findWhereEqual($column, $value, $limit = NULL, Connection $connection = NULL)
 	{
@@ -451,42 +485,36 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 		$result = $query->execute();
 		if($result instanceof Statement)
 		{
-			if($result->rowCount() == 1)
+			//If more than one record was returned return the array of results.
+			$models = array();
+			while($row = $result->fetch(PDO::FETCH_ASSOC))
 			{
-				//Load the result data
-				$model->_data = $result->fetch(PDO::FETCH_ASSOC);
-				return $model;
+				$model = static::make();
+				$model->_data = $row;
+				$models[] = $model;
 			}
-			elseif($result->rowCount() >= 1)
-			{
-				//If more than one record was returned return the array of results.
-				$models = array();
-				while($row = $result->fetch(PDO::FETCH_ASSOC))
-				{
-					$model = static::make();
-					$model->_data = $row;
-					$models[] = $model;
-				}
+			if(count($models) == 1)
+				return array_pop($models);
+			elseif(count($models) > 1)
 				return $models;
-			}
 			else
-				return false;
+				throw new ModelNotFoundException();
 		}
-		else
-			return false;		//Return false on query failure
+		
+		throw new ModelNotFoundException();
 	}
 	
-	public static function findWhereNull($column)
+	public static function findWhereNull($column, $limit = NULL, Connection $connection = NULL)
 	{
 		//@todo incomplete function
 	}
 	
-	public static function findWhereIn($column, array $values)
+	public static function findWhereIn($column, array $values, $limit = NULL, Connection $connection = NULL)
 	{
 		//@todo incomplete function
 	}
 	
-	public static function findWhereStatement($statement)
+	public static function findWhereStatement($statement, $limit = NULL, Connection $connection = NULL)
 	{
 		//@todo incomplete function
 	}
