@@ -273,7 +273,7 @@ class Union
 
 	/**
 	 * @param int $limit
-	 * @return Select
+	 * @return Union
 	 */
 	public function setLimit($limit)
 	{
@@ -283,7 +283,7 @@ class Union
 	
 	/**
 	 * @param int $limitOffset
-	 * @return Select
+	 * @return Union
 	 */
 	public function setLimitOffset($limitOffset)
 	{
