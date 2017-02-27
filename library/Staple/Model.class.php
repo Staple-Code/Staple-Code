@@ -60,6 +60,16 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	 * @var Connection
 	 */
 	protected $_connection;
+	/**
+	 * Bool to decide between soft deletes and hard deletes.
+	 * @var bool
+	 */
+	protected $_softDelete = false;
+	/**
+	 * The column name of the soft delete column.
+	 * @var string
+	 */
+	protected $_softDeleteField = 'deleted_at';
 
 	/**
 	 *
@@ -526,5 +536,28 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	public static function findWhereStatement($statement, $limit = NULL, Connection $connection = NULL)
 	{
 		//@todo incomplete function
+	}
+
+	/**
+	 * Delete the model from the database.
+	 * @param bool $hardDelete
+	 * @return bool
+	 */
+	public function drop($hardDelete = false)
+	{
+		if($this->_softDelete == false || $hardDelete == true)
+		{
+			$query = Query::delete($this->_getTable(), $this->getConnection())
+				->whereEqual($this->_primaryKey, $this->_data[$this->_primaryKey]);
+		}
+		else
+		{
+			$data = [$this->_softDeleteField = new \DateTime('now')];
+			$query = Query::update($this->_getTable(), $data, $this->getConnection())
+				->whereEqual($this->_primaryKey, $this->_data[$this->_primaryKey]);
+		}
+
+		//Execute the query and return the result
+		return $query->execute();
 	}
 }
