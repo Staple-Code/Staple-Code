@@ -23,7 +23,7 @@
  */
 namespace Staple;
 
-use \Exception;
+use Exception;
 use Staple\Exception\PageNotFoundException;
 
 class Autoload

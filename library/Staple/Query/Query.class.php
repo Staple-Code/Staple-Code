@@ -25,13 +25,13 @@
  */
 namespace Staple\Query;
 
-use \Staple\Exception\QueryException;
-use \Exception;
-use \Staple\Error;
-use \DateTime;
+use DateTime;
+use Exception;
+use PDO;
+use PDOStatement;
+use Staple\Error;
+use Staple\Exception\QueryException;
 use Staple\Pager;
-use \PDO;
-use \PDOStatement;
 
 abstract class Query
 {

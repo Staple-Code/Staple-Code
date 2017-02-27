@@ -23,9 +23,9 @@
  */
 namespace Staple\Query;
 
-use \Staple\Exception\QueryException;
-use \Staple\Error;
-use \Staple\Pager;
+use Staple\Error;
+use Staple\Exception\QueryException;
+use Staple\Pager;
 use Staple\Traits\Factory;
 
 class Select extends Query

@@ -23,7 +23,12 @@
  */
 namespace Staple;
 
-use \SplObjectStorage, \SplSubject, \SplObserver, \ErrorException, \Exception, \Staple\Exception\PageNotFoundException;
+use ErrorException;
+use Exception;
+use SplObjectStorage;
+use SplObserver;
+use SplSubject;
+use Staple\Exception\PageNotFoundException;
 
 class Error implements SplSubject
 {

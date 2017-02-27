@@ -23,7 +23,12 @@
 
 namespace Staple\Query;
 
-use \PDO, \PDOStatement, \SplObserver, \SplSubject, \SplObjectStorage, \Staple\Config;
+use PDO;
+use PDOStatement;
+use SplObjectStorage;
+use SplObserver;
+use SplSubject;
+use Staple\Config;
 
 class Connection extends PDO implements SplSubject
 {
