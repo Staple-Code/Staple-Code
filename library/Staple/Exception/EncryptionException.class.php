@@ -1,6 +1,6 @@
 <?php
 /**
- * Unit Tests for \Staple\Encrypt object
+ * An exception class to handle encryption errors.
  *
  * @author Ironpilot
  * @copyright Copyright (c) 2011, STAPLE CODE
@@ -21,28 +21,8 @@
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Staple\Tests;
+namespace Staple\Exception;
 
-
-use PHPUnit\Framework\TestCase;
-use Staple\Encrypt;
-
-class EncryptTest extends TestCase
+class EncryptionException extends \Exception
 {
-	private $key = 'kASMCL^TRB8A<UQwOcgsHDKhgUs[ZtMe';
-	private $salt = 'askdfRIUF';
-	private $pepper = 'orpDjk34';
-
-	public function testEncryptAndDecrypt()
-	{
-		$originalString = 'Blah encrypted string.';
-
-		$iv = openssl_random_pseudo_bytes(16);
-
-		$encrypted = Encrypt::encrypt($originalString, $this->key, Encrypt::AES, $this->salt, $this->pepper, $iv);
-
-		$decryptedString = Encrypt::decrypt($encrypted,$this->key, Encrypt::AES, $this->salt, $this->pepper, $iv);
-
-		$this->assertEquals($originalString,$decryptedString);
-	}
 }

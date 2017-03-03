@@ -258,7 +258,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	 */
 	public function jsonSerialize()
 	{
-		$exclude = ['_primaryKey', '_table', '_data', '_connection'];
+		$exclude = ['_primaryKey', '_table', '_data', '_connection','_softDelete','_softDeleteField'];
 		$reflect = new ReflectionClass($this);
 		$props = $reflect->getProperties(ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED);
 
