@@ -27,8 +27,8 @@ use Staple\Exception\EncryptionException;
 
 class Encrypt
 {
-	const AES = MCRYPT_RIJNDAEL_128;
-	const AES256 = MCRYPT_RIJNDAEL_256;
+	const AES = 'AES-128-CBC';
+	const AES256 = 'AES-256-CBC';
 
 	/**
 	 * Simple MD5 hashing function
@@ -67,86 +67,58 @@ class Encrypt
 	 * @param string $cipher
 	 * @param string $salt
 	 * @param string $pepper
-	 * @param string $iv
+	 * @param string $nonce
 	 * @param int $options
 	 * @return string
 	 * @throws EncryptionException
 	 */
-	public static function encrypt($encrypt, $key, $cipher = 'AES-128-CBC', $salt = '', $pepper = '', string $iv = '', int $options = 0)
+	public static function encrypt($encrypt, $key, $cipher = self::AES, $salt = '', $pepper = '', string $nonce = '', int $options = 0)
 	{
+		//Check for OpenSSL extension
+		if(!function_exists('openssl_encrypt'))
+			throw new EncryptionException('OpenSSL Module not loaded.');
+
 		//Check for cipher existence
 		$availableMethods = openssl_get_cipher_methods();
-		if(($method = in_array($cipher, $availableMethods)) === false)
-		{
+		if(in_array($cipher, $availableMethods) === false)
 			throw new EncryptionException('Encryption cipher is not available on this system.');
-		}
-
-		if(strlen($iv) < 1)
-		{
-			$iv = openssl_random_pseudo_bytes(16);
-		}
 
 		//Add salt and pepper
 		$encryptString = $pepper . $encrypt . $salt;
 
-		return openssl_encrypt($encryptString, 'AES-128-CBC', $key, $options, $iv);
-	}
-
-	/**
-	 * @param $encrypt
-	 * @param $key
-	 * @param string $salt
-	 * @param string $pepper
-	 * @param null $iv
-	 * @return string
-	 * @deprecated
-	 */
-	public static function AES_encrypt($encrypt, $key, $salt = '', $pepper = '', $iv = NULL)
-	{
-		return static::encrypt($encrypt, $key, MCRYPT_RIJNDAEL_128, $salt, $pepper, $iv);
+		return openssl_encrypt($encryptString, $cipher, $key, $options, $nonce);
 	}
 
 	/**
 	 * Decrypt data using specified algorithm
 	 * @param string $decrypt
 	 * @param string $key
-	 * @param string $cypher
+	 * @param string $cipher
 	 * @param string $salt
 	 * @param string $pepper
-	 * @param string $iv
+	 * @param string $nonce
+	 * @param int $options
 	 * @return string
+	 * @throws EncryptionException
 	 */
-	public static function decrypt($decrypt, $key, $cypher = MCRYPT_RIJNDAEL_128, $salt = '', $pepper = '', $iv = NULL)
+	public static function decrypt($decrypt, $key, $cipher = self::AES, $salt = '', $pepper = '', $nonce = NULL, int $options = 0)
 	{
-		if ($iv == NULL)
-		{
-			$iv_size = mcrypt_get_iv_size($cypher, MCRYPT_MODE_ECB);
-			$iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);
-		}
+		//Check for OpenSSL extension
+		if(!function_exists('openssl_decrypt'))
+			throw new EncryptionException('OpenSSL Module not loaded.');
+
+		//Check for cipher existance
+		$availableMethods = openssl_get_cipher_methods();
+		if(in_array($cipher, $availableMethods) === false)
+			throw new EncryptionException('Encryption cipher is not available on this system.');
 
 		//To correctly detect string length we trim the output.
-		$decryptString = rtrim(mcrypt_decrypt($cypher, $key, $decrypt, MCRYPT_MODE_ECB, $iv),"\0");
+		$decryptString = openssl_decrypt($decrypt, $cipher, $key, $options, $nonce);
 
 		//Remove salt and pepper
 		$start = strlen($pepper);
 		$end = strlen($decryptString) - strlen($salt) - strlen($pepper);
-		$decryptString = substr($decryptString, $start, $end);
-		return $decryptString;
-	}
-
-	/**
-	 * Decrypt using AES 256
-	 * @param $decrypt
-	 * @param $key
-	 * @param string $salt
-	 * @param string $pepper
-	 * @param null $iv
-	 * @deprecated
-	 * @return string
-	 */
-	public static function AES_decrypt($decrypt, $key, $salt = '', $pepper = '', $iv = NULL)
-	{
-		return static::decrypt($decrypt, $key, MCRYPT_RIJNDAEL_128, $salt, $pepper, $iv);
+		return substr($decryptString, $start, $end);
 	}
 
 	/**

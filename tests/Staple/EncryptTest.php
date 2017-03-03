@@ -33,21 +33,16 @@ class EncryptTest extends TestCase
 	private $salt = 'askdfRIUF';
 	private $pepper = 'orpDjk34';
 
-	public function testAESEncrypt()
+	public function testEncryptAndDecrypt()
 	{
-		$string = 'Blah encrypted string.';
+		$originalString = 'Blah encrypted string.';
 
-		$encrypted = Encrypt::encrypt($string, $this->key, MCRYPT_RIJNDAEL_128, $this->salt, $this->pepper);
+		$iv = openssl_random_pseudo_bytes(16);
 
-		$this->assertEquals('5532425a685970434a4c666773736b766b35344d747a486852684f6854353351774948726742736935567342352f74384252307666386d694e36675373625854',bin2hex($encrypted));
-	}
+		$encrypted = Encrypt::encrypt($originalString, $this->key, Encrypt::AES, $this->salt, $this->pepper, $iv);
 
-	public function testAESDecrypt()
-	{
-		$string = '5be2da124b05f90210a061b7553b72c7be235ec7c6aace4c739aa0f8cb602b327d8c0104c0017b37450b8032a47da639';
+		$decryptedString = Encrypt::decrypt($encrypted,$this->key, Encrypt::AES, $this->salt, $this->pepper, $iv);
 
-		$decrypted = Encrypt::decrypt(hex2bin($string), $this->key, MCRYPT_RIJNDAEL_128, $this->salt, $this->pepper);
-
-		$this->assertEquals('Blah encrypted string.',$decrypted);
+		$this->assertEquals($originalString,$decryptedString);
 	}
 }
