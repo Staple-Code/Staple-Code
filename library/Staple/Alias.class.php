@@ -225,7 +225,7 @@ class Alias
 
 		//Form Element View Adapters
 		'FormElementViewAdapter'		=> '\\Staple\\Form\\ViewAdapters\\ElementViewAdapter',
-		'FormFoundation5ViewAdapter'	=> '\\Staple\\Form\\ViewAdapters\\Foundation5ViewAdapter',
+		'FormFoundationViewAdapter'		=> '\\Staple\\Form\\ViewAdapters\\FoundationViewAdapter',
 		'FormBootstrapViewAdapter'		=> '\\Staple\\Form\\ViewAdapters\\BootstrapViewAdapter',
 
 		//Session Classes
