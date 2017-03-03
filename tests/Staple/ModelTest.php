@@ -24,10 +24,11 @@
 namespace Staple\Tests;
 
 use PHPUnit\Framework\TestCase;
+use PDO;
 use SplObserver;
+use Staple\Exception\ModelNotFoundException;
 use Staple\Model;
 use Staple\Query\Condition;
-use Staple\Query\Connection;
 use Staple\Query\IConnection;
 use Staple\Query\IStatement;
 use Staple\Query\Select;
@@ -239,7 +240,7 @@ class MockTestConnection implements IConnection
 }
 
 
-class ModelTest extends \PHPUnit_Framework_TestCase
+class ModelTest extends TestCase
 {
 	/**
 	 * @return MockTestConnection
@@ -306,8 +307,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 		$user = userModel::find(1, $this->getMockConnection());
 		/** @var userModel $user2 */
 		$user2 = userModel::find(2, $this->getMockConnection());
-		/** @var bool $user3 */
-		$user3 = userModel::find(3, $this->getMockConnection());
+
 
 		//Assert user 1 results
 		$this->assertInstanceOf('Staple\Tests\userModel',$user);
@@ -327,14 +327,23 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 		$this->assertEquals('tom@hotmail.com', $user2->getEmail());
 		$this->assertEquals(2, $user2->getId());
 
-		//Assert user 3 not found
-		$this->assertFalse($user3);
+		try
+		{
+			/** @var bool $user3 */
+			$user3 = userModel::find(3, $this->getMockConnection());
+			$this->hasFailed();
+		}
+		catch(ModelNotFoundException $e)
+		{
+			//Assert user 3 not found
+			$this->assertInstanceOf('\\Staple\Exception\\ModelNotFoundException',$e);
+		}
 	}
 
 	public function testFindAll()
 	{
 		/** @var userModel[] $users */
-		$users = userModel::findAll($this->getMockConnection());
+		$users = userModel::findAll(NULL,NULL,$this->getMockConnection());
 
 		$this->assertCount(2, $users);
 		foreach($users as $user)

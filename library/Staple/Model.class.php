@@ -34,6 +34,7 @@ use Staple\Query\IConnection;
 use Staple\Query\Insert;
 use Staple\Query\IStatement;
 use Staple\Query\Query;
+use Staple\Query\Select;
 use Staple\Traits\Factory;
 use stdClass;
 
@@ -435,12 +436,12 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	 * Returns all of the models in an array.
 	 * @param mixed $order
 	 * @param mixed $limit
-	 * @param Connection|NULL $connection
+	 * @param IConnection|NULL $connection
 	 * @return $this[]
 	 * @throws QueryException
 	 * @throws ModelNotFoundException
 	 */
-	public static function findAll($order = NULL, $limit = NULL, Connection $connection = NULL)
+	public static function findAll($order = NULL, $limit = NULL, IConnection $connection = NULL)
 	{
 		//Make a model instance
 		$model = static::make();
@@ -459,7 +460,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 
 		//Execute the query
 		$result = $query->execute();
-		if($result instanceof Statement)
+		if($result instanceof IStatement)
 		{
 			$models = [];
 			while($row = $result->fetch(PDO::FETCH_ASSOC))
@@ -502,7 +503,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 
 		//Execute the query
 		$result = $query->execute();
-		if($result instanceof Statement)
+		if($result instanceof IStatement)
 		{
 			//If more than one record was returned return the array of results.
 			$models = array();
@@ -529,7 +530,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 		$model = static::make();
 
 		//Create the query
-		$query = Query::select($model->_getTable())->whereEqual($column,$value);
+		$query = Query::select($model->_getTable())->whereNull($column);
 
 		//Change connection if needed
 		if(isset($connection)) $query->setConnection($connection);
@@ -587,7 +588,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 		$model = static::make();
 
 		//Create the query
-		$query = Query::select($model->_getTable())->whereIn($column,$values);
+		$query = Query::select($model->_getTable())->whereStatement($statement);
 
 		//Change connection if needed
 		if(isset($connection)) $query->setConnection($connection);
