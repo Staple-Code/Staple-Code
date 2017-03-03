@@ -23,6 +23,8 @@
  */
 namespace Staple;
 
+use Staple\Exception\EncryptionException;
+
 class Encrypt
 {
 	const AES = MCRYPT_RIJNDAEL_128;
@@ -62,24 +64,32 @@ class Encrypt
 	 * Encrypt data with AES
 	 * @param string $encrypt
 	 * @param string $key
-	 * @param string $cypher
+	 * @param string $cipher
 	 * @param string $salt
 	 * @param string $pepper
 	 * @param string $iv
+	 * @param int $options
 	 * @return string
+	 * @throws EncryptionException
 	 */
-	public static function encrypt($encrypt, $key, $cypher = MCRYPT_RIJNDAEL_128, $salt = '', $pepper = '', $iv = NULL)
+	public static function encrypt($encrypt, $key, $cipher = 'AES-128-CBC', $salt = '', $pepper = '', string $iv = '', int $options = 0)
 	{
-		if ($iv == NULL)
+		//Check for cipher existence
+		$availableMethods = openssl_get_cipher_methods();
+		if(($method = in_array($cipher, $availableMethods)) === false)
 		{
-			$iv_size = mcrypt_get_iv_size($cypher, MCRYPT_MODE_ECB);
-			$iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);
+			throw new EncryptionException('Encryption cipher is not available on this system.');
+		}
+
+		if(strlen($iv) < 1)
+		{
+			$iv = openssl_random_pseudo_bytes(16);
 		}
 
 		//Add salt and pepper
 		$encryptString = $pepper . $encrypt . $salt;
 
-		return mcrypt_encrypt($cypher, $key, $encryptString, MCRYPT_MODE_ECB, $iv);
+		return openssl_encrypt($encryptString, 'AES-128-CBC', $key, $options, $iv);
 	}
 
 	/**
