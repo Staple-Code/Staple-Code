@@ -38,7 +38,7 @@ use Staple\Form\CheckboxGroupElement;
 use Staple\Form\CheckboxElement;
 use Staple\Form\ButtonElement;
 
-class FoundationViewAdapter extends ElementViewAdapter
+class Foundation5ViewAdapter extends ElementViewAdapter
 {
 
 	public function TextElement(TextElement $field)
@@ -157,15 +157,23 @@ class FoundationViewAdapter extends ElementViewAdapter
 
 	public function CheckboxElement(CheckboxElement $field)
 	{
-
 		$field->addClass('row');
 
 		$classes = $field->getClassString();
 
 		$buf = "<div$classes>\n"; //Row Start
-		$buf .= "\t<div class=\"small-12 columns\">\n"; //Label Start
+		$buf .= "\t<div class=\"small-1 columns\">\n"; //Field Start
+		$buf .= "\t".$field->field();
+		$buf .= "\t</div>";//Field End
+
+		$buf .= "\t<div class=\"small-11 columns\">\n"; //Label Start
 		$buf .= "\t".$field->label();
-		$buf .= "\t</div>\n"; //Label End
+
+		if (count($field->getErrors()) != 0)
+		{
+			$buf .= $this->getErrorBuffer($field);
+		}
+		$buf .= "\t</div>\n"; //Field End
 
 		if (strlen($field->getInstructions()) >= 1)
 		{
@@ -174,15 +182,6 @@ class FoundationViewAdapter extends ElementViewAdapter
 			$buf .= "\t</div>\n"; //Instructions End
 		}
 
-		$buf .= "\t<div class=\"small-12 columns\">\n"; //Field Start
-
-		$buf .= "\t".$field->field();
-
-		if (count($field->getErrors()) != 0)
-		{
-			$buf .= $this->getErrorBuffer($field);
-		}
-		$buf .= "\t</div>\n"; //Field End
 		$buf .= "</div>\n"; //Row end
 
 		return $buf;
