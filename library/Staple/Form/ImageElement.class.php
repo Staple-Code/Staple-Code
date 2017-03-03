@@ -22,8 +22,6 @@
  */
 namespace Staple\Form;
 
-use Staple\Dev;
-
 class ImageElement extends FieldElement
 {
 	protected $src;
@@ -44,14 +42,7 @@ class ImageElement extends FieldElement
 	 */
 	public function field()
 	{
-		if(array_key_exists('host', parse_url($this->src)))
-		{
-			$imgSrc = $this->src;
-		}
-		else
-		{
-			$imgSrc = $this->link($this->src);
-		}
+		$imgSrc = array_key_exists('host', parse_url($this->src)) ? $this->src : $this->link($this->src);
 
 		return '	<input type="image" src="'. $imgSrc .'" id="'.$this->escape($this->id).'" name="'.$this->escape($this->name).'" value="'.$this->escape($this->value).'">';
 	}
