@@ -524,6 +524,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	}
 
 	/**
+	 * Returns all of the models in an array within the given SQL condition.
 	 * @param $statement
 	 * @param null $order
 	 * @param null $limit
@@ -543,7 +544,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 		if(isset($connection)) $query->setConnection($connection);
 
 		//Set WhereStatement
-		if(isset($statement)) $query->whereStatement($statement);
+		$query->whereStatement($statement);
 
 		//Set limit
 		if(isset($limit)) $query->limit($limit);
