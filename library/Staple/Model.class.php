@@ -533,9 +533,50 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 		//@todo incomplete function
 	}
 
+	/**
+	 * Returns all of the models in an array within the given SQL condition.
+	 * @param $statement
+	 * @param null $order
+	 * @param null $limit
+	 * @param Connection|NULL $connection
+	 * @return array
+	 * @throws ModelNotFoundException
+	 */
 	public static function findWhereStatement($statement, $limit = NULL, Connection $connection = NULL)
 	{
-		//@todo incomplete function
+		//Make a model instance
+		$model = static::make();
+
+		//Create the query
+		$query = Select::table($model->_getTable());
+
+		//Change connection if needed
+		if(isset($connection)) $query->setConnection($connection);
+
+		//Set WhereStatement
+		$query->whereStatement($statement);
+
+		//Set limit
+		if(isset($limit)) $query->limit($limit);
+
+		//Execute the query
+		$result = $query->execute();
+		if($result instanceof Statement)
+		{
+			$models = [];
+			while($row = $result->fetch(PDO::FETCH_ASSOC))
+			{
+				$model = static::make();
+				$model->_data = $row;
+				$models[] = $model;
+			}
+			if(count($models) >= 1)
+				return $models;
+			else
+				throw new ModelNotFoundException();
+		}
+
+		throw new ModelNotFoundException();
 	}
 
 	/**
