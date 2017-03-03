@@ -55,7 +55,7 @@ return [
 
 	'forms'	=> [
 		//'elementViewAdapter' => 'FormBootstrapViewAdapter',
-		//'elementViewAdapter' => 'FormFoundationViewAdapter',
+		//'elementViewAdapter' => 'FormFoundation5ViewAdapter',
 	],
 
 	'db' => [
