@@ -22,19 +22,21 @@
  */
 namespace Staple\Form;
 
+use Staple\Dev;
+
 class ImageElement extends FieldElement
 {
 	protected $src;
 	
 	public function setSrc($insert)
 	{
-		$this->Image = $insert;
+		$this->src = $insert;
 		return $this;
 	}
 	
 	public function getSrc()
 	{
-		return $this->Image;
+		return $this->src;
 	}
 	
 	/* (non-PHPdoc)
@@ -42,7 +44,16 @@ class ImageElement extends FieldElement
 	 */
 	public function field()
 	{
-		return '	<input type="image" src="'.$this->link($this->src).'" id="'.$this->escape($this->id).'" name="'.$this->escape($this->name).'" value="'.$this->escape($this->value).'">';
+		if(array_key_exists('host', parse_url($this->src)))
+		{
+			$imgSrc = $this->src;
+		}
+		else
+		{
+			$imgSrc = $this->link($this->src);
+		}
+
+		return '	<input type="image" src="'. $imgSrc .'" id="'.$this->escape($this->id).'" name="'.$this->escape($this->name).'" value="'.$this->escape($this->value).'">';
 	}
 
 	/* (non-PHPdoc)
