@@ -262,11 +262,13 @@ class Condition
 
 	/**
 	 * Set the connection.
-	 * @param Connection $connection
+	 * @param IConnection $connection
+	 * @return $this
 	 */
-	public function setConnection(Connection $connection)
+	public function setConnection(IConnection $connection)
 	{
 		$this->connection = $connection;
+		return $this;
 	}
 
 
@@ -419,16 +421,18 @@ class Condition
 	 * @param $column
 	 * @param $start
 	 * @param $end
+	 * @param IConnection $connection
 	 * @return static
 	 * @throws QueryException
 	 */
-	public static function between($column, $start, $end)
+	public static function between($column, $start, $end, IConnection $connection)
 	{
 		/** @var Condition $obj */
 		$obj = new static();
 		$obj->setColumn($column)
 			->setOperator(self::BETWEEN)
 			->setValue(Query::convertTypes($start)." AND ".Query::convertTypes($end))
+			->setConnection($connection)
 			->setColumnJoin(true);
 		return $obj;
 	}

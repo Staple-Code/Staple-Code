@@ -88,12 +88,12 @@ class Select extends Query
 	/**
 	 * @param string $table
 	 * @param array $columns
-	 * @param Connection $db
+	 * @param IConnection $db
 	 * @param array | string $order
 	 * @param Pager | int $limit
 	 * @throws QueryException
 	 */
-	public function __construct($table = NULL, array $columns = NULL, Connection $db = NULL, $order = NULL, $limit = NULL)
+	public function __construct($table = NULL, array $columns = NULL, IConnection $db = NULL, $order = NULL, $limit = NULL)
 	{
 		parent::__construct(NULL, $db);
 		
