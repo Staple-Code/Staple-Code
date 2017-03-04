@@ -38,7 +38,7 @@ use Staple\Form\CheckboxGroupElement;
 use Staple\Form\CheckboxElement;
 use Staple\Form\ButtonElement;
 
-class Foundation5ViewAdapter extends ElementViewAdapter
+class FoundationViewAdapter extends ElementViewAdapter
 {
 
 	public function TextElement(TextElement $field)

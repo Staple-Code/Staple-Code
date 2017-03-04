@@ -34,7 +34,7 @@ use Staple\Form\ViewAdapters\FoundationViewAdapter;
 class ButtonElementTest extends TestCase
 {
 	const STANDARD_BUILD = "<div class=\"form_element element_button\" id=\"ButtonElement_element\">\n\t<label for=\"ButtonElement\" class=\"form_element element_button\"></label>\n\t<input type=\"button\" id=\"ButtonElement\" name=\"ButtonElement\" value=\"My Button\" class=\"form_element element_button\">\n</div>\n";
-	const FOUNDATION_BUILD = "<div class=\"row\">\n\t<div class=\"small-12 columns\">\n\t<input type=\"button\" id=\"ButtonElement\" name=\"ButtonElement\" value=\"My Button\" class=\"button\">\n\t</div>\n</div>\n";
+	const FOUNDATION_BUILD = "<div class=\"row\">\n\t<div class=\"small-12 columns\">\n\t\t<input type=\"button\" id=\"ButtonElement\" name=\"ButtonElement\" value=\"My Button\" class=\"button\">\n\t</div>\n</div>\n";
 	const BOOTSTRAP_BUILD = "<div class=\"form-group\">\n\t<input type=\"button\" id=\"ButtonElement\" name=\"ButtonElement\" value=\"My Button\" class=\"btn\">\n</div>\n";
 	/**
 	 * @return ButtonElement
@@ -115,7 +115,7 @@ class ButtonElementTest extends TestCase
 
 		try
 		{
-			$element->addValidator(EqualValidator::Create('Submit'));
+			$element->addValidator(EqualValidator::create('Submit'));
 			$this->assertEquals(1,0);
 		}
 		catch (\Exception $e)
