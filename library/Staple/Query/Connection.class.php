@@ -27,10 +27,9 @@ use PDO;
 use PDOStatement;
 use SplObjectStorage;
 use SplObserver;
-use SplSubject;
 use Staple\Config;
 
-class Connection extends PDO implements SplSubject
+class Connection extends PDO implements IConnection
 {
 	const DRIVER_SQLSRV = 'sqlsrv';
 	const DRIVER_MYSQL = 'mysql';
@@ -570,10 +569,10 @@ class Connection extends PDO implements SplSubject
 	public function query($statement)
 	{
 		//Log the query
-		$this->addQueryToLog($statement);
+		$this->addQueryToLog((string)$statement);
 
 		//Execute the query and check for errors
-		if(($result = parent::query($statement, PDO::FETCH_CLASS, '\Staple\Query\Statement')) === false)
+		if(($result = parent::query((string)$statement, PDO::FETCH_CLASS, '\Staple\Query\Statement')) === false)
 		{
 			//Notify the observers that an error has occurred.
 			$this->notify();
@@ -589,8 +588,7 @@ class Connection extends PDO implements SplSubject
 		return $result;
 	}
 
-
-	/*-------------------------------------------------Observer Functions-------------------------------------------------*/
+	/*-------------------------------------------------Observer Methods-------------------------------------------------*/
 
 	/**
 	 * (PHP 5 &gt;= 5.1.0)<br/>
