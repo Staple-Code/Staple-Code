@@ -32,7 +32,7 @@ use PHPUnit\Framework\TestCase;
 class CheckboxElementTest extends TestCase
 {
 	const STANDARD_BUILD = "<div class=\"form_element element_checkbox\" id=\"TestCheckboxElement_element\">\n\t<input type=\"checkbox\" id=\"TestCheckboxElement\" name=\"TestCheckboxElement\" value=\"1\" class=\"form_element element_checkbox\">\n\t<label for=\"TestCheckboxElement\" class=\"form_element element_checkbox\">My Test Checkbox Element</label>\n</div>";
-	const FOUNDATION_BUILD = "<div class=\"row\">\n\t<div class=\"small-12 columns\">\n\t\t<label for=\"TestCheckboxElement\" class=\"row\">My Test Checkbox Element</label>\n\t</div>\n\t<div class=\"small-12 columns\">\n\t\t<input type=\"checkbox\" id=\"TestCheckboxElement\" name=\"TestCheckboxElement\" value=\"1\" class=\"row\">\n\t</div>\n</div>\n";
+	const FOUNDATION_BUILD = "<div class=\"row\">\n\t<div class=\"small-1 columns\">\n\t\t<input type=\"checkbox\" id=\"TestCheckboxElement\" name=\"TestCheckboxElement\" value=\"1\">\n\t</div>\n\t<div class=\"small-11 columns\">\n\t\t<label for=\"TestCheckboxElement\">My Test Checkbox Element</label>\n\t</div>\n</div>\n";
 	const BOOTSTRAP_BUILD = "<div class=\"checkbox\">\n\t<label class=\"control-label\" for=\"TestCheckboxElement\">\n\t<input type=\"checkbox\" id=\"TestCheckboxElement\" name=\"TestCheckboxElement\" value=\"1\">\n\tMy Test Checkbox Element</label>\n</div>\n";
 	/**
 	 * @return CheckboxElement
