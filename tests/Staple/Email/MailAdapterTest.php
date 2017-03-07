@@ -24,11 +24,12 @@
 
 namespace Staple\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Staple\Email\Email;
 
 require_once 'MockMailAdapter.php';
 
-class MailAdapterTest extends \PHPUnit_Framework_TestCase
+class MailAdapterTest extends TestCase
 {
 	/**
 	 * Return the email object
@@ -112,7 +113,7 @@ class MailAdapterTest extends \PHPUnit_Framework_TestCase
 
 	public function testHtmlEmail()
 	{
-
+		$this->markTestIncomplete();
 	}
 
 	public function testEmailSend()
