@@ -28,7 +28,7 @@ use Staple\Exception\QueryException;
 use Staple\Pager;
 use Staple\Traits\Factory;
 
-class Select extends Query
+class Select extends Query implements ISelectQuery
 {
 	use Factory;
 

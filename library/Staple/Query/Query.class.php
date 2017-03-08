@@ -33,7 +33,7 @@ use Staple\Error;
 use Staple\Exception\QueryException;
 use Staple\Pager;
 
-abstract class Query
+abstract class Query implements IQuery
 {
 	
 	/**

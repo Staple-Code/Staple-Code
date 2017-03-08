@@ -29,6 +29,8 @@ use ReflectionClass;
 use ReflectionProperty;
 use Staple\Exception\ModelNotFoundException;
 use Staple\Exception\QueryException;
+use Staple\Model\ModelQuery;
+use Staple\Model\ModelSelectQuery;
 use Staple\Query\Connection;
 use Staple\Query\IConnection;
 use Staple\Query\Insert;
@@ -252,6 +254,17 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	public function _getTable()
 	{
 		return $this->_table;
+	}
+
+	/**
+	 * Manually set the model data.
+	 * @param $data
+	 * @return $this
+	 */
+	public function _setData($data)
+	{
+		$this->_data = $data;
+		return $this;
 	}
 
 	/**
@@ -668,5 +681,32 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 
 		//Execute the query and return the result
 		return $query->execute();
+	}
+
+	//----------------------------------------QUERY FUNCTIONS----------------------------------------
+
+	/**
+	 * Perform a query on a model. If no query is specified then a select query is created.
+	 * @param
+	 * @return ModelSelectQuery
+	 */
+	public static function query($baseQuery = NULL) : ModelQuery
+	{
+		if(isset($baseQuery))
+			$query = ModelQuery::create(new static())
+				->setQueryObject($baseQuery);
+		else
+			$query = new ModelSelectQuery(new static());
+		return $query;
+	}
+
+	/**
+	 * Perform a SELECT query on the models.
+	 * @return ModelSelectQuery
+	 */
+	public static function select() : ModelSelectQuery
+	{
+		$query = new ModelSelectQuery(new static());
+		return $query;
 	}
 }
