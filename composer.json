@@ -2,6 +2,8 @@
   "require": {
     "twig/twig":"~2.0",
     "phpunit/phpunit": "~6.0",
-    "predis/predis":"1.1.*@dev"
+    "predis/predis":"1.1.*@dev",
+    "sendgrid/sendgrid": "~5.1",
+    "phpmailer/phpmailer": "~5.2"
   }
 }

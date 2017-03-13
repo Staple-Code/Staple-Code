@@ -89,11 +89,21 @@ return [
 	],
 
 	'email' => [
-		'html' 		=> 1,
+		//Global settings
 		'from' 		=> 'no-reply@staplecode.org',
 		'bcc' 		=> '',
-		'server' 	=> '',
-		'template' 	=> MODULES_ROOT.'email/template.html',
+
+		//Default PHP mail() function adapter
+		//'adapter'	=> 'Staple\Email\MailAdapter',
+		//'server' 	=> 'localhost',
+		//'html' 		=> true,
+
+		//PHPMailer adapter
+		'adapter'	=> 'Staple\Email\PHPMailerEmailAdapter',
+
+		//SendGrid Email Adapter
+		//'adapter'	=> 'Staple\Email\SendGridEmailAdapter',
+		//'sendgrid_api_key'	=>	''	//String to supply the SendGrid API key
 	],
 
 	'errors' => [
