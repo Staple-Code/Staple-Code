@@ -1,8 +1,8 @@
 <?php
 
 /** 
- * The Staple_AuthAdapter interface creates a preset list of functions that must be implemented
- * to allow authentication to pass through Staple_Auth. Adapters sent to Staple_Auth must
+ * The AuthAdapter interface creates a preset list of functions that must be implemented
+ * to allow authentication to pass through Auth. Adapters sent to Auth must
  * implement this class or an error will occur. 
  *  
  * @author Ironpilot
@@ -29,26 +29,24 @@ namespace Staple;
 interface AuthAdapter
 {
 	/**
-	 * This function must be implemented to check the authorization based on the adapter 
-	 * at hand. The function must return a boolean true for the Staple_Auth object to view
-	 * authentication as successful. If a non-boolean true is returned, authentication will
-	 * fail.
+	 * This function checks the authorization based on the adapter at hand. The function must
+	 * return a boolean true for the Auth object to view authentication as successful. If a
+	 * non-boolean true is returned, authentication will fail.
+	 * @param mixed $credentials
 	 * @return bool
 	 */
 	public function getAuth($credentials);
 	/**
-	 * 
-	 * This function must be implemented to return a numeric level of access. This level is
-	 * used to determine feature access based on account type.
+	 * This function returns a numeric level of access. This level is used to determine action
+	 * access based on account type.
+	 * @param mixed $uid
 	 * @return int
 	 */
 	public function getLevel($uid);
 	
 	/**
-	 * Returns the userid from the adapater
-	 * @return string
+	 * Returns the UserId from the adapter
+	 * @return mixed
 	 */
 	public function getUserId();
 }
-
-?>
