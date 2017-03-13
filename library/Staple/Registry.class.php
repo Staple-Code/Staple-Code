@@ -31,7 +31,7 @@ class Registry
 	protected static $store = array();
 	
 	/**
-	 * Returns a booleon if the specified key exists in the store.
+	 * Returns a boolean if the specified key exists in the store.
 	 * @param string $key
 	 * @return bool
 	 */
