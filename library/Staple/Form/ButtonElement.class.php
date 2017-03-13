@@ -52,10 +52,10 @@ class ButtonElement extends FieldElement
 	}
 
 	/**
-	 * @param null $fieldView
+	 * Return the built form element
 	 * @return string
 	 */
-	public function build($fieldView = NULL)
+	public function build()
 	{
 		$buf = '';
 		$view = FORMS_ROOT.'/fields/SubmitElement.phtml';
@@ -66,10 +66,10 @@ class ButtonElement extends FieldElement
 			$buf = ob_get_contents();
 			ob_end_clean();
 		}
-	        elseif(isset($this->elementViewAdapter))
-	        {
-	            $buf = $this->getElementViewAdapter()->ButtonElement($this);
-	        }
+		elseif(isset($this->elementViewAdapter))
+		{
+			$buf = $this->getElementViewAdapter()->ButtonElement($this);
+		}
 		else 
 		{
 			$this->addClass('form_element');

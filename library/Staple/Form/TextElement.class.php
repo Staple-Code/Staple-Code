@@ -115,7 +115,6 @@ class TextElement extends FieldElement
 	 */
 	public function field()
 	{
-		$type = '';
 		$size = '';
 		$max = '';
 
@@ -134,11 +133,10 @@ class TextElement extends FieldElement
 
 
 	/**
-	 * Build the form field.
-	 * @see Staple_Form_Element::build()
+	 * Return the built form element
 	 * @return string
 	 */
-	public function build($fieldView = NULL)
+	public function build()
 	{
 		$buf = '';
 		//@todo look into folder structure for field views

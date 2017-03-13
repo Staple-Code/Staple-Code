@@ -73,7 +73,11 @@ class HiddenElement extends FieldElement
 		return '';
 	}
 
-	public function build($fieldView = NULL)
+	/**
+	 * Return the built form element
+	 * @return string
+	 */
+	public function build()
 	{
 		$view = FORMS_ROOT.'/fields/HiddenElement.phtml';
 		if(file_exists($view))
@@ -83,10 +87,10 @@ class HiddenElement extends FieldElement
 			$buf = ob_get_contents();
 			ob_end_clean();
 		}
-	        elseif(isset($this->elementViewAdapter))
-	        {
-	            $buf = $this->getElementViewAdapter()->HiddenElement($this);
-	        }
+		elseif(isset($this->elementViewAdapter))
+		{
+			$buf = $this->getElementViewAdapter()->HiddenElement($this);
+		}
 		else
 		{
 			$buf = $this->field();

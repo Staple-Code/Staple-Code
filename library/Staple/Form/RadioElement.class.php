@@ -207,11 +207,10 @@ class RadioElement extends FieldElement
 	}
 
 	/**
-	 * Builds the select list form element.
-	 * 
-	 * @see Staple_Form_Element::build()
+	 * Return the built form element
+	 * @return string
 	 */
-	public function build($fieldView = NULL)
+	public function build()
 	{
 		$buf = '';
 		$view = FORMS_ROOT.'/fields/RadioGroup.phtml';
@@ -222,10 +221,10 @@ class RadioElement extends FieldElement
 			$buf = ob_get_contents();
 			ob_end_clean();
 		}
-	        elseif(isset($this->elementViewAdapter))
-	        {
-	            $buf = $this->getElementViewAdapter()->RadioElement($this);
-	        }
+		elseif(isset($this->elementViewAdapter))
+		{
+			$buf = $this->getElementViewAdapter()->RadioElement($this);
+		}
 		else
 		{
 			$this->addClass('form_element');
