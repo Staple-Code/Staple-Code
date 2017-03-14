@@ -2,6 +2,7 @@
   "require": {
     "twig/twig":"~2.0",
     "phpunit/phpunit": "~6.0",
-    "predis/predis":"1.1.*@dev"
+    "predis/predis":"1.1.*@dev",
+    "codacy/coverage": "dev-master"
   }
 }
