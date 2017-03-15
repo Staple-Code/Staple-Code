@@ -1,0 +1,80 @@
+---
+# OSS Soft-Serve default vars
+---
+// Greyscale
+$grey:                   grey;
+$grey-dark:              darken($grey, 30%);
+$grey-light:             lighten($grey, 30%);
+
+$white:                  white;
+
+// Theme colors
+$masthead-background:    lightslategray;
+$secondary-color:        bisque;
+
+{% if site.colors.primary %}
+$masthead-background:    {{ site.colors.primary }};
+{% endif %}
+{% if site.colors.secondary %}
+$secondary-color:        {{ site.colors.secondary }};
+{% endif %}
+
+$link-color:             $masthead-background;
+$link-hover:             darken($link-color, 30%);
+
+// Fonts
+$font-body:              "Work sans", sans-serif;
+$font-headline:          "Roboto slab", serif;
+
+$body-font-color:        $grey-dark;
+$headline-font-color:    slateGrey;
+
+// Code
+$code-inline-color:      teal;
+$code-inline-background: $grey-light;
+
+$code-block-color:       darken($code-inline-color, 10%);
+$code-block-background:  $code-inline-background;
+
+// Load Sass.
+@import "mixins";
+@import "syntax-one-dark";
+@import "code";
+@import "home";
+@import "docs";
+
+// Layout specific outside of semantic-ui
+body > * {
+  color: $grey;
+  // Override for semantic-ui since we're using the CDN.
+  font-family: "Open Sans", sans-serif !important;
+  p {
+    line-height: 2rem;
+  }
+}
+
+h2, h3, h4, h5, h6 {
+  color: $masthead-background;
+  font-family: "Open Sans";
+}
+
+a {
+  color: $link-color;
+  &:not(a .icon) {
+    @include link-underline(1px);
+  }
+  &:hover {
+    color: $link-hover;
+  }
+}
+
+footer {
+  color: $grey-light;
+  margin-bottom: 5rem;
+  .versioning {
+    font-size: 90%;
+    span {
+      display: block;
+    }
+  }
+}

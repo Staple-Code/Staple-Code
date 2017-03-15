@@ -1,0 +1,77 @@
+.oss {
+  &.landing {
+    &.masthead {
+      background: $masthead-background;
+      color: $white;
+      text-align: center;
+      .container {
+        margin: 13vh 0 9vh;
+        a.button {
+          margin: .5rem;
+          &:hover {
+            color: $masthead-background;
+          }
+          @media (max-width: 700px) {
+            width: 100%;
+          }
+        }
+      }
+      h1.logo {
+        color: $white;
+        font: 9vh/4rem "Shrikhand";
+        @include text-shadow(4px, 1px, 3px, darken($masthead-background, 20%));
+      }
+      h1 + h2,
+      h1:not(.logo) {
+        color: $secondary-color;
+        font: 4vh/2rem "Open Sans";
+      }
+      hr {
+        background: lighten($masthead-background, 15%);
+        border: none;
+        height: 1px;
+        width: 20vw;
+        margin: 2rem auto;
+      }
+      .tag-line {
+        font: 300 "Open Sans";
+        text-transform: uppercase;
+        margin-bottom: 2rem;
+        span {
+          // oss soft-serve specific
+          font: 140% "Shrikhand";
+          text-transform: capitalize;
+        }
+      }
+    }
+  }
+  &.introduction {
+    p:first-of-type {
+      color: $grey;
+      font: 300 140%/2.9rem "Open Sans", sans-serif;
+      margin: 3rem 0;
+      padding-top: 2rem;
+    }
+    &> h2 {
+      font-size: 200%;
+      text-align: center;
+    }
+    .next {
+      background-color: $masthead-background;
+      color: $white;
+    }
+    .last {
+      margin: 4rem 0;
+    }
+    .huge.button {
+      background: $masthead-background;
+      color: $white;
+      > .content {
+        color: $white;
+      }
+      &:hover {
+        background: darken($masthead-background, 20%);
+      }
+    }
+  }
+}
