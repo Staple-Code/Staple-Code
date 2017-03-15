@@ -10,7 +10,7 @@ install:
   - composer install
 
 before_script:
-  - curl -s http://getcomposer.org/installer | php
+  - vendor/bin/codacycoverage clover
 
 script: vendor/bin/phpunit --configuration tests/phpunit.xml
 
