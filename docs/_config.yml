@@ -34,7 +34,6 @@ exclude:
   - Gemfile.lock
 
 # OSS SS
-theme: oss-soft-serve
 permalink: /docs/:title
 
 # main colors:

@@ -1,0 +1,57 @@
+---
+layout: default
+---
+
+<div class="oss landing ui vertical center aligned one column grid masthead">
+  <div class="ui text container">
+    {% if site.main_repo.fork == true %}
+    {% assign color = site.main_repo.color %}
+    <a href="{{ site.main_repo.url }}" class="ui {{ color }} right corner huge label">
+      <i class="github alt icon"></i>
+    </a>
+    {% endif %}
+
+    {% if site.logo %}
+      <div class="logo">
+        <img src="{{ site.logo }}" alt="{{ site.name }}" />
+      </div>
+      <h1>{{ site.cta.main }}</h1>
+    {% else %}
+      <h1 class="logo">{{ site.name }}</h1>
+      <h2>{{ site.cta.main }}</h2>
+    {% endif %}
+    <hr>
+    <div class="tag-line">{{ site.cta.secondary }}</div>
+
+    <a class="ui large inverted icon button" href="{{ site.main_repo.url }}">View on {{ site.main_repo.name }} <i class="hand rock icon"></i></a>
+    <a class="ui large inverted icon button" href="#installation">Getting Started <i class="hand paper icon"></i></a>
+    <a class="ui large inverted icon button" href="{{ "/docs/" | relative_url }}">Documentation <i class="hand scissors icon"></i></a>
+
+  </div>
+
+</div>
+
+<div class="ui stacked text container oss introduction">
+
+  <div class="ui hidden divider"></div>
+  {% if site.description %}
+    <p>{{ site.description }}</p>
+  {% endif %}
+
+  {% capture introduction %}
+    {% include getting-started.md %}
+  {% endcapture %}
+  {{ introduction | markdownify }}
+
+  <div class="ui hidden divider"></div>
+
+  <div class="ui center aligned grid last">
+    <a class="ui animated huge button" href="/docs/">
+      <div class="visible content">Keep Reading <i class="right angle icon"></i></div>
+      <div class="hidden content">
+        Documentation <i class="book icon"></i>
+      </div>
+    </a>
+  </div>
+
+</div>

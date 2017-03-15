@@ -1,0 +1,40 @@
+.oss {
+  &.docs {
+    .fixed.menu {
+      background-color: $masthead-background;
+      height: 100px;
+      h1 {
+        color: $white;
+        font: 6vh/4rem "Shrikhand";
+        margin: 1.5rem 1rem;
+        @include text-shadow(4px, 1px, 3px, darken($masthead-background, 20%));
+      }
+    }
+    .left.rail {
+      width: 20vw;
+      padding-top: 3rem;
+      .title {
+        color: $masthead-background;
+        font-size: 1.4em;
+      }
+      .content {
+        font-size: 1.2em;
+      }
+    }
+    &.main.segment {
+      margin-top: 100px;
+      padding-left: 3rem;
+      padding-top: 3.5rem;
+      left: 33vw;
+      width: 55vw;
+      h2, h3, h4, h5, h6 {
+        &:before {
+          color: lighten($masthead-background, 30%);
+          content: '#';
+          margin-left: -2.7rem;
+          padding-right: 1.4rem;
+        }
+      }
+    }
+  }
+}
