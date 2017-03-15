@@ -55,7 +55,11 @@ class ImageElement extends FieldElement
 		return '	<label for="'.$this->escape($this->id).'"'.$this->getClassString('label').'>'.$this->label.'</label>';
 	}
 
-	public function build($fieldView = NULL)
+	/**
+	 * Return the built form element
+	 * @return string
+	 */
+	public function build()
 	{
 		$buf = '';
 		$view = FORMS_ROOT.'/fields/ImageElement.phtml';
@@ -66,10 +70,10 @@ class ImageElement extends FieldElement
 			$buf = ob_get_contents();
 			ob_end_clean();
 		}
-	        elseif(isset($this->elementViewAdapter))
-	        {
-	            $buf = $this->getElementViewAdapter()->ImageElement($this);
-	        }
+		elseif(isset($this->elementViewAdapter))
+		{
+			$buf = $this->getElementViewAdapter()->ImageElement($this);
+		}
 		else 
 		{
 			$this->addClass('form_element');

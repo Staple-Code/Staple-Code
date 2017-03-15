@@ -25,8 +25,12 @@
  */
 namespace Staple\Form;
 
+use Staple\Traits\Factory;
+
 abstract class FieldFilter
 {
+	use Factory;
+
 	/**
 	 * Filters a field and returns the filtered value;
 	 * @return string
@@ -38,12 +42,4 @@ abstract class FieldFilter
 	 * multiple times.
 	 */
 	abstract public function getName();
-	
-	/**
-	 * Static factory creation method.
-	 */
-	public static function Create()
-	{
-		return new static();
-	}
 }
