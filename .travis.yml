@@ -9,7 +9,13 @@ php:
 install:
   - composer install
 
-script: vendor/bin/phpunit --configuration tests/phpunit.xml
+before_script:
+  - curl -s http://getcomposer.org/installer | php
+
+script: vendor/bin/phpunit --configuration tests/phpunit.xml --coverage-clover build/logs/clover.xml
+
+after_script:
+  - php vendor/bin/codacycoverage clover build/logs/clover.xml
 
 notifications:
   slack:
