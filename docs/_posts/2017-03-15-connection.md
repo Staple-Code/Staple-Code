@@ -2,7 +2,7 @@
 layout: document
 title: "Connection"
 date: 2017-03-15 17:32:04
-categories: query
+categories: Data
 ---
 
 # The Connection Class
