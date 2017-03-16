@@ -55,7 +55,7 @@ license: GNU LGPLv3 # https://www.gnu.org/licenses/lgpl-3.0.en.html
 # If you need a source not listed, add below. OSS Soft-Serve will loop.
 main_repo:
   name: Github
-  url: https://github.com/ironpilot/Staple-Code
+  url: https://github.com/Staple-Code/Staple-Code
   fork: true # assumes Github if true; adds upper corner badge
   color: red # fork badge color: Red Orange Yellow Olive Green Teal Blue Violet Purple Pink Brown Grey Black
 
