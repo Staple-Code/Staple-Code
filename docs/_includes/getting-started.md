@@ -1,5 +1,5 @@
 
-## Install
+## Installation
 
 To create a new site with the STAPLE MVC Framework either download a released version or pull a recent copy of
 master or development. Put these files in your base web directory and point your server to the `/public` folder
@@ -7,7 +7,7 @@ to start serving a website.
 
 You will need a few things for the server to be able to process your site:
 
- - PHP 5.5 or higher.
+ - PHP 7.0 or higher.
  - A URL rewrite module.
 
 Both IIS (web.config) and Apache (.htaccess) rewrite rules are included in the repository. For nginx, you will
