@@ -2,7 +2,7 @@
 <footer class="ui text container">
 
   <div class="ui horizontal divider">
-    {% if site.github %}<a href="https://github.com/{{ site.github }}"><i class="large github icon"></i></a>{% endif %}
+    {% if site.main_repo.url %}<a href="{{ site.main_repo.url }}"><i class="large github icon"></i></a>{% endif %}
     {% if site.email %}<a href="{{ site.email | prepend: "mailto:" }}"><i class="large envelope icon"></i></a>{% endif %}
     {% if site.twitter %}<a href="https://twitter.com/{{ site.twitter }}"><i class="large twitter icon"></i></a>{% endif %}
   </div>
