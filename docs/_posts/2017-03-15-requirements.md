@@ -1,12 +1,12 @@
 ---
 layout: document
-title: "requirements"
+title: "Requirements"
 date: 2017-03-15 17:34:04
 categories: Introduction
 ---
 
-## System requirements
+## System Requirements
 
 - Windows or Linux environment
-- PHP 5.3+
+- PHP 7.0
 - MySQL (Optional)
