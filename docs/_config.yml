@@ -48,8 +48,8 @@ If your already familiar with other PHP MVC frameworks then setup will be a bree
 logo: "/assets/staplecode-logo.svg"        #/images/path/to/logo
 
 # Version and license
-version: 1.0  # http://semver.org/
-license: GNU # https://opensource.org/licenses/MIT
+version: 2.0.3.17  # http://semver.org/
+license: GNU LGPLv3 # https://www.gnu.org/licenses/lgpl-3.0.en.html
 
 # Where is your product available?
 # If you need a source not listed, add below. OSS Soft-Serve will loop.
@@ -66,5 +66,5 @@ repos:
 
 # Product CTAs (Calls to Action).
 cta:
-  main: "An open source php framework"
+  main: "An Open Source PHP Framework"
   secondary:
