@@ -1,3 +1,9 @@
+---
+layout: document
+title: "Installation"
+date: 2017-03-09 00:00:00
+categories: Introduction
+---
 
 ## Installation
 
@@ -13,7 +19,7 @@ You will need a few things for the server to be able to process your site:
 Both IIS (web.config) and Apache (.htaccess) rewrite rules are included in the repository. For nginx, you will
 have to add the following in your server configuration for nginx:
 
-```bash
+```
 location / {
    index  index.php index.html index.htm;
    try_files $uri $uri/ @staple;

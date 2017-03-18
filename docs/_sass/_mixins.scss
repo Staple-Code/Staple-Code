@@ -1,0 +1,92 @@
+@mixin border($position:null,$color:$border-color) {
+  @if $position != null {
+    border-#{$position}: 1px solid $color;
+  } @else {
+     border: 1px solid $color;
+  }
+}
+
+@mixin square($width, $height: $width) {
+  width: $width;
+  height: $height;
+}
+
+@mixin bg-size($width, $height: null) {
+  @if $height == null {              // use $width to set background to "cover"
+  -webkit-background-size: $width;
+     -moz-background-size: $width;
+      -ms-background-size: $width;
+       -o-background-size: $width;
+          background-size: $width;
+  } @else {
+  -webkit-background-size: $width $height;
+     -moz-background-size: $width $height;
+      -ms-background-size: $width $height;
+       -o-background-size: $width $height;
+          background-size: $width $height;
+  }
+}
+
+@mixin border-radius($top-left, $top-right: null, $bottom-right: null, $bottom-left: null) {
+  @if $top-right == null {
+    -webkit-border-radius: $top-left;
+       -moz-border-radius: $top-left;
+         -o-border-radius: $top-left;
+            border-radius: $top-left;
+  } @else {
+    -webkit-border-radius: $top-left $top-right $bottom-right $bottom-left;
+       -moz-border-radius: $top-left $top-right $bottom-right $bottom-left;
+         -o-border-radius: $top-left $top-right $bottom-right $bottom-left;
+            border-radius: $top-left $top-right $bottom-right $bottom-left;
+  }
+}
+
+@mixin text-shadow($x, $y, $blur, $color) {
+  -webkit-text-shadow: $x $y $blur $color;
+     -moz-text-shadow: $x $y $blur $color;
+       -o-text-shadow: $x $y $blur $color;
+          text-shadow: $x $y $blur $color;
+}
+
+@mixin transition($style, $duration, $ease: ease-in-out, $delay: 0s) {
+  -webkit-transition: $style $duration $ease;
+     -moz-transition: $style $duration $ease;
+       -o-transition: $style $duration $ease;
+          transition: $style $duration $ease;
+}
+
+@mixin rotate($deg) {
+  -webkit-transform: rotate($deg);
+     -moz-transform: rotate($deg);
+      -ms-transform: rotate($deg);
+       -o-transform: rotate($deg);
+          transform: rotate($deg);
+}
+
+@mixin link-underline($height : 2px) {
+  color: $link-color;
+  cursor: pointer;
+  text-decoration: none;
+  padding-bottom: 2px;
+  position: relative;
+  &:before {
+    content: "";
+	  position: absolute;
+	  left: 0;
+    bottom: 0;
+	  right: 100%;
+	  background: $link-color;
+	  height: $height;
+	  @include transition(right, .2s);
+  }
+  &:hover,
+  &:focus,
+  &:active,
+  &.active {
+    text-decoration: none;
+    color: $link-hover;
+    &:before {
+      right: 0;
+    }
+  }
+}

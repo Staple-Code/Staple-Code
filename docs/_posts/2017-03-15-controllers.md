@@ -2,7 +2,7 @@
 layout: document
 title: "Controllers"
 date: 2017-03-15 17:28:56
-categories: Controllers
+categories: Components
 ---
 
 Controllers in STAPLE live in the /application/controllers folder. Controller
@@ -16,7 +16,7 @@ on a controller. This method allows you to add actions that need to occur
 before the action is executed. An example would be to switch to a secure
 connection (HTTPS).
 
-```php
+```php?start_inline=1
 class MyController extends Controller
 {
     public function _start()
@@ -48,7 +48,7 @@ could be routed by either `MyController/FirstPage` or by `my-controller/first-pa
 
 ### Controller Actions
 
-```php
+```php?start_inline=1
 class MyController extends Controller
 {
     // The default action: my-controller/index
@@ -87,7 +87,7 @@ will be output as a text `var_dump` of the object.
 To return the default view object from the controller, create a new `View`
 object with no parameters.
 
-```php
+```php?start_inline=1
 class ClientController extends Controller
 {
     public function view($id)
@@ -102,7 +102,7 @@ class ClientController extends Controller
 To return a view other than the default, you can specify the view name when
 creating the view object.
 
-```php
+```php?start_inline=1
 class ReportController extends Controller
 {
     public function sales()

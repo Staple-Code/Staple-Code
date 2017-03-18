@@ -14,7 +14,7 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 title: StapleCode
-email: your-email@domain.com
+email:
 description: > # this means to ignore newlines until "baseurl:"
   Write an awesome description for your new site here. You can edit this
   line in _config.yml. It will appear in your document head meta (for
@@ -34,7 +34,6 @@ exclude:
   - Gemfile.lock
 
 # OSS SS
-theme: oss-soft-serve
 permalink: /docs/:title
 
 # main colors:
@@ -45,18 +44,18 @@ colors:
 name: StapleCode
 # If you have nothing to say, you should, but we'll skip to installation
 description: "
-If your already familiar with other PHP MVC frameworks then setup will be a breeze. If you're literally just getting started with MVC frameworks, no worries! Our documentation site can answer many questions and provides a wealth of examples."
+If you're already familiar with other PHP MVC frameworks then setup will be a breeze. If you're literally just getting started with MVC frameworks, no worries! Our documentation site can answer many questions and provides a wealth of examples."
 logo: "/assets/staplecode-logo.svg"        #/images/path/to/logo
 
 # Version and license
-version: 1.0  # http://semver.org/
-license: GNU # https://opensource.org/licenses/MIT
+version: 2.0.3.17  # http://semver.org/
+license: GNU LGPLv3 # https://www.gnu.org/licenses/lgpl-3.0.en.html
 
 # Where is your product available?
 # If you need a source not listed, add below. OSS Soft-Serve will loop.
 main_repo:
   name: Github
-  url: https://github.com/ironpilot/Staple-Code
+  url: https://github.com/Staple-Code/Staple-Code
   fork: true # assumes Github if true; adds upper corner badge
   color: red # fork badge color: Red Orange Yellow Olive Green Teal Blue Violet Purple Pink Brown Grey Black
 
@@ -67,5 +66,5 @@ repos:
 
 # Product CTAs (Calls to Action).
 cta:
-  main: "An open source php framework"
+  main: "An Open Source PHP Framework"
   secondary:

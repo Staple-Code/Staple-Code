@@ -2,7 +2,7 @@
 layout: document
 title: "Connection"
 date: 2017-03-15 17:32:04
-categories: query
+categories: Data
 ---
 
 # The Connection Class
@@ -15,7 +15,7 @@ for various database connections.
 To initialize the default connection as specified by the `db`
 section of the `application.ini` or `application.php` file call:
 
-```php
+```php?start_inline=1
 $conn = Connection::get();
 ```
 
@@ -29,7 +29,7 @@ any name that you would like. You can retrieve and establish
 the named connection by referring to the top-level name of the
 config attributes.
 
-```php
+```php?start_inline=1
 $conn = Connection::getNamedConnection('myconn');
 ```
 
@@ -37,14 +37,14 @@ $conn = Connection::getNamedConnection('myconn');
 
 Execute a query against a database connection object.
 
-```php
+```php?start_inline=1
 $result = $conn->query('SELECT * FROM customers;');
 ```
 
 You can also send other query objects to the query method to have
 them executed against the database.
 
-```php
+```php?start_inline=1
 $select = Query::select('customers');
 $result = $conn->query($select);
 ```
