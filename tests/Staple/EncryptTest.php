@@ -24,29 +24,25 @@
 namespace Staple\Tests;
 
 
+use PHPUnit\Framework\TestCase;
 use Staple\Encrypt;
 
-class EncryptTest extends \PHPUnit_Framework_TestCase
+class EncryptTest extends TestCase
 {
 	private $key = 'kASMCL^TRB8A<UQwOcgsHDKhgUs[ZtMe';
 	private $salt = 'askdfRIUF';
 	private $pepper = 'orpDjk34';
 
-	public function testAESEncrypt()
+	public function testEncryptAndDecrypt()
 	{
-		$string = 'Blah encrypted string.';
+		$originalString = 'Blah encrypted string.';
 
-		$encrypted = Encrypt::encrypt($string, $this->key, MCRYPT_RIJNDAEL_128, $this->salt, $this->pepper);
+		$iv = openssl_random_pseudo_bytes(16);
 
-		$this->assertEquals('5be2da124b05f90210a061b7553b72c7be235ec7c6aace4c739aa0f8cb602b327d8c0104c0017b37450b8032a47da639',bin2hex($encrypted));
-	}
+		$encrypted = Encrypt::encrypt($originalString, $this->key, Encrypt::AES, $this->salt, $this->pepper, $iv);
 
-	public function testAESDecrypt()
-	{
-		$string = '5be2da124b05f90210a061b7553b72c7be235ec7c6aace4c739aa0f8cb602b327d8c0104c0017b37450b8032a47da639';
+		$decryptedString = Encrypt::decrypt($encrypted,$this->key, Encrypt::AES, $this->salt, $this->pepper, $iv);
 
-		$decrypted = Encrypt::decrypt(hex2bin($string), $this->key, MCRYPT_RIJNDAEL_128, $this->salt, $this->pepper);
-
-		$this->assertEquals('Blah encrypted string.',$decrypted);
+		$this->assertEquals($originalString,$decryptedString);
 	}
 }

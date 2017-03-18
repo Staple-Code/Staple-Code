@@ -1,14 +1,42 @@
 <?php
 return [
 	'application'	=> [
-		'public_location' 	=>	'/',
-		'loader' 			=>	'', //Default value is blank. Used to specify your own autoloader.
+		'public_location'		=>	'/',
+		'loader'			=>	'', //Default value is blank. Used to specify your own autoloader.
+		'throw_on_loader_failure'	=>	false,	//Throws an Exception if the autoloader cannot find a class.
 	],
 
 	'page'	=>	[
 		'header' 	=>	'', //Deprecated - MODULES_ROOT'header.php'
 		'footer' 	=>	'', //Deprecated - MODULES_ROOT'footer.php'
 		'title' 	=>	'STAPLE Code - A PHP 5 Model-View-Controller Framework for Rapid Application Development',
+	],
+
+	'session'	=>	[
+		//automatically create a session on every call to the framework.
+		'auto_create' 		=> 1,
+		'max_lifetime' 		=> 1440,
+
+
+		//Database Session Handler
+		//'handler' => 'Staple\Session\DatabaseHandler',
+		//'connection' 		=> '',            //if none specified, the default database connection is used.
+		//'table' 			=> 'sessions',
+		//'encrypt_key' 	=> '',
+
+		//File Session Handler
+		'handler' 			=> 'Staple\Session\FileHandler',
+		//file_location => ''
+
+		//Redis Session Handler
+		//'handler' 			=> 'Staple\Session\RedisHandler',
+		//'scheme' 			=> 'tcp',
+		//'host' 				=> 'localhost',
+		//'port' 				=> '6379',
+		//'cafile'			=> '',
+		//'password' 			=> '',
+		//'encrypt_key' 		=> '',
+		//'prefix' 			=> 'session:',
 	],
 
 	'layout'	=>	[
@@ -22,8 +50,10 @@ return [
 		'meta_description' 	=>	'',
 	],
 
-	'forms'	=>	[
-		'elementViewAdapter' => NULL,	//BootstrapViewAdapter and FoundationViewAdapter are included with the framework
+	'forms'	=> [
+		'elementViewAdapter'	=> NULL,
+		//'elementViewAdapter' => 'FormBootstrapViewAdapter',
+		//'elementViewAdapter' => 'FormFoundationViewAdapter',
 	],
 
 	'db'	=>	[
@@ -45,8 +75,10 @@ return [
 		'pwfield'			=>	'password',
 		'rolefield'			=>	'accountType',
 		'pwenctype'			=>	'SHA1',
-		'allowedRoute'		=>	['index/index'],
-		//ADDefaultPrivs	=>	'10',
+		'allowedRoute' 		=> [
+			'index/index'
+		],
+		//'ADDefaultPrivs' => '10',
 	],
 
 	'encrypt'	=>	[

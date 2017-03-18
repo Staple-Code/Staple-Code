@@ -119,11 +119,10 @@ class PasswordElement extends FieldElement
 	}
 
 	/**
-	 * Build the form field.
-	 * @see Staple_Form_Element::build()
+	 * Return the built form element
 	 * @return string
 	 */
-	public function build($fieldView = NULL)
+	public function build()
 	{
 		$buf = '';
 		$view = FORMS_ROOT.'/fields/PasswordElement.phtml';
@@ -134,10 +133,10 @@ class PasswordElement extends FieldElement
 			$buf = ob_get_contents();
 			ob_end_clean();
 		}
-	        elseif(isset($this->elementViewAdapter))
-	        {
-	            $buf = $this->getElementViewAdapter()->PasswordElement($this);
-	        }
+		elseif(isset($this->elementViewAdapter))
+		{
+			$buf = $this->getElementViewAdapter()->PasswordElement($this);
+		}
 		else
 		{
 			$this->addClass('form_element');

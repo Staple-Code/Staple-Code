@@ -8,9 +8,10 @@
 
 namespace Staple\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Staple\Config;
 
-class ConfigTest extends \PHPUnit_Framework_TestCase
+class ConfigTest extends TestCase
 {
 	protected function setUp()
 	{
@@ -24,7 +25,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 
 	public function testConfigRead()
 	{
-		$this->assertCount(2,Config::get('application'));
+		$this->assertCount(3,Config::get('application'));
 		$this->assertArrayHasKey('host',Config::get('db'));
 		$this->assertEquals('localhost',Config::getValue('db','host'));
 		$this->assertEquals(NULL,Config::getValue('forms','elementViewAdapter'));
@@ -49,7 +50,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 
 	public function testSetValue()
 	{
-		$this->assertCount(2,Config::get('application'));
+		$this->assertCount(3,Config::get('application'));
 		$this->assertArrayHasKey('host',Config::get('db'));
 		$this->assertEquals('localhost',Config::getValue('db','host'));
 		$this->assertEquals(NULL,Config::getValue('forms','elementViewAdapter'));

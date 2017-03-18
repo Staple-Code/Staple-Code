@@ -273,7 +273,7 @@ class Union
 
 	/**
 	 * @param int $limit
-	 * @return Select
+	 * @return Union
 	 */
 	public function setLimit($limit)
 	{
@@ -283,7 +283,7 @@ class Union
 	
 	/**
 	 * @param int $limitOffset
-	 * @return Select
+	 * @return Union
 	 */
 	public function setLimitOffset($limitOffset)
 	{
@@ -338,14 +338,6 @@ class Union
 		if(count($this->selectFlags) > 0)
 		{
 			$stmt .= ' '.implode(' ', $this->selectFlags);
-		}
-
-		//SQL Server Limit - when offset is zero
-		if($this->getLimit() > 0
-			&& $this->getLimitOffset() == 0
-			&& $this->getConnection()->getDriver() == Connection::DRIVER_SQLSRV)
-		{
-			$stmt .= ' TOP ' . $this->getLimit().' ';
 		}
 
 		//Throw exception if no queries exist.
@@ -417,10 +409,10 @@ class Union
 				$stmt .= $this->order;
 			}
 
-			//SQL Server 2012 Pagination
+			//SQL Server Pagination
 			if($this->getConnection()->getDriver() == Connection::DRIVER_SQLSRV)
 			{
-				if (isset($this->limit) && !isset($sql2005limit) && $this->getLimitOffset() != 0)
+				if (isset($this->limit) && $this->getLimitOffset() != 0)
 				{
 					//Offset
 					$stmt .= "\n\tOFFSET " . $this->getLimitOffset(). ' ROWS ';

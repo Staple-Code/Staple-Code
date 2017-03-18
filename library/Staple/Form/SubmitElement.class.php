@@ -51,7 +51,11 @@ class SubmitElement extends FieldElement
 		return "	<label for=\"".$this->escape($this->id)."\"".$this->getClassString('label').">".$this->label."</label>\n";
 	}
 
-	public function build($fieldView = NULL)
+	/**
+	 * Return the built form element
+	 * @return string
+	 */
+	public function build()
 	{
 		$buf = '';
 		$view = FORMS_ROOT.'/fields/SubmitElement.phtml';

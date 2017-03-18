@@ -21,8 +21,9 @@
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
 namespace Staple\Tests;
+use PHPUnit\Framework\TestCase;
 use Staple\Form\Filter\PhoneFormatFilter;
-class PhoneFormatFilterTest extends \PHPUnit_Framework_TestCase
+class PhoneFormatFilterTest extends TestCase
 {
     private function getTestObject()
     {

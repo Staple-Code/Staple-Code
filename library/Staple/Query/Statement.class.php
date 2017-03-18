@@ -25,7 +25,7 @@ namespace Staple\Query;
 
 use \PDOStatement, \PDO;
 
-class Statement extends PDOStatement
+class Statement extends PDOStatement implements IStatement
 {
     /**
      * The database driver that is currently in use.

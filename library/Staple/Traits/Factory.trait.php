@@ -11,7 +11,20 @@ namespace Staple\Traits;
 
 trait Factory
 {
+	/**
+	 * Factory Method
+	 * @return static
+	 */
 	public static function make()
+	{
+		return new static();
+	}
+
+	/**
+	 * Factory Method
+	 * @return static
+	 */
+	public static function create()
 	{
 		return new static();
 	}

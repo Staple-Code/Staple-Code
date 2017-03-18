@@ -23,6 +23,7 @@
 
 namespace Staple\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Staple\Config;
 use Staple\Form\ButtonElement;
 use Staple\Form\CheckboxElement;
@@ -43,6 +44,7 @@ use Staple\Form\Validate\LengthValidator;
 use Staple\Form\ViewAdapters\BootstrapViewAdapter;
 use Staple\Form\ViewAdapters\ElementViewAdapter;
 use Staple\Form\ViewAdapters\FoundationViewAdapter;
+use Staple\View;
 
 class MyViewAdapter extends ElementViewAdapter
 {
@@ -108,7 +110,7 @@ class MyViewAdapter extends ElementViewAdapter
 
 }
 
-class FormTest extends \PHPUnit_Framework_TestCase
+class FormTest extends TestCase
 {
 	protected function setUp()
 	{
@@ -137,17 +139,17 @@ class FormTest extends \PHPUnit_Framework_TestCase
 			->addField(TextElement::create('lname', 'Last Name')
 				->setRequired()
 				->addValidator(new LengthValidator(5, 20)))
-			->addField(TextareaElement::Create('bio', 'Your Biography')
+			->addField(TextareaElement::create('bio', 'Your Biography')
 				->setRows(5)
 				->setCols(40)
 				->addValidator(new LengthValidator(5, 5000)))
 			->addField(
-				SelectElement::Create('birthyear', 'Year of Birth')
+				SelectElement::create('birthyear', 'Year of Birth')
 					->setRequired()
 					->addOptionsArray(array('', '1994', '1995', '1996', '1997', '1998', '1999', '2000'), true)
 					->addValidator(new InArrayValidator(array('', '1994', '1995', '1996', '1997', '1998', '1999', '2000')))
 			)
-			->addField(RadioElement::Create('spouse', 'I need to add a spouse:')
+			->addField(RadioElement::create('spouse', 'I need to add a spouse:')
 				->addButtonsArray(array('Yes', 'No'))
 				->setValue(1)
 				->addValidator(new EqualValidator('Yes'))
@@ -506,35 +508,35 @@ class FormTest extends \PHPUnit_Framework_TestCase
 		$expectedOutput = "\n<form name=\"testform\" id=\"testform_form\" action=\"/test/form\" method=\"GET\">"
 			. "\n<div id=\"testform_div\">"
 			. "\n<div class=\"row\">"
-			. "\n<div class=\"small-12 columns\">"
-			. "\n\t<label for=\"fname\" class=\"form_required\">First Name</label>"
-			. "\n</div>"
-			. "\n<div class=\"small-12 columns\">"
-			. "\n\t<input type=\"text\" id=\"fname\" name=\"fname\" value=\"\" class=\"form_required\">"
-			. "\n</div>"
-			. "\n</div>"
-			. "\n<div class=\"row\">"
-			. "\n<div class=\"small-12 columns\">"
-			. "\n\t<label for=\"lname\" class=\"form_required\">Last Name</label>"
-			. "\n</div>"
-			. "\n<div class=\"small-12 columns\">"
-			. "\n\t<input type=\"text\" id=\"lname\" name=\"lname\" value=\"\" class=\"form_required\">"
-			. "\n</div>"
+			. "\n\t<div class=\"small-12 columns\">"
+			. "\n\t\t<label for=\"fname\" class=\"form_required\">First Name</label>"
+			. "\n\t</div>"
+			. "\n\t<div class=\"small-12 columns\">"
+			. "\n\t\t<input type=\"text\" id=\"fname\" name=\"fname\" value=\"\" class=\"form_required\">"
+			. "\n\t</div>"
 			. "\n</div>"
 			. "\n<div class=\"row\">"
-			. "\n<div class=\"small-12 columns\">"
-			. "\n\t<label for=\"bio\">Your Biography</label>"
-			. "\n</div>"
-			. "\n<div class=\"small-12 columns\">"
-			. "\n\t<textarea rows=\"5\" cols=\"40\" id=\"bio\" name=\"bio\"></textarea>"
-			. "\n</div>"
+			. "\n\t<div class=\"small-12 columns\">"
+			. "\n\t\t<label for=\"lname\" class=\"form_required\">Last Name</label>"
+			. "\n\t</div>"
+			. "\n\t<div class=\"small-12 columns\">"
+			. "\n\t\t<input type=\"text\" id=\"lname\" name=\"lname\" value=\"\" class=\"form_required\">"
+			. "\n\t</div>"
 			. "\n</div>"
 			. "\n<div class=\"row\">"
-			. "\n<div class=\"small-12 columns\">"
-			. "\n\t<label for=\"birthyear\" class=\"form_required\">Year of Birth</label>"
+			. "\n\t<div class=\"small-12 columns\">"
+			. "\n\t\t<label for=\"bio\">Your Biography</label>"
+			. "\n\t</div>"
+			. "\n\t<div class=\"small-12 columns\">"
+			. "\n\t\t<textarea rows=\"5\" cols=\"40\" id=\"bio\" name=\"bio\"></textarea>"
+			. "\n\t</div>"
 			. "\n</div>"
-			. "\n<div class=\"small-12 columns\">"
-			. "\n\t<select name=\"birthyear\" id=\"birthyear\" class=\"form_required\">"
+			. "\n<div class=\"row\">"
+			. "\n\t<div class=\"small-12 columns\">"
+			. "\n\t\t<label for=\"birthyear\" class=\"form_required\">Year of Birth</label>"
+			. "\n\t</div>"
+			. "\n\t<div class=\"small-12 columns\">"
+			. "\n\t\t<select name=\"birthyear\" id=\"birthyear\" class=\"form_required\">"
 			. "\n\t\t<option value=\"\"></option>"
 			. "\n\t\t<option value=\"1994\">1994</option>"
 			. "\n\t\t<option value=\"1995\">1995</option>"
@@ -544,26 +546,26 @@ class FormTest extends \PHPUnit_Framework_TestCase
 			. "\n\t\t<option value=\"1999\">1999</option>"
 			. "\n\t\t<option value=\"2000\">2000</option>"
 			. "\n\t</select>"
-			. "\n</div>"
+			. "\n\t</div>"
 			. "\n</div>"
 			. "\n<div class=\"row\">"
 			. "\n\t<div class=\"small-12 columns\">"
-			. "\n\t<label class=\"row\">I need to add a spouse:</label>"
+			. "\n\t\t<label>I need to add a spouse:</label>"
 			. "\n\t</div>"
-			. "\n\n<div class=\"small-12 columns\">"
-			. "\n\t<div class=\"form_radio\" id=\"spouse_0_div\">"
-			. "\n\t\t<input type=\"radio\" name=\"spouse\" id=\"spouse_0\" value=\"0\" class=\"row\">"
+			. "\n\t<div class=\"small-12 columns\">"
+			. "\n\t\t<div class=\"form_radio\" id=\"spouse_0_div\">"
+			. "\n\t\t<input type=\"radio\" name=\"spouse\" id=\"spouse_0\" value=\"0\">"
 			. "\n\t\t<label for=\"spouse_0\">Yes</label>"
 			. "\n\t</div>"
 			. "\n\t<div class=\"form_radio\" id=\"spouse_1_div\">"
-			. "\n\t\t<input type=\"radio\" name=\"spouse\" id=\"spouse_1\" value=\"1\" checked class=\"row\">"
+			. "\n\t\t<input type=\"radio\" name=\"spouse\" id=\"spouse_1\" value=\"1\" checked>"
 			. "\n\t\t<label for=\"spouse_1\">No</label>"
 			. "\n\t</div>"
 			. "\n\t</div>"
 			. "\n</div>"
 			. "\n<div class=\"row\">"
 			. "\n\t<div class=\"small-12 columns\">"
-			. "\n\t<input type=\"submit\" id=\"send\" name=\"send\" value=\"Send Query\" class=\"button\">"
+			. "\n\t\t<input type=\"submit\" id=\"send\" name=\"send\" value=\"Send Query\" class=\"button\">"
 			. "\n\t</div>"
 			. "\n</div>\n"
 			. "\n\t<input type=\"hidden\" id=\"ident\" name=\"ident\" value=\"$ident\">\n"
@@ -591,44 +593,44 @@ class FormTest extends \PHPUnit_Framework_TestCase
 		$expectedOutput = "\n<form name=\"testform\" id=\"testform_form\" action=\"/test/form\" method=\"GET\">"
 			. "\n<div id=\"testform_div\">"
 			. "\n<div class=\"row\">"
-			. "\n<div class=\"small-12 columns\">"
-			. "\n\t<label for=\"fname\" class=\"form_required\">First Name</label>"
-			. "\n</div>"
-			. "\n<div class=\"small-12 columns\">"
-			. "\n\t<input type=\"text\" id=\"fname\" name=\"fname\" value=\"{$form->escape($form->fname->getValue())}\" class=\"form_required\">"
+			. "\n\t<div class=\"small-12 columns\">"
+			. "\n\t\t<label for=\"fname\" class=\"form_required\">First Name</label>"
+			. "\n\t</div>"
+			. "\n\t<div class=\"small-12 columns\">"
+			. "\n\t\t<input type=\"text\" id=\"fname\" name=\"fname\" value=\"{$form->escape($form->fname->getValue())}\" class=\"form_required\">"
 			. "\n\t<small class=\"error\">"
 			. "\n\t\t- Minimum length not met.<br>"
 			. "\n\t</small>"
-			. "\n</div>"
+			. "\n\t</div>"
 			. "\n</div>"
 			. "\n<div class=\"row\">"
-			. "\n<div class=\"small-12 columns\">"
-			. "\n\t<label for=\"lname\" class=\"form_required\">Last Name</label>"
-			. "\n</div>"
-			. "\n<div class=\"small-12 columns\">"
-			. "\n\t<input type=\"text\" id=\"lname\" name=\"lname\" value=\"{$form->escape($form->lname->getValue())}\" class=\"form_required\">"
+			. "\n\t<div class=\"small-12 columns\">"
+			. "\n\t\t<label for=\"lname\" class=\"form_required\">Last Name</label>"
+			. "\n\t</div>"
+			. "\n\t<div class=\"small-12 columns\">"
+			. "\n\t\t<input type=\"text\" id=\"lname\" name=\"lname\" value=\"{$form->escape($form->lname->getValue())}\" class=\"form_required\">"
 			. "\n\t<small class=\"error\">"
 			. "\n\t\t- Minimum length not met.<br>"
 			. "\n\t</small>"
-			. "\n</div>"
+			. "\n\t</div>"
 			. "\n</div>"
 			. "\n<div class=\"row\">"
-			. "\n<div class=\"small-12 columns\">"
-			. "\n\t<label for=\"bio\">Your Biography</label>"
-			. "\n</div>"
-			. "\n<div class=\"small-12 columns\">"
-			. "\n\t<textarea rows=\"5\" cols=\"40\" id=\"bio\" name=\"bio\">{$form->escape($form->bio->getValue())}</textarea>"
+			. "\n\t<div class=\"small-12 columns\">"
+			. "\n\t\t<label for=\"bio\">Your Biography</label>"
+			. "\n\t</div>"
+			. "\n\t<div class=\"small-12 columns\">"
+			. "\n\t\t<textarea rows=\"5\" cols=\"40\" id=\"bio\" name=\"bio\">{$form->escape($form->bio->getValue())}</textarea>"
 			. "\n\t<small class=\"error\">"
 			. "\n\t\t- Minimum length not met.<br>"
 			. "\n\t</small>"
-			. "\n</div>"
+			. "\n\t</div>"
 			. "\n</div>"
 			. "\n<div class=\"row\">"
-			. "\n<div class=\"small-12 columns\">"
-			. "\n\t<label for=\"birthyear\" class=\"form_required\">Year of Birth</label>"
-			. "\n</div>"
-			. "\n<div class=\"small-12 columns\">"
-			. "\n\t<select name=\"birthyear\" id=\"birthyear\" class=\"form_required\">"
+			. "\n\t<div class=\"small-12 columns\">"
+			. "\n\t\t<label for=\"birthyear\" class=\"form_required\">Year of Birth</label>"
+			. "\n\t</div>"
+			. "\n\t<div class=\"small-12 columns\">"
+			. "\n\t\t<select name=\"birthyear\" id=\"birthyear\" class=\"form_required\">"
 			. "\n\t\t<option value=\"\"></option>"
 			. "\n\t\t<option value=\"1994\">1994</option>"
 			. "\n\t\t<option value=\"1995\">1995</option>"
@@ -641,19 +643,19 @@ class FormTest extends \PHPUnit_Framework_TestCase
 			. "\n\t<small class=\"error\">"
 			. "\n\t\t- Supplied data not in accepted list of values.<br>"
 			. "\n\t</small>"
-			. "\n</div>"
+			. "\n\t</div>"
 			. "\n</div>"
 			. "\n<div class=\"row\">"
 			. "\n\t<div class=\"small-12 columns\">"
-			. "\n\t<label class=\"row\">I need to add a spouse:</label>"
+			. "\n\t\t<label>I need to add a spouse:</label>"
 			. "\n\t</div>"
-			. "\n\n<div class=\"small-12 columns\">"
-			. "\n\t<div class=\"form_radio\" id=\"spouse_0_div\">"
-			. "\n\t\t<input type=\"radio\" name=\"spouse\" id=\"spouse_0\" value=\"0\" class=\"row\">"
+			. "\n\t<div class=\"small-12 columns\">"
+			. "\n\t\t<div class=\"form_radio\" id=\"spouse_0_div\">"
+			. "\n\t\t<input type=\"radio\" name=\"spouse\" id=\"spouse_0\" value=\"0\">"
 			. "\n\t\t<label for=\"spouse_0\">Yes</label>"
 			. "\n\t</div>"
 			. "\n\t<div class=\"form_radio\" id=\"spouse_1_div\">"
-			. "\n\t\t<input type=\"radio\" name=\"spouse\" id=\"spouse_1\" value=\"1\" checked class=\"row\">"
+			. "\n\t\t<input type=\"radio\" name=\"spouse\" id=\"spouse_1\" value=\"1\" checked>"
 			. "\n\t\t<label for=\"spouse_1\">No</label>"
 			. "\n\t</div>"
 			. "\n\t<small class=\"error\">"
@@ -663,8 +665,66 @@ class FormTest extends \PHPUnit_Framework_TestCase
 			. "\n</div>"
 			. "\n<div class=\"row\">"
 			. "\n\t<div class=\"small-12 columns\">"
-			. "\n\t<input type=\"submit\" id=\"send\" name=\"send\" value=\"Send Query\" class=\"button\">"
+			. "\n\t\t<input type=\"submit\" id=\"send\" name=\"send\" value=\"Send Query\" class=\"button\">"
 			. "\n\t</div>"
+			. "\n</div>\n"
+			. "\n\t<input type=\"hidden\" id=\"ident\" name=\"ident\" value=\"$ident\">\n"
+			. "\n</div>"
+			. "\n</form>\n";
+		$output = $form->build();
+
+		$this->assertEquals($expectedOutput, $output);
+	}
+
+	public function testFormBuildWithView()
+	{
+		$form = $this->getComplexTestForm();
+		$form->setView(View::create('testFormView','form'));
+
+		//Expected Results
+		$ident = $form->fields['ident']->getValue();
+		$expectedOutput = '<h2>Your Profile</h2>'
+			. "\n<form name=\"testform\" id=\"testform_form\" action=\"/test/form\" method=\"GET\">"
+			. "\n<div id=\"testform_div\">"
+			. "\n<div class=\"form_required form_element element_text\" id=\"fname_element\">"
+			. "\n\t<label for=\"fname\" class=\"form_required form_element element_text\">First Name</label>"
+			. "\n\t<input type=\"text\" id=\"fname\" name=\"fname\" value=\"\" class=\"form_required form_element element_text\">"
+			. "\n</div>"
+			. "\n<div class=\"form_required form_element element_text\" id=\"lname_element\">"
+			. "\n\t<label for=\"lname\" class=\"form_required form_element element_text\">Last Name</label>"
+			. "\n\t<input type=\"text\" id=\"lname\" name=\"lname\" value=\"\" class=\"form_required form_element element_text\">"
+			. "\n</div>"
+			. "\n<div class=\"form_element element_textarea\" id=\"bio_element\">"
+			. "\n\t<label for=\"bio\" class=\"form_element element_textarea\">Your Biography</label>"
+			. "\n\t<textarea rows=\"5\" cols=\"40\" id=\"bio\" name=\"bio\" class=\"form_element element_textarea\"></textarea>"
+			. "\n</div>"
+			. "\n<div class=\"form_required form_element element_select\" id=\"birthyear_element\">"
+			. "\n\t<label for=\"birthyear\" class=\"form_required form_element element_select\">Year of Birth</label>"
+			. "\n\t<select name=\"birthyear\" id=\"birthyear\" class=\"form_required form_element element_select\">"
+			. "\n\t\t<option value=\"\"></option>"
+			. "\n\t\t<option value=\"1994\">1994</option>"
+			. "\n\t\t<option value=\"1995\">1995</option>"
+			. "\n\t\t<option value=\"1996\">1996</option>"
+			. "\n\t\t<option value=\"1997\">1997</option>"
+			. "\n\t\t<option value=\"1998\">1998</option>"
+			. "\n\t\t<option value=\"1999\">1999</option>"
+			. "\n\t\t<option value=\"2000\">2000</option>"
+			. "\n\t</select>"
+			. "\n</div>"
+			. "\n<div class=\"form_element element_radiogroup\" id=\"spouse_element\">"
+			. "\n\t<label class=\"form_element element_radiogroup\">I need to add a spouse:</label>"
+			. "\n\t<div class=\"form_radio\" id=\"spouse_0_div\">"
+			. "\n\t\t<input type=\"radio\" name=\"spouse\" id=\"spouse_0\" value=\"0\" class=\"form_element element_radiogroup\">"
+			. "\n\t\t<label for=\"spouse_0\">Yes</label>"
+			. "\n\t</div>"
+			. "\n\t<div class=\"form_radio\" id=\"spouse_1_div\">"
+			. "\n\t\t<input type=\"radio\" name=\"spouse\" id=\"spouse_1\" value=\"1\" checked class=\"form_element element_radiogroup\">"
+			. "\n\t\t<label for=\"spouse_1\">No</label>"
+			. "\n\t</div>"
+			. "\n</div>"
+			. "\n<div class=\"form_element element_submit\" id=\"send_element\">"
+			. "\n\t<label for=\"send\" class=\"form_element element_submit\"></label>"
+			. "\n\t<input type=\"submit\" id=\"send\" name=\"send\" value=\"Send Query\" class=\"form_element element_submit\">"
 			. "\n</div>\n"
 			. "\n\t<input type=\"hidden\" id=\"ident\" name=\"ident\" value=\"$ident\">\n"
 			. "\n</div>"

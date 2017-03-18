@@ -23,12 +23,15 @@
  */
 namespace Staple\Query;
 
-use \Staple\Exception\QueryException;
-use \Staple\Error;
-use \Staple\Pager;
+use Staple\Error;
+use Staple\Exception\QueryException;
+use Staple\Pager;
+use Staple\Traits\Factory;
 
-class Select extends Query
+class Select extends Query implements ISelectQuery
 {
+	use Factory;
+
 	const ALL = 'ALL';
 	const DISTINCT = 'DISTINCT';
 	const DISTINCTROW = 'DISTINCTROW';
@@ -85,12 +88,12 @@ class Select extends Query
 	/**
 	 * @param string $table
 	 * @param array $columns
-	 * @param Connection $db
+	 * @param IConnection $db
 	 * @param array | string $order
 	 * @param Pager | int $limit
 	 * @throws QueryException
 	 */
-	public function __construct($table = NULL, array $columns = NULL, Connection $db = NULL, $order = NULL, $limit = NULL)
+	public function __construct($table = NULL, array $columns = NULL, IConnection $db = NULL, $order = NULL, $limit = NULL)
 	{
 		parent::__construct(NULL, $db);
 		
@@ -115,7 +118,12 @@ class Select extends Query
 			$this->limit($limit);
 		}
 	}
-	
+
+	/**
+	 * Add a flag to the SQL statement.
+	 * @param $flag
+	 * @return $this
+	 */
 	public function addFlag($flag)
 	{
 		switch($flag)
@@ -784,10 +792,10 @@ class Select extends Query
 				$stmt .= $this->order;
 			}
 
-			//SQL Server 2012 Pagination
+			//SQL Server Pagination
 			if($this->getConnection()->getDriver() == Connection::DRIVER_SQLSRV)
 			{
-				if (isset($this->limit) && !isset($sql2005limit) && $this->getLimitOffset() != 0)
+				if (isset($this->limit) && $this->getLimitOffset() != 0)
 				{
 					//Offset
 					$stmt .= "\nOFFSET " . $this->getLimitOffset(). ' ROWS ';

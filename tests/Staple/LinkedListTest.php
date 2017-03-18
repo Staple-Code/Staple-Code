@@ -24,9 +24,10 @@
 namespace Staple\Tests;
 
 
+use PHPUnit\Framework\TestCase;
 use Staple\Data\LinkedList;
 
-class LinkedListTest extends \PHPUnit_Framework_TestCase
+class LinkedListTest extends TestCase
 {
 	/**
 	 * @return LinkedList

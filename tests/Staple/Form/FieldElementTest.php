@@ -23,6 +23,7 @@
 
 namespace Staple\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Staple\Form\FieldElement;
 use Staple\Form\FieldValidator;
 
@@ -84,7 +85,7 @@ class dummyFieldElementValidator extends FieldValidator
 }
 
 
-class FieldElementTest extends \PHPUnit_Framework_TestCase
+class FieldElementTest extends TestCase
 {
 	private function getTestObject($name)
 	{

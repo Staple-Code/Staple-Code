@@ -159,6 +159,12 @@ class Main
 		//Register the Autoload class
 		spl_autoload_register(array($this->loader, 'load'));
 
+		//Add the composer autoloader, if exists.
+		if(file_exists(VENDOR_ROOT.'autoload.php'))
+		{
+			include_once VENDOR_ROOT.'autoload.php';
+		}
+
 		//Call the bootstrapper
 		$this->boot();
 		

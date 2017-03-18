@@ -91,13 +91,14 @@ class SelectElement extends FieldElement
 	
 	/**
 	 * Sets the value for the select box
-	 * @param boolean $val
-	 * @return FieldElement
+	 * @param mixed $val
+	 * @return static
 	 */
 	public function setValue($val)
 	{
 		$this->selected = true;
-		return parent::setValue($val);
+		parent::setValue($val);
+		return $this;
 	}
 	
 	/**
@@ -262,13 +263,10 @@ class SelectElement extends FieldElement
 	}
 
 	/**
-	 * Builds the select list form element.
-	 * 
-	 * @see Staple_Form_Element::build()
-	 * @param string $fieldView
+	 * Return the built form element
 	 * @return string
 	 */
-	public function build($fieldView = NULL)
+	public function build()
 	{
 		$buf = '';
 		$view = FORMS_ROOT.'/fields/SelectElement.phtml';
@@ -279,10 +277,10 @@ class SelectElement extends FieldElement
 			$buf = ob_get_contents();
 			ob_end_clean();
 		}
-	        elseif(isset($this->elementViewAdapter))
-	        {
-	            $buf = $this->getElementViewAdapter()->SelectElement($this);
-	        }
+		elseif(isset($this->elementViewAdapter))
+		{
+			$buf = $this->getElementViewAdapter()->SelectElement($this);
+		}
 		else
 		{
 			$this->addClass('form_element');

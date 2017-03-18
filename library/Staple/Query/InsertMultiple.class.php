@@ -190,7 +190,7 @@ class InsertMultiple extends Insert
 	 * @throws QueryException
 	 * @return $this
 	 */
-	public function setData(array $data)
+	public function setData($data)
 	{
 		//Check all the array values
 		foreach ($data as $row)

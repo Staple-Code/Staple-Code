@@ -9,13 +9,15 @@
 namespace Staple\Tests;
 
 
+use PHPUnit\Framework\TestCase;
 use Staple\TwigView;
+use Staple\View;
 
-class TwigViewTest extends \PHPUnit_Framework_TestCase
+class TwigViewTest extends TestCase
 {
 	const TWIG_RENDER_SIMPLE = "<h2>Twig Render Test</h2>\n\nTest Variable Value";
 	/**
-	 * @return TwigView
+	 * @return View
 	 */
 	private function getTestObject()
 	{

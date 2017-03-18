@@ -25,6 +25,7 @@
 namespace Staple\Tests;
 
 
+use PHPUnit\Framework\TestCase;
 use Staple\Form\PasswordElement;
 use Staple\Form\Validate\AlnumValidator;
 use Staple\Form\Validate\DateValidator;
@@ -33,10 +34,10 @@ use Staple\Form\Validate\LengthValidator;
 use Staple\Form\ViewAdapters\BootstrapViewAdapter;
 use Staple\Form\ViewAdapters\FoundationViewAdapter;
 
-class PasswordElementTest extends \PHPUnit_Framework_TestCase
+class PasswordElementTest extends TestCase
 {
 	const STANDARD_BUILD = "<div class=\"form_element element_password\" id=\"MyPassword_element\">\n\t<label for=\"MyPassword\" class=\"form_element element_password\">Enter Your Password</label>\n\t<input type=\"password\" id=\"MyPassword\" name=\"MyPassword\" value=\"\" class=\"form_element element_password\">\n</div>\n";
-	const FOUNDATION_BUILD = "<div class=\"row\">\n<div class=\"small-12 columns\">\n\t<label for=\"MyPassword\">Enter Your Password</label>\n</div>\n<div class=\"small-12 columns\">\n\t<input type=\"password\" id=\"MyPassword\" name=\"MyPassword\" value=\"\">\n</div>\n</div>\n";
+	const FOUNDATION_BUILD = "<div class=\"row\">\n\t<div class=\"small-12 columns\">\n\t\t<label for=\"MyPassword\">Enter Your Password</label>\n\t</div>\n\t<div class=\"small-12 columns\">\n\t\t<input type=\"password\" id=\"MyPassword\" name=\"MyPassword\" value=\"\">\n\t</div>\n</div>\n";
 	const BOOTSTRAP_BUILD = "<div class=\"form-group\">\n\t<label class=\"control-label\" for=\"MyPassword\">Enter Your Password</label>\n\t<input type=\"password\" id=\"MyPassword\" name=\"MyPassword\" value=\"\" class=\"form-control\">\n</div>\n";
 	/**
 	 * @return PasswordElement
@@ -138,7 +139,7 @@ class PasswordElementTest extends \PHPUnit_Framework_TestCase
 		$element = $this->getTestTextElement();
 
 		//Validate Length
-		$element->addValidator(LengthValidator::Create(10));
+		$element->addValidator(LengthValidator::create(10));
 		$element->setValue('12345');
 		$this->assertFalse($element->isValid());
 		$element->setValue('1234567890');
@@ -150,7 +151,7 @@ class PasswordElementTest extends \PHPUnit_Framework_TestCase
 		$element = $this->getTestTextElement();
 
 		//Validate Alphanumeric
-		$element->addValidator(AlnumValidator::Create());
+		$element->addValidator(AlnumValidator::create());
 		$element->setValue("This is a sentence.");
 		$this->assertFalse($element->isValid());
 		$element->setValue('MyUsername1');
@@ -162,7 +163,7 @@ class PasswordElementTest extends \PHPUnit_Framework_TestCase
 		$element = $this->getTestTextElement();
 
 		//Validate Dates
-		$element->addValidator(DateValidator::Create());
+		$element->addValidator(DateValidator::create());
 		$element->setValue('now');
 		$this->assertFalse($element->isValid());	//Date validation occurs with regex.
 		$element->setValue('10/03/1996');
@@ -180,7 +181,7 @@ class PasswordElementTest extends \PHPUnit_Framework_TestCase
 		$element = $this->getTestTextElement();
 
 		//Validate Email Address
-		$element->addValidator(EmailValidator::Create());
+		$element->addValidator(EmailValidator::create());
 		$element->setValue("notemyemail");
 		$this->assertFalse($element->isValid());
 		$element->setValue('Thisemail@works.com');

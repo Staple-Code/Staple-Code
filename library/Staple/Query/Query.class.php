@@ -25,15 +25,15 @@
  */
 namespace Staple\Query;
 
-use \Staple\Exception\QueryException;
-use \Exception;
-use \Staple\Error;
-use \DateTime;
+use DateTime;
+use Exception;
+use PDO;
+use PDOStatement;
+use Staple\Error;
+use Staple\Exception\QueryException;
 use Staple\Pager;
-use \PDO;
-use \PDOStatement;
 
-abstract class Query
+abstract class Query implements IQuery
 {
 	
 	/**
@@ -44,24 +44,24 @@ abstract class Query
 	
 	/**
 	 * The Connection database object. A database object is required to properly escape input.
-	 * @var Connection
+	 * @var IConnection
 	 */
 	protected $connection;
 	
 	/**
 	 * An array of Where Clauses. The clauses are additive, using the AND  conjunction.
-	 * @var array[Staple_Query_Condition]
+	 * @var Condition[]
 	 */
 	protected $where = array();
 
 	/**
 	 * @param string $table
-	 * @param Connection $db
+	 * @param IConnection $db
 	 * @throws QueryException
 	 */
-	public function __construct($table = NULL, Connection $db = NULL)
+	public function __construct($table = NULL, IConnection $db = NULL)
 	{
-		if($db instanceof Connection)
+		if($db instanceof IConnection)
 		{
 			$this->setConnection($db);
 		}
@@ -75,7 +75,7 @@ abstract class Query
 				throw new QueryException('Unable to find a database connection.', Error::DB_ERROR, $e);
 			}
 		}
-		if(!($this->connection instanceof Connection))
+		if(!($this->connection instanceof IConnection))
 		{
 			throw new QueryException('Unable to create database object', Error::DB_ERROR);
 		}
@@ -104,11 +104,20 @@ abstract class Query
 	}
 
 	/**
-	 * @return Connection $db
+	 * @return IConnection $db
 	 */
 	public function getConnection()
 	{
 		return $this->connection;
+	}
+
+	/**
+	 * Return the array of where conditions currently attached to the query.
+	 * @return Condition[]
+	 */
+	public function getWhere()
+	{
+		return $this->where;
 	}
 
 	/**
@@ -141,10 +150,10 @@ abstract class Query
 	}
 
 	/**
-	 * @param Connection $connection
+	 * @param IConnection $connection
 	 * @return $this
 	 */
-	public function setConnection(Connection $connection)
+	public function setConnection(IConnection $connection)
 	{
 		$this->connection = $connection;
 		return $this;
@@ -157,18 +166,18 @@ abstract class Query
 	
 	/**
 	 * Executes the query and returns the result.
-	 * @param Connection $connection - the database connection to execute the quote upon.
+	 * @param IConnection $connection - the database connection to execute the quote upon.
 	 * @return Statement | bool
 	 * @throws Exception
 	 */
-	public function execute(Connection $connection = NULL)
+	public function execute(IConnection $connection = NULL)
 	{
 		if(isset($connection))
 			$this->setConnection($connection);
 
-		if($this->connection instanceof Connection)
+		if($this->connection instanceof IConnection)
 		{
-			return $this->connection->query($this->build());
+			return $this->connection->query($this);
 		}
 		else
 		{
@@ -178,15 +187,66 @@ abstract class Query
 			}
 			catch (Exception $e)
 			{
-				//@todo try for a default connection if no staple connection
+				throw new QueryException('No Database Connection', Error::DB_ERROR);
+			}
+			if($this->connection instanceof IConnection)
+			{
+				return $this->connection->query($this);
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Prepares the query before executing and returns the result.
+	 *
+	 * @param IConnection $connection
+	 * @return Statement
+	 * @throws QueryException
+	 * @throws \PDOException
+	 */
+	public function prepareAndExecute(IConnection $connection = null)
+	{
+		if(isset($connection))
+			$this->setConnection($connection);
+
+		$driverOptions = $this->connection->getDriverOptions();
+
+		if($this->connection instanceof Connection)
+		{
+			/** @var Statement $stmt */
+			$stmt = $this->connection->prepare($this->build(), $driverOptions);
+			if($stmt !== false)
+				$stmt->execute();
+			else
+				throw new QueryException('Failed to prepare query. Error: ' . serialize($this->connection->errorInfo()));
+
+			return $stmt;
+		}
+		else
+		{
+			try
+			{
+				$this->connection = Connection::get();
+			}
+			catch(Exception $e)
+			{
 				throw new QueryException('No Database Connection', Error::DB_ERROR);
 			}
 			if($this->connection instanceof Connection)
 			{
-				return $this->connection->query($this->build());
+				/** @var Statement $stmt */
+				$stmt = $this->connection->prepare($this->build(), $driverOptions);
+				if($stmt !== false)
+					$stmt->execute();
+				else
+					throw new QueryException('Failed to prepare query.');
+
+				return $stmt;
 			}
 		}
-		return false;
+
+		throw new QueryException('No Database Connection', Error::DB_ERROR);
 	}
 
 	/**
@@ -330,13 +390,13 @@ abstract class Query
 	/**
 	 * Converts a PHP data type into a compatible MySQL string.
 	 * @param mixed $inValue
-	 * @param Connection $db
+	 * @param IConnection $db
 	 * @throws QueryException
 	 * @return string
 	 */
-	public static function convertTypes($inValue, Connection $db = NULL)
+	public static function convertTypes($inValue, IConnection $db = NULL)
 	{
-		if(!($db instanceof Connection))
+		if(!($db instanceof IConnection))
 		{
 			try{
 				$db = Connection::get();
@@ -404,12 +464,12 @@ abstract class Query
 	 *
 	 * @param string $table
 	 * @param array $columns
-	 * @param Connection $db
+	 * @param IConnection $db
 	 * @param array | string $order
 	 * @param Pager | int $limit
 	 * @return Select
 	 */
-	public static function select($table = NULL, array $columns = NULL, Connection $db = NULL, $order = NULL, $limit = NULL)
+	public static function select($table = NULL, array $columns = NULL, IConnection $db = NULL, $order = NULL, $limit = NULL)
 	{
 		return new Select($table, $columns, $db, $order, $limit);
 	}
@@ -419,11 +479,11 @@ abstract class Query
 	 *
 	 * @param string $table
 	 * @param array $data
-	 * @param Connection
+	 * @param IConnection
 	 * @param string $priority
 	 * @return Insert
 	 */
-	public static function insert($table = NULL, $data = NULL, Connection $db = NULL, $priority = NULL)
+	public static function insert($table = NULL, $data = NULL, IConnection $db = NULL, $priority = NULL)
 	{
 		return new Insert($table, $data, $db, $priority);
 	}
@@ -433,12 +493,12 @@ abstract class Query
 	 *
 	 * @param string $table
 	 * @param array $data
-	 * @param Connection $db
+	 * @param IConnection $db
 	 * @param array | string $order
 	 * @param Pager | int $limit
 	 * @return Update
 	 */
-	public static function update($table = NULL, array $data = NULL, Connection $db = NULL, $order = NULL, $limit = NULL)
+	public static function update($table = NULL, array $data = NULL, IConnection $db = NULL, $order = NULL, $limit = NULL)
 	{
 		return new Update($table, $data, $db, $order, $limit);
 	}
@@ -447,10 +507,10 @@ abstract class Query
 	 * Construct and return a Delete query object.
 	 *
 	 * @param string $table
-	 * @param Connection $db
+	 * @param IConnection $db
 	 * @return Delete
 	 */
-	public static function delete($table = NULL, Connection $db = NULL)
+	public static function delete($table = NULL, IConnection $db = NULL)
 	{
 		return new Delete($table, $db);
 	}
@@ -459,10 +519,10 @@ abstract class Query
 	 * Construct and return a Union query object
 	 *
 	 * @param array $queries
-	 * @param Connection $db
+	 * @param IConnection $db
 	 * @return Union
 	 */
-	public static function union(array $queries = array(), Connection $db = NULL)
+	public static function union(array $queries = array(), IConnection $db = NULL)
 	{
 		return new Union($queries, $db);
 	}
@@ -471,10 +531,10 @@ abstract class Query
 	 * Create and return a Query DataSet object
 	 *
 	 * @param array $data
-	 * @param Connection $connection
+	 * @param IConnection $connection
 	 * @return DataSet
 	 */
-	public static function dataSet(array $data = NULL, Connection $connection = NULL)
+	public static function dataSet(array $data = NULL, IConnection $connection = NULL)
 	{
 		return new DataSet($data,$connection);
 	}
@@ -482,10 +542,10 @@ abstract class Query
     /**
      * Execute a raw SQL statement
      * @param string | Query $statement
-     * @param Connection $connection
+     * @param IConnection $connection
      * @return Statement
      */
-	public static function raw($statement, Connection $connection = NULL)
+	public static function raw($statement, IConnection $connection = NULL)
 	{
         if(isset($connection))
             return $connection->query($statement);

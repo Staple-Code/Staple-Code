@@ -23,7 +23,12 @@
  */
 namespace Staple;
 
-use \SplObjectStorage, \SplSubject, \SplObserver, \ErrorException, \Exception, \Staple\Exception\PageNotFoundException;
+use ErrorException;
+use Exception;
+use SplObjectStorage;
+use SplObserver;
+use SplSubject;
+use Staple\Exception\PageNotFoundException;
 
 class Error implements SplSubject
 {
@@ -74,7 +79,8 @@ class Error implements SplSubject
 	
 	/**
 	 * Get the Logger Object
-	 * @param SplObserver $logger        	
+	 * @param SplObserver $logger
+	 * @return $this
 	 */
 	public function setLogger(SplObserver $logger)
 	{
@@ -93,6 +99,7 @@ class Error implements SplSubject
 
 	/**
 	 * @param Exception $lastException
+	 * @return $this
 	 */
 	private function setLastException(Exception $lastException)
 	{
@@ -107,6 +114,7 @@ class Error implements SplSubject
 	 * @param string $errstr
 	 * @param string $errfile
 	 * @param int $errline
+	 * @throws ErrorException
 	 */
 	public static function handleError($errno, $errstr, $errfile, $errline)
 	{
@@ -120,10 +128,15 @@ class Error implements SplSubject
 	 * per application.
 	 * @param Exception $ex
 	 */
-	public function handleException(Exception $ex)
+	public function handleException($ex)
 	{
 		//handle the error
-		$this->setLastException($ex);
+		
+		//Set Last Exception
+		if($ex instanceof Exception)
+		{
+			$this->setLastException($ex);
+		}
 		
 		//Notify observers
 		$this->notify();

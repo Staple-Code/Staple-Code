@@ -28,13 +28,13 @@ class ImageElement extends FieldElement
 	
 	public function setSrc($insert)
 	{
-		$this->Image = $insert;
+		$this->src = $insert;
 		return $this;
 	}
 	
 	public function getSrc()
 	{
-		return $this->Image;
+		return $this->src;
 	}
 	
 	/* (non-PHPdoc)
@@ -42,7 +42,9 @@ class ImageElement extends FieldElement
 	 */
 	public function field()
 	{
-		return '	<input type="image" src="'.$this->link($this->src).'" id="'.$this->escape($this->id).'" name="'.$this->escape($this->name).'" value="'.$this->escape($this->value).'">';
+		$imgSrc = array_key_exists('host', parse_url($this->src)) ? $this->src : $this->link($this->src);
+
+		return '	<input type="image" src="'. $imgSrc .'" id="'.$this->escape($this->id).'" name="'.$this->escape($this->name).'" value="'.$this->escape($this->value).'">';
 	}
 
 	/* (non-PHPdoc)
@@ -53,7 +55,11 @@ class ImageElement extends FieldElement
 		return '	<label for="'.$this->escape($this->id).'"'.$this->getClassString('label').'>'.$this->label.'</label>';
 	}
 
-	public function build($fieldView = NULL)
+	/**
+	 * Return the built form element
+	 * @return string
+	 */
+	public function build()
 	{
 		$buf = '';
 		$view = FORMS_ROOT.'/fields/ImageElement.phtml';
@@ -64,10 +70,10 @@ class ImageElement extends FieldElement
 			$buf = ob_get_contents();
 			ob_end_clean();
 		}
-	        elseif(isset($this->elementViewAdapter))
-	        {
-	            $buf = $this->getElementViewAdapter()->ImageElement($this);
-	        }
+		elseif(isset($this->elementViewAdapter))
+		{
+			$buf = $this->getElementViewAdapter()->ImageElement($this);
+		}
 		else 
 		{
 			$this->addClass('form_element');

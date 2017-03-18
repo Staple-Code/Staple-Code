@@ -66,6 +66,7 @@ class CheckboxElement extends FieldElement
 	{
 		$this->setChecked($val);
 		$this->changed = true;
+		parent::setValue($val);
 		return $this;
 	}
 	
@@ -113,7 +114,11 @@ class CheckboxElement extends FieldElement
 		return '	<label for="'.$this->escape($this->id).'"'.$this->getClassString('label').'>'.$this->label.'</label>'."\n";
 	}
 
-	public function build($fieldView = NULL)
+	/**
+	 * Return the built form element
+	 * @return string
+	 */
+	public function build()
 	{
 		$buf = '';
 		$view = FORMS_ROOT.'/fields/CheckboxElement.phtml';
@@ -124,10 +129,10 @@ class CheckboxElement extends FieldElement
 			$buf = ob_get_contents();
 			ob_end_clean();
 		}
-	        elseif(isset($this->elementViewAdapter))
-	        {
-	            $buf = $this->getElementViewAdapter()->CheckboxElement($this);
-	        }
+		elseif(isset($this->elementViewAdapter))
+		{
+			$buf = $this->getElementViewAdapter()->CheckboxElement($this);
+		}
 		else
 		{
 			$this->addClass('form_element');

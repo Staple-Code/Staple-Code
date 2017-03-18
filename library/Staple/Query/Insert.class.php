@@ -25,9 +25,12 @@ namespace Staple\Query;
 use \Staple\Exception\QueryException;
 use \Exception;
 use \Staple\Error;
+use Staple\Traits\Factory;
 
 class Insert
 {
+	use Factory;
+
 	const LOW = "LOW_PRIORITY";
 	const DELAYED = "DELAYED";
 	const HIGH = "HIGH_PRIORITY";

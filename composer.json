@@ -1,7 +1,8 @@
 {
   "require": {
-    "twig/twig":"~1.0",
-    "phpunit/phpunit": "5.5.*",
-    "predis/predis":"1.1.*@dev"
+    "twig/twig":"~2.0",
+    "phpunit/phpunit": "~6.0",
+    "predis/predis":"1.1.*@dev",
+    "codacy/coverage": "dev-master"
   }
 }

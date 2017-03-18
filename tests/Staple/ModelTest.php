@@ -23,7 +23,15 @@
 
 namespace Staple\Tests;
 
+use PHPUnit\Framework\TestCase;
+use PDO;
+use SplObserver;
+use Staple\Exception\ModelNotFoundException;
 use Staple\Model;
+use Staple\Query\Condition;
+use Staple\Query\IConnection;
+use Staple\Query\IStatement;
+use Staple\Query\Select;
 
 class userModel extends Model
 {
@@ -40,9 +48,213 @@ class clientModel extends Model
 	protected $_table = 'customers';
 }
 
-
-class ModelTest extends \PHPUnit_Framework_TestCase
+class MockTestStatement implements IStatement
 {
+	private $data = array();
+
+	protected $driver = NULL;
+
+	public function fetch($fetch_style = PDO::ATTR_DEFAULT_FETCH_MODE, $cursor_orientation = PDO::FETCH_ORI_NEXT, $cursor_offset = 0)
+	{
+		$val = current($this->data);
+		next($this->data);
+		return $val;
+	}
+
+	public function fetchAll($fetch_style = PDO::ATTR_DEFAULT_FETCH_MODE, $fetch_argument = NULL, $ctor_args = array())
+	{
+		return $this->data;
+	}
+
+	public function rowCount()
+	{
+		return count($this->data);
+	}
+
+	public function foundRows()
+	{
+		return count($this->data);
+	}
+
+	public function setDriver($driver)
+	{
+		$this->driver = $driver;
+		return $this;
+	}
+
+	public function getDriver()
+	{
+		return $this->driver;
+	}
+
+	public function getData()
+	{
+		return $this->data;
+	}
+
+	public function setData(array $data)
+	{
+		$this->data = $data;
+		return $this;
+	}
+}
+
+class MockTestConnection implements IConnection
+{
+	private $data = [
+		[
+			'id'	=>	1,
+			'name'	=>	"Joe",
+			'email'	=>	'joe@aol.com'
+		],
+		[
+			'id'	=>	2,
+			'name'	=>	"Tom",
+			'email'	=>	'tom@hotmail.com'
+		],
+	];
+
+	protected $driver;
+
+	public function exec($statement)
+	{
+		// TODO: Implement exec() method.
+	}
+
+	public function query($statement)
+	{
+		switch(get_class($statement))
+		{
+			case 'Staple\Query\Select':
+				/** @var Select $statement */
+				$mockStatement = new MockTestStatement();
+				$results = [];
+				foreach($this->data as $row)
+				{
+					$remove = false;
+					/** @var Condition $where */
+					foreach($statement->getWhere() as $where)
+					{
+						switch($where->getOperator())
+						{
+							case $where::EQUAL:
+							case Condition::IS:
+								if($row[$where->getColumn()] != $where->getValue())
+									$remove = true;
+								break;
+							case Condition::GREATER:
+								if($row[$where->getColumn()] <= $where->getValue())
+									$remove = true;
+								break;
+							case Condition::GREATER_EQUAL:
+								if($row[$where->getColumn()] < $where->getValue())
+									$remove = true;
+								break;
+							case Condition::LESS:
+								if($row[$where->getColumn()] >= $where->getValue())
+									$remove = true;
+								break;
+							case Condition::LESS_EQUAL:
+								if($row[$where->getColumn()] > $where->getValue())
+									$remove = true;
+								break;
+							case Condition::IN:
+								if(!in_array($where->getValue(),$row[$where->getColumn()]))
+									$remove = true;
+								break;
+							case Condition::NOTEQUAL:
+							case Condition::IS_NOT:
+								if($row[$where->getColumn()] == $where->getValue())
+									$remove = true;
+								break;
+						}
+					}
+
+					if($remove !== true)
+					{
+						$results[] = $row;
+					}
+				}
+				$mockStatement->setData($results);
+				break;
+			default:
+				$mockStatement = false;
+		}
+
+		return $mockStatement;
+	}
+
+	/**
+	 * (PHP 5 &gt;= 5.1.0)<br/>
+	 * Attach an SplObserver
+	 * @link http://php.net/manual/en/splsubject.attach.php
+	 * @param SplObserver $observer <p>
+	 * The <b>SplObserver</b> to attach.
+	 * </p>
+	 * @return void
+	 */
+	public function attach(SplObserver $observer)
+	{
+		// TODO: Implement attach() method.
+	}
+
+	/**
+	 * (PHP 5 &gt;= 5.1.0)<br/>
+	 * Detach an observer
+	 * @link http://php.net/manual/en/splsubject.detach.php
+	 * @param SplObserver $observer <p>
+	 * The <b>SplObserver</b> to detach.
+	 * </p>
+	 * @return void
+	 */
+	public function detach(SplObserver $observer)
+	{
+		// TODO: Implement detach() method.
+	}
+
+	/**
+	 * (PHP 5 &gt;= 5.1.0)<br/>
+	 * Notify an observer
+	 * @link http://php.net/manual/en/splsubject.notify.php
+	 * @return void
+	 */
+	public function notify()
+	{
+		// TODO: Implement notify() method.
+	}
+
+	public function getLastQuery()
+	{
+		// TODO: Implement getLastQuery() method.
+	}
+
+	public function setLastQuery($lastQuery)
+	{
+		// TODO: Implement setLastQuery() method.
+	}
+
+	public function getDriver()
+	{
+		return $this->driver;
+	}
+
+	public function getDriverOptions()
+	{
+		return NULL;
+	}
+}
+
+
+class ModelTest extends TestCase
+{
+	/**
+	 * @return MockTestConnection
+	 */
+	protected function getMockConnection()
+	{
+		return new mockTestConnection();
+	}
+
 	protected function getTestUserModelObject()
 	{
 		//Setup a bunch of data to test with.
@@ -96,10 +308,73 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
 	public function testFind()
 	{
-		$this->markTestIncomplete();
-		userModel::make()->find(1);
+		/** @var userModel $user */
+		$user = userModel::find(1, $this->getMockConnection());
+		/** @var userModel $user2 */
+		$user2 = userModel::find(2, $this->getMockConnection());
 
-		//$this->assertInstanceOf(,'userModel');
+
+		//Assert user 1 results
+		$this->assertInstanceOf('Staple\Tests\userModel',$user);
+		$this->assertEquals(1, $user->id);
+		$this->assertEquals('Joe', $user->name);
+		$this->assertEquals('joe@aol.com', $user->email);
+		$this->assertEquals('Joe', $user->getName());
+		$this->assertEquals('joe@aol.com', $user->getEmail());
+		$this->assertEquals(1, $user->getId());
+
+		//Assert user 2 results
+		$this->assertInstanceOf('Staple\Tests\userModel',$user2);
+		$this->assertEquals(2, $user2->id);
+		$this->assertEquals('Tom', $user2->name);
+		$this->assertEquals('tom@hotmail.com', $user2->email);
+		$this->assertEquals('Tom', $user2->getName());
+		$this->assertEquals('tom@hotmail.com', $user2->getEmail());
+		$this->assertEquals(2, $user2->getId());
+
+		try
+		{
+			/** @var bool $user3 */
+			userModel::find(3, $this->getMockConnection());
+			$this->hasFailed();
+		}
+		catch(ModelNotFoundException $e)
+		{
+			//Assert user 3 not found
+			$this->assertInstanceOf('\\Staple\Exception\\ModelNotFoundException',$e);
+		}
+	}
+
+	public function testFindAll()
+	{
+		/** @var userModel[] $users */
+		$users = userModel::findAll(NULL,NULL,$this->getMockConnection());
+
+		$this->assertCount(2, $users);
+		foreach($users as $user)
+		{
+			$this->assertInstanceOf('Staple\Tests\userModel',$user);
+		}
+
+		$user2 = array_pop($users);
+		//Assert user 2 results
+		$this->assertInstanceOf('Staple\Tests\userModel',$user2);
+		$this->assertEquals(2, $user2->id);
+		$this->assertEquals('Tom', $user2->name);
+		$this->assertEquals('tom@hotmail.com', $user2->email);
+		$this->assertEquals('Tom', $user2->getName());
+		$this->assertEquals('tom@hotmail.com', $user2->getEmail());
+		$this->assertEquals(2, $user2->getId());
+
+		$user1 = array_pop($users);
+		//Assert user 1 results
+		$this->assertInstanceOf('Staple\Tests\userModel',$user1);
+		$this->assertEquals(1, $user1->id);
+		$this->assertEquals('Joe', $user1->name);
+		$this->assertEquals('joe@aol.com', $user1->email);
+		$this->assertEquals('Joe', $user1->getName());
+		$this->assertEquals('joe@aol.com', $user1->getEmail());
+		$this->assertEquals(1, $user1->getId());
 	}
 
 	public function testArrayGet()
@@ -116,8 +391,6 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
 	public function testArraySet()
 	{
-		$user = $this->getTestUserModelObject();
-
 		$user = $this->getTestUserModelObject();
 
 		//Check that we can get the data

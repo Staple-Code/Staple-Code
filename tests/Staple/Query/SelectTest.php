@@ -23,18 +23,20 @@
 
 namespace Staple\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Staple\Query\Query;
 use Staple\Query\Select;
+use Staple\Query\MockConnection;
 
-require_once 'Mocks/MockConnection.php';
+//require_once '../Mocks/MockConnection.php';
 
-class SelectTest extends \PHPUnit_Framework_TestCase
+class SelectTest extends TestCase
 {
 	const TABLE_NAME = 'customers';
 
-	private function getMockConnection()
+	private function getMockConnection($driver = MockConnection::DRIVER_MYSQL)
 	{
-		return new MockConnection();
+		return new MockConnection($driver);
 	}
 
 	public function testBuildSelectObject()

@@ -26,10 +26,11 @@ namespace Staple\Form;
 use \Staple\Error;
 use \Exception;
 use Staple\Form\ViewAdapters\ElementViewAdapter;
+use Staple\Traits\Helpers;
 
-abstract class FieldElement
+abstract class FieldElement implements FieldElementInterface
 {
-	use \Staple\Traits\Helpers;
+	use Helpers;
 
 	/**
 	 * Name of the field on the form.
@@ -361,6 +362,7 @@ abstract class FieldElement
 	 * This function queries all of the validators for javascript to verify their data.
 	 * @throws Exception
 	 * @return string
+	 * @deprecated
 	 */
 	public function clientJQuery()
 	{
@@ -383,6 +385,7 @@ abstract class FieldElement
 	 * This function queries all of the validators for javascript to verify their data.
 	 * @throws Exception
 	 * @return string
+	 * @deprecated
 	 */
 	public function clientJS()
 	{
@@ -427,12 +430,12 @@ abstract class FieldElement
 	/**
 	 * Sets the field label.
 	 * @param string $insert
-	 * @param bool $noescape
+	 * @param bool $noEscape Because there is almost always a way out...
 	 * @return $this
 	 */
-	public function setLabel($insert, $noescape = FALSE)
+	public function setLabel($insert, $noEscape = FALSE)
 	{
-		if ($noescape === true)
+		if ($noEscape === true)
 		{
 			$this->label = $insert;
 		}
@@ -453,7 +456,7 @@ abstract class FieldElement
 
 	/**
 	 * Sets the field value, if field is not read only.
-	 * @param string $insert
+	 * @param mixed $insert
 	 * @throws Exception
 	 * @return $this
 	 */
@@ -705,12 +708,12 @@ abstract class FieldElement
 	}
 
 	/**
-	 * Returns the classes array.
+	 * Alias of getClasses method
 	 * @return array[string]
 	 */
 	public function getCSSClasses()
 	{
-		return $this->classes;
+		return $this->getClasses();
 	}
 
 	/**
@@ -751,6 +754,15 @@ abstract class FieldElement
 	 */
 
 	/**
+	 * Adds the FieldElement object to a form
+	 * @param Form $form
+	 */
+	public function addToForm(Form $form)
+	{
+		$form->addField($this);
+	}
+
+	/**
 	 * Build the field instructions
 	 */
 	public function instructions()
@@ -778,7 +790,7 @@ abstract class FieldElement
 	/**
 	 * Build the field using a layout, or with the default build.
 	 */
-	abstract public function build($fieldView = NULL);
+	abstract public function build();
 
 	/*
 	 * @todo add method to add custom field view and add property to hold field view name

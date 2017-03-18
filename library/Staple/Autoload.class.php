@@ -23,7 +23,7 @@
  */
 namespace Staple;
 
-use \Exception;
+use Exception;
 use Staple\Exception\PageNotFoundException;
 
 class Autoload
@@ -87,10 +87,22 @@ class Autoload
 	protected $throwOnFailure = true;
 	/**
 	 * Automatically loads class files for the application.
+	 * @param bool $throwOnLoaderFailure
 	 * @throws Exception
 	 */
-	public function __construct()
+	public function __construct($throwOnLoaderFailure = true)
 	{
+		if($throwOnLoaderFailure === false)
+		{
+			$this->setThrowOnFailure(false);
+		}
+
+		//Set default for loader exception throwing
+		if(Config::exists('application','throw_on_loader_failure'))
+		{
+			$this->setThrowOnFailure(Config::getValue('application','throw_on_loader_failure'));
+		}
+
 		//Add the default controller location
 		$this->addControllerSearchDirectory(CONTROLLER_ROOT,false);
 		$this->setControllerSuffix(self::CONTROLLER_SUFFIX);
@@ -159,12 +171,7 @@ class Autoload
 			}
 			else
 			{
-				//Check for a vendor autoload
-				if(file_exists(VENDOR_ROOT.'autoload.php'))
-				{
-					include VENDOR_ROOT.'autoload.php';
-				}
-				elseif($this->throwOnFailure === true)
+				if($this->throwOnFailure === true)
 				{
 					throw new Exception("Class Not Found: ".$class_name,Error::LOADER_ERROR);
 				}
