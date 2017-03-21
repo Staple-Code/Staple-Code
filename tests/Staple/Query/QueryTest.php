@@ -28,13 +28,11 @@ use Staple\Query\Connection;
 use Staple\Query\Query;
 use Staple\Query\MockConnection;
 
-//require_once '../Mocks/MockConnection.php';
-
 class QueryTest extends TestCase
 {
-	private function getMockConnection($driver = NULL)
+	private function getMockConnection()
 	{
-		return new MockConnection($driver);
+		return new MockConnection(NULL);
 	}
 	private function getInMemorySqlite()
 	{
@@ -71,5 +69,55 @@ class QueryTest extends TestCase
 		//Assert
 		$this->assertInstanceOf('Staple\Query\Connection',$connection);
 		$this->assertEquals(Connection::DRIVER_SQLITE,$connection->getDriver());
+	}
+
+	/**
+	 * Test that we can construct a stored procedure call to MySQL
+	 * @test
+	 */
+	public function testStoredMySqlProcedureConstruction()
+	{
+		$connection = $this->getMockConnection();
+		$connection->setDriver(Connection::DRIVER_MYSQL);
+
+		$params = [
+			'first_name'=>	'John',
+			'last_name' =>	'Smith',
+			'married'	=>	true,
+			'age' 		=>	32,
+			'deleted'	=>	NULL,
+		];
+		Query::procedure('GetCustomers', $params, $connection);
+
+		$this->assertEquals('CALL GetCustomers(:first_name, :last_name, :married, :age, :deleted)',$connection->getLastQuery());
+
+		//Now test with numeric keys for the params
+		$connection = $this->getMockConnection();
+		$connection->setDriver(Connection::DRIVER_MYSQL);
+
+		$params = [
+			'John',
+			'Smith',
+			true,
+			32,
+			NULL,
+		];
+		Query::procedure('GetCustomers', $params, $connection);
+
+		$this->assertEquals('CALL GetCustomers(?, ?, ?, ?, ?)',$connection->getLastQuery());
+	}
+
+	/**
+	 * Test that we can construct a stored procedure call to SQL Server
+	 * @test
+	 */
+	public function testStoredSqlSrvProcedureConstruction()
+	{
+		$connection = $this->getMockConnection();
+		$connection->setDriver(Connection::DRIVER_SQLSRV);
+
+		Query::procedure('GetCustomers',['first_name'=>'John','last_name'=>'Smith'],$connection);
+
+		$this->assertEquals('EXEC GetCustomers @first_name = ?, @last_name = ?', $connection->getLastQuery());
 	}
 }
