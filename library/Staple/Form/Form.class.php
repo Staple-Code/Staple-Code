@@ -396,14 +396,13 @@ class Form
 	 */
 	public function addData(array $data)
 	{
-		$this->addDataToTarget($data, $this->fields);
-
-		return $this;
+		return $this->addDataToTarget($data, $this->fields);
 	}
 
 	/**
 	 * @param array $data
 	 * @param FieldElement[] | array $target
+	 * @return $this
 	 */
 	private function addDataToTarget(array $data, $target)
 	{
@@ -443,6 +442,8 @@ class Form
 				}
 			}
 		}
+
+		return $this;
 	}
 
 	/**
@@ -732,7 +733,7 @@ JS;
 	 * @return array
 	 * @throws Exception
 	 */
-	public function validateFields($fields)
+	public static function validateFields($fields)
 	{
 		$errors = [];
 		foreach($fields as $key => $field)
@@ -779,7 +780,7 @@ JS;
 			}
 			elseif(is_array($field))        //Parse Field Validation Recursively
 			{
-				$errArray = $this->validateFields($field);
+				$errArray = self::validateFields($field);
 				if(count($errArray) > 0)
 					$errors[$key] = $errArray;
 			}
