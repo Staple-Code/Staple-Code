@@ -565,14 +565,19 @@ class Form
 	}
 
 	/**
-	 * @todo complete the javascript validators.....
-	 *
+	 * Never Completed
+	 * @deprecated
 	 */
 	public function clientJS()
 	{
 		
 	}
 
+	/**
+	 * @return string
+	 * @throws Exception
+	 * @deprecated
+	 */
 	public function clientJQuery()
 	{
 		$script = <<<JS
