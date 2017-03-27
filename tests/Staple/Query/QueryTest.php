@@ -47,7 +47,7 @@ class QueryTest extends TestCase
 		//Act
 		$select = Query::select('customers',NULL, $connection);
 		$insert = Query::insert('customers',array('id'=>1), $connection);
-		$update = Query::update('customers',array('name'=>'Larry'), $connection);
+		$update = Query::update('customers',array('name'=>'Larry'), $connection)->setAllowUnboundedUpdate(true);
 		$delete = Query::delete('customers', $connection);
 
 		//Assert
