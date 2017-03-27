@@ -57,37 +57,27 @@ class Update extends Query
 	 * @var int
 	 */
 	protected $limitOffset;
+	/**
+	 * Protection against unbounded update statements.
+	 * @var bool
+	 */
+	protected $allowUnboundedUpdate = false;
 
 	/**
 	 * @param string $table
 	 * @param array $data
-	 * @param Connection $db
+	 * @param IConnection $db
 	 * @param array | string $order
 	 * @param Pager | int $limit
 	 * @throws Exception
 	 */
-	public function __construct($table = NULL, array $data = NULL, Connection $db = NULL, $order = NULL, $limit = NULL)
+	public function __construct($table = NULL, array $data = NULL, IConnection $db = NULL, $order = NULL, $limit = NULL)
 	{
+		parent::__construct($table, $db);
+
 		$this->data = new DataSet();
-		if(isset($db))
-		{
-			$this->setConnection($db);
-			$this->data->setConnection($db);
-		}
-		else
-		{
-			try {
-				$this->setConnection(Connection::get());
-			}
-			catch (Exception $e)
-			{
-				throw new QueryException('Unable to find a database connection.', Error::DB_ERROR, $e);
-			}
-		}
-		if(isset($table))
-		{
-			$this->setTable($table);
-		}
+		$this->data->setConnection($this->getConnection());
+
 		if(isset($data))
 		{
 			$this->setData($data);
@@ -121,9 +111,10 @@ class Update extends Query
 	}
 
 	/**
-	 * Adds or replaces data in the insert dataset.
+	 * Adds or replaces data in the insert data set.
 	 * @param array $data
 	 * @throws Exception
+	 * @return $this
 	 */	
 	public function addData(array $data)
 	{
@@ -137,6 +128,7 @@ class Update extends Query
 	 * @param mixed $data
 	 * @throws Exception
 	 * @see self::setDataColumn
+	 * @return $this;
 	 */
 	public function addDataColumn($column, $data)
 	{
@@ -147,6 +139,7 @@ class Update extends Query
 	 * Adds a literal value to the dataset without conversion.
 	 * @param string $column
 	 * @param string $value
+	 * @return $this
 	 */
 	public function addLiteralColumn($column, $value)
 	{
@@ -193,6 +186,7 @@ class Update extends Query
 	/**
 	 * Set the order.
 	 * @param string | array $order
+	 * @return $this
 	 */
 	public function setOrder($order)
 	{
@@ -202,7 +196,7 @@ class Update extends Query
 
 	/**
 	 * @param int $limit
-	 * @return Select
+	 * @return $this
 	 */
 	public function setLimit($limit)
 	{
@@ -254,7 +248,27 @@ class Update extends Query
 		}
 		return $this;
 	}
-	
+
+	/**
+	 * Is the query allowed to be unbounded.
+	 * @return bool
+	 */
+	public function isAllowUnboundedUpdate()
+	{
+		return $this->allowUnboundedUpdate;
+	}
+
+	/**
+	 * Set the flag to allow the update to be unbounded.
+	 * @param bool $allowUnboundedUpdate
+	 * @return $this
+	 */
+	public function setAllowUnboundedUpdate($allowUnboundedUpdate)
+	{
+		$this->allowUnboundedUpdate = (bool)$allowUnboundedUpdate;
+		return $this;
+	}
+
 	/**
 	 * Alias of setOrder()
 	 * @see self::setOrder()
@@ -288,7 +302,7 @@ class Update extends Query
 
 	/**
 	 * @param int $limitOffset
-	 * @return Select
+	 * @return $this
 	 */
 	public function setLimitOffset($limitOffset)
 	{
@@ -341,6 +355,10 @@ class Update extends Query
 		if(count($this->where) > 0)
 		{
 			$stmt .= "\nWHERE ".implode(' AND ', $this->where);
+		}
+		elseif($this->isAllowUnboundedUpdate() == false)
+		{
+			throw new QueryException('Attempted to build an unbounded UPDATE statement.');
 		}
 		
 		//Can only order and limit on a single table query
