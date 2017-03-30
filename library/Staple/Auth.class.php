@@ -414,6 +414,9 @@ class Auth
 	private static function restoreAuthSession()
 	{
 		//Restore the auth object from the session.
-		return Session::auth();
+		$auth = Session::auth();
+		if($auth instanceof Auth)
+			self::$instance = Session::auth();
+		return $auth;
 	}
 }
