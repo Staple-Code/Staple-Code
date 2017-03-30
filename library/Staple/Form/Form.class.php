@@ -170,7 +170,7 @@ class Form
 		{
 			//check that the form was submitted.
 			if(isset($_REQUEST['ident']))
-				if(Session::formIdentity($this->getName()) == $_REQUEST['ident'])
+				if(Session::checkForm($this->getName(), $_REQUEST['ident']))
 					$this->submitted = true;
 		}
 
@@ -287,7 +287,7 @@ class Form
 	 */
 	protected function createIdentifier()
 	{
-		if(isset($this->name))
+		if(isset($this->name) && !isset($this->identifier))
 		{
 			$this->identifier = Encrypt::genHex(32);
 			$ident = new HiddenElement('ident');
@@ -297,7 +297,7 @@ class Form
 
 			//Check for form submission
 			if(isset($_REQUEST['ident']))
-				if($_REQUEST['ident'] == Session::formIdentity($this->getName()))
+				if(Session::checkForm($this->getName(),$_REQUEST['ident']))
 					$this->submitted = true;
 
 			//Set the identifier into the session.
@@ -497,7 +497,7 @@ class Form
 	private function checkSubmitted()
 	{
 		if(isset($_REQUEST['ident']))
-			if(Session::formIdentity($this->getName()) == $_REQUEST['ident'])
+			if(Session::checkForm($this->getName(), $_REQUEST['ident']))
 				$this->submitted = true;
 
 		return $this->submitted;

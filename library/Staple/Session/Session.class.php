@@ -312,6 +312,18 @@ class Session
 	}
 
 	/**
+	 * Check for form submission
+	 * @param string $name
+	 * @param string $hash
+	 * @return bool
+	 */
+	public static function checkForm($name, $hash)
+	{
+		$data = self::getInternalData();
+		return $data->checkFormIdentity($name, $hash);
+	}
+
+	/**
 	 * Set or retrieve a registry key
 	 * @param string $key
 	 * @param mixed $value

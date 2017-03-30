@@ -101,6 +101,20 @@ class InternalSessionData
 	}
 
 	/**
+	 * Check for form submission.
+	 * @param string $formName
+	 * @param string $hash
+	 * @return bool
+	 */
+	public function checkFormIdentity($formName, $hash)
+	{
+		if(isset($this->forms->$formName))
+			if($this->forms->$formName == $hash)
+				return true;
+		return false;
+	}
+
+	/**
 	 * Return a controller object or null;
 	 * @param string $name
 	 * @return Controller
