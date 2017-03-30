@@ -233,11 +233,12 @@ class Main
 	{
 		if($class instanceof Controller)
 		{
-			return Main::get()->registerController($class);
+			return Session::registerController($class);
 		}
 		elseif(is_string($class))
 		{
-			return Main::get()->getController($class);
+			$class = strtolower($class);
+			return Session::getController($class);
 		}
 
 		return NULL;
@@ -287,25 +288,16 @@ class Main
 	public function getController($class)
 	{
 		$class = strtolower($class);
-		if(isset($this->controllers[$class]))
-		{
-			return $this->controllers[$class];
-		}
-		else return NULL;
+		return Session::getController($class);
 	}
 	
 	/**
-	 * 
 	 * Executes the application process.
 	 * @param Route | string $route
+	 * @return boolean
 	 */
 	public function run($route = NULL)
 	{
-		//Load the controllers from the session.
-		if(isset($_SESSION['Staple']['Controllers']))
-			if(is_array($_SESSION['Staple']['Controllers']))
-				$this->controllers = $_SESSION['Staple']['Controllers'];
-		
 		//First determine which routing information to use
 		if(!is_null($route))								//Use the supplied Route
 		{
@@ -340,16 +332,6 @@ class Main
 		//Include the boot file.
 		include_once APPLICATION_ROOT.'boot.php';
 	}
-
-	/**
-	 * Save the controller info to the session.
-	 * @return $this
-	 */
-	private function saveSession()
-	{
-		$_SESSION['Staple']['Controllers'] = $this->controllers;		//Store the controllers in the session
-		return $this;
-	}
 	
 	/**
 	 * Execute the current route
@@ -374,25 +356,11 @@ class Main
 	 */
 	public function redirect($newRoute)
 	{
-		$this->setRoute(Route::make($newRoute));
+		$this->setRoute(Route::create($newRoute));
 		$this->executeRoute();
 		exit(0);
 	}
-	/**
-	 * Registers a controller that was instantiated outside of the Staple_Main class.
-	 * @param Controller $controller
-	 * @return Controller
-	 */
-	public function registerController(Controller $controller)
-	{
-		$class_name = strtolower(substr(get_class($controller),0,strlen(get_class($controller))-10));
-		if(!array_key_exists($class_name, $this->controllers))
-		{
-			$this->controllers[$class_name] = $controller;
-		}
-		$this->saveSession();
-		return $controller;
-	}
+
 	/**
 	 * @return Autoload $loader
 	 */

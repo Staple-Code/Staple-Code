@@ -30,6 +30,7 @@ use \Staple\Config;
 use \Staple\Encrypt;
 use Staple\Exception\FormBuildException;
 use \Staple\Form\ViewAdapters\ElementViewAdapter;
+use Staple\Session\Session;
 use Staple\Traits\Helpers;
 use Staple\View;
 
@@ -168,16 +169,8 @@ class Form
 		if(isset($this->name))
 		{
 			//check that the form was submitted.
-			if(isset($_SESSION['Staple']['Forms'][$this->name]))
-			{
-				if(array_key_exists('ident', $_SESSION['Staple']['Forms'][$this->name]) && array_key_exists('ident', $_REQUEST))
-				{
-					if($_SESSION['Staple']['Forms'][$this->name]['ident'] == $_REQUEST['ident'])
-					{
-						$this->submitted = true;
-					}
-				}
-			}
+			if(Session::formIdentity($this->getName()) == $_REQUEST['ident'])
+				$this->submitted = true;
 		}
 
 		//Set the form view
@@ -302,12 +295,11 @@ class Form
 			$this->addField($ident);
 
 			//Check for form submission
-			if(isset($_REQUEST['ident']) && isset($_SESSION['Staple']['Forms'][$this->getName()]['ident']))
-				if($_REQUEST['ident'] == $_SESSION['Staple']['Forms'][$this->getName()]['ident'])
-					$this->submitted = true;
+			if($_REQUEST['ident'] == Session::formIdentity($this->getName()))
+				$this->submitted = true;
 
 			//Set the identifier into the session.
-			$_SESSION['Staple']['Forms'][$this->getName()]['ident'] = $this->identifier;
+			Session::formIdentity($this->getName(), $this->identifier);
 
 			return true;
 		}
@@ -353,8 +345,7 @@ class Form
 			unset($this->fields['ident']);
 
 		//Remove from the session, if set.
-		if(isset($_SESSION['Staple']['Forms'][$this->name]['ident']))
-			unset($_SESSION['Staple']['Forms'][$this->name]['ident']);
+		Session::formIdentity($this->getName(), NULL, true);
 
 		//Return current object
 		return $this;
@@ -503,13 +494,8 @@ class Form
 	 */
 	private function checkSubmitted()
 	{
-		if(isset($this->name) && isset($_SESSION['Staple']['Forms'][$this->name]['ident']) && isset($_REQUEST['ident']))
-		{
-			if($_SESSION['Staple']['Forms'][$this->name]['ident'] == $_REQUEST['ident'])
-			{
-				$this->submitted = true;
-			}
-		}
+		if(Session::formIdentity($this->getName()) == $_REQUEST['ident'])
+			$this->submitted = true;
 
 		return $this->submitted;
 	}

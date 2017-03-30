@@ -29,7 +29,9 @@
 
 namespace Staple\Session;
 
+use Staple\Auth;
 use Staple\Config;
+use Staple\Controller;
 use Staple\Exception\SessionException;
 use Staple\Traits\Singleton;
 
@@ -231,6 +233,98 @@ class Session
 	}
 
 	/**
+	 * Get the internal session data object for Staple.
+	 * @return InternalSessionData
+	 */
+	public static function getInternalData()
+	{
+		if(!self::getInstance()->isSessionStarted())
+			self::start();
+		return $_SESSION['Staple'] ?? NULL;
+	}
+
+	/**
+	 * Create or retrieve the internal session data object for Staple.
+	 * @return InternalSessionData
+	 */
+	protected static function createInternalDataObject()
+	{
+		if(self::getInternalData() instanceof InternalSessionData)
+			return $_SESSION['Staple'];
+
+		$_SESSION['Staple'] = new InternalSessionData();
+		return $_SESSION['Staple'];
+	}
+
+	/**
+	 * Register a controller with the session.
+	 * @param Controller $controller
+	 * @return Controller
+	 */
+	public static function registerController(Controller $controller) : Controller
+	{
+		$data = self::getInternalData();
+		return $data->registerController($controller);
+	}
+
+	/**
+	 * @param string $controller
+	 * @return Controller|NULL
+	 */
+	public static function getController($controller) : Controller
+	{
+		$data = self::getInternalData();
+		return $data->getController($controller);
+	}
+
+	/**
+	 * Set Auth in the session
+	 * @param Auth $auth
+	 * @return Auth
+	 */
+	public static function auth(Auth $auth = NULL) : Auth
+	{
+		$data = self::getInternalData();
+		if($auth instanceof Auth)
+			return $data->setAuth($auth);
+		else
+			return $data->getAuth();
+	}
+
+	/**
+	 * Set, retrieve or clear a form identity from the session.
+	 * @param string $name
+	 * @param string $value
+	 * @param bool $clear
+	 * @return string
+	 */
+	public static function formIdentity($name, $value = null, $clear = false) : string
+	{
+		$data = self::getInternalData();
+		if(isset($value))
+			return $data->setFormIdentity($name, $value);
+		elseif($clear == true)
+			return $data->clearFormIdentity($name);
+		else
+			return $data->getFormIdentity($name);
+	}
+
+	/**
+	 * Set or retrieve a registry key
+	 * @param string $key
+	 * @param mixed $value
+	 * @return mixed
+	 */
+	public static function register($key, $value = null)
+	{
+		$data = self::getInternalData();
+		if(isset($value))
+			return $data->setRegistryKey($key, $value);
+		else
+			return $data->getRegistryKey($key);
+	}
+
+	/**
 	 * Start the session.
 	 * @param string $sessionId
 	 * @param bool $suppressThrow
@@ -244,6 +338,7 @@ class Session
 		{
 			if (!headers_sent())
 			{
+				//Create a new Session
 				if (isset($sessionId))
 				{
 					session_id($sessionId);
@@ -259,6 +354,9 @@ class Session
 					$session->setSessionId(session_id())
 						->setSessionStarted(true);
 				}
+
+				//Create Internal Data Object upon session create
+				self::createInternalDataObject();
 			}
 			else
 			{
