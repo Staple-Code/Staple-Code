@@ -43,12 +43,6 @@ class Main
 	protected $route;
 	
 	/**
-	 * Holds references to the current instantiated controllers
-	 * @var array[Controller]
-	 */
-	protected $controllers = array();
-	
-	/**
 	 * The autoloader class instance
 	 * @var Autoload
 	 */

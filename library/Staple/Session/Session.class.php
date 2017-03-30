@@ -236,22 +236,24 @@ class Session
 	 * Get the internal session data object for Staple.
 	 * @return InternalSessionData
 	 */
-	public static function getInternalData()
+	public static function getInternalData() : InternalSessionData
 	{
 		if(!self::getInstance()->isSessionStarted())
 			self::start();
-		return $_SESSION['Staple'] ?? NULL;
+
+		if(isset($_SESSION['Staple']))
+			if($_SESSION['Staple'] instanceof InternalSessionData)
+				return $_SESSION['Staple'];
+
+		return self::createInternalDataObject();
 	}
 
 	/**
 	 * Create or retrieve the internal session data object for Staple.
 	 * @return InternalSessionData
 	 */
-	protected static function createInternalDataObject()
+	protected static function createInternalDataObject() : InternalSessionData
 	{
-		if(self::getInternalData() instanceof InternalSessionData)
-			return $_SESSION['Staple'];
-
 		$_SESSION['Staple'] = new InternalSessionData();
 		return $_SESSION['Staple'];
 	}
@@ -271,7 +273,7 @@ class Session
 	 * @param string $controller
 	 * @return Controller|NULL
 	 */
-	public static function getController($controller) : Controller
+	public static function getController($controller)
 	{
 		$data = self::getInternalData();
 		return $data->getController($controller);
@@ -282,7 +284,7 @@ class Session
 	 * @param Auth $auth
 	 * @return Auth
 	 */
-	public static function auth(Auth $auth = NULL) : Auth
+	public static function auth(Auth $auth = NULL)
 	{
 		$data = self::getInternalData();
 		if($auth instanceof Auth)
@@ -298,7 +300,7 @@ class Session
 	 * @param bool $clear
 	 * @return string
 	 */
-	public static function formIdentity($name, $value = null, $clear = false) : string
+	public static function formIdentity($name, $value = null, $clear = false)
 	{
 		$data = self::getInternalData();
 		if(isset($value))
@@ -354,9 +356,6 @@ class Session
 					$session->setSessionId(session_id())
 						->setSessionStarted(true);
 				}
-
-				//Create Internal Data Object upon session create
-				self::createInternalDataObject();
 			}
 			else
 			{

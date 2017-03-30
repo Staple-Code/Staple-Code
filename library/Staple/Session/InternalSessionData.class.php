@@ -46,7 +46,7 @@ class InternalSessionData
 	 * Array of instantiated controllers
 	 * @var Controller[]
 	 */
-	protected $controllers;
+	protected $controllers = [];
 	/**
 	 * Form Identities.
 	 * @var stdClass
@@ -56,7 +56,12 @@ class InternalSessionData
 	 * The session registry array.
 	 * @var array
 	 */
-	protected $registry;
+	protected $registry = [];
+
+	public function __construct()
+	{
+		$this->forms = new stdClass();
+	}
 
 	/**
 	 * Retrieve form identity value
@@ -100,7 +105,7 @@ class InternalSessionData
 	 * @param string $name
 	 * @return Controller
 	 */
-	public function getController($name) : Controller
+	public function getController($name)
 	{
 		return $this->controllers[$name] ?? NULL;
 	}
@@ -135,7 +140,7 @@ class InternalSessionData
 	 * Get the Auth Object
 	 * @return Auth
 	 */
-	public function getAuth() : Auth
+	public function getAuth()
 	{
 		return $this->auth;
 	}

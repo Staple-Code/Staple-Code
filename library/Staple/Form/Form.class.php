@@ -169,8 +169,9 @@ class Form
 		if(isset($this->name))
 		{
 			//check that the form was submitted.
-			if(Session::formIdentity($this->getName()) == $_REQUEST['ident'])
-				$this->submitted = true;
+			if(isset($_REQUEST['ident']))
+				if(Session::formIdentity($this->getName()) == $_REQUEST['ident'])
+					$this->submitted = true;
 		}
 
 		//Set the form view
@@ -295,8 +296,9 @@ class Form
 			$this->addField($ident);
 
 			//Check for form submission
-			if($_REQUEST['ident'] == Session::formIdentity($this->getName()))
-				$this->submitted = true;
+			if(isset($_REQUEST['ident']))
+				if($_REQUEST['ident'] == Session::formIdentity($this->getName()))
+					$this->submitted = true;
 
 			//Set the identifier into the session.
 			Session::formIdentity($this->getName(), $this->identifier);
@@ -494,8 +496,9 @@ class Form
 	 */
 	private function checkSubmitted()
 	{
-		if(Session::formIdentity($this->getName()) == $_REQUEST['ident'])
-			$this->submitted = true;
+		if(isset($_REQUEST['ident']))
+			if(Session::formIdentity($this->getName()) == $_REQUEST['ident'])
+				$this->submitted = true;
 
 		return $this->submitted;
 	}
