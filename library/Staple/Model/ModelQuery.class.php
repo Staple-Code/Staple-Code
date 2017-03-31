@@ -137,6 +137,7 @@ class ModelQuery implements IQuery
 
 		/** @var IStatement $result */
 		$result = $this->getQueryObject()->execute();
+		$query = $this->getQueryObject()->getConnection()->getLastQuery();
 		if($result !== false)
 		{
 			while(($row = $result->fetch(\PDO::FETCH_ASSOC)) !== false)
@@ -147,7 +148,7 @@ class ModelQuery implements IQuery
 			}
 		}
 
-		return ModelQueryResult::create($models);
+		return ModelQueryResult::create($models, $this->getConnection(), $query);
 	}
 
 	/**
@@ -169,9 +170,9 @@ class ModelQuery implements IQuery
 	/**
 	 * @param mixed $table
 	 * @param string $alias
-	 * @return $this
+	 * @return IQuery
 	 */
-	public function setTable($table, $alias = NULL)
+	public function setTable($table, $alias = NULL) : IQuery
 	{
 		$this->queryObject->setTable($table, $alias);
 		return $this;
@@ -179,9 +180,9 @@ class ModelQuery implements IQuery
 
 	/**
 	 * @param IConnection $connection
-	 * @return $this
+	 * @return IQuery
 	 */
-	public function setConnection(IConnection $connection)
+	public function setConnection(IConnection $connection) : IQuery
 	{
 		$this->queryObject->setConnection($connection);
 		return $this;
