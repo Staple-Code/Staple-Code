@@ -112,7 +112,7 @@ class Auth
 	public function __destruct()
 	{
 		if(isset(self::$instance))
-			$_SESSION['Staple']['auth'] = self::$instance;
+			Session::auth(self::$instance);
 	}
 	
 	/**
@@ -404,7 +404,7 @@ class Auth
 		if(Session::getInstance()->isSessionStarted() == false)
 			Session::start();
 
-		$_SESSION['Staple']['auth'] = self::$instance;
+		Session::auth(self::$instance);
 	}
 
 	/**
@@ -414,10 +414,9 @@ class Auth
 	private static function restoreAuthSession()
 	{
 		//Restore the auth object from the session.
-		if(array_key_exists('Staple', $_SESSION))
-			if(array_key_exists('auth', $_SESSION['Staple']))
-				self::$instance = $_SESSION['Staple']['auth'];
-
-		return self::$instance;
+		$auth = Session::auth();
+		if($auth instanceof Auth)
+			self::$instance = Session::auth();
+		return $auth;
 	}
 }

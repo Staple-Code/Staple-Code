@@ -25,11 +25,12 @@
 namespace Staple;
 
 use \Exception;
+use Staple\Session\Session;
 
 class Registry
 {
 	protected static $store = array();
-	
+
 	/**
 	 * Returns a booleon if the specified key exists in the store.
 	 * @param string $key
@@ -37,17 +38,10 @@ class Registry
 	 */
 	public static function isValid($key)
 	{
-		if(!array_key_exists('Staple', $_SESSION))
+		$data = Session::register($key);
+		if(!is_null($data))
 		{
-			$_SESSION['Staple'] = array();
-		}
-		if(!array_key_exists('Registry', $_SESSION['Staple']))
-		{
-			$_SESSION['Staple']['Registry'] = array();
-		}
-		if(array_key_exists($key, $_SESSION['Staple']['Registry']))
-		{
-			self::$store[$key] = $_SESSION['Staple']['Registry'][$key];
+			self::$store[$key] = $data;
 			return true;
 		}
 		return array_key_exists($key, self::$store);
@@ -60,24 +54,19 @@ class Registry
 	 */
 	public static function get($key)
 	{
-		if(!array_key_exists('Staple', $_SESSION))
-		{
-			$_SESSION['Staple'] = array();
-		}
-		if(!array_key_exists('Registry', $_SESSION['Staple']))
-		{
-			$_SESSION['Staple']['Registry'] = array();
-		}
-		
 		if(array_key_exists($key, self::$store))
 			return self::$store[$key];
-		elseif(array_key_exists($key, $_SESSION['Staple']['Registry']))
-		{
-			self::$store[$key] = $_SESSION['Staple']['Registry'][$key];
-			return $_SESSION['Staple']['Registry'][$key];
-		}
 		else
-			return NULL;
+		{
+			$data = Session::register($key);
+			if(isset($data))
+			{
+				self::$store[$key] = $data;
+				return $data;
+			}
+			else
+				return null;
+		}
 	}
 	
 	/**
@@ -88,29 +77,10 @@ class Registry
 	 */
 	public static function set($key, $obj, $storeInSession = true)
 	{
-		if(!array_key_exists('Staple', $_SESSION))
-		{
-			$_SESSION['Staple'] = array();
-		}
-		if(!array_key_exists('Registry', $_SESSION['Staple']))
-		{
-			$_SESSION['Staple']['Registry'] = array();
-		}
-		
 		//We can't store resources in the session.
 		if(!is_resource($obj) && $storeInSession === true)
 		{
-			if(array_key_exists($key, $_SESSION['Staple']['Registry']))
-			{
-				if($_SESSION['Staple']['Registry'][$key] !== $obj)
-				{
-					$_SESSION['Staple']['Registry'][$key] = $obj;
-				}
-			}
-			else
-			{
-				$_SESSION['Staple']['Registry'][$key] = $obj;
-			}
+			Session::register($key, $obj);
 		}
 		
 		//Store the value locally as well.

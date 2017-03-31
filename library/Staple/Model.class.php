@@ -466,7 +466,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 		//Change connection if needed
 		if(isset($connection)) $query->setConnection($connection);
 
-		//Set limit
+		//Set order
 		if(isset($order)) $query->orderBy($order);
 
 		//Set limit
@@ -494,7 +494,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	 * @param string $column
 	 * @param mixed $value
 	 * @param int $limit
-	 * @param Connection $connection
+	 * @param IConnection $connection
 	 * @return $this[]
 	 * @throws QueryException
 	 * @throws ModelNotFoundException
@@ -536,11 +536,11 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	 * Find models where specified column is null.
 	 * @param string $column
 	 * @param int|Pager $limit
-	 * @param Connection|NULL $connection
+	 * @param IConnection|NULL $connection
 	 * @return array
 	 * @throws ModelNotFoundException
 	 */
-	public static function findWhereNull($column, $limit = NULL, Connection $connection = NULL)
+	public static function findWhereNull($column, $limit = NULL, IConnection $connection = NULL)
 	{
 		//Make a model instance
 		$model = static::make();
@@ -578,11 +578,11 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	 * @param string $column
 	 * @param array $values
 	 * @param int|Pager $limit
-	 * @param Connection|NULL $connection
+	 * @param IConnection|NULL $connection
 	 * @return array
 	 * @throws ModelNotFoundException
 	 */
-	public static function findWhereIn($column, array $values, $limit = NULL, Connection $connection = NULL)
+	public static function findWhereIn($column, array $values, $limit = NULL, IConnection $connection = NULL)
 	{
 		//Make a model instance
 		$model = static::make();
@@ -621,11 +621,11 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	 * @param string $statement
 	 * @param mixed $order
 	 * @param int|Pager $limit
-	 * @param Connection|NULL $connection
+	 * @param IConnection|NULL $connection
 	 * @return array
 	 * @throws ModelNotFoundException
 	 */
-	public static function findWhereStatement($statement, $limit = NULL, Connection $connection = NULL)
+	public static function findWhereStatement($statement, $limit = NULL, IConnection $connection = NULL)
 	{
 		//Make a model instance
 		$model = static::make();
@@ -687,8 +687,8 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 
 	/**
 	 * Perform a query on a model. If no query is specified then a select query is created.
-	 * @param
-	 * @return ModelSelectQuery
+	 * @param Query $baseQuery
+	 * @return ModelQuery
 	 */
 	public static function query($baseQuery = NULL) : ModelQuery
 	{

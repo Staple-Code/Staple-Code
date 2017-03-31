@@ -222,14 +222,13 @@ class DatabaseHandler implements Handler
 
 		if(($result = $query->execute()) !== false)
 		{
-			if($result->rowCount() == 1)
+			$record = $result->fetch(PDO::FETCH_OBJ);
+			if(is_object($record))
 			{
-				$record = $result->fetch(PDO::FETCH_OBJ);
-
 				if (Config::exists('session', 'encrypt_key'))
-					return Encrypt::decrypt(base64_decode($record->payload), Config::getValue('session', 'encrypt_key'));
+					return (string)Encrypt::decrypt(base64_decode($record->payload), Config::getValue('session', 'encrypt_key'));
 				else
-					return $record->payload;
+					return (string)$record->payload;
 			}
 		}
 		return (string)'';
@@ -277,7 +276,7 @@ class DatabaseHandler implements Handler
 
 		if(($resultFind = $queryFind->execute()) !== false)
 		{
-			if($resultFind->rowCount() >= 1)
+			if(count($resultFind->fetchAll()) >= 1)
 			{
 				$query = Query::update($this->getTable(),$data,$this->getConnection())
 					->whereEqual('id',$session_id);
