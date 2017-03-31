@@ -369,6 +369,11 @@ class Session
 						->setSessionStarted(true);
 				}
 			}
+			elseif(php_sapi_name() == 'cli')
+			{
+				//Ignore sessions in the CLI
+				return $session;
+			}
 			else
 			{
 				if (!$suppressThrow)
