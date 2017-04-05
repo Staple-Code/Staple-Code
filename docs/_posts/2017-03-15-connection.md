@@ -5,12 +5,12 @@ date: 2017-03-15 17:32:04
 categories: Data
 ---
 
-# The Connection Class
+## The Connection Class
 
 The Connection class extends the PHP PDO objects to allow
 for various database connections.
 
-## Default Connection
+### Default Connection
 
 To initialize the default connection as specified by the `db`
 section of the `application.ini` or `application.php` file call:
@@ -22,7 +22,7 @@ $conn = Connection::get();
 Most query objects will call this method if a different connection
 object is not previously specified.
 
-### Named Connections
+#### Named Connections
 
 A named connection can be specified in the config file under
 any name that you would like. You can retrieve and establish
@@ -33,7 +33,7 @@ config attributes.
 $conn = Connection::getNamedConnection('myconn');
 ```
 
-### Queries
+#### Queries
 
 Execute a query against a database connection object.
 

@@ -18,12 +18,12 @@ layout: default
 
 <div class="oss docs main ui vertical segment">
   <div class="ui dividing left rail">
-    <div class="ui vertical following fluid accordion text menu">
+    <div class="ui vertical following fluid text menu">
       {% assign sorted_cats = site.categories | sort %}
       {% for category in sorted_cats %}
-      {% assign sorted_posts = category[1] | sort | reversed %}
-      <div class="item">
-        <a class="title active"><i class="dropdown icon"></i> <strong>{{ category[0] | capitalize }}</strong></a>
+      {% assign sorted_posts = category[1] | sort  %}
+      <div class="title">
+        {{ category[0] | capitalize }}
       </div>
       <div class="content menu">
         {% for post in sorted_posts %}

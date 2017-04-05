@@ -2,10 +2,10 @@
 p ,
 li {
   > code {
-    background: $grey-light;
-    color: darken($grey, 10%);
-    font-size: 90%;
-    padding: 0.1em 0.5em;
+    background: lighten(complement($masthead-background), 50%);
+    color: darken(complement($masthead-background), 10%);
+    font-size: 95%;
+    padding: 0.2em 0.5em;
     @include border-radius(3px);
   }
 }
