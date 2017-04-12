@@ -25,7 +25,7 @@ return [
 		//'encrypt_key' 	=> '',
 
 		//File Session Handler
-		'handler' 			=> 'Staple\Session\FileHandler',
+		//'handler' 			=> 'Staple\Session\FileHandler',
 		//file_location => ''
 
 		//Redis Session Handler
@@ -37,6 +37,9 @@ return [
 		//'password' 			=> '',
 		//'encrypt_key' 		=> '',
 		//'prefix' 			=> 'session:',
+
+		//Array Handler
+		'handler' 			=> 'Staple\Session\ArrayHandler',
 	],
 
 	'layout'	=>	[

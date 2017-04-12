@@ -30,11 +30,23 @@ interface IQuery
 	public function __toString();
 	//Get the query table
 	public function getTable();
-	//Retrieve Query Connection
+	/**
+	 * Retrieve Query Connection
+	 * @return IConnection
+	 */
 	public function getConnection();
-	//Set the query table
+	/**
+	 * Set the query table
+	 * @param mixed $table
+	 * @param string|NULL $alias
+	 * @return IQuery
+	 */
 	public function setTable($table,$alias = NULL);
-	//Set the query connection
+	/**
+	 * Set the query connection
+	 * @param IConnection $connection
+	 * @return IQuery
+	 */
 	public function setConnection(IConnection $connection);
 	//Build the query into a string.
 	public function build();

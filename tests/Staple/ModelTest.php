@@ -24,13 +24,12 @@
 namespace Staple\Tests;
 
 use PHPUnit\Framework\TestCase;
-use PDO;
 use SplObserver;
 use Staple\Exception\ModelNotFoundException;
 use Staple\Model;
 use Staple\Query\Condition;
 use Staple\Query\IConnection;
-use Staple\Query\IStatement;
+use Staple\Query\MockStatement;
 use Staple\Query\Select;
 
 class userModel extends Model
@@ -46,57 +45,6 @@ class productListCategoryModel extends Model
 class clientModel extends Model
 {
 	protected $_table = 'customers';
-}
-
-class MockTestStatement implements IStatement
-{
-	private $data = array();
-
-	protected $driver = NULL;
-
-	public function fetch($fetch_style = PDO::ATTR_DEFAULT_FETCH_MODE, $cursor_orientation = PDO::FETCH_ORI_NEXT, $cursor_offset = 0)
-	{
-		$val = current($this->data);
-		next($this->data);
-		return $val;
-	}
-
-	public function fetchAll($fetch_style = PDO::ATTR_DEFAULT_FETCH_MODE, $fetch_argument = NULL, $ctor_args = array())
-	{
-		return $this->data;
-	}
-
-	public function rowCount()
-	{
-		return count($this->data);
-	}
-
-	public function foundRows()
-	{
-		return count($this->data);
-	}
-
-	public function setDriver($driver)
-	{
-		$this->driver = $driver;
-		return $this;
-	}
-
-	public function getDriver()
-	{
-		return $this->driver;
-	}
-
-	public function getData()
-	{
-		return $this->data;
-	}
-
-	public function setData(array $data)
-	{
-		$this->data = $data;
-		return $this;
-	}
 }
 
 class MockTestConnection implements IConnection
@@ -127,7 +75,7 @@ class MockTestConnection implements IConnection
 		{
 			case 'Staple\Query\Select':
 				/** @var Select $statement */
-				$mockStatement = new MockTestStatement();
+				$mockStatement = new MockStatement();
 				$results = [];
 				foreach($this->data as $row)
 				{
@@ -175,7 +123,7 @@ class MockTestConnection implements IConnection
 						$results[] = $row;
 					}
 				}
-				$mockStatement->setData($results);
+				$mockStatement->setRows($results);
 				break;
 			default:
 				$mockStatement = false;

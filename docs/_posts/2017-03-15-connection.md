@@ -53,3 +53,15 @@ The results of a query can be a boolean true or false for queries
 that do not have a recordset returned, ex. `UPDATE`,
 `INSERT`, `DELETE`. For `SELECT` and `UNION` queries, upon success
 a `Statement` object is returned.
+
+### Stored Procedures
+
+You can call stored procedures using the `exec($statement)` method
+on the `Connection` class.
+
+```php?start_inline=1
+$result = $conn->exec('CALL MySproc()');
+```
+
+This will return either a boolean or a `PDOStatement` object depending
+the results of the stored procedure.

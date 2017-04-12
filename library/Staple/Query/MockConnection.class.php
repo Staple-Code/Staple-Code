@@ -28,7 +28,7 @@ namespace Staple\Query;
 
 use PDOStatement, SplObjectStorage;
 
-class MockConnection extends Connection
+class MockConnection extends Connection implements IConnection
 {
 	/**
 	 * Results to be returned from a query or exec call.
@@ -72,6 +72,8 @@ class MockConnection extends Connection
 	public function exec($statement)
 	{
 		$statement = (string)$statement;
+		$this->addQueryToLog($statement);
+		$this->notify();
 		return $this->getResults();
 	}
 
@@ -82,10 +84,21 @@ class MockConnection extends Connection
 	public function query($statement)
 	{
 		$statement = (string)$statement;
+		$this->addQueryToLog($statement);
+		$this->notify();
 		return $this->getResults();
 	}
 
+	public function prepare($statement, $options = NULL)
+	{
+		$statement = (string)$statement;
+		$this->addQueryToLog($statement);
+		$this->notify();
+		return new MockStatement();
+	}
+
 	/**
+	 * Get the preset results
 	 * @return mixed
 	 */
 	private function getResults()

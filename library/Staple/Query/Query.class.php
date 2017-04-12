@@ -555,71 +555,26 @@ abstract class Query implements IQuery
 
 	/**
 	 * Create a prepared statement for a stored procedure call.
-	 * @param $name
+	 * @param string $procedureName
 	 * @param array $parameters
-	 * @param Connection $connection
+	 * @param IConnection $connection
 	 * @param array $driverOptions
 	 * @return PDOStatement
 	 * @throws QueryException
 	 */
-	public static function procedure($name, array $parameters = NULL, Connection $connection = NULL, array $driverOptions = [])
+	public static function procedure($procedureName, array $parameters = NULL, IConnection $connection = NULL, array $driverOptions = [])
 	{
-		if(isset($connection))
-		{
-			$myConn = $connection;
-		}
-		else
-		{
-			$myConn = Connection::get();
-		}
+		if(!isset($connection))
+			$connection = Connection::get();
 
-		if(isset($parameters))
-		{
-			$params = '(';
+		$execStatement = self::getConnectionSpecificExecuteStatement($procedureName, $parameters, $connection);
 
-			$numericKeys = false;
-			foreach ($parameters as $key=>$value)
-			{
-				if (is_int($key))
-				{
-					$numericKeys = true;
-				}
-				elseif(substr($key,0,1) != ':')
-				{
-					unset($parameters[$key]);
-					$parameters[':'.$key] = $value;
-				}
-				else
-				{
-					if ($numericKeys == true)
-					{
-						throw new QueryException('You cannot mix numeric and named parameter keys.');
-					}
-				}
-			}
-
-			$keys = array_keys($parameters);
-			if($numericKeys == true)
-			{
-				for($i = 0; $i<count($keys); $i++)
-				{
-					$params .= '?, ';
-				}
-			}
-			else
-				$params .= implode(', ',$keys);
-
-			$params .= ')';
-		}
-		else
-		{
-			$params = '()';
-		}
-
-		$driverOptions[PDO::FETCH_CLASS] = '\Staple\Query\Statement';
+		//SqlSrv Cannot return a different object yet.
+		if($connection->getDriver() != Connection::DRIVER_SQLSRV)
+			$driverOptions[PDO::FETCH_CLASS] = '\Staple\Query\Statement';
 
 		//Prepare Statement
-		$stmt = $myConn->prepare('CALL '.$name.$params, $driverOptions);
+		$stmt = $connection->prepare($execStatement, $driverOptions);
 
 		//Bind Values
 		if(isset($parameters))
@@ -641,5 +596,118 @@ abstract class Query implements IQuery
 		}
 
 		return $stmt;
+	}
+
+	/**
+	 * Get connection specific execute statement string
+	 * @param string $procedureName
+	 * @param array &$parameters
+	 * @param IConnection $connection
+	 * @return string
+	 * @throws QueryException
+	 */
+	public static function getConnectionSpecificExecuteStatement($procedureName, array &$parameters, IConnection $connection)
+	{
+		//Grab the appropriate exec string
+		switch($connection->getDriver())
+		{
+			case Connection::DRIVER_SQLSRV:
+				return self::composeSqlSrvProcedureString($procedureName, $parameters);
+				break;
+			case Connection::DRIVER_MYSQL:
+				return self::composeMySqlProcedureString($procedureName, $parameters);
+				break;
+			default:
+				throw new QueryException('Could not find a string generator for your database driver.');
+				break;
+		}
+	}
+
+	/**
+	 * Generate the MySQL stored procedure execution string.
+	 * @param string $procedureName
+	 * @param array &$parameters
+	 * @return string
+	 * @throws QueryException
+	 */
+	public static function composeMySqlProcedureString($procedureName, array &$parameters)
+	{
+		$params = '(';
+
+		$numericKeys = false;
+		foreach ($parameters as $key=>$value)
+		{
+			if (is_int($key))
+			{
+				$numericKeys = true;
+				break;
+			}
+			elseif(substr($key,0,1) != ':')
+			{
+				unset($parameters[$key]);
+				$parameters[':'.$key] = $value;
+			}
+			else
+			{
+				if ($numericKeys == true)
+				{
+					throw new QueryException('You cannot mix numeric and named parameter keys.');
+				}
+			}
+		}
+
+		$keys = array_keys($parameters);
+		if($numericKeys == true)
+		{
+			for($i = 0; $i<count($keys); $i++)
+			{
+				$params .= '?, ';
+			}
+			$params = substr($params,0,strlen($params)-2);
+		}
+		else
+			$params .= implode(', ',$keys);
+
+		$params .= ')';
+
+		return 'CALL '.$procedureName.$params;
+	}
+
+	/**
+	 * Generate the SQL Server stored procedure execution string.
+	 * @param string $procedureName
+	 * @param array &$parameters
+	 * @return string
+	 * @throws QueryException
+	 */
+	public static function composeSqlSrvProcedureString($procedureName, array &$parameters)
+	{
+		$params = ' ';
+		foreach ($parameters as $key=>$value)
+		{
+			if (is_int($key))
+				throw new QueryException('You must specify the procedure variable name as the array key.');
+			elseif(substr($key,0,1) != '@')
+			{
+				unset($parameters[$key]);
+				$parameters['@'.$key] = $value;
+			}
+		}
+
+		$keys = array_keys($parameters);
+		$params .= implode(' = ?, ',$keys);
+		$params .= ' = ?';
+
+		//Fix parameters array for PDO binding
+		$parameters = array_values($parameters);
+		for($i = count($parameters); $i > 0; $i--)
+		{
+			$tmp = $parameters[$i-1];
+			unset($parameters[$i-1]);
+			$parameters[$i] = $tmp;
+		}
+		ksort($parameters);
+
+		return 'EXEC '.$procedureName.$params;
 	}
 }

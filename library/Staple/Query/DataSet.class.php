@@ -36,15 +36,15 @@ class DataSet implements \ArrayAccess, \Iterator, \Countable
 	protected $literal = array();
 	/**
 	 * The database connection
-	 * @var Connection
+	 * @var IConnection
 	 */
 	protected $connection;
 
 	/**
 	 * @param array $data
-	 * @param Connection $connection
+	 * @param IConnection $connection
 	 */
-	public function __construct(array $data = NULL, Connection $connection = NULL)
+	public function __construct(array $data = NULL, IConnection $connection = NULL)
 	{
 		if(isset($data))
 		{
@@ -56,7 +56,7 @@ class DataSet implements \ArrayAccess, \Iterator, \Countable
 
 	/**
 	 * Return the currently set connection or attempt to retrieve the default connection if non specified.
-	 * @return Connection
+	 * @return IConnection
 	 */
 	public function getConnection()
 	{
@@ -68,11 +68,13 @@ class DataSet implements \ArrayAccess, \Iterator, \Countable
 
 	/**
 	 * Set the connection.
-	 * @param Connection $connection
+	 * @param IConnection $connection
+	 * @return $this
 	 */
-	public function setConnection(Connection $connection)
+	public function setConnection(IConnection $connection)
 	{
 		$this->connection = $connection;
+		return $this;
 	}
 	
 	/* (non-PHPdoc)
@@ -174,6 +176,7 @@ class DataSet implements \ArrayAccess, \Iterator, \Countable
 	 * Adds a data pair (key and value) to the dataset. Will overwrite the value of any existing duplicate key.
 	 * @param string $key
 	 * @param mixed $value
+	 * @return $this
 	 */
 	public function addDataPair($key,$value)
 	{
@@ -187,6 +190,7 @@ class DataSet implements \ArrayAccess, \Iterator, \Countable
 	 * if duplicated.
 	 *  
 	 * @param array $data
+	 * @return $this
 	 */
 	public function addData(array $data)
 	{
@@ -213,17 +217,27 @@ class DataSet implements \ArrayAccess, \Iterator, \Countable
 		$this->data = $data;
 		return $this;
 	}
-	
+
+	/**
+	 * @return array
+	 */
 	public function getData()
 	{
 		return $this->data;
 	}
-	
+
+	/**
+	 * @return array
+	 */
 	public function getColumns()
 	{
 		return array_keys($this->data);
 	}
-	
+
+	/**
+	 * @param $column
+	 * @return mixed|null
+	 */
 	public function getLiteralFor($column)
 	{
 		if(array_key_exists($column, $this->literal))
@@ -235,14 +249,23 @@ class DataSet implements \ArrayAccess, \Iterator, \Countable
 			return NULL;
 		}
 	}
-	
+
+	/**
+	 * @param $column
+	 * @param $data
+	 * @return $this
+	 */
 	public function addLiteralColumn($column, $data)
 	{
 		$this->data[$column] = $data;
 		$this->literal[$column] = true;
 		return $this;
 	}
-	
+
+	/**
+	 * @param array $data
+	 * @return $this
+	 */
 	public function addLiteralData(array $data)
 	{
 		foreach ($data as $key=>$value)
@@ -252,15 +275,19 @@ class DataSet implements \ArrayAccess, \Iterator, \Countable
 		$this->data = array_merge($this->data, $data);
 		return $this;
 	}
-	
+
+	/**
+	 * Get the INSERT string for the data in this object.
+	 * @return string
+	 */
 	public function getInsertString()
 	{
 		$stmt = '('.implode(',',$this->getColumns()).') ';
 		$stmt .= "\nVALUES (";
-		$colcount = 0;
+		$colCount = 0;
 		foreach ($this->data as $name=>$col)
 		{
-			if($colcount > 0)
+			if($colCount > 0)
 			{
 				$stmt .= ',';
 			}
@@ -272,19 +299,23 @@ class DataSet implements \ArrayAccess, \Iterator, \Countable
 			{
 				$stmt .= Query::convertTypes($col,$this->getConnection());
 			}
-			$colcount++;
+			$colCount++;
 		}
 		$stmt .= ") ";
 		return $stmt;
 	}
-	
+
+	/**
+	 * Get the multi-insert string for the data in this object.
+	 * @return string
+	 */
 	public function getInsertMultipleString()
 	{
 		$stmt = '(';
-		$colcount = 0;
+		$colCount = 0;
 		foreach ($this->data as $name=>$col)
 		{
-			if($colcount > 0)
+			if($colCount > 0)
 			{
 				$stmt .= ',';
 			}
@@ -296,19 +327,23 @@ class DataSet implements \ArrayAccess, \Iterator, \Countable
 			{
 				$stmt .= Query::convertTypes($col,$this->getConnection());
 			}
-			$colcount++;
+			$colCount++;
 		}
 		$stmt .= ")";
 		return $stmt;
 	}
-	
+
+	/**
+	 * Get the UPDATE string for the data in this object.
+	 * @return string
+	 */
 	public function getUpdateString()
 	{
 		$stmt = '';
-		$colcount = 0;
+		$colCount = 0;
 		foreach ($this->data as $name=>$col)
 		{
-			if($colcount > 0)
+			if($colCount > 0)
 			{
 				$stmt .= ',';
 			}
@@ -321,7 +356,7 @@ class DataSet implements \ArrayAccess, \Iterator, \Countable
 			{
 				$stmt .= Query::convertTypes($col,$this->getConnection());
 			}
-			$colcount++;
+			$colCount++;
 		}
 		return $stmt;
 	}

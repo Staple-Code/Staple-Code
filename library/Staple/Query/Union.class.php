@@ -418,7 +418,7 @@ class Union
 					$stmt .= "\n\tOFFSET " . $this->getLimitOffset(). ' ROWS ';
 
 					//Limit
-					$stmt .= "\n\tFETCH NEXT " . $this->getLimit(). ' ROWS ';
+					$stmt .= "\n\tFETCH NEXT " . $this->getLimit(). ' ROWS ONLY';
 				}
 			}
 		}
