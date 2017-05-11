@@ -60,6 +60,11 @@ class Insert
 	 * @var string
 	 */
 	protected $table;
+	/**
+	 * The schema name.
+	 * @var string
+	 */
+	protected $schema;
 	
 	/**
 	 * Boolean flag for ON DUPLICATE KEY UPDATE
@@ -331,6 +336,27 @@ class Insert
 	public function getUpdateColumns()
 	{
 		return $this->updateColumns;
+	}
+
+	/**
+	 * Get the schema string.
+	 * @return string
+	 */
+	public function getSchema()
+	{
+		return $this->schema;
+	}
+
+	/**
+	 * Set the schema string
+	 * @param string $schema
+	 * @return $this
+	 */
+	public function setSchema($schema)
+	{
+		$this->schema = (string)$schema;
+
+		return $this;
 	}
 	
 	/**
