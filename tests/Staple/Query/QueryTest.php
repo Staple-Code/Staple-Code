@@ -56,7 +56,7 @@ class QueryTest extends TestCase
 		$this->assertInstanceOf('\Staple\Query\Insert',$insert);
 		$this->assertEquals("INSERT \nINTO customers (id) \nVALUES (1) ",(string)$insert);
 		$this->assertInstanceOf('\Staple\Query\Update',$update);
-		$this->assertEquals("UPDATE  customers\nSET  name='Larry'",(string)$update);
+		$this->assertEquals("UPDATE customers\nSET name='Larry'",(string)$update);
 		$this->assertInstanceOf('\Staple\Query\Delete',$delete);
 		$this->assertEquals("DELETE FROM customers",(string)$delete);
 	}
