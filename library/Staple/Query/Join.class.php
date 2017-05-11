@@ -345,7 +345,7 @@ class Join
 	}
 
 	/**
-	 * Create and Inner Join to the table.
+	 * Create an inner join to the table.
 	 * @param $table
 	 * @param $condition
 	 * @param null $alias
@@ -356,11 +356,17 @@ class Join
 	{
 		return new static(self::INNER, $table, $condition, NULL, NULL, NULL, $alias, $schema);
 	}
-	
+
+	/**
+	 * Create a left join to the table.
+	 * @param $table
+	 * @param $condition
+	 * @param null $alias
+	 * @param null $schema
+	 * @return static
+	 */
 	public static function left($table,$condition, $alias = NULL, $schema = NULL)
 	{
 		return new static(self::LEFT, $table, $condition, NULL, NULL, NULL, $alias, $schema);
 	}
 }
-
-?>
