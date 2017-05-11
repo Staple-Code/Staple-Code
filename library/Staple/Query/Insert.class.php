@@ -161,7 +161,16 @@ class Insert
 		}
 		
 		//Table
-		$stmt .= "\nINTO ".$this->table.' ';
+		$stmt .= "\nINTO ";
+		if(isset($this->schema))
+		{
+			$stmt .= $this->schema.'.';
+		}
+		elseif(!empty($this->connection->getSchema()))
+		{
+			$stmt .= $this->connection->getSchema().'.';
+		}
+		$stmt .= $this->table.' ';
 		
 		//Data
 		if($this->data instanceof DataSet)

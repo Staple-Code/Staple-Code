@@ -84,6 +84,12 @@ class Connection extends PDO implements IConnection
 	protected $db;
 
 	/**
+	 * The default schema to provide to Query objects.
+	 * @var string
+	 */
+	protected $schema;
+
+	/**
 	 * Array of connector options
 	 * @var array
 	 */
@@ -136,7 +142,7 @@ class Connection extends PDO implements IConnection
 	 * Convert old mysqli properties to PDO method calls.
 	 * @deprecated
 	 * @param $name
-	 * @return null|string
+	 * @return mixed
 	 */
 	public function __get($name)
 	{
@@ -243,6 +249,10 @@ class Connection extends PDO implements IConnection
 		//Set the DB Name property
 		if(isset($config['db']))
 			$inst->setDb($config['db']);
+
+		//Set the default schema
+		if(isset($config['schema']))
+			$inst->setSchema($config['schema']);
 
 		return $inst;
 	}
@@ -446,6 +456,24 @@ class Connection extends PDO implements IConnection
 	public function setDb($db)
 	{
 		$this->db = $db;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getSchema()
+	{
+		return $this->schema;
+	}
+
+	/**
+	 * @param string $schema
+	 * @return $this
+	 */
+	public function setSchema($schema)
+	{
+		$this->schema = (string)$schema;
 		return $this;
 	}
 

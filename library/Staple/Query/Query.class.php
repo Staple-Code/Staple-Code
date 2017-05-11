@@ -41,6 +41,11 @@ abstract class Query implements IQuery
 	 * @var mixed
 	 */
 	public $table;
+	/**
+	 * The schema that the table lives in. For SQL Server.
+	 * @var string
+	 */
+	protected $schema;
 	
 	/**
 	 * The Connection database object. A database object is required to properly escape input.
@@ -118,6 +123,32 @@ abstract class Query implements IQuery
 	public function getWhere()
 	{
 		return $this->where;
+	}
+
+	/**
+	 * Get the schema string
+	 * @return string
+	 */
+	public function getSchema()
+	{
+		return $this->schema;
+	}
+
+	/**
+	 * Set the schema string
+	 * @param string $schema
+	 * @return $this
+	 * @throws QueryException
+	 */
+	public function setSchema($schema)
+	{
+		//Check that we are not on MYSQL
+		if(isset($this->connection))
+			if($this->connection->getDriver() == Connection::DRIVER_MYSQL)
+				throw new QueryException('Schema cannot be specified on a MySQL Connection');
+
+		$this->schema = (string)$schema;
+		return $this;
 	}
 
 	/**

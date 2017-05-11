@@ -28,8 +28,6 @@ use Staple\Query\Query;
 use Staple\Query\Select;
 use Staple\Query\MockConnection;
 
-//require_once '../Mocks/MockConnection.php';
-
 class SelectTest extends TestCase
 {
 	const TABLE_NAME = 'customers';
@@ -69,10 +67,33 @@ class SelectTest extends TestCase
 			'zip'
 		];
 		$query = Query::select(self::TABLE_NAME,$columns,$conn)
+			->innerJoin('orders','orders.customer_id = '.self::TABLE_NAME.'.id');
+
+		//Assert
+		$expected = "SELECT\nfirst_name, last_name, address, city, state, zip \nFROM ".self::TABLE_NAME."\nINNER JOIN orders ON orders.customer_id = ".self::TABLE_NAME.".id";
+		$this->assertEquals($expected,(string)$query);
+	}
+
+	public function testQueryWithSchema()
+	{
+		//Setup
+		$conn = $this->getMockConnection();
+
+		//Act
+		$columns = [
+			'first_name',
+			'last_name',
+			'address',
+			'city',
+			'state',
+			'zip'
+		];
+		$query = Query::select(self::TABLE_NAME,$columns,$conn)
+			->setSchema('myschema')
 			->innerJoin('orders','orders.customer_id = customers.id');
 
 		//Assert
-		$expected = "SELECT\nfirst_name, last_name, address, city, state, zip \nFROM customers\nINNER JOIN orders ON orders.customer_id = customers.id";
+		$expected = "SELECT\nfirst_name, last_name, address, city, state, zip \nFROM myschema.".self::TABLE_NAME."\nINNER JOIN myschema.orders ON orders.customer_id = ".self::TABLE_NAME.".id";
 		$this->assertEquals($expected,(string)$query);
 	}
 }

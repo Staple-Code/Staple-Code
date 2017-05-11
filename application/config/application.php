@@ -65,6 +65,7 @@ return [
 		'username' 		=> '',
 		'password' 		=> '',
 		'db' 			=> 'staple',
+		//'schema'		=> '',		//For SQL Server you can specify a default schema here.
 		//options 		=> [],     //Specify any additional options here
 	],
 

@@ -549,6 +549,7 @@ class Select extends Query implements ISelectQuery
 	 */
 	public function addJoin(Join $join)
 	{
+		$join->setParentQuery($this);
 		$this->joins[] = $join;
 		return $this;
 	}
@@ -742,8 +743,20 @@ class Select extends Query implements ISelectQuery
 			}
 			$stmt .= $tables;
 		}
+		elseif($this->table instanceof Query)
+		{
+			$stmt .= (string)$this->table;
+		}
 		else
 		{
+			if(isset($this->schema))
+			{
+				$stmt .= $this->schema.'.';
+			}
+			elseif(!empty($this->connection->getSchema()))
+			{
+				$stmt .= $this->connection->getSchema().'.';
+			}
 			$stmt .= $this->table;
 		}
 		
