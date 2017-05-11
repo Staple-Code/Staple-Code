@@ -594,11 +594,12 @@ class Select extends Query implements ISelectQuery
 	 * @param string $table
 	 * @param string $condition
 	 * @param string|null $alias
+	 * @param string|null $schema
 	 * @return $this
 	 */
-	public function leftJoin($table, $condition, $alias = NULL)
+	public function leftJoin($table, $condition, $alias = NULL, $schema = NULL)
 	{
-		$this->addJoin(Join::left($table, $condition,$alias));
+		$this->addJoin(Join::left($table, $condition, $alias, $schema));
 		return $this;
 	}
 
@@ -607,11 +608,12 @@ class Select extends Query implements ISelectQuery
 	 * @param string $table
 	 * @param string $condition
 	 * @param string|null $alias
+	 * @param string|null $schema
 	 * @return $this
 	 */
-	public function innerJoin($table, $condition, $alias = NULL)
+	public function innerJoin($table, $condition, $alias = NULL, $schema = NULL)
 	{
-		$this->addJoin(Join::inner($table, $condition,$alias));
+		$this->addJoin(Join::inner($table, $condition, $alias, $schema));
 		return $this;
 	}
 
