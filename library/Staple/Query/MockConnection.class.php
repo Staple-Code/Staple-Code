@@ -47,8 +47,6 @@ class MockConnection extends Connection implements IConnection
 
 		try
 		{
-			parent::__construct($dsn, $username, $password, $options);
-
 			if(!isset($this->driver)) $this->setDriver(self::getDriverFromDsn($dsn));
 
 			if(isset($username))
@@ -58,6 +56,8 @@ class MockConnection extends Connection implements IConnection
 
 			//Set the options property
 			$this->setOptions($options);
+
+			parent::__construct($dsn, $username, $password, $options);
 		}
 		catch(\PDOException $e)
 		{
@@ -114,5 +114,17 @@ class MockConnection extends Connection implements IConnection
 	{
 		$this->results = $results;
 		return $this;
+	}
+
+	public function quote($string, $parameter_type = \PDO::PARAM_STR)
+	{
+		if(is_string($string) || is_float($string))
+		{
+			return "'".$string."'";
+		}
+		else
+		{
+			return $string;
+		}
 	}
 }

@@ -70,6 +70,15 @@ class Join
 	 * @var string
 	 */
 	protected $type;
+	/**
+	 * The schema string
+	 * @var string
+	 */
+	protected $schema;
+	/**
+	 * @var Select
+	 */
+	protected $parentQuery;
 	
 	/**
 	 * Default Constructor
@@ -79,8 +88,10 @@ class Join
 	 * @param string $leftTable
 	 * @param string $leftColumn
 	 * @param string $rightColumn
+	 * @param string $tableAlias
+	 * @param string $schema
 	 */
-	public function __construct($type = self::INNER, $table = NULL, $condition = NULL, $leftTable = NULL, $leftColumn = NULL, $rightColumn = NULL, $tableAlias = NULL)
+	public function __construct($type = self::INNER, $table = NULL, $condition = NULL, $leftTable = NULL, $leftColumn = NULL, $rightColumn = NULL, $tableAlias = NULL, $schema = NULL)
 	{
 		//Set the Join Type
 		$this->setType($type);
@@ -92,6 +103,7 @@ class Join
 		if(isset($leftColumn)) $this->setLeftColumn($leftColumn);
 		if(isset($rightColumn)) $this->setRightColumn($rightColumn);
 		if(isset($tableAlias)) $this->setTableAlias($tableAlias);
+		if(isset($schema)) $this->setSchema($schema);
 	}
 	
 	public function __toString()
@@ -225,15 +237,99 @@ class Join
 		return $this;
 	}
 
+	/**
+	 * Return the schema string
+	 * @return string
+	 */
+	public function getSchema()
+	{
+		return $this->schema;
+	}
+
+	/**
+	 * Set the schema string
+	 * @param string $schema
+	 * @return $this
+	 */
+	public function setSchema($schema)
+	{
+		$this->schema = (string)$schema;
+
+		return $this;
+	}
+
+	/**
+	 * Return the parent query object
+	 * @return Select
+	 */
+	public function getParentQuery()
+	{
+		return $this->parentQuery;
+	}
+
+	/**
+	 * Set the parent query object
+	 * @param Select $parentQuery
+	 * @return $this
+	 */
+	public function setParentQuery(Select $parentQuery)
+	{
+		$this->parentQuery = $parentQuery;
+
+		return $this;
+	}
+
+
+
 	public function build()
 	{
-		$join = $this->getType().' '.$this->table;
+		//The parent query
+		$parent = $this->getParentQuery();
+
+		//Type
+		$join = $this->getType().' ';
+
+		//Table
+		if(isset($this->schema))
+		{
+			$join .= $this->schema.'.';
+		}
+		else
+		{
+			if($parent instanceof Select)
+			{
+				if(!empty($parent->getSchema()))
+				{
+					$join .= $parent->getSchema().'.';
+				}
+				elseif($parent->getConnection() instanceof Connection)
+				{
+					if(!empty($parent->getConnection()->getSchema()))
+						$join .= $parent->getConnection()->getSchema() . '.';
+				}
+			}
+		}
+		$join .= $this->table;
 
 		//Add a table alias
-		//@todo refactor this to support other DB Types
 		if(isset($this->tableAlias))
 		{
-			$join .= ' `'.$this->tableAlias.'`';
+			$driver = NULL;
+			if($this->getParentQuery() instanceof Select)
+				if($this->getParentQuery()->getConnection() instanceof Connection)
+					$driver = $this->getParentQuery()->getConnection()->getDriver();
+			switch($driver)
+			{
+				case Connection::DRIVER_MYSQL:
+					$join .= ' `'.$this->tableAlias.'`';
+					break;
+				case Connection::DRIVER_SQLSRV:
+					$join .= ' ['.$this->tableAlias.']';
+					break;
+				default:
+					$join .= ' '.$this->tableAlias;
+					break;
+			}
 		}
 
 		//Setup the Join Condition
@@ -247,16 +343,30 @@ class Join
 		}
 		return $join;
 	}
-	
-	public static function inner($table, $condition, $alias = NULL)
+
+	/**
+	 * Create an inner join to the table.
+	 * @param $table
+	 * @param $condition
+	 * @param null $alias
+	 * @param null $schema
+	 * @return static
+	 */
+	public static function inner($table, $condition, $alias = NULL, $schema = NULL)
 	{
-		return new static(self::INNER,$table,$condition,NULL,NULL,NULL,$alias);
+		return new static(self::INNER, $table, $condition, NULL, NULL, NULL, $alias, $schema);
 	}
-	
-	public static function left($table,$condition, $alias = NULL)
+
+	/**
+	 * Create a left join to the table.
+	 * @param $table
+	 * @param $condition
+	 * @param null $alias
+	 * @param null $schema
+	 * @return static
+	 */
+	public static function left($table,$condition, $alias = NULL, $schema = NULL)
 	{
-		return new static(self::LEFT,$table,$condition,NULL,NULL,NULL,$alias);
+		return new static(self::LEFT, $table, $condition, NULL, NULL, NULL, $alias, $schema);
 	}
 }
-
-?>

@@ -27,10 +27,15 @@ use \SplSubject;
 
 interface IConnection extends SplSubject
 {
+	public static function get();
 	public function getDriver();
 	public function getLastQuery();
 	public function setLastQuery($lastQuery);
 	public function exec($statement);
 	public function query($statement);
 	public function getDriverOptions();
+	public function errorInfo();
+	public function errorCode();
+	public function getSchema();
+	public function setSchema($schema);
 }

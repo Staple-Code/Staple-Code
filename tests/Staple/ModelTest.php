@@ -28,6 +28,7 @@ use SplObserver;
 use Staple\Exception\ModelNotFoundException;
 use Staple\Model;
 use Staple\Query\Condition;
+use Staple\Query\Connection;
 use Staple\Query\IConnection;
 use Staple\Query\MockStatement;
 use Staple\Query\Select;
@@ -47,7 +48,7 @@ class clientModel extends Model
 	protected $_table = 'customers';
 }
 
-class MockTestConnection implements IConnection
+class MockTestConnection extends Connection implements IConnection
 {
 	private $data = [
 		[
@@ -62,7 +63,10 @@ class MockTestConnection implements IConnection
 		],
 	];
 
-	protected $driver;
+	public function __construct()
+	{
+
+	}
 
 	public function exec($statement)
 	{
@@ -200,7 +204,7 @@ class ModelTest extends TestCase
 	 */
 	protected function getMockConnection()
 	{
-		return new mockTestConnection();
+		return new MockTestConnection();
 	}
 
 	protected function getTestUserModelObject()

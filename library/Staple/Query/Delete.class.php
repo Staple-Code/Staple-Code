@@ -123,7 +123,18 @@ class Delete extends Query
 		}
 		
 		//FROM CLAUSE
-		$stmt .= "FROM ".$this->table;
+		$stmt .= "FROM ";
+
+		//Table
+		if(isset($this->schema))
+		{
+			$stmt .= $this->schema.'.';
+		}
+		elseif(!empty($this->connection->getSchema()))
+		{
+			$stmt .= $this->connection->getSchema().'.';
+		}
+		$stmt .= $this->table;
 		
 		//JOINS
 		if(count($this->joins) > 0)
