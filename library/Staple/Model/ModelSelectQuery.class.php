@@ -97,36 +97,64 @@ class ModelSelectQuery extends ModelQuery implements ISelectQuery
 		return $this;
 	}
 
+	/**
+	 * @param $column
+	 * @param $value
+	 * @return $this
+	 */
 	public function whereNotLike($column, $value)
 	{
 		$this->queryObject->whereNotLike($column, $value);
 		return $this;
 	}
 
+	/**
+	 * @param $column
+	 * @return $this
+	 */
 	public function whereNull($column)
 	{
 		$this->queryObject->whereNull($column);
 		return $this;
 	}
 
+	/**
+	 * @param $column
+	 * @param $values
+	 * @return $this
+	 */
 	public function whereIn($column, $values)
 	{
 		$this->queryObject->whereIn($column, $values);
 		return $this;
 	}
 
+	/**
+	 * @param $column
+	 * @param $start
+	 * @param $end
+	 * @return $this
+	 */
 	public function whereBetween($column, $start, $end)
 	{
 		$this->queryObject->whereBetween($column, $start, $end);
 		return $this;
 	}
 
+	/**
+	 * @param mixed $limit
+	 * @param int $offset
+	 * @return $this
+	 */
 	public function limit($limit, $offset = NULL)
 	{
 		$this->queryObject->limit($limit, $offset);
 		return $this;
 	}
 
+	/**
+	 * @return mixed
+	 */
 	public function getColumns()
 	{
 		return $this->queryObject->getColumns();
@@ -138,6 +166,10 @@ class ModelSelectQuery extends ModelQuery implements ISelectQuery
 		return $this;
 	}
 
+	/**
+	 * @param array $columns
+	 * @return $this
+	 */
 	public function columns(array $columns)
 	{
 		$this->queryObject->columns($columns);
@@ -150,18 +182,29 @@ class ModelSelectQuery extends ModelQuery implements ISelectQuery
 		return $this;
 	}
 
+	/**
+	 * @param $order
+	 * @return $this
+	 */
 	public function orderBy($order)
 	{
 		$this->queryObject->orderBy($order);
 		return $this;
 	}
 
+	/**
+	 * @param $group
+	 * @return $this
+	 */
 	public function groupBy($group)
 	{
 		$this->queryObject->groupBy($group);
 		return $this;
 	}
 
+	/**
+	 * @return $this
+	 */
 	public function clearHaving()
 	{
 		$this->queryObject->clearHaving();
