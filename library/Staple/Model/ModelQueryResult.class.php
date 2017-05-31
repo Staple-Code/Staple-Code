@@ -29,7 +29,7 @@ use Staple\Model;
 use Staple\Query\Connection;
 use Staple\Query\IConnection;
 
-class ModelQueryResult implements \Iterator, \ArrayAccess
+class ModelQueryResult implements \Iterator, \ArrayAccess, \JsonSerializable
 {
 	/**
 	 * @var int
@@ -84,6 +84,16 @@ class ModelQueryResult implements \Iterator, \ArrayAccess
 	}
 
 	/**
+	 * Return the query results to be json encoded.
+	 * @return array
+	 */
+	function jsonSerialize()
+	{
+		return $this->results;
+	}
+
+
+	/**
 	 * Return the count of the results of the query.
 	 * @return int
 	 */
@@ -129,6 +139,15 @@ class ModelQueryResult implements \Iterator, \ArrayAccess
 	 * @return Model[]
 	 */
 	public function toArray()
+	{
+		return $this->getResults();
+	}
+
+	/**
+	 * Alias of getResults() method.
+	 * @return array|Model[]
+	 */
+	public function all()
 	{
 		return $this->getResults();
 	}
