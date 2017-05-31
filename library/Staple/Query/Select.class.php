@@ -726,6 +726,14 @@ class Select extends Query implements ISelectQuery
 				}
 				else 
 				{
+					if(isset($this->schema))
+					{
+						$stmt .= $this->schema.'.';
+					}
+					elseif(!empty($this->connection->getSchema()))
+					{
+						$stmt .= $this->connection->getSchema().'.';
+					}
 					$tables .= $tbl;
 				}
 
