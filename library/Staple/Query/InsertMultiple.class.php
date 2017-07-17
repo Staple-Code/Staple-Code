@@ -33,11 +33,6 @@ class InsertMultiple extends Insert
 	 * @var array[Staple_Query_DataSet]
 	 */
 	protected $data = array();
-	/**
-	 * The columns to insert the data into
-	 * @var array[string]
-	 */
-	protected $columns = array();
 	
 	/**
 	 * Query to insert multiple rows
@@ -100,9 +95,18 @@ class InsertMultiple extends Insert
 		{
 			$stmt .= 'IGNORE ';
 		}
-		
-		//DB Table
-		$stmt .= "\nINTO ".$this->table.' ';
+
+		//Table
+		$stmt .= "\nINTO ";
+		if(isset($this->schema))
+		{
+			$stmt .= $this->schema.'.';
+		}
+		elseif(!empty($this->connection->getSchema()))
+		{
+			$stmt .= $this->connection->getSchema().'.';
+		}
+		$stmt .= $this->table.' ';
 		
 		//Columns
 		$stmt .= '('.implode(',', $this->columns).') ';
