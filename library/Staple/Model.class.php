@@ -635,7 +635,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	 * @return array
 	 * @throws ModelNotFoundException
 	 */
-	public static function findWhereStatement($statement, $limit = NULL, IConnection $connection = NULL)
+	public static function findWhereStatement($statement, $order=NULL, $limit = NULL, IConnection $connection = NULL)
 	{
 		//Make a model instance
 		$model = static::make();
@@ -648,6 +648,9 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 
 		//Set WhereStatement
 		$query->whereStatement($statement);
+
+		//Set order
+		if(isset($order)) $query->orderBy($order);
 
 		//Set limit
 		if(isset($limit)) $query->limit($limit);
