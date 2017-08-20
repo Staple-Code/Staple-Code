@@ -234,6 +234,9 @@ class Alias
 		'SessionFileHandler'			=>	'\\Staple\\Session\\FileHandler',
 		'SessionDatabaseHandler'		=>	'\\Staple\\Session\\DatabaseHandler',
 		'SessionRedisHandler'			=>	'\\Staple\\Session\\RedisHandler',
+
+		//Controller Classes
+		'RestfulController'				=>	'\\Staple\\Controller\RestfulController',
 	);
 	
 	/**
