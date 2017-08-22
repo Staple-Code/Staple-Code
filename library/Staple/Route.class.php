@@ -61,8 +61,8 @@ class Route
 	
 	public function __construct($link = NULL)
 	{
-		if(isset($link))
-		{
+		//if(isset($link))
+		//{
 			if(is_array($link))
 			{
 				$this->processArrayRoute($link);
@@ -71,7 +71,7 @@ class Route
 			{
 				$this->processStringRoute($link);
 			}
-		}
+		//}
 	}
 	
 	/**
@@ -453,10 +453,9 @@ class Route
 	protected function processArrayRoute(array $route)
 	{
 		//Set the Controller
-		if(array_key_exists(0, $route))
+		if(count($route) >= 1)
 		{
-			$controller = $route[0];
-			unset($route[0]);
+			$controller = array_shift($route);
 			//Check route info and convert to method case
 			if(ctype_alnum(str_replace('-', '', $controller)) && ctype_alpha(substr($controller, 0, 1)))
 			{
@@ -474,13 +473,17 @@ class Route
 		}
 		
 		//Set the Action
-		if(array_key_exists(1, $route))
+		if(count($route) >= 1)
 		{
-			$action = $route[1];
-			unset($route[1]);
+			$action = array_shift($route);
 			if(ctype_alnum(str_replace('-', '', $action)) && ctype_alpha(substr($action, 0, 1)))
 			{
 				$this->setAction(Link::methodCase($action));
+			}
+			elseif(ctype_digit($action))
+			{
+				$this->setAction(self::DEFAULT_ACTION);
+				array_unshift($route, $action);
 			}
 			else
 			{
