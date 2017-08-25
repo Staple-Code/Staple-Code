@@ -22,7 +22,7 @@ $validate->check('1.87');               //false
 
 ### Constructor Arguments
 
-In addition to the values for minimum and maximu the constructor for the `BetweenFloatValidator` 
+In addition to the values for minimum and maximum the constructor for the `BetweenFloatValidator` 
 object also accepts an argument to set the error message that you would like returned 
 from the object.
 
