@@ -33,6 +33,8 @@ use Staple\Exception\RoutingException;
 use Staple\Json;
 use Staple\Link;
 use Staple\Main;
+use Staple\Request;
+use Staple\Response;
 use Staple\Route;
 use Staple\View;
 
@@ -70,6 +72,16 @@ abstract class RestfulController
 	 * This method is called by the front controller.
 	 */
 	public function _start() {}
+
+	/**
+	 * Overridable and empty method allows for additional actions to happen before each routed action.
+	 */
+	protected function before() {}
+
+	/**
+	 * Overridable and empty method allows for additional actions to happen after each routed action.
+	 */
+	protected function after() {}
 	
 	/*----------------------------------------Auth Functions----------------------------------------*/
 	
@@ -329,7 +341,9 @@ abstract class RestfulController
 					if($this->_auth($method) === true)
 					{
 						//Everything went well, dispatch the controller.
+						$this->before();
 						$this->_dispatch($method, $params);
+						$this->after();
 					}
 					else
 					{
@@ -340,7 +354,9 @@ abstract class RestfulController
 				else
 				{
 					//No authentication needed, dispatch the controller
+					$this->before();
 					$this->_dispatch($method, $params);
+					$this->after();
 				}
 
 				//Return true so that we don't hit the exception.
@@ -426,5 +442,58 @@ abstract class RestfulController
 		{
 			return;
 		}
+	}
+
+	/*-----------------------------------HELPERS-----------------------------------*/
+
+	protected function forceSecure()
+	{
+		if(!Request::isSecure())
+		{
+			echo Json::error(
+				'Request must be secure.',
+				400,
+				'HTTPS is required for this request.'
+			);
+			exit();
+		}
+	}
+
+	protected function addHeader($header, $value, $replace = true)
+	{
+		header($header.': '.$value, $replace);
+	}
+
+	protected function addAccessControlMethods(array $methods)
+	{
+		if(count($methods) == 0)
+		{
+			$methods = [
+				Request::METHOD_GET,
+				Request::METHOD_POST,
+				Request::METHOD_PUT,
+				Request::METHOD_PATCH,
+				Request::METHOD_DELETE,
+				Request::METHOD_OPTIONS
+			];
+		}
+		header(Response::HEADER_ACCESS_CONTROL_ALLOW_METHODS.': '.implode(',', $methods));
+	}
+
+	protected function addAccessControlOrigin($origin = '*')
+	{
+		header(Response::HEADER_ACCESS_CONTROL_ALLOW_ORIGIN.': '.$origin);
+	}
+
+	protected function addAccessControlAllowedHeaders(array $headers)
+	{
+		header(Response::HEADER_ACCESS_CONTROL_ALLOW_HEADERS.': '.implode(',',$headers));
+	}
+
+	protected function addCorsHeaders($origin = '*', array $methods = [], array $headers = [])
+	{
+		$this->addAccessControlOrigin($origin);
+		$this->addAccessControlMethods($methods);
+		$this->addAccessControlAllowedHeaders($headers);
 	}
 }

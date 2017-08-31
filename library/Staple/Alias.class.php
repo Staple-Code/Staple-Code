@@ -51,6 +51,7 @@ class Alias
 		'Pager'							=>	'\\Staple\\Pager',
 		'Registry'						=>	'\\Staple\\Registry',
 		'Request'						=>	'\\Staple\\Request',
+		'Response'						=>	'\\Staple\\Response',
 		'Route'							=>	'\\Staple\\Route',
 		'Script'						=>	'\\Staple\\Script',
 		'Utility'						=>	'\\Staple\\Utility',
