@@ -47,6 +47,10 @@ abstract class RestfulController
 	protected $openMethods = array();
 	protected $accessLevels = array();
 	protected $open = false;
+
+	private $_headerCorsAllowedMethodsSent = false;
+	private $_headerCorsAllowedOriginSent = false;
+	private $_headerCorsAllowHeadersSent = false;
 	
 	/**
 	 * 
@@ -362,6 +366,19 @@ abstract class RestfulController
 				//Return true so that we don't hit the exception.
 				return true;
 			}
+			elseif(Request::METHOD_OPTIONS == strtolower($requestMethod))
+			{
+				// If a POST method exists with the same name as the OPTIONS request then we are
+				// probably in a Pre-flight scenario
+				if(method_exists($this, strtolower(Request::METHOD_POST).$action))
+				{
+					//If we have already sent the allowed origins header then we can return true.
+					if($this->_headerCorsAllowedOriginSent === true)
+						return true;
+					else
+						throw new RoutingException('Matching method for POST request found. Did you forget CORS headers or an options endpoint?');
+				}
+			}
 		}
 
 		//If a valid page cannot be found, throw page not found exception
@@ -478,16 +495,19 @@ abstract class RestfulController
 			];
 		}
 		header(Response::HEADER_ACCESS_CONTROL_ALLOW_METHODS.': '.implode(',', $methods));
+		$this->_headerCorsAllowedMethodsSent = true;
 	}
 
 	protected function addAccessControlOrigin($origin = '*')
 	{
 		header(Response::HEADER_ACCESS_CONTROL_ALLOW_ORIGIN.': '.$origin);
+		$this->_headerCorsAllowedOriginSent = true;
 	}
 
 	protected function addAccessControlAllowedHeaders(array $headers)
 	{
 		header(Response::HEADER_ACCESS_CONTROL_ALLOW_HEADERS.': '.implode(',',$headers));
+		$this->_headerCorsAllowHeadersSent = true;
 	}
 
 	protected function addCorsHeaders($origin = '*', array $methods = [], array $headers = [])

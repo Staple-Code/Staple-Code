@@ -181,4 +181,23 @@ class Request
 		header('Location: '.$to);
 		exit(0);
 	}
+
+	/**
+	 * Grab the contents of the POST body.
+	 * @return bool|string
+	 */
+	public static function BodyContent()
+	{
+		return file_get_contents('php://input');
+	}
+
+	/**
+	 * Grab the content of the request and JSON decode it to a PHP object or array.
+	 * @return \stdClass|array|null
+	 */
+	public static function JsonContent()
+	{
+		$post = self::BodyContent();
+		return ($post === false) ? null : json_decode($post);
+	}
 }
