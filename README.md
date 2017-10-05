@@ -11,7 +11,7 @@ to start serving a website.
 
 You will need a few things for the server to be able to process your site:
 
- - PHP 5.5 or higher.
+ - PHP 7.0 or higher.
  - A URL rewrite module.
 
 Both IIS (web.config) and Apache (.htaccess) rewrite rules are included in the repository. For nginx, you will
