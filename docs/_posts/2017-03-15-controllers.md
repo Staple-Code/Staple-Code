@@ -7,7 +7,7 @@ categories: Components
 
 Controllers in STAPLE live in the /application/controllers folder. Controller
 classes should extend the `Controller` base object and the name should end
-in `Controller` for the autoloading to find the classes.
+in `Controller` for the autoloader to find the classes.
 
 ## Controller Startup `_start()`
 
@@ -79,7 +79,7 @@ The return of a controller action will determine what the front controller
 returns in its response. If the return of a controller-action is a `View`
 object, then the view will be rendered and returned to the user. If the
 result is a string, the string will be output and returned. Returned objects
-will be attemtped to be converted to JSON and returned, otherwise they
+will be attempted to be converted to JSON and returned, otherwise they
 will be output as a text `var_dump` of the object.
 
 ### Return a View
