@@ -543,7 +543,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	 * @return array
 	 * @throws ModelNotFoundException
 	 */
-	public static function findWhereNull($column, $order=NULL, $limit = NULL, IConnection $connection = NULL)
+	public static function findWhereNull($column, $order = NULL, $limit = NULL, IConnection $connection = NULL)
 	{
 		//Make a model instance
 		$model = static::make();
@@ -559,7 +559,6 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 
 		//Set limit
 		if(isset($limit)) $query->limit($limit);
-
 
 		//Execute the query
 		$result = $query->execute();
@@ -589,7 +588,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	 * @return array
 	 * @throws ModelNotFoundException
 	 */
-	public static function findWhereIn($column, array $values, $order=NULL, $limit = NULL, IConnection $connection = NULL)
+	public static function findWhereIn($column, array $values, $order = NULL, $limit = NULL, IConnection $connection = NULL)
 	{
 		//Make a model instance
 		$model = static::make();
@@ -635,7 +634,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	 * @return array
 	 * @throws ModelNotFoundException
 	 */
-	public static function findWhereStatement($statement, $order=NULL, $limit = NULL, IConnection $connection = NULL)
+	public static function findWhereStatement($statement, $order = NULL, $limit = NULL, IConnection $connection = NULL)
 	{
 		//Make a model instance
 		$model = static::make();

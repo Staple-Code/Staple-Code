@@ -25,6 +25,7 @@ namespace Staple;
 
 use \ReflectionMethod;
 use \ReflectionClass;
+use Staple\Controller\RestfulController;
 use Staple\Exception\PageNotFoundException;
 use Staple\Exception\RoutingException;
 
@@ -33,7 +34,10 @@ class Route
 	const ROUTE_MVC = 1;
 	const ROUTE_SCRIPT = 2;
 	const CONTROLLER_SUFFIX = "Controller";
-	
+	const PROVIDER_SUFFIX = "Provider";
+	const DEFAULT_ACTION = 'index';
+	const DEFAULT_CONTROLLER = 'index';
+
 	/**
 	 * The name of the controller being executed.
 	 * @var string
@@ -57,8 +61,8 @@ class Route
 	
 	public function __construct($link = NULL)
 	{
-		if(isset($link))
-		{
+		//if(isset($link))
+		//{
 			if(is_array($link))
 			{
 				$this->processArrayRoute($link);
@@ -67,7 +71,7 @@ class Route
 			{
 				$this->processStringRoute($link);
 			}
-		}
+		//}
 	}
 	
 	/**
@@ -126,55 +130,79 @@ class Route
 		//The class name for the controller
 		$dispatchClass = $class.self::CONTROLLER_SUFFIX;
 
-		//Check for the controller existence
-		if(class_exists($dispatchClass))
+		try
 		{
-			//Check for the action existence
-			if(method_exists($dispatchClass, $method))
+			//Check for the controller existence
+			if(class_exists($dispatchClass))
 			{
-				//If the controller has not been created yet, create an instance and store it in the front controller
-				if(($controller = Main::controller($class)) == NULL)
+				if(get_parent_class($dispatchClass) == RestfulController::class)
 				{
-					/**
-					 * @var Controller $controller
-					 */
-					$controller = new $dispatchClass();
-					$controller->_start();
-					
-					//Store the controller object
-					Main::controller($controller);
+					$this->routeToProvider($dispatchClass);
 				}
 				else
 				{
-					//If the controller already exists in the session just execute the start method again.
-					$controller->_start();
-				}
-				
-				//Verify that an instance of the controller class exists and is of the right type
-				if($controller instanceof Controller)
-				{
-					//Check if global Auth is enabled.
-					if(Config::getValue('auth', 'enabled') != 0)
+					//Check for the action existence
+					if(method_exists($dispatchClass, $method))
 					{
-						//Check the sub-controller for access to the method
-						if($controller->_auth($method) === true)
+						//If the controller has not been created yet, create an instance and store it in the front controller
+						if(($controller = Main::controller($class)) == NULL)
 						{
-							//Everything went well, dispatch the controller.
-							$this->dispatchController();
+							/**
+							 * @var Controller $controller
+							 */
+							$controller = new $dispatchClass();
+							$controller->_start();
+
+							//Store the controller object
+							Main::controller($controller);
 						}
 						else
 						{
-							//No Authentication, send us to the login screen.
-							Auth::get()->noAuth($this);
+							//If the controller already exists in the session just execute the start method again.
+							$controller->_start();
+						}
+
+						//Verify that an instance of the controller class exists and is of the right type
+						if($controller instanceof Controller)
+						{
+							//Check if global Auth is enabled.
+							if(Config::getValue('auth', 'enabled') != 0)
+							{
+								//Check the sub-controller for access to the method
+								if($controller->_auth($method) === true)
+								{
+									//Everything went well, dispatch the controller.
+									$this->dispatchController();
+								}
+								else
+								{
+									//No Authentication, send us to the login screen.
+									Auth::get()->noAuth($this);
+								}
+							}
+							else
+							{
+								//No authentication needed, dispatch the controller
+								$this->dispatchController();
+							}
+
+							//Return true so that we don't hit the exception.
+							return true;
 						}
 					}
-					else
-					{
-						//No authentication needed, dispatch the controller
-						$this->dispatchController();
-					}
-					
-					//Return true so that we don't hit the exception.
+				}
+			}
+		}
+		catch(PageNotFoundException $e)
+		{
+			//The class name for the controller
+			$dispatchProvider = $class.self::PROVIDER_SUFFIX;
+
+			if(class_exists($dispatchProvider))
+			{
+				if(get_parent_class($dispatchProvider) == RestfulController::class)
+				{
+					$this->routeToProvider($dispatchProvider);
 					return true;
 				}
 			}
@@ -233,7 +261,7 @@ class Route
 					$return->build();
 				}
 			}
-			elseif ($return instanceof Json)	//Check for a Json object to be coverted and echoed.
+			elseif ($return instanceof Json)	//Check for a Json object to be converted and echoed.
 			{
 				echo json_encode($return);
 			}
@@ -305,6 +333,26 @@ class Route
 		else
 		{
 			throw new RoutingException('Tried to dispatch to an invalid controller.', Error::APPLICATION_ERROR);
+		}
+	}
+
+	/**
+	 * Push the route to a Restful Controller
+	 * @param $providerClass
+	 * @throws RoutingException
+	 */
+	private function routeToProvider($providerClass)
+	{
+		$providerObject = new $providerClass();
+		if($providerObject instanceof RestfulController)
+		{
+			$route = array_merge([$this->getAction()], $this->getParams());
+			$providerObject->_route($route);
+		}
+		else
+		{
+			unset($providerObject);
+			throw new RoutingException('Invalid Routing Object');
 		}
 	}
 	
@@ -405,10 +453,9 @@ class Route
 	protected function processArrayRoute(array $route)
 	{
 		//Set the Controller
-		if(array_key_exists(0, $route))
+		if(count($route) >= 1)
 		{
-			$controller = $route[0];
-			unset($route[0]);
+			$controller = array_shift($route);
 			//Check route info and convert to method case
 			if(ctype_alnum(str_replace('-', '', $controller)) && ctype_alpha(substr($controller, 0, 1)))
 			{
@@ -422,17 +469,21 @@ class Route
 		}
 		else
 		{
-			$this->setController('index');
+			$this->setController(self::DEFAULT_CONTROLLER);
 		}
 		
 		//Set the Action
-		if(array_key_exists(1, $route))
+		if(count($route) >= 1)
 		{
-			$action = $route[1];
-			unset($route[1]);
+			$action = array_shift($route);
 			if(ctype_alnum(str_replace('-', '', $action)) && ctype_alpha(substr($action, 0, 1)))
 			{
 				$this->setAction(Link::methodCase($action));
+			}
+			elseif(ctype_digit($action))
+			{
+				$this->setAction(self::DEFAULT_ACTION);
+				array_unshift($route, $action);
 			}
 			else
 			{
@@ -442,7 +493,7 @@ class Route
 		}
 		else
 		{
-			$this->setAction('index');
+			$this->setAction(self::DEFAULT_ACTION);
 		}
 		
 		//Set Parameters
@@ -485,12 +536,12 @@ class Route
 		if($routeCount == 0 || strlen($route) == 0)
 		{
 			$splitRoute = array();
-			array_push($splitRoute, 'index');
-			array_push($splitRoute, 'index');
+			array_push($splitRoute, self::DEFAULT_CONTROLLER);
+			array_push($splitRoute, self::DEFAULT_ACTION);
 		}
 		elseif($routeCount == 1)
 		{
-			array_push($splitRoute, 'index');
+			array_push($splitRoute, self::DEFAULT_ACTION);
 		}
 		elseif($routeCount >= 2)
 		{
@@ -498,7 +549,7 @@ class Route
 			if(is_numeric($splitRoute[1]))
 			{
 				$shift = array_shift($splitRoute);
-				array_unshift($splitRoute, $shift, 'index');
+				array_unshift($splitRoute, $shift, self::DEFAULT_ACTION);
 			}
 		}
 		
@@ -531,5 +582,3 @@ class Route
 			->setType(self::ROUTE_MVC);
 	}
 }
-
-?>
