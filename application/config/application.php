@@ -26,7 +26,7 @@ return [
 
 		//File Session Handler
 		'handler' 			=> 'Staple\Session\FileHandler',
-		//file_location => ''
+		'file_location' 	=> __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'tmp',
 
 		//Redis Session Handler
 		//'handler' 			=> 'Staple\Session\RedisHandler',
