@@ -314,7 +314,7 @@ class Autoload
 			{
 				require_once $include;
 			}
-			elseif($this->throwOnFailure === true)
+			else
 			{
 				throw new PageNotFoundException('Page Not Found',Error::PAGE_NOT_FOUND);
 			}

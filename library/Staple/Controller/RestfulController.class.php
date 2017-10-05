@@ -22,8 +22,8 @@
  */
 namespace Staple\Controller;
 
-use \Exception;
-use Staple\Auth;
+use Exception;
+use Staple\Auth\Auth;
 use Staple\Config;
 use Staple\Dev;
 use Staple\Error;
@@ -327,7 +327,7 @@ abstract class RestfulController
 		//Set Parameters
 		$params = $route;
 
-		$requestMethod = $_SERVER['REQUEST_METHOD'];
+		$requestMethod = Request::get()->getMethod();
 		if(ctype_alpha($requestMethod))
 		{
 			$method = strtolower($requestMethod) . $action;
@@ -366,7 +366,7 @@ abstract class RestfulController
 				//Return true so that we don't hit the exception.
 				return true;
 			}
-			elseif(Request::METHOD_OPTIONS == strtolower($requestMethod))
+			elseif(Request::METHOD_OPTIONS == strtoupper($requestMethod))
 			{
 				// If a POST method exists with the same name as the OPTIONS request then we are
 				// probably in a Pre-flight scenario

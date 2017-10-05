@@ -21,14 +21,23 @@
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-namespace Staple;
+namespace Staple\Auth;
 
-use \Exception;
-use \ReflectionMethod;
-use \ReflectionClass;
-use Staple\Exception\PageNotFoundException;
+use Exception;
+use ReflectionClass;
+use ReflectionMethod;
+use Staple\AuthController;
+use Staple\Config;
+use Staple\Dev;
+use Staple\Error;
 use Staple\Exception\AuthException;
+use Staple\Exception\PageNotFoundException;
+use Staple\Json;
+use Staple\Layout;
+use Staple\Main;
+use Staple\Route;
 use Staple\Session\Session;
+use Staple\View;
 
 class Auth
 {
@@ -243,7 +252,7 @@ class Auth
 	 * which will allow the developer to react to the route that was requested.
 	 * @param Route $attemptedRoute
 	 */
-	public function noAuth($attemptedRoute = NULL)
+	public function noAuth(Route $attemptedRoute = NULL)
 	{
 		$this->dispatchAuthController($attemptedRoute);
 	}

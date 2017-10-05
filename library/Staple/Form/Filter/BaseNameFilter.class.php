@@ -22,7 +22,7 @@
  */
 namespace Staple\Form\Filter;
 
-use \Staple\Form\FieldFilter;
+use Staple\Form\FieldFilter;
 
 class BaseNameFilter extends FieldFilter
 {
@@ -43,5 +43,3 @@ class BaseNameFilter extends FieldFilter
 	}
 
 }
-
-?>

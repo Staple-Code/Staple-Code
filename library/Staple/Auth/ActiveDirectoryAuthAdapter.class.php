@@ -28,10 +28,13 @@
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-namespace Staple;
+namespace Staple\Auth;
 
-use \Exception;
-use \Staple\ActiveDirectory as AD;
+use Exception;
+use Staple\ActiveDirectory as AD;
+use Staple\Config;
+use Staple\DB;
+use Staple\Error;
 
 class ActiveDirectoryAuthAdapter implements AuthAdapter
 {

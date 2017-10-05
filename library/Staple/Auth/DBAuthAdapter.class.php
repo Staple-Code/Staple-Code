@@ -30,9 +30,12 @@
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-namespace Staple;
+namespace Staple\Auth;
 
-use \Exception;
+use Exception;
+use Staple\Config;
+use Staple\DB;
+use Staple\Error;
 
 class DBAuthAdapter implements AuthAdapter
 {
