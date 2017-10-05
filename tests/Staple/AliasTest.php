@@ -47,6 +47,23 @@ class AliasTest extends TestCase
 		$this->assertNotEquals($this->alias->checkAlias('Controller'),'\\Staple\\Alias');
 	}
 
+	public function testAllAliasLoad()
+	{
+		$map = Alias::getClassMap();
+
+		foreach($map as $key=>$value)
+		{
+			if(class_exists($key))
+				$this->assertTrue(true);
+			elseif(interface_exists($key))
+				$this->assertTrue(true);
+			elseif(trait_exists($key))
+				$this->assertTrue(true);
+			else
+				$this->assertTrue(false);
+		}
+	}
+
 	public function testAddAlias()
 	{
 		//Add an alias

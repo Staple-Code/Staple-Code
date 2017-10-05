@@ -23,8 +23,9 @@
  */
 namespace Staple;
 
-use \ReflectionMethod;
-use \ReflectionClass;
+use ReflectionClass;
+use ReflectionMethod;
+use Staple\Auth\Auth;
 use Staple\Controller\RestfulController;
 use Staple\Exception\PageNotFoundException;
 use Staple\Exception\RoutingException;
@@ -189,6 +190,10 @@ class Route
 							//Return true so that we don't hit the exception.
 							return true;
 						}
+					}
+					else
+					{
+						throw new PageNotFoundException('Page Not Found',Error::PAGE_NOT_FOUND);
 					}
 				}
 			}

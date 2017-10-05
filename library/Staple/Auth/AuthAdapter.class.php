@@ -24,7 +24,7 @@
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-namespace Staple;
+namespace Staple\Auth;
 
 interface AuthAdapter
 {
