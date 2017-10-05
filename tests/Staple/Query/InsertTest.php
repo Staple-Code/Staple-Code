@@ -30,8 +30,10 @@ use Staple\Query\MockConnection;
 
 class InsertTest extends TestCase
 {
-	const INSERT_IGNORE_STATEMENT = "INSERT HIGH_PRIORITY IGNORE \nINTO table (id,name,summary,rank,cat,created) \nVALUES (1,'Test','This is a test and only a test.','3.14',2,'2010-01-01 00:00:00') ";
-	const INSERT_SELECT_STATEMENT = "INSERT \nINTO categories \nSELECT\nname, summary, rank, category_id AS cat, created \nFROM article_categories\nWHERE id = articles.cat";
+	const INSERT_IGNORE_STATEMENT = "INSERT HIGH_PRIORITY IGNORE \nINTO schemestaple.categories (id,name,summary,rank,cat,created) \nVALUES (1,'Test','This is a test and only a test.','3.14',2,'2010-01-01 00:00:00') ";
+	const INSERT_SELECT_STATEMENT = "INSERT \nINTO schemestaple.categories \nSELECT\nname, summary, rank, category_id AS cat, created \nFROM schemestaple.article_categories\nWHERE id = articles.cat";
+	const INSERT_SELECT_COLUMNS_STATEMENT = "INSERT \nINTO schemestaple.categories (name,summary,rank,cat,created) \nSELECT\nname, summary, rank, category_id AS cat, created \nFROM schemestaple.article_categories\nWHERE id = articles.cat";
+	const INSERT_SCHEMA_STATEMENT = "INSERT \nINTO myschema.categories \nSELECT\nname, summary, rank, category_id AS cat, created \nFROM myschema.article_categories\nWHERE id = articles.cat";
 
 	private function getMockConnection()
 	{
@@ -61,11 +63,41 @@ class InsertTest extends TestCase
 		$this->assertEquals(self::INSERT_SELECT_STATEMENT, (string)$insertSelect);
 	}
 
+	public function testInsertSelectWithCustomColumnList()
+	{
+		//Setup the database
+		$this->getMockConnection();
+
+		$select = Select::create()
+			->setColumns([
+				'name',
+				'summary',
+				'rank',
+				'cat'=>'category_id',
+				'created'
+			])
+			->setTable('article_categories')
+			->whereEqual('id', 'articles.cat', true);
+
+		$insertSelect = Insert::create()
+			->setColumns([
+				'name',
+				'summary',
+				'rank',
+				'cat',
+				'created'
+			])
+			->setTable('categories')
+			->setData($select);
+
+		$this->assertEquals(self::INSERT_SELECT_COLUMNS_STATEMENT, (string)$insertSelect);
+	}
+
 	public function testInsertIgnore()
 	{
 		//Create the Query
 		$insert = Insert::create()
-			->setTable('table')
+			->setTable('categories')
 			->setPriority(Insert::HIGH)
 			->setIgnore(true)
 			->addData(['id'	=>	1,
@@ -77,5 +109,30 @@ class InsertTest extends TestCase
 			]);
 
 		$this->assertEquals(self::INSERT_IGNORE_STATEMENT,(string)$insert);
+	}
+
+	public function testInsertWithSchema()
+	{
+		//Setup the database
+		$this->getMockConnection();
+
+		$select = Select::create()
+			->setColumns([
+				'name',
+				'summary',
+				'rank',
+				'cat'=>'category_id',
+				'created'
+			])
+			->setTable('article_categories')
+			->setSchema('myschema')
+			->whereEqual('id', 'articles.cat', true);
+
+		$insertSelect = Insert::create()
+			->setTable('categories')
+			->setSchema('myschema')
+			->setData($select);
+
+		$this->assertEquals(self::INSERT_SCHEMA_STATEMENT, (string)$insertSelect);
 	}
 }

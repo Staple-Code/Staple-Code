@@ -66,7 +66,8 @@ class CheckboxElement extends FieldElement
 	{
 		$this->setChecked($val);
 		$this->changed = true;
-		parent::setValue($val);
+		if(!empty($val))
+			parent::setValue($val);
 		return $this;
 	}
 	

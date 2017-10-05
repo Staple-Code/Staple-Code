@@ -1,7 +1,6 @@
 # STAPLE-Code (PHP MVC Framework)
-![Build Status](https://travis-ci.org/ironpilot/Staple-Code.svg?branch=master)
+![Build Status](https://travis-ci.org/Staple-Code/Staple-Code.svg?branch=master)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/41ca2c4097d049e29e1e44a77141f94d)](https://www.codacy.com/app/contact_8/Staple-Code?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ironpilot/Staple-Code&amp;utm_campaign=Badge_Grade)
-[![Dependency Status](https://www.versioneye.com/user/projects/58a20ce36a7781002af203d3/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/58a20ce36a7781002af203d3)
 
 ## Install
 
@@ -11,7 +10,7 @@ to start serving a website.
 
 You will need a few things for the server to be able to process your site:
 
- - PHP 5.5 or higher.
+ - PHP 7.0 or higher.
  - A URL rewrite module.
 
 Both IIS (web.config) and Apache (.htaccess) rewrite rules are included in the repository. For nginx, you will
@@ -84,3 +83,12 @@ The new action is accessible from `/index/my-action` relative to the root of you
 ## License
 
 GNU Lesser GPLv3, See LICENSE file for the license contents.
+
+## Documentation
+
+Documentation is integrated in with the repository and is built using [Jekyll](https://jekyllrb.com/). To 
+run the Jekyll site navigate to `/docs` and type:
+
+```cmd
+bundle exec jekyll serve
+```

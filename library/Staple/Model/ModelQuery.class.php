@@ -126,6 +126,15 @@ class ModelQuery implements IQuery
 	}
 
 	/**
+	 * Return all results as array of models.
+	 * @return array|Model[]
+	 */
+	public function all()
+	{
+		return $this->get()->all();
+	}
+
+	/**
 	 * @return Model[]
 	 */
 	public function get() : ModelQueryResult

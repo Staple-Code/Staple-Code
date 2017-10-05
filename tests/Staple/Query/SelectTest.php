@@ -24,11 +24,10 @@
 namespace Staple\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Staple\Exception\QueryException;
 use Staple\Query\Query;
 use Staple\Query\Select;
 use Staple\Query\MockConnection;
-
-//require_once '../Mocks/MockConnection.php';
 
 class SelectTest extends TestCase
 {
@@ -69,10 +68,84 @@ class SelectTest extends TestCase
 			'zip'
 		];
 		$query = Query::select(self::TABLE_NAME,$columns,$conn)
+			->innerJoin('orders','orders.customer_id = '.self::TABLE_NAME.'.id');
+
+		//Assert
+		$expected = "SELECT\nfirst_name, last_name, address, city, state, zip \nFROM ".self::TABLE_NAME."\nINNER JOIN orders ON orders.customer_id = ".self::TABLE_NAME.".id";
+		$this->assertEquals($expected,(string)$query);
+	}
+
+	public function testQueryWithSchema()
+	{
+		//Setup
+		$connMySQL = $this->getMockConnection(MockConnection::DRIVER_MYSQL);
+		$connSqlSrv = $this->getMockConnection(MockConnection::DRIVER_SQLSRV);
+
+		//Act
+		//Should throw for MySQL
+		try
+		{
+			Query::select(self::TABLE_NAME, null, $connMySQL)
+				->setSchema('test');
+			$this->fail('Did not throw as expected.');
+		} catch(QueryException $q)
+		{
+			$this->assertInstanceOf('\Staple\Exception\QueryException',$q);
+		}
+
+		//Test SQL Server
+		$columns = [
+			'first_name',
+			'last_name',
+			'address',
+			'city',
+			'state',
+			'zip'
+		];
+		$query = Query::select(self::TABLE_NAME,$columns,$connSqlSrv)
+			->setSchema('myschema')
 			->innerJoin('orders','orders.customer_id = customers.id');
 
 		//Assert
-		$expected = "SELECT\nfirst_name, last_name, address, city, state, zip \nFROM customers\nINNER JOIN orders ON orders.customer_id = customers.id";
+		$expected = "SELECT\nfirst_name, last_name, address, city, state, zip \nFROM myschema.".self::TABLE_NAME."\nINNER JOIN myschema.orders ON orders.customer_id = ".self::TABLE_NAME.".id";
+		$this->assertEquals($expected,(string)$query);
+	}
+
+	public function testQueryWithSchemaAliasedTable()
+	{
+		//Setup
+		$connMySQL = $this->getMockConnection(MockConnection::DRIVER_MYSQL);
+		$connSqlSrv = $this->getMockConnection(MockConnection::DRIVER_SQLSRV);
+
+		//Act
+		//Should throw for MySQL
+		try
+		{
+			Query::select(null, null, $connMySQL)
+				->setTable(self::TABLE_NAME, 'myTable')
+				->setSchema('test');
+			$this->fail('Did not throw as expected.');
+		} catch(QueryException $q)
+		{
+			$this->assertInstanceOf('\Staple\Exception\QueryException',$q);
+		}
+
+		//Test SQL Server
+		$columns = [
+			'first_name',
+			'last_name',
+			'address',
+			'city',
+			'state',
+			'zip'
+		];
+		$query = Query::select(null, $columns, $connSqlSrv)
+			->setTable(self::TABLE_NAME, 'myTable')
+			->setSchema('myschema')
+			->innerJoin('orders','orders.customer_id = customers.id');
+
+		//Assert
+		$expected = "SELECT\nfirst_name, last_name, address, city, state, zip \nFROM myschema.".self::TABLE_NAME." AS myTable\nINNER JOIN myschema.orders ON orders.customer_id = ".self::TABLE_NAME.".id";
 		$this->assertEquals($expected,(string)$query);
 	}
 }

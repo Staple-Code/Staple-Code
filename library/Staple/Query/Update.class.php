@@ -318,7 +318,7 @@ class Update extends Query
 	 */
 	function build()
 	{
-		$stmt = 'UPDATE ';
+		$stmt = 'UPDATE';
 		
 		//Flags
 		if(count($this->flags) > 0)
@@ -332,22 +332,50 @@ class Update extends Query
 			$stmt .= ' ';			//A little extra space
 			foreach($this->table as $alias=>$table)
 			{
+				if(isset($this->schema))
+				{
+					$stmt .= $this->schema.'.';
+				}
+				elseif(!empty($this->connection->getSchema()))
+				{
+					$stmt .= $this->connection->getSchema().'.';
+				}
 				$stmt .= $table;
 				if(is_string($alias))
 				{
-					$stmt .= ' AS `'.$alias.'`';
+					switch($this->connection->getDriver())
+					{
+						case Connection::DRIVER_MYSQL:
+							$stmt .= ' AS `'.$alias.'`';
+							break;
+						case Connection::DRIVER_SQLSRV:
+							$stmt .= ' AS ['.$alias.']';
+							break;
+						default:
+							$stmt .= ' AS '.$alias;
+							break;
+					}
 				}
 			}
 		}
 		else 
 		{
-			$stmt .= ' '.$this->table;
+			$stmt .= ' ';
+			if(isset($this->schema))
+			{
+				$stmt .= $this->schema.'.';
+			}
+			elseif(!empty($this->connection->getSchema()))
+			{
+				$stmt .= $this->connection->getSchema().'.';
+			}
+			$stmt .= $this->table;
 		}
 		
 		//SET data
 		if(count($this->data) >= 0)
 		{
-			$stmt .= "\nSET ";
+			$stmt .= "\nSET";
 			$stmt .= $this->data->getUpdateString();
 		}
 		

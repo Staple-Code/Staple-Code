@@ -60,6 +60,11 @@ class Insert
 	 * @var string
 	 */
 	protected $table;
+	/**
+	 * The schema name.
+	 * @var string
+	 */
+	protected $schema;
 	
 	/**
 	 * Boolean flag for ON DUPLICATE KEY UPDATE
@@ -71,6 +76,11 @@ class Insert
 	 * @var array[string]
 	 */
 	protected $updateColumns = array();
+	/**
+	 * An array of column names to use in the insert statement.
+	 * @var array
+	 */
+	protected $columns;
 
 	/**
 	 * @param string $table
@@ -161,8 +171,23 @@ class Insert
 		}
 		
 		//Table
-		$stmt .= "\nINTO ".$this->table.' ';
-		
+		$stmt .= "\nINTO ";
+		if(isset($this->schema))
+		{
+			$stmt .= $this->schema.'.';
+		}
+		elseif(!empty($this->connection->getSchema()))
+		{
+			$stmt .= $this->connection->getSchema().'.';
+		}
+		$stmt .= $this->table.' ';
+
+		//Column List
+		if(isset($this->columns))
+		{
+			$stmt .= '('.implode(',',$this->getColumns()).') ';
+		}
+
 		//Data
 		if($this->data instanceof DataSet)
 		{
@@ -322,6 +347,47 @@ class Insert
 	public function getUpdateColumns()
 	{
 		return $this->updateColumns;
+	}
+
+	/**
+	 * Return the column array
+	 * @return array
+	 */
+	public function getColumns()
+	{
+		return $this->columns;
+	}
+
+	/**
+	 * Set the array of columns
+	 * @param array $columns
+	 * @return Insert
+	 */
+	public function setColumns(array $columns)
+	{
+		$this->columns = $columns;
+		return $this;
+	}
+
+	/**
+	 * Get the schema string.
+	 * @return string
+	 */
+	public function getSchema()
+	{
+		return $this->schema;
+	}
+
+	/**
+	 * Set the schema string
+	 * @param string $schema
+	 * @return $this
+	 */
+	public function setSchema($schema)
+	{
+		$this->schema = (string)$schema;
+
+		return $this;
 	}
 	
 	/**
