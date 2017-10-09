@@ -72,7 +72,7 @@ return [
 
 	'auth'	=>	[
 		'enabled'			=>	0,
-		'adapter'			=>	'DBAuthAdapter',
+		'adapter'			=>	'Staple\Tests\FakeAuthAdapter',
 		'controller'		=>	'accountController',
 		'authtable'			=>	'accounts',
 		'uidfield'			=>	'username',

@@ -105,12 +105,11 @@ class ActiveDirectoryAuthAdapter implements AuthAdapter
 	}
 
 	/**
-	 * Gets the access level for the supplied $uid.
-	 * @param string $uid
+	 * Gets the access level for the current $uid.
 	 * @return int
 	 * @see Staple_AuthAdapter::getLevel()
 	 */
-	public function getLevel($uid)
+	public function getLevel()
 	{
 		if($this->checkConfig($this->_settings))
 		{
@@ -120,7 +119,7 @@ class ActiveDirectoryAuthAdapter implements AuthAdapter
 				$sql = 'SELECT '.$db->real_escape_string($this->_settings['rolefield']).' 
 						FROM '.$db->real_escape_string($this->_settings['authtable']).'
 						WHERE '.$db->real_escape_string($this->_settings['uidfield']).' = '.
-							'\''.$db->real_escape_string($uid).'\';';
+							'\''.$db->real_escape_string($this->uid).'\';';
 				$result = $db->query($sql);
 				if($result !== false)
 				{
@@ -137,9 +136,7 @@ class ActiveDirectoryAuthAdapter implements AuthAdapter
 				}
 				else
 				{
-		
-						return 0;
-					
+					return 0;
 				}
 			}
 			else
@@ -155,6 +152,7 @@ class ActiveDirectoryAuthAdapter implements AuthAdapter
 	 * Checks the configuration fields for validity
 	 * @param array $config
 	 * @throws Exception
+	 * @return bool
 	 */
 	protected function checkConfig(array $config)
 	{
@@ -184,5 +182,3 @@ class ActiveDirectoryAuthAdapter implements AuthAdapter
 	}
 	
 }
-
-?>

@@ -34,7 +34,12 @@
  */
 namespace Staple;
 
-use \mysqli, \Exception, \SplObserver, \SplSubject, \SplObjectStorage;
+use Exception;
+use mysqli;
+use mysqli_result;
+use SplObjectStorage;
+use SplObserver;
+use SplSubject;
 
 class DB extends mysqli implements SplSubject
 {
@@ -152,7 +157,7 @@ class DB extends mysqli implements SplSubject
      * @return DB
      * @static
      */
-	public static function get(array $conf = array())
+	public static function get()
 	{
 		return static::getInstance();
 	}
@@ -215,9 +220,9 @@ class DB extends mysqli implements SplSubject
 	}
 	
 	/**
-	 * (non-PHPdoc)
-	 * @see mysqli::query()
+	 * Runs a query against the database
 	 * @return mysqli_result | bool
+	 * @throws Exception
 	 */
 	public function query($query,$resultmode = MYSQLI_STORE_RESULT)
 	{
@@ -335,27 +340,10 @@ class DB extends mysqli implements SplSubject
 	 */
 	public function getErrors()
 	{
-		//PHP_VERSION 5.4.0 supports the error list array. 
-		if(PHP_VERSION_ID > 50400)
-		{
-			return $this->error_list;
-		}
-		else
-		{
-			//Make the PHP 5.4 version manually.
-			if(strlen($this->error) >= 1)
-			{
-				return array(array('errno'=>$this->errno, 'sqlstate'=>$this->sqlstate, 'error'=>$this->error));
-			}
-			else 
-			{
-				return array();
-			}
-		}
+		return $this->error_list;
 	}
 
 	/**
-	 * 
 	 * Checks the configuration file to make sure that all required keys exist.
 	 * @param array $config
 	 * @throws Exception

@@ -31,7 +31,7 @@
 
 namespace Staple\Session;
 
-use Staple\Auth;
+use Staple\Auth\Auth;
 use Staple\Controller;
 use stdClass;
 

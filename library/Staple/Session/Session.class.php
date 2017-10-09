@@ -29,7 +29,7 @@
 
 namespace Staple\Session;
 
-use Staple\Auth;
+use Staple\Auth\Auth;
 use Staple\Config;
 use Staple\Controller;
 use Staple\Exception\SessionException;
@@ -83,26 +83,37 @@ class Session
 		//Set the optional session name
 		if(isset($name))
 		{
-			session_name($name);
+			if(php_sapi_name() != 'cli')
+				session_name($name);
 			$this->setSessionName($name);
 		}
-		elseif (($configName = Config::getValue('session','name',false)) != NULL)
+		elseif(($configName = Config::getValue('session', 'name', false)) != null)
 		{
-			session_name($name);
+			if(php_sapi_name() != 'cli')
+				session_name($name);
 			$this->setSessionName($name);
 		}
 
 		//Set the session max lifetime
-		if(Config::exists('session','max_lifetime'))
-			$this->setMaxLifetime(Config::getValue('session','max_lifetime'));
+		if(Config::exists('session', 'max_lifetime'))
+			$this->setMaxLifetime(Config::getValue('session', 'max_lifetime'));
 		else
 			$this->setMaxLifetime(ini_get('session.gc_maxlifetime'));
 
-
 		//Setup session handler functions
-		$handlerSetup = session_set_save_handler($this->handler, true);
-		if(!$handlerSetup)
-			throw new SessionException('Failed to setup session save handler: '.get_class($this->handler));
+		if(php_sapi_name() != 'cli')
+		{
+			if(!headers_sent())
+			{
+				$handlerSetup = @session_set_save_handler($this->handler, true);
+				if(!$handlerSetup)
+					throw new SessionException('Failed to setup session save handler: ' . get_class($this->handler));
+			}
+			else
+			{
+				throw new SessionException('Headers already sent: ' . implode('/n', headers_list()));
+			}
+		}
 	}
 
 	public function __wakeup()
@@ -394,9 +405,15 @@ class Session
 	/**
 	 * Regenerate the session ID
 	 * @param bool $deleteOldSession
+	 * @return bool
 	 */
-	public static function regenerate($deleteOldSession = true)
+	public function regenerate($deleteOldSession = true)
 	{
-		session_regenerate_id($deleteOldSession);
+		if($this->sessionStarted)
+		{
+			session_regenerate_id($deleteOldSession);
+			return true;
+		}
+		return false;
 	}
 }

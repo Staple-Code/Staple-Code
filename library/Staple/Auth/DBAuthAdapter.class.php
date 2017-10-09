@@ -32,43 +32,16 @@
  */
 namespace Staple\Auth;
 
-use Exception;
 use Staple\Config;
-use Staple\DB;
-use Staple\Error;
+use Staple\Query\Query;
 
 class DBAuthAdapter implements AuthAdapter
 {
-	/**
-	 * Settings Array
-	 * @deprecated
-	 * @var array
-	 */
-	private $_settings = array();
 	/**
 	 * Store the user identifier. Usually the username.
 	 * @var string
 	 */
 	private $uid;
-	
-	
-	/**
-	 * 
-	 * The constructor loads and checks the adapter configuration.
-	 * @throws Exception
-	 */
-	public function __construct()
-	{
-		if($this->checkConfig(Config::get('auth')))
-		{
-			$this->_settings = Config::get('auth');
-		}
-		else
-		{
-			throw new Exception('Staple_DBAuthAdapter critical failure.',Error::AUTH_ERROR);
-		}
-
-	}
 	
 	/**
 	 * getAuth checks the database for valid credentials and returns true if they are found.
@@ -78,40 +51,32 @@ class DBAuthAdapter implements AuthAdapter
 	 */
 	public function getAuth($cred)
 	{
-		if($this->checkConfig($this->_settings))
+		if(array_key_exists('username', $cred) AND array_key_exists('password', $cred))
 		{
-			if(array_key_exists('username', $cred) AND array_key_exists('password', $cred))
+			switch(Config::getValue('db','pwenctype', false))
 			{
-				$db = DB::get();
-				$this->uid = $cred['username'];
-				switch($this->_settings['pwenctype'])
+				case 'SHA256':
+					$pass = hash('sha256', $cred['password']);
+					break;
+				default:
+					$pass = password_hash($cred['password'], PASSWORD_DEFAULT);
+			}
+
+			$columns = [
+				Config::getValue('db','uidfield'),
+				Config::getValue('db','pwfield')
+			];
+			$query = Query::select(Config::getValue('db','authtable'), $columns)
+				->whereEqual(Config::getValue('db','uidfield'), $cred['username']);
+			if(($result = $query->execute()) !== false)
+			{
+				$row = $result->fetch(\PDO::FETCH_ASSOC);
+				//Secondary check to make sure the results did not differ from MySQL's response.
+				if(strtolower($row[Config::getValue('db','uidfield')]) == strtolower($cred['username'])
+					&& password_verify($pass, $row[Config::getValue('db','pwfield')]))
 				{
-					case 'MD5':
-						$pass = md5($cred['password']);
-						break;
-					case 'SHA1':
-						$pass =sha1($cred['password']);
-						break;
-					//case 'AES':
-					//	$pass = Staple_Encrypt::AES_encrypt(($cred['password']),'');
-					//	break;
-					default:
-						$pass = $cred['password'];
-				}
-				$sql = 'SELECT '.$db->real_escape_string($this->_settings['uidfield']).','.$db->real_escape_string($this->_settings['pwfield']).'
-							FROM '.$db->real_escape_string($this->_settings['authtable']).'
-						WHERE '.$db->real_escape_string($this->_settings['uidfield']).' = '.
-							'\''.$db->real_escape_string($cred['username']).'\'
-							AND '.$db->real_escape_string($this->_settings['pwfield']).' = '.
-							'\''.$db->real_escape_string($pass).'\';';
-				if(($result = $db->query($sql)) !== false)
-				{
-					$myrow = $result->fetch_array();
-					//Secondary check to make sure the results did not differ from MySQL's response.
-					if($myrow[$this->_settings['uidfield']] == $this->uid && $myrow[$this->_settings['pwfield']] == $pass)
-					{
-						return true;
-					}
+					$this->uid = $cred['username'];
+					return true;
 				}
 			}
 		}
@@ -120,65 +85,36 @@ class DBAuthAdapter implements AuthAdapter
 
 	/**
 	 * Gets the access level for the supplied $uid.
-	 * @param string $uid
 	 * @return int
 	 * @see Staple_AuthAdapter::getLevel()
 	 */
-	public function getLevel($uid)
+	public function getLevel()
 	{
-		if($this->checkConfig($this->_settings))
+		if(array_key_exists('rolefield', Config::getValue('db','rolefield')))
 		{
-			if(array_key_exists('rolefield', $this->_settings))
+			$query = Query::select(Config::getValue('db','authtable'), [Config::getValue('db','rolefield')])
+				->whereEqual(Config::getValue('db','uidfield'),$this->uid);
+			if(($result = $query->execute()) !== false)
 			{
-				$db = DB::get();
-				$sql = 'SELECT '.$db->real_escape_string($this->_settings['rolefield']).' 
-						FROM '.$db->real_escape_string($this->_settings['authtable']).'
-						WHERE '.$db->real_escape_string($this->_settings['uidfield']).' = '.
-							'\''.$db->real_escape_string($uid).'\';';
-				$result = $db->query($sql);
-				if($result !== false)
+				$level = (int)$result->fetchColumn(0);
+				if($level < 0)
 				{
-					$myrow = $result->fetch_array();
-					$level = (int)$myrow[$this->_settings['rolefield']];
-					if($level < 0)
-					{
-						return 0;
-					}
-					else 
-					{
-						return $level;
-					}
+					return 0;
 				}
 				else
 				{
-					return 0;
+					return $level;
 				}
 			}
 			else
 			{
-				return 1;
+				return 0;
 			}
 		}
-		return 0;
-	}
-
-	/**
-	 * Checks the configuration fields for validity
-	 * @param array $config
-	 * @throws Exception
-	 * @return bool
-	 */
-	protected function checkConfig(array $config)
-	{
-		$keys = array('enabled','adapter','authtable','uidfield','pwfield','pwenctype');
-		foreach($keys as $value)
+		else
 		{
-			if(!array_key_exists($value, $config))
-			{
-				throw new Exception('Staple_DBAuthAdapter configuration error.',Error::AUTH_ERROR);
-			}
+			return 1;
 		}
-		return true;
 	}
 	
 	/**
@@ -190,5 +126,4 @@ class DBAuthAdapter implements AuthAdapter
 	{
 		return $this->uid;
 	}
-
 }
