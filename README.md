@@ -83,3 +83,12 @@ The new action is accessible from `/index/my-action` relative to the root of you
 ## License
 
 GNU Lesser GPLv3, See LICENSE file for the license contents.
+
+## Documentation
+
+Documentation is integrated in with the repository and is built using [Jekyll](https://jekyllrb.com/). To 
+run the Jekyll site navigate to `/docs` and type:
+
+```cmd
+bundle exec jekyll serve
+```
