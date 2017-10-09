@@ -50,13 +50,6 @@ class Auth
 	
 	/**
 	 * 
-	 * Holds the user identifier.
-	 * @var int | string
-	 */
-	private $userId = NULL;
-	
-	/**
-	 * 
 	 * Holds a reference to the AuthAdapter object.
 	 * @var AuthAdapter
 	 */
@@ -98,7 +91,7 @@ class Auth
 	 * 
 	 * @throws Exception
 	 */
-	private function __construct()
+	public function __construct()
 	{
 		$this->authed = false;
 		if(Config::exists('auth'))
@@ -153,7 +146,7 @@ class Auth
 	 * @return Auth
 	 */
 	public static function get()
-	{			
+	{
 		if(!(self::$instance instanceof Auth))
 		{
 			//Start session if not already done.
@@ -198,7 +191,7 @@ class Auth
 	 */
 	public function getAuthId()
 	{
-		return $this->userId;
+		return $this->adapter->getUserId();
 	}
 	
 	/**
@@ -215,12 +208,7 @@ class Auth
 		//Make sure an adapter is loaded.
 		if(!($this->adapter instanceof AuthAdapter))
 		{
-			$adapt = $this->_settings['adapter'];
-			$this->adapter = new $adapt();
-			if(!($this->adapter instanceof AuthAdapter))
-			{
-				throw new Exception('Invalid Authentication Adapter', Error::AUTH_ERROR);
-			}
+			$this->createAuthAdapter();
 		}
 		
 		//Check Auth against the adapter
@@ -228,8 +216,7 @@ class Auth
 		{
 			Session::getInstance()->regenerate(true);
 			$this->authed = true;
-			$this->userId = $this->adapter->getUserId();
-			$this->authLevel = $this->adapter->getLevel($this->userId);
+			$this->authLevel = $this->adapter->getLevel();
 			$this->message = "Authentication Successful";
 			self::writeSession();
 			return true;
@@ -237,11 +224,27 @@ class Auth
 		else
 		{
 			$this->authed = false;
-			$this->userId = null;
 			$this->authLevel = 0;
 			$this->message = "Authentication Failed";
 			self::writeSession();
 			return false;
+		}
+	}
+
+	private function createAuthAdapter()
+	{
+		$adapter = Config::getValue('auth', 'adapter');
+		if(class_exists($adapter))
+		{
+			$this->adapter = new $adapter();
+			if(!($this->adapter instanceof AuthAdapter))
+			{
+				throw new Exception('Invalid Authentication Adapter', Error::AUTH_ERROR);
+			}
+		}
+		else
+		{
+			throw new Exception('Adapter Class Not Found', Error::AUTH_ERROR);
 		}
 	}
 	
@@ -263,7 +266,7 @@ class Auth
 	 */
 	public function clearAuth()
 	{
-		$this->userId = NULL;
+		$this->createAuthAdapter();
 		$this->authed = false;
 		$this->authLevel = 0;
 		$this->message = 'Logged Out';

@@ -2,7 +2,7 @@
 
 /** 
  * The AuthAdapter interface creates a preset list of functions that must be implemented
- * to allow authentication to pass through Staple\Auth. Adapters sent to Staple\Auth must
+ * to allow authentication to pass through Staple\Auth\Auth. Adapters sent to Staple\Auth\Auth must
  * implement this class or an error will occur. 
  *  
  * @author Ironpilot
@@ -41,10 +41,9 @@ interface AuthAdapter
 	 * 
 	 * This function must be implemented to return a numeric level of access. This level is
 	 * used to determine feature access based on account type.
-	 * @param mixed $uid
 	 * @return mixed
 	 */
-	public function getLevel($uid);
+	public function getLevel();
 	
 	/**
 	 * Returns the User ID from the adapter.
