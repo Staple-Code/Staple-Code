@@ -36,7 +36,7 @@ interface AuthAdapter
 	 * @param mixed $credentials
 	 * @return bool
 	 */
-	public function getAuth($credentials);
+	public function getAuth($credentials): bool;
 	/**
 	 * 
 	 * This function must be implemented to return a numeric level of access. This level is

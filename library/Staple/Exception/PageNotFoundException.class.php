@@ -26,5 +26,6 @@ namespace Staple\Exception;
 
 class PageNotFoundException extends \Exception
 {
-
+	protected $message = 'Page Not Found';
+	protected $code = 404;
 } 

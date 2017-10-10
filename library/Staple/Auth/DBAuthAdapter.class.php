@@ -49,11 +49,11 @@ class DBAuthAdapter implements AuthAdapter
 	 * @return bool
 	 * @see Staple_AuthAdapter::getAuth()
 	 */
-	public function getAuth($cred)
+	public function getAuth($cred): bool
 	{
 		if(array_key_exists('username', $cred) AND array_key_exists('password', $cred))
 		{
-			switch(Config::getValue('db','pwenctype', false))
+			switch(Config::getValue('auth','pwenctype', false))
 			{
 				case 'SHA256':
 					$pass = hash('sha256', $cred['password']);
@@ -63,17 +63,17 @@ class DBAuthAdapter implements AuthAdapter
 			}
 
 			$columns = [
-				Config::getValue('db','uidfield'),
-				Config::getValue('db','pwfield')
+				Config::getValue('auth','uidfield'),
+				Config::getValue('auth','pwfield')
 			];
-			$query = Query::select(Config::getValue('db','authtable'), $columns)
-				->whereEqual(Config::getValue('db','uidfield'), $cred['username']);
+			$query = Query::select(Config::getValue('auth','authtable'), $columns)
+				->whereEqual(Config::getValue('auth','uidfield'), $cred['username']);
 			if(($result = $query->execute()) !== false)
 			{
 				$row = $result->fetch(\PDO::FETCH_ASSOC);
 				//Secondary check to make sure the results did not differ from MySQL's response.
-				if(strtolower($row[Config::getValue('db','uidfield')]) == strtolower($cred['username'])
-					&& password_verify($pass, $row[Config::getValue('db','pwfield')]))
+				if(strtolower($row[Config::getValue('auth','uidfield')]) == strtolower($cred['username'])
+					&& password_verify($pass, $row[Config::getValue('auth','pwfield')]))
 				{
 					$this->uid = $cred['username'];
 					return true;
@@ -90,10 +90,10 @@ class DBAuthAdapter implements AuthAdapter
 	 */
 	public function getLevel()
 	{
-		if(array_key_exists('rolefield', Config::getValue('db','rolefield')))
+		if(array_key_exists('rolefield', Config::getValue('auth','rolefield')))
 		{
-			$query = Query::select(Config::getValue('db','authtable'), [Config::getValue('db','rolefield')])
-				->whereEqual(Config::getValue('db','uidfield'),$this->uid);
+			$query = Query::select(Config::getValue('auth','authtable'), [Config::getValue('auth','rolefield')])
+				->whereEqual(Config::getValue('auth','uidfield'),$this->uid);
 			if(($result = $query->execute()) !== false)
 			{
 				$level = (int)$result->fetchColumn(0);

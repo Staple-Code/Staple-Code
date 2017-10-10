@@ -26,6 +26,7 @@ namespace Staple;
 use ReflectionClass;
 use ReflectionMethod;
 use Staple\Auth\Auth;
+use Staple\Controller\Controller;
 use Staple\Controller\RestfulController;
 use Staple\Exception\PageNotFoundException;
 use Staple\Exception\RoutingException;
@@ -166,25 +167,16 @@ class Route
 						//Verify that an instance of the controller class exists and is of the right type
 						if($controller instanceof Controller)
 						{
-							//Check if global Auth is enabled.
-							if(Config::getValue('auth', 'enabled') != 0)
+							//Check the sub-controller for access to the method
+							if($controller->_auth($method) === true)
 							{
-								//Check the sub-controller for access to the method
-								if($controller->_auth($method) === true)
-								{
-									//Everything went well, dispatch the controller.
-									$this->dispatchController();
-								}
-								else
-								{
-									//No Authentication, send us to the login screen.
-									Auth::get()->noAuth($this);
-								}
+								//Everything went well, dispatch the controller.
+								$this->dispatchController();
 							}
 							else
 							{
-								//No authentication needed, dispatch the controller
-								$this->dispatchController();
+								//No Authentication, send us to the login screen.
+								Auth::get()->noAuth($this);
 							}
 
 							//Return true so that we don't hit the exception.
@@ -229,12 +221,6 @@ class Route
 		
 		if($controller instanceof Controller)
 		{
-			//Set the view's controller to match the route
-			$controller->view->setController($this->getController());
-		
-			//Set the view's action to match the route
-			$controller->view->setView($this->getAction());
-		
 			//Call the controller action
 			$actionMethod = new ReflectionMethod($controller,$this->getAction());
 			$return = $actionMethod->invokeArgs($controller, $this->getParams());
@@ -302,37 +288,6 @@ class Route
 			elseif(is_string($return))		//If the return value was simply a string, echo it out.
 			{
 				echo $return;
-			}
-			else
-			{
-				//Fall back to previous functionality by rendering views and layouts.
-
-				//If the view does not have a controller name set, set it to the currently executing controller.
-				if(!$controller->view->hasController())
-				{
-					$loader = Main::get()->getLoader();
-					$conString = get_class($controller);
-
-					$controller->view->setController(substr($conString,0,strlen($conString)-strlen($loader::CONTROLLER_SUFFIX)));
-				}
-
-				//If the view doesn't have a view set, use the route's action.
-				if(!$controller->view->hasView())
-				{
-					$controller->view->setView($this->getAction());
-				}
-
-				//Check for a layout
-				if($controller->layout instanceof Layout)
-				{
-					//Align the controller and layout views. They should already be the same anyway.
-					$controller->layout->setView($controller->view);
-					$controller->layout->build();
-				}
-				else
-				{
-					$controller->view->build();
-				}
 			}
 		}
 		else

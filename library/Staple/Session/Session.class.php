@@ -31,7 +31,7 @@ namespace Staple\Session;
 
 use Staple\Auth\Auth;
 use Staple\Config;
-use Staple\Controller;
+use Staple\Controller\Controller;
 use Staple\Exception\SessionException;
 use Staple\Traits\Singleton;
 

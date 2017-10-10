@@ -31,7 +31,7 @@ class Alias
 		'Alias'							=>	'\\Staple\\Alias',
 		'Autoload'						=>	'\\Staple\\Autoload',
 		'Config'						=>	'\\Staple\\Config',
-		'Controller'					=>	'\\Staple\\Controller',
+		'Controller'					=>	'\\Staple\\Controller\\Controller',
 		'DB'							=>	'\\Staple\\DB',
 		'Dev'							=>	'\\Staple\\Dev',
 		'Encrypt'						=>	'\\Staple\\Encrypt',
@@ -52,39 +52,11 @@ class Alias
 		'Utility'						=>	'\\Staple\\Utility',
 		'View'							=>	'\\Staple\\View',
 
-		//Legacy Class Names
-		'Staple_Autoload'				=>	'\\Staple\\Autoload',
-		'Staple_AD'						=>	'\\Staple\\ActiveDirectory',
-		'Staple_Config'					=>	'\\Staple\\Config',
-		'Staple_Controller'				=>	'\\Staple\\Controller',
-		'Staple_DB'					=>	'\\Staple\\DB',
-		'Staple_Dev'					=>	'\\Staple\\Dev',
-		'Staple_Encrypt'				=>	'\\Staple\\Encrypt',
-		'Staple_Error'					=>	'\\Staple\\Error',
-		'Staple_Form'					=>	'\\Staple\\Form\\Form',
-		'Staple_Image'					=>	'\\Staple\\Image',
-		'Staple_Layout'					=>	'\\Staple\\Layout',
-		'Staple_Link'					=>	'\\Staple\\Link',
-		'Staple_Mail'					=>	'\\Staple\\Mail',
-		'Staple_Main'					=>	'\\Staple\\Main',
-		'Staple_Model'					=>	'\\Staple\\Model',
-		'Staple_Pager'					=>	'\\Staple\\Pager',
-		'Staple_Registry'				=>	'\\Staple\\Registry',
-		'Staple_Request'				=>	'\\Staple\\Request',
-		'Staple_Route'					=>	'\\Staple\\Route',
-		'Staple_Script'					=>	'\\Staple\\Script',
-		'Staple_Util'					=>	'\\Staple\\Utility',
-		'Staple_View'					=>	'\\Staple\\View',
-
 		//Auth
 		'Auth'						=>	'\\Staple\\Auth\\Auth',
 		'AuthAdapter'					=>	'\\Staple\\Auth\\AuthAdapter',
 		'ActiveDirectoryAuthAdapter'			=>	'\\Staple\\Auth\\ActiveDirectoryAuthAdapter',
 		'DBAuthAdapter'					=>	'\\Staple\\Auth\\DBAuthAdapter',
-		'Staple_Auth'					=>	'\\Staple\\Auth\\Auth',
-		'Staple_ADAuthAdapter'				=>	'\\Staple\\Auth\\ActiveDirectoryAuthAdapter',
-		'Staple_AuthAdapter'				=>	'\\Staple\\Auth\\AuthAdapter',
-		'Staple_DBAuthAdapter'				=>	'\\Staple\\Auth\\DBAuthAdapter',
 
 		//Form Class Aliases
 		'ButtonElement'					=>	'\\Staple\\Form\\ButtonElement',
@@ -102,23 +74,6 @@ class Alias
 		'SubmitElement'					=>	'\\Staple\\Form\\SubmitElement',
 		'TextareaElement'				=>	'\\Staple\\Form\\TextareaElement',
 		'TextElement'					=>	'\\Staple\\Form\TextElement',
-
-		//Legacy Form Classes
-		'Staple_Form_ButtonElement'		=>	'\\Staple\\Form\\ButtonElement',
-		'Staple_Form_CheckboxElement'		=>	'\\Staple\\Form\\CheckboxElement',
-		'Staple_Form_CheckboxGroup'		=>	'\\Staple\\Form\\CheckboxGroupElement',
-		'Staple_Form_Element'			=>	'\\Staple\\Form\\FieldElement',
-		'Staple_Form_Filter'			=>	'\\Staple\\Form\\FieldFilter',
-		'Staple_Form_Validator'			=>	'\\Staple\\Form\\FieldValidator',
-		'Staple_Form_FileElement'		=>	'\\Staple\\Form\\FileElement',
-		'Staple_Form_HiddenElement'		=>	'\\Staple\\Form\\HiddenElement',
-		'Staple_Form_ImageElement'		=>	'\\Staple\\Form\\ImageElement',
-		'Staple_Form_PasswordElement'		=>	'\\Staple\\Form\\PasswordElement',
-		'Staple_Form_RadioGroup'		=>	'\\Staple\\Form\\RadioElement',
-		'Staple_Form_SelectElement'		=>	'\\Staple\\Form\\SelectElement',
-		'Staple_Form_SubmitElement'		=>	'\\Staple\\Form\\SubmitElement',
-		'Staple_Form_TextareaElement'		=>	'\\Staple\\Form\\TextareaElement',
-		'Staple_Form_TextElement'		=>	'\\Staple\\Form\TextElement',
 
 		//Validator Class Aliases
 		'AlnumValidator'				=>	'\\Staple\\Form\\Validate\AlnumValidator',
@@ -138,24 +93,6 @@ class Alias
 		'UploadedFileValidator'				=>	'\\Staple\\Form\\Validate\UploadedFileValidator',
 		'ZipValidator'					=>	'\\Staple\\Form\\Validate\ZipValidator',
 
-		//Legacy Validator Class Aliases
-		'Staple_Form_Validate_Alnum'			=>	'\\Staple\\Form\\Validate\AlnumValidator',
-		'Staple_Form_Validate_BetweenFloat'		=>	'\\Staple\\Form\\Validate\BetweenFloatValidator',
-		'Staple_Form_Validate_Between'			=>	'\\Staple\\Form\\Validate\BetweenValidator',
-		'Staple_Form_Validate_Date'			=>	'\\Staple\\Form\\Validate\DateValidator',
-		'Staple_Form_Validate_Email'			=>	'\\Staple\\Form\\Validate\EmailValidator',
-		'Staple_Form_Validate_Equal'			=>	'\\Staple\\Form\\Validate\EqualValidator',
-		'Staple_Form_Validate_Float'			=>	'\\Staple\\Form\\Validate\FloatValidator',
-		'Staple_Form_Validate_IdenticalField'		=>	'\\Staple\\Form\\Validate\IdenticalFieldValidator',
-		'Staple_Form_Validate_InArray'			=>	'\\Staple\\Form\\Validate\InArrayValidator',
-		'Staple_Form_Validate_Length'			=>	'\\Staple\\Form\\Validate\LengthValidator',
-		'Staple_Form_Validate_NotEqual'			=>	'\\Staple\\Form\\Validate\NotEqualValidator',
-		'Staple_Form_Validate_Numeric'			=>	'\\Staple\\Form\\Validate\NumericValidator',
-		'Staple_Form_Validate_Phone'			=>	'\\Staple\\Form\\Validate\PhoneValidator',
-		'Staple_Form_Validate_Regex'			=>	'\\Staple\\Form\\Validate\RegexValidator',
-		'Staple_Form_Validate_UploadedFile'		=>	'\\Staple\\Form\\Validate\UploadedFileValidator',
-		'Staple_Form_Validate_Zip'			=>	'\\Staple\\Form\\Validate\ZipValidator',
-
 		//Filter Class Aliases
 		'BaseNameFilter'				=>	'\\Staple\\Form\\Filter\\BaseNameFilter',
 		'IntegerFilter'					=>	'\\Staple\\Form\\Filter\\IntegerFilter',
@@ -166,16 +103,6 @@ class Alias
 		'ToUpperFilter'					=>	'\\Staple\\Form\\Filter\\ToUpperFilter',
 		'TrimFilter'					=>	'\\Staple\\Form\\Filter\\TrimFilter',
 
-		//Legacy Validator Class Aliases
-		'Staple_Form_Filter_BaseName'		=> '\\Staple\\Form\\Filter\BaseNameFilter',
-		'Staple_Form_Filter_Integer'		=>	'\\Staple\\Form\\Filter\IntegerFilter',
-		'Staple_Form_Filter_PhoneFormat'	=>	'\\Staple\\Form\\Filter\PhoneFormatFilter',
-		'Staple_Form_Filter_Tags'			=>	'\\Staple\\Form\\Filter\TagsFilter',
-		'Staple_Form_Filter_ToDateTime'		=>	'\\Staple\\Form\\Filter\ToDateTimeFilter',
-		'Staple_Form_Filter_ToLower'		=>	'\\Staple\\Form\\Filter\ToLowerFilter',
-		'Staple_Form_Filter_ToUpper'		=>	'\\Staple\\Form\\Filter\ToUpperFilter',
-		'Staple_Form_Filter_Trim'			=>	'\\Staple\\Form\\Filter\TrimFilter',
-
 		//Data Class Aliases
 		'DoubleLinkedList'			=>	'\\Staple\\Data\\DoubleLinkedList',
 		'LinkedList'				=>	'\\Staple\\Data\\LinkedList',
@@ -183,14 +110,6 @@ class Alias
 		'LinkedListNodeDouble'			=>	'\\Staple\\Data\\LinkedListNodeDouble',
 		'Queue'					=>	'\\Staple\\Data\\Queue',
 		'Stack'					=>	'\\Staple\\Data\\Stack',
-
-		//Legacy Data Class Aliases
-		'Staple_Data_DoubleLinkedList'		=>	'\\Staple\\Data\\DoubleLinkedList',
-		'Staple_Data_LinkedList'		=>	'\\Staple\\Data\\LinkedList',
-		'Staple_Data_LinkedListNode'		=>	'\\Staple\\Data\\LinkedListNode',
-		'Staple_Data_LinkedListNodeDouble'	=>	'\\Staple\\Data\\LinkedListNodeDouble',
-		'Staple_Data_Queue'			=>	'\\Staple\\Data\\Queue',
-		'Staple_Data_Stack'			=>	'\\Staple\\Data\\Stack',
 
 		//Query Builder Classes
 		'QueryCondition'					=>	'\\Staple\\Query\\Condition',
@@ -203,18 +122,6 @@ class Alias
 		'Select'						=>	'\\Staple\\Query\\Select',
 		'Union'							=>	'\\Staple\\Query\\Union',
 		'Update'						=>	'\\Staple\\Query\\Update',
-
-		//Legacy Query Builder Classes
-		'Staple_Query_Condition'				=>	'\\Staple\\Query\\Condition',
-		'Staple_Query_DataSet'					=>	'\\Staple\\Query\\DataSet',
-		'Staple_Query_Delete'					=>	'\\Staple\\Query\\Delete',
-		'Staple_Query_Insert'					=>	'\\Staple\\Query\\Insert',
-		'Staple_Query_InsertMultiple'				=>	'\\Staple\\Query\\InsertMultiple',
-		'Staple_Query_Join'					=>	'\\Staple\\Query\\Join',
-		'Staple_Query'						=>	'\\Staple\\Query\\Query',
-		'Staple_Query_Select'					=>	'\\Staple\\Query\\Select',
-		'Staple_Query_Union'					=>	'\\Staple\\Query\\Union',
-		'Staple_Query_Update'					=>	'\\Staple\\Query\\Update',
 
 		//Exception Class Aliases
 		'PageNotFoundException'			=>	'\\Staple\\Exception\\PageNotFoundException',
