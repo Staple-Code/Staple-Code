@@ -69,6 +69,10 @@ return [
 
 	'auth' => [
 		'adapter' 			=> 'DBAuthAdapter',
+	],
+
+	//Configuration Values for the DBAuthAdapter
+	'DBAuthAdapter' => [
 		'authtable' 		=> 'accounts',
 		'uidfield' 			=> 'username',
 		'pwfield' 			=> 'password',

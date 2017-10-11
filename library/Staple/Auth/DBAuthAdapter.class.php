@@ -2,13 +2,12 @@
 /** 
  * This is the packaged database authorization adapter. This adapter requires the following
  * settings to be included in the configuration file:
- * 
- * enabled - Set to 1 or 0 to enable or disable authentication. 1 is the default setting, if excluded.
+ *
  * adapter - Tells the Staple_Main class which AuthAdapter to load.
  * authtable - Specifies the database table where auth credentials reside.
  * uidfield - Defines the username or user identifer field.
  * pwfield - Defines the password field.
- * pwenctype - The type of encryption used on the password. Values include 'MD5', 'SHA1', 'AES', and 'none'. 
+ * pwenctype - The type of encryption used on the password. Values include 'SHA256', 'Default'
  * rolefield - (optional) This field specifies the database table that holds the access level. If no field is provided or it is null, 1 will be returned.
  * 
  * @author Ironpilot
@@ -53,7 +52,7 @@ class DBAuthAdapter implements AuthAdapter
 	{
 		if(array_key_exists('username', $cred) AND array_key_exists('password', $cred))
 		{
-			switch(Config::getValue('auth','pwenctype', false))
+			switch(Config::getValue('DBAuthAdapter','pwenctype', false))
 			{
 				case 'SHA256':
 					$pass = hash('sha256', $cred['password']);
@@ -63,17 +62,17 @@ class DBAuthAdapter implements AuthAdapter
 			}
 
 			$columns = [
-				Config::getValue('auth','uidfield'),
-				Config::getValue('auth','pwfield')
+				Config::getValue('DBAuthAdapter','uidfield'),
+				Config::getValue('DBAuthAdapter','pwfield')
 			];
-			$query = Query::select(Config::getValue('auth','authtable'), $columns)
-				->whereEqual(Config::getValue('auth','uidfield'), $cred['username']);
+			$query = Query::select(Config::getValue('DBAuthAdapter','authtable'), $columns)
+				->whereEqual(Config::getValue('DBAuthAdapter','uidfield'), $cred['username']);
 			if(($result = $query->execute()) !== false)
 			{
 				$row = $result->fetch(\PDO::FETCH_ASSOC);
 				//Secondary check to make sure the results did not differ from MySQL's response.
-				if(strtolower($row[Config::getValue('auth','uidfield')]) == strtolower($cred['username'])
-					&& password_verify($pass, $row[Config::getValue('auth','pwfield')]))
+				if(strtolower($row[Config::getValue('DBAuthAdapter','uidfield')]) == strtolower($cred['username'])
+					&& password_verify($pass, $row[Config::getValue('DBAuthAdapter','pwfield')]))
 				{
 					$this->uid = $cred['username'];
 					return true;
@@ -86,14 +85,13 @@ class DBAuthAdapter implements AuthAdapter
 	/**
 	 * Gets the access level for the supplied $uid.
 	 * @return int
-	 * @see Staple_AuthAdapter::getLevel()
 	 */
 	public function getLevel()
 	{
-		if(array_key_exists('rolefield', Config::getValue('auth','rolefield')))
+		if(array_key_exists('rolefield', Config::getValue('DBAuthAdapter','rolefield')))
 		{
-			$query = Query::select(Config::getValue('auth','authtable'), [Config::getValue('auth','rolefield')])
-				->whereEqual(Config::getValue('auth','uidfield'),$this->uid);
+			$query = Query::select(Config::getValue('DBAuthAdapter','authtable'), [Config::getValue('DBAuthAdapter','rolefield')])
+				->whereEqual(Config::getValue('DBAuthAdapter','uidfield'),$this->uid);
 			if(($result = $query->execute()) !== false)
 			{
 				$level = (int)$result->fetchColumn(0);
@@ -120,7 +118,6 @@ class DBAuthAdapter implements AuthAdapter
 	/**
 	 * Returns the User ID from the adapter.
 	 * @return string
-	 * @see Staple_AuthAdapter::getUserId()
 	 */
 	public function getUserId()
 	{
