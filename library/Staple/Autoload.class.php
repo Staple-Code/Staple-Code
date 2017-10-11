@@ -287,7 +287,7 @@ class Autoload
 			}
 			elseif($this->throwOnFailure === true)
 			{
-				throw new PageNotFoundException('Page Not Found',Error::PAGE_NOT_FOUND);
+				throw new PageNotFoundException();
 			}
 		}
 
@@ -316,7 +316,7 @@ class Autoload
 			}
 			else
 			{
-				throw new PageNotFoundException('Page Not Found',Error::PAGE_NOT_FOUND);
+				throw new PageNotFoundException();
 			}
 		}
 

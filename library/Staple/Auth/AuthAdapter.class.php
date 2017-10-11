@@ -26,6 +26,8 @@
  */
 namespace Staple\Auth;
 
+use Staple\Route;
+
 interface AuthAdapter
 {
 	/**
@@ -44,10 +46,22 @@ interface AuthAdapter
 	 * @return mixed
 	 */
 	public function getLevel();
-	
 	/**
 	 * Returns the User ID from the adapter.
 	 * @return mixed
 	 */
 	public function getUserId();
+	/**
+	 * This method should return a boolean true or false if the supplied auth level is able
+	 * to access the supplied route. Additionally the reflection for the class and method
+	 * are also supplied to this method for further verification. If there are no roles or
+	 * levels in the supplied application, this method can simply return true to disable this
+	 * check.
+	 * @param Route $route
+	 * @param $requiredLevel
+	 * @param \ReflectionClass|null $reflectionClass
+	 * @param \ReflectionMethod|null $reflectionMethod
+	 * @return bool
+	 */
+	public function authRoute(Route $route, $requiredLevel, \ReflectionClass $reflectionClass = null, \ReflectionMethod $reflectionMethod = null): bool;
 }

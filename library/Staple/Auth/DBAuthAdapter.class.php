@@ -33,9 +33,11 @@ namespace Staple\Auth;
 
 use Staple\Config;
 use Staple\Query\Query;
+use Staple\Traits\AuthRoute;
 
 class DBAuthAdapter implements AuthAdapter
 {
+	use AuthRoute;
 	/**
 	 * Store the user identifier. Usually the username.
 	 * @var string
@@ -88,30 +90,23 @@ class DBAuthAdapter implements AuthAdapter
 	 */
 	public function getLevel()
 	{
-		if(array_key_exists('rolefield', Config::getValue('DBAuthAdapter','rolefield')))
+		$query = Query::select(Config::getValue('DBAuthAdapter','authtable'), [Config::getValue('DBAuthAdapter','rolefield')])
+			->whereEqual(Config::getValue('DBAuthAdapter','uidfield'),$this->uid);
+		if(($result = $query->execute()) !== false)
 		{
-			$query = Query::select(Config::getValue('DBAuthAdapter','authtable'), [Config::getValue('DBAuthAdapter','rolefield')])
-				->whereEqual(Config::getValue('DBAuthAdapter','uidfield'),$this->uid);
-			if(($result = $query->execute()) !== false)
+			$level = (int)$result->fetchColumn(0);
+			if($level < 0)
 			{
-				$level = (int)$result->fetchColumn(0);
-				if($level < 0)
-				{
-					return 0;
-				}
-				else
-				{
-					return $level;
-				}
+				return 0;
 			}
 			else
 			{
-				return 0;
+				return $level;
 			}
 		}
 		else
 		{
-			return 1;
+			return 0;
 		}
 	}
 	

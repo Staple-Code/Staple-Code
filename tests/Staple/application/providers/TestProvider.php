@@ -40,4 +40,15 @@ class TestProvider extends RestfulController
 	{
 		return true;
 	}
+
+	/**
+	 * @protected
+	 */
+	public function getProtected()
+	{
+		return Json::success(new class {
+			public $request = 'Successful';
+			public $data = 'This is secure data.';
+		});
+	}
 }
