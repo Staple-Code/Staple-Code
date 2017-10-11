@@ -1,6 +1,9 @@
 <?php
-use Staple\Auth;
-use Staple\AuthController;
+
+use Staple\Auth\Auth;
+use Staple\Controller\Controller;
+use Staple\Route;
+use Staple\View;
 
 /** 
  * @author Ironpilot
@@ -23,34 +26,39 @@ use Staple\AuthController;
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-class accountController extends AuthController
+class AccountController extends Controller
 {
-	public function _start()
-	{
-		parent::_start();
-		$this->_openMethod('signin');
-	}
+	/**
+	 * @protected
+	 * @return View
+	 */
 	public function index()
 	{
-		$this->view->message = Auth::get()->getMessage();
+		return View::create()->data([
+			'message' => Auth::get()->getMessage()
+		]);
 	}
+
+	/**
+	 * @return Route
+	 */
 	public function signin()
 	{
-		$username = $_POST['user'];
-		$password = $_POST['pass'];
+		$username = $_POST['user'] ?? null;
+		$password = $_POST['pass'] ?? null;
 		
 		$auth = Auth::get();
-		$granted = $auth->doAuth(array(
+		$granted = $auth->doAuth([
 				'username'=>$username,
 				'password'=>$password,
-				));
+				]);
 		if($granted === true)
 		{
-			$this->_redirect('index/index');
+			return Route::create('index/index');
 		}
 		else
 		{
-			$this->_redirect('account/index');
+			return Route::create('account/index');
 		}
 	}
 }

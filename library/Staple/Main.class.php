@@ -25,6 +25,7 @@
  */
 namespace Staple;
 
+use Staple\Controller\Controller;
 use Staple\Session\Session;
 
 class Main

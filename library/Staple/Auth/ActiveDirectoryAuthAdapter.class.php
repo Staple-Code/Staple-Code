@@ -80,7 +80,7 @@ class ActiveDirectoryAuthAdapter implements AuthAdapter
 	 * @return bool
 	 * @see Staple_AuthAdapter::getAuth()
 	 */
-	public function getAuth($cred)
+	public function getAuth($cred): bool
 	{
 		if($this->checkConfig($this->_settings))
 		{

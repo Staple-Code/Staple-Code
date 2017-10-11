@@ -32,7 +32,7 @@
 namespace Staple\Session;
 
 use Staple\Auth\Auth;
-use Staple\Controller;
+use Staple\Controller\Controller;
 use stdClass;
 
 class InternalSessionData

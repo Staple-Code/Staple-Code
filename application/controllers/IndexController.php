@@ -1,7 +1,9 @@
 <?php
-/** 
- * This is a template file for the program's AuthController.
- * 
+
+use Staple\Controller\Controller;
+use Staple\View;
+
+/**
  * @author Ironpilot
  * @copyright Copyright (c) 2011, STAPLE CODE
  * 
@@ -19,15 +21,17 @@
  * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
- * 
  */
-namespace Staple;
-
-abstract class AuthController extends Controller
+class IndexController extends Controller
 {
 	public function _start()
 	{
-		$this->_openMethod('index');
+		// Controller Startup Code
+	}
+	
+	public function index()
+	{
+		// Index Action Code Goes Here.
+		return View::create();
 	}
 }
-?>

@@ -33,7 +33,7 @@ class FakeAuthAdapter implements AuthAdapter
 	 * @param mixed $credentials
 	 * @return bool
 	 */
-	public function getAuth($credentials)
+	public function getAuth($credentials): bool
 	{
 		if(is_array($credentials))
 		{
@@ -104,6 +104,7 @@ class AuthTest extends TestCase
 	public function testLoginWithArrayOfCredentials()
 	{
 		$auth = $this->getAuth();
+		$auth->implementAuthAdapter(new FakeAuthAdapter());
 		$credentials = [
 			'username'	=>	'testusername',
 			'password'	=>	'test&P@ssword'
@@ -119,6 +120,7 @@ class AuthTest extends TestCase
 	public function testFailedLoginWithArrayOfCredentials()
 	{
 		$auth = $this->getAuth();
+		$auth->implementAuthAdapter(new FakeAuthAdapter());
 		$credentials = [
 			'username'	=>	'testusername',
 			'password'	=>	'noPassword'
@@ -134,6 +136,7 @@ class AuthTest extends TestCase
 	public function testLoginAndLogOut()
 	{
 		$auth = $this->getAuth();
+		$auth->implementAuthAdapter(new FakeAuthAdapter());
 		$credentials = [
 			'username'	=>	'testusername',
 			'password'	=>	'test&P@ssword'

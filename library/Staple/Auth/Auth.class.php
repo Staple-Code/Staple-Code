@@ -24,20 +24,11 @@
 namespace Staple\Auth;
 
 use Exception;
-use ReflectionClass;
-use ReflectionMethod;
-use Staple\AuthController;
 use Staple\Config;
-use Staple\Dev;
 use Staple\Error;
 use Staple\Exception\AuthException;
-use Staple\Exception\PageNotFoundException;
-use Staple\Json;
-use Staple\Layout;
-use Staple\Main;
 use Staple\Route;
 use Staple\Session\Session;
-use Staple\View;
 
 class Auth
 {
@@ -54,13 +45,6 @@ class Auth
 	 * @var AuthAdapter
 	 */
 	private $adapter;
-	
-	/**
-	 * 
-	 * Holds the configuration for this object.
-	 * @var array
-	 */
-	private $_settings = array();
 	
 	/**
 	 * 
@@ -81,6 +65,16 @@ class Auth
 	 * @var string
 	 */
 	protected $message = '';
+	/**
+	 * This is the route that will be executed when authentication is unsuccessful.
+	 * @var Route
+	 */
+	protected $defaultUnauthenticatedRoute;
+	/**
+	 * This is the last route that was attempted by the authentication system.
+	 * @var Route
+	 */
+	protected $lastAttemptedRoute;
 	
 	/**
 	 * 
@@ -94,18 +88,7 @@ class Auth
 	public function __construct()
 	{
 		$this->authed = false;
-		if(Config::exists('auth'))
-		{
-			$curConfig = Config::get('auth');
-			if($this->checkConfig($curConfig))
-			{
-				$this->_settings = $curConfig;
-			}
-		}
-		else
-		{
-			throw new Exception('Authentication Module Failure', Error::AUTH_ERROR);
-		}
+		$this->defaultUnauthenticatedRoute = new Route('index/index');
 	}
 	
 	/**
@@ -115,28 +98,6 @@ class Auth
 	{
 		if(isset(self::$instance))
 			Session::auth(self::$instance);
-	}
-	
-	/**
-	 * 
-	 * Accepts the parsed configuration file and checks for configuration keys required by the
-	 * class. If a key is missing, it throws an Exception cancelling the execution of the script.
-	 * 
-	 * @param array $conf
-	 * @throws Exception
-	 * @return bool
-	 */
-	private function checkConfig(array $conf)
-	{
-		$keys = array('enabled','adapter','controller');
-		foreach($keys as $keyval)
-		{
-			if(!array_key_exists($keyval, $conf))
-			{
-				throw new Exception('Authentication Module Configuration Error',Error::AUTH_ERROR);
-			}
-		}
-		return true;
 	}
 	
 	/**
@@ -193,7 +154,49 @@ class Auth
 	{
 		return $this->adapter->getUserId();
 	}
-	
+
+	/**
+	 * Return the default unauthenticated route.
+	 * @return Route
+	 */
+	protected function getDefaultUnauthenticatedRoute(): Route
+	{
+		return $this->defaultUnauthenticatedRoute;
+	}
+
+	/**
+	 * Set a new route for the default unauthenticated route.
+	 * @param Route $defaultUnauthenticatedRoute
+	 * @return Auth
+	 */
+	public function setDefaultUnauthenticatedRoute(Route $defaultUnauthenticatedRoute): Auth
+	{
+		$this->defaultUnauthenticatedRoute = $defaultUnauthenticatedRoute;
+
+		return $this;
+	}
+
+	/**
+	 * Get the last attempted route by the authentication system.
+	 * @return Route|null
+	 */
+	public function getLastAttemptedRoute()
+	{
+		return $this->lastAttemptedRoute;
+	}
+
+	/**
+	 * Set the last attempted route.
+	 * @param Route $lastAttemptedRoute
+	 * @return Auth
+	 */
+	protected function setLastAttemptedRoute(Route $lastAttemptedRoute): Auth
+	{
+		$this->lastAttemptedRoute = $lastAttemptedRoute;
+
+		return $this;
+	}
+
 	/**
 	 * 
 	 * Attempts authorization, accepting credentials and forwarding them to the AuthAdapter.
@@ -231,21 +234,47 @@ class Auth
 		}
 	}
 
-	private function createAuthAdapter()
+	/**
+	 * Create the AuthAdapter with the option to supply a custom adapter.
+	 * @param AuthAdapter|null $adapter
+	 * @throws Exception
+	 * @return bool
+	 */
+	private function createAuthAdapter(AuthAdapter $adapter = null)
 	{
-		$adapter = Config::getValue('auth', 'adapter');
-		if(class_exists($adapter))
+		if($adapter instanceof AuthAdapter)
 		{
-			$this->adapter = new $adapter();
-			if(!($this->adapter instanceof AuthAdapter))
-			{
-				throw new Exception('Invalid Authentication Adapter', Error::AUTH_ERROR);
-			}
+			$this->adapter = $adapter;
+			return true;
 		}
 		else
 		{
-			throw new Exception('Adapter Class Not Found', Error::AUTH_ERROR);
+			$configuredAdapter = Config::getValue('auth', 'adapter');
+			if(class_exists($configuredAdapter))
+			{
+				$this->adapter = new $configuredAdapter();
+				if(!($this->adapter instanceof AuthAdapter))
+				{
+					throw new Exception('Invalid Authentication Adapter', Error::AUTH_ERROR);
+				}
+				return true;
+			}
+			else
+			{
+				throw new Exception('Adapter Class Not Found', Error::AUTH_ERROR);
+			}
 		}
+	}
+
+	/**
+	 * Implement a new authentication adapter. This also clears any current authentication that exists.
+	 * @param AuthAdapter $adapter
+	 * @return bool
+	 */
+	public function implementAuthAdapter(AuthAdapter $adapter)
+	{
+		$this->clearAuth();
+		return $this->createAuthAdapter($adapter);
 	}
 	
 	/**
@@ -254,10 +283,32 @@ class Auth
 	 * This method accepts an optional route parameter that can be sent forward to the auth controller
 	 * which will allow the developer to react to the route that was requested.
 	 * @param Route $attemptedRoute
+	 * @param Route $routeTo
+	 * @return bool
+	 * @throws AuthException
 	 */
-	public function noAuth(Route $attemptedRoute = NULL)
+	public function noAuth(Route $attemptedRoute = null, Route $routeTo = null)
 	{
-		$this->dispatchAuthController($attemptedRoute);
+		//Break a potential infinite loop
+		if($this->getLastAttemptedRoute() instanceof Route)
+		{
+			if($attemptedRoute->getController() == $this->getLastAttemptedRoute()->getController()
+				&& $attemptedRoute->getAction() == $this->getLastAttemptedRoute()->getAction())
+			{
+				throw new AuthException('Not Authorized');
+			}
+		}
+
+		$this->setLastAttemptedRoute($attemptedRoute);
+		if($routeTo instanceof Route)
+		{
+			return $routeTo->execute();
+		}
+		else
+		{
+			$route = $this->getDefaultUnauthenticatedRoute();
+			return $route->execute();
+		}
 	}
 	
 	/**
@@ -280,131 +331,6 @@ class Auth
 	public function getMessage()
 	{
 		return $this->message;
-	}
-	
-	/**
-	 * 
-	 * Dispatches to the AuthController -> index action. Throws an Exception if the controller does
-	 * not extend Staple_AuthController.
-	 * @param Route $previousRoute
-	 * @throws Exception
-	 * @return bool
-	 */
-	private function dispatchAuthController($previousRoute = NULL)
-	{
-		//Get and Construct the Auth Controller
-		$controllerClass = Config::getValue('auth','controller');
-		$class = substr($controllerClass, 0, strlen($controllerClass)-10);
-
-		//Setup the action to call
-		$action = (strlen(Config::getValue('auth', 'action', false)) > 0) ? Config::getValue('auth', 'action', false) : 'index';
-
-		//Check for the controller existence
-		if(class_exists($controllerClass))
-		{
-			//Check for the action existence
-			if (method_exists($controllerClass, $action))
-			{
-				//Create and Start the Auth Controller
-				/** @var AuthController $controller */
-				$controller = new $controllerClass();
-				$controller->_start();
-
-				//Register the controller with the front controller
-				Main::controller($controllerClass);
-
-				//If the controller
-				if ($controller instanceof AuthController)
-				{
-					//Set the view's controller to match the route
-					$controller->view->setController($class);
-
-					//Set the view's action to match the route
-					$controller->view->setView($action);
-
-					//Call the controller action
-					$actionMethod = new ReflectionMethod($controller, $action);
-					$return = $actionMethod->invokeArgs($controller, array($previousRoute));
-
-					if ($return instanceof View)        //Check for a returned View object
-					{
-						//If the view does not have a controller name set, set it to the currently executing controller.
-						if ($return->hasController() == false)
-						{
-							$loader = Main::get()->getLoader();
-							$conString = get_class($controller);
-
-							$return->setController(substr($conString, 0, strlen($conString) - strlen($loader::CONTROLLER_SUFFIX)));
-						}
-
-						//If the view doesn't have a view set, use the route's action.
-						if(!$return->hasView())
-						{
-							$return->setView($action);
-						}
-
-						//Check for a controller layout and build it.
-						if ($controller->layout instanceof Layout)
-						{
-							$controller->layout->build(NULL, $return);
-						}
-						else
-						{
-							$return->build();
-						}
-					}
-					elseif ($return instanceof Json)    //Check for a Json object to be coverted and echoed.
-					{
-						echo json_encode($return);
-					}
-					elseif (is_object($return))        //Check for another object type
-					{
-						//If the object is stringable, covert it to a string and output it.
-						$class = new ReflectionClass($return);
-						if ($class->implementsInterface('JsonSerializable'))
-						{
-							echo json_encode($return);
-						}
-						//If the object is stringable, covert to a string and output it.
-						elseif ((!is_array($return)) &&
-							((!is_object($return) && settype($return, 'string') !== false) ||
-								(is_object($return) && method_exists($return, '__toString'))))
-						{
-							echo (string)$return;
-						}
-						//If nothing else works, echo the object through the dump method.
-						else
-						{
-							Dev::dump($return);
-						}
-					}
-					elseif (is_string($return))        //If the return value was simply a string, echo it out.
-					{
-						echo $return;
-					}
-					else
-					{
-						//Fall back to previous functionality by rendering views and layouts.
-						if ($controller->layout instanceof Layout)
-						{
-							$controller->layout->build();
-						}
-						else
-						{
-							$controller->view->build();
-						}
-					}
-					return true;
-				}
-				else
-				{
-					throw new AuthException('Fatal Error connecting to Auth Controller', Error::AUTH_ERROR);
-				}
-			}
-		}
-
-		//Throw an exception if the auth page cannot be found
-		throw new PageNotFoundException('Page Not Found.', Error::PAGE_NOT_FOUND);
 	}
 
 	/**

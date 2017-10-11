@@ -14,12 +14,13 @@ in `Controller` for the autoloader to find the classes.
 The special method `_start()` is called every time that an action is executed
 on a controller. This method allows you to add actions that need to occur
 before the action is executed. An example would be to switch to a secure
-connection (HTTPS).
+connection (HTTPS). This method needs to be protected to ensure that it is not
+accessible directly from the browser.
 
 ```php?start_inline=1
 class MyController extends Controller
 {
-    public function _start()
+    protected function _start()
     {
         // Pre-action code here
     }
@@ -113,3 +114,116 @@ class ReportController extends Controller
 ```
 
 ## Communicating Data to Views
+
+To send data to the view, you can return the data with the object itself using
+the `data()` method on the `View` object. The data needs to be an associative 
+array. 
+
+```php?start_inline=1
+class ReportController extends Controller
+{
+    public function sales()
+    {
+        return View::create()->data([
+            'make'  =>  'Subaru',
+            'model' =>  'Outback',
+            'sales' =>  1450
+        ]);
+    }
+}
+```
+
+In the View itself data is accessible by calling for the key on the `View` object.
+
+```php
+<div>
+    <?php 
+    echo $this->make;
+    ?> 
+</div>
+```
+
+## Authenticating Controller Actions
+
+Staple has an authentication system built directly into the controllers. To use the
+authentication mechanism on the each controller you have a few quick options.
+
+### Protect Entire Controllers
+
+To protect every route in a single `Controller` you can add the `@protected` notation
+in the Controller's opening comment section.
+
+```php?start_inline=1
+/**
+ * This controller has secure data inside.
+ * @protected
+ */
+class SecureController extends Controller
+{
+    public function account()
+    {
+        return View::create();
+    }
+}
+```
+
+All current routes and any future routes will now require authentication before they
+can be called.
+
+### Protect Single Actions
+
+If you have a `Controller` which will have mixed content, both secure and insecure,
+you can add the `@protected` notation to the comments above the action itself.
+
+```php?start_inline=1
+class DataController extends Controller
+{
+    /**
+     * This data is public
+     */
+    public function publicData()
+    {
+        return View::create();
+    }
+    
+    /**
+     * You must authenticate to access this data.
+     * @protected
+     */
+    public function secureData()
+    {
+        return View::create();
+    }
+}
+```
+
+### Exclude Actions from Authentication
+
+You can also exclude actions from a global controller protection by adding the
+`@open` notation to a specific action.
+
+```php?start_inline=1
+/**
+ * This controller has secure data inside.
+ * @protected
+ */
+class DataController extends Controller
+{
+    /**
+     * This data is public
+     * @open
+     */
+    public function publicData()
+    {
+        return View::create();
+    }
+    
+    /**
+     * You must authenticate to access this data.
+     */
+    public function secureData()
+    {
+        return View::create();
+    }
+}
+```

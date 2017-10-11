@@ -43,7 +43,7 @@ return [
 	],
 
 	'layout'	=>	[
-		'default' 			=>	'bootstrap',
+		'default' 			=>	'main',
 		'scripts'			=>	[
 			'/bootstrap/js/bootstrap.min.js',
 			'https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js',
@@ -72,7 +72,7 @@ return [
 
 	'auth'	=>	[
 		'enabled'			=>	0,
-		'adapter'			=>	'Staple\Tests\FakeAuthAdapter',
+		'adapter'			=>	'Staple\Auth\DBAuthAdapter',
 		'controller'		=>	'accountController',
 		'authtable'			=>	'accounts',
 		'uidfield'			=>	'username',
