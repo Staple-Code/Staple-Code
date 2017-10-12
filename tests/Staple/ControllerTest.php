@@ -131,8 +131,7 @@ class ControllerTest extends TestCase
 		$route = Route::create(self::ROUTE_VIEW);
 		ob_start();
 		$route->execute();
-		$textBuffer = ob_get_contents();
-		ob_end_clean();
+		$textBuffer = ob_get_clean();
 
 		$this->assertEquals('This is a test View.', $textBuffer);
 	}
@@ -149,8 +148,7 @@ class ControllerTest extends TestCase
 		$route = Route::create(self::ROUTE_AUTHENTICATED);
 		ob_start();
 		$route->execute();
-		$textBuffer = ob_get_contents();
-		ob_end_clean();
+		$textBuffer = ob_get_clean();
 
 		$this->assertFalse($auth->isAuthed());
 		$this->assertNotEquals('Authenticated Content', $textBuffer);
@@ -163,8 +161,7 @@ class ControllerTest extends TestCase
 		$route = Route::create(self::ROUTE_AUTHENTICATED);
 		ob_start();
 		$route->execute();
-		$textBuffer = ob_get_contents();
-		ob_end_clean();
+		$textBuffer = ob_get_clean();
 
 		$this->assertEquals('Authenticated Content', $textBuffer);
 		$this->assertTrue($auth->isAuthed());
@@ -177,8 +174,7 @@ class ControllerTest extends TestCase
 		$route = Route::create(self::ROUTE_UNPROTECTED_VIEW);
 		ob_start();
 		$route->execute();
-		$textBuffer = ob_get_contents();
-		ob_end_clean();
+		$textBuffer = ob_get_clean();
 
 		$this->assertEquals('This is a test View.', $textBuffer);
 
@@ -192,8 +188,7 @@ class ControllerTest extends TestCase
 		$route = Route::create(self::ROUTE_PROTECTED);
 		ob_start();
 		$route->execute();
-		$textBuffer = ob_get_contents();
-		ob_end_clean();
+		$textBuffer = ob_get_clean();
 
 		$this->assertFalse($auth->isAuthed());
 		$this->assertEquals('This is a test View.', $textBuffer);
@@ -206,8 +201,7 @@ class ControllerTest extends TestCase
 		$route = Route::create(self::ROUTE_PROTECTED);
 		ob_start();
 		$route->execute();
-		$textBuffer = ob_get_contents();
-		ob_end_clean();
+		$textBuffer = ob_get_clean();
 
 		$this->assertEquals('Authenticated Content', $textBuffer);
 		$this->assertTrue($auth->isAuthed());
