@@ -25,7 +25,7 @@
  */
 namespace Staple;
 
-use \Exception;
+use Exception;
 use Staple\Form\Form;
 
 class View 
@@ -356,6 +356,7 @@ class View
 	 */
 	public function build()
 	{
+		echo 'Building View:';
 		if($this->_render === true)
 		{
 			if (isset($this->_staticView))
@@ -373,6 +374,7 @@ class View
 				//Load the view from the default loader
 				$controller = isset($this->_controller) ? $this->_controller : Main::get()->getRoute()->getController();
 				$view = Main::get()->getLoader()->loadView($controller, $this->getView());
+				echo $controller.' | '.$view;
 				if (strlen($view) >= 1 && $view !== false)
 				{
 					//Initialize the view model, if set
