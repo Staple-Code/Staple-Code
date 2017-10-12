@@ -25,7 +25,7 @@
  */
 namespace Staple;
 
-use \Exception;
+use Exception;
 use Staple\Form\Form;
 
 class View 

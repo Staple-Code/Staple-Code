@@ -393,6 +393,20 @@ class Autoload
 			{
 				return $theView;
 			}
+			else
+			{
+				//Try Method-Casing the View and Controller.
+				$theView = $dir;
+				if(substr($theView,strlen($theView)-2) == DIRECTORY_SEPARATOR)
+				{
+					$theView .= DIRECTORY_SEPARATOR;
+				}
+				$theView .= Link::methodCase(lcfirst($controller)).DIRECTORY_SEPARATOR.Link::methodCase(lcfirst($view)).static::VIEW_FILE_EXTENSION;
+				if(file_exists($theView))
+				{
+					return $theView;
+				}
+			}
 		}
 		if($required === true)
 		{
