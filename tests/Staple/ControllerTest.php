@@ -126,6 +126,7 @@ class ControllerTest extends TestCase
 
 	public function testRouting()
 	{
+		require __DIR__.'/application/views/test/index.phtml';
 		//View Route
 		Request::fake(self::ROUTE_VIEW, Request::METHOD_GET);
 		$route = Route::create(self::ROUTE_VIEW);
