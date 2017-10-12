@@ -63,17 +63,14 @@ class Route
 	
 	public function __construct($link = NULL)
 	{
-		//if(isset($link))
-		//{
-			if(is_array($link))
-			{
-				$this->processArrayRoute($link);
-			}
-			else
-			{
-				$this->processStringRoute($link);
-			}
-		//}
+		if(is_array($link))
+		{
+			$this->processArrayRoute($link);
+		}
+		else
+		{
+			$this->processStringRoute($link);
+		}
 	}
 	
 	/**
@@ -185,7 +182,7 @@ class Route
 					}
 					else
 					{
-						throw new PageNotFoundException('Page Not Found',Error::PAGE_NOT_FOUND);
+						throw new PageNotFoundException();
 					}
 				}
 			}
@@ -206,7 +203,7 @@ class Route
 		}
 		
 		//If a valid page cannot be found, throw page not found exception
-		throw new PageNotFoundException('Page Not Found',Error::PAGE_NOT_FOUND);
+		throw new PageNotFoundException();
 	}
 	
 	/**
@@ -307,7 +304,7 @@ class Route
 		if($providerObject instanceof RestfulController)
 		{
 			$route = array_merge([$this->getAction()], $this->getParams());
-			$providerObject->_route($route);
+			$providerObject->route($route);
 		}
 		else
 		{

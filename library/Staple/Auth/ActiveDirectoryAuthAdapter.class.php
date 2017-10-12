@@ -35,9 +35,11 @@ use Staple\ActiveDirectory as AD;
 use Staple\Config;
 use Staple\DB;
 use Staple\Error;
+use Staple\Traits\AuthRoute;
 
 class ActiveDirectoryAuthAdapter implements AuthAdapter
 {
+	use AuthRoute;
 	/**
 	 * 
 	 * Enter description here ...

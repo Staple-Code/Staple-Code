@@ -11,9 +11,12 @@ namespace Staple\Tests;
 use PHPUnit\Framework\TestCase;
 use Staple\Auth\Auth;
 use Staple\Auth\AuthAdapter;
+use Staple\Traits\AuthRoute;
 
 class FakeAuthAdapter implements AuthAdapter
 {
+	use AuthRoute;
+
 	const USER_KEY = 'username';
 	const PASS_KEY = 'password';
 	const TEST_USERNAME = 'testusername';

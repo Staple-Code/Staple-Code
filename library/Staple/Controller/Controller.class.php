@@ -24,17 +24,17 @@ namespace Staple\Controller;
 
 use Exception;
 use Staple\Auth\Auth;
+use Staple\Autoload;
 use Staple\Config;
 use Staple\Error;
 use Staple\Exception\AuthException;
 use Staple\Layout;
+use Staple\Route;
 use Staple\Traits\AuthHelpers;
 use Staple\Traits\Helpers;
 
 abstract class Controller
 {
-	const AUTH_FLAG_PROTECTED = '@protected';
-	const AUTH_FLAG_OPEN = '@open';
 	use Helpers;
 	use AuthHelpers;
 
@@ -94,19 +94,40 @@ abstract class Controller
 		{
 			if(method_exists($this,$method))
 			{
+				$auth = Auth::get();
 				$reflectMethod = new \ReflectionMethod($this, $method);
 				$reflectClass = new \ReflectionClass($this);
 				$classComments = $reflectClass->getDocComment();
 				$methodComments = $reflectMethod->getDocComment();
-				if(stripos($classComments, self::AUTH_FLAG_PROTECTED) !== false)        //The entire Controller is protected.
+
+				//Auth Level
+				$routeAuth = true;
+				if(stripos($classComments, Auth::AUTH_FLAG_LEVEL) !== false)
 				{
-					if(stripos($methodComments, self::AUTH_FLAG_OPEN))					//Controller is protected but the method is open.
-						return true;
-					return Auth::get()->isAuthed();
+					$levelSplit = explode(Auth::AUTH_FLAG_LEVEL, $classComments);
+					$eolSplit = explode($levelSplit[1], '\n');
+					$authLevel = trim($eolSplit[0]);
+					$routeAuth = $auth->authRoute(Route::create([str_ireplace(Autoload::CONTROLLER_SUFFIX, '', $reflectClass->getName()),$method]), $authLevel, $reflectClass, $reflectMethod);
+
 				}
-				elseif(stripos($methodComments, self::AUTH_FLAG_PROTECTED) !== false)    //The method is protected.
+				elseif(stripos($methodComments, Auth::AUTH_FLAG_LEVEL) !== false)
 				{
-					return Auth::get()->isAuthed();
+					$levelSplit = explode(Auth::AUTH_FLAG_LEVEL, $methodComments);
+					$eolSplit = explode($levelSplit[1], '\n');
+					$authLevel = trim($eolSplit[0]);
+					$routeAuth = $auth->authRoute(Route::create([str_ireplace(Autoload::CONTROLLER_SUFFIX, '', $reflectClass->getName()),$method]), $authLevel, $reflectClass, $reflectMethod);
+				}
+
+				//Auth Protection
+				if(stripos($classComments, Auth::AUTH_FLAG_PROTECTED) !== false)			//The entire Controller is protected.
+				{
+					if(stripos($methodComments, Auth::AUTH_FLAG_OPEN) !== false)					//Controller is protected but the method is open.
+						return true;
+					return $auth->isAuthed() && $routeAuth;
+				}
+				elseif(stripos($methodComments, Auth::AUTH_FLAG_PROTECTED) !== false)    //The method is protected.
+				{
+					return $auth->isAuthed() && $routeAuth;
 				}
 				return true;
 			}

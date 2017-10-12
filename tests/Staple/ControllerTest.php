@@ -27,9 +27,12 @@ use Staple\Auth\Auth;
 use Staple\Auth\AuthAdapter;
 use Staple\Request;
 use Staple\Route;
+use Staple\Traits\AuthRoute;
 
 class FakeCtrlAuthAdapter implements AuthAdapter
 {
+	use AuthRoute;
+
 	const USER_KEY = 'username';
 	const PASS_KEY = 'password';
 	const TEST_USERNAME = 'testusername';
@@ -114,6 +117,12 @@ class ControllerTest extends TestCase
 	const ROUTE_AUTHENTICATED = 'test/authenticated';
 	const ROUTE_PROTECTED = 'protected/data';
 	const ROUTE_UNPROTECTED_VIEW = 'protected/index';
+
+	protected function setUp()
+	{
+		//Clear auth before each test.
+		Auth::get()->clearAuth();
+	}
 
 	public function testRouting()
 	{

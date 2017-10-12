@@ -24,7 +24,7 @@ namespace Staple\Controller;
 
 use Exception;
 use Staple\Auth\Auth;
-use Staple\Config;
+use Staple\Autoload;
 use Staple\Dev;
 use Staple\Error;
 use Staple\Exception\AuthException;
@@ -54,9 +54,7 @@ abstract class RestfulController
 	
 	/**
 	 * 
-	 * Controller constructor creates an instance of View and saves it in the $view
-	 * property. It then calls the overridable method _start() for additional boot time
-	 * procedures.
+	 * RestfulController constructor
 	 */
 	public function __construct()
 	{
@@ -73,7 +71,8 @@ abstract class RestfulController
 	
 	/**
 	 * Overridable and empty method allows for additional boot time procedures.
-	 * This method is called by the front controller.
+	 * This method is called every time an action is executed and before authentication
+	 * of the route occurs.
 	 */
 	public function _start() {}
 
@@ -91,12 +90,12 @@ abstract class RestfulController
 	
 	/**
 	 * Returns a boolean true or false whether the method requires authentication
-	 * before being dispatched from the front controller.
+	 * before being dispatched.
 	 * @param string $method
 	 * @return bool
 	 * @throws Exception
 	 */
-	public function _auth($method)
+	protected function auth($method)
 	{
 		$method = (string)$method;
 		if(!ctype_alnum($method))
@@ -107,190 +106,48 @@ abstract class RestfulController
 		{
 			if(method_exists($this,$method))
 			{
-				//Is the controller completely open?
-				if($this->open === true)
+				$auth = Auth::get();
+				$reflectMethod = new \ReflectionMethod($this, $method);
+				$reflectClass = new \ReflectionClass($this);
+				$classComments = $reflectClass->getDocComment();
+				$methodComments = $reflectMethod->getDocComment();
+
+				//Auth Level
+				$routeAuth = true;
+				if(stripos($classComments, Auth::AUTH_FLAG_LEVEL) !== false)
 				{
-					return true;
+					$levelSplit = explode(Auth::AUTH_FLAG_LEVEL, $classComments);
+					$eolSplit = explode($levelSplit[1], '\n');
+					$authLevel = trim($eolSplit[0]);
+					$routeAuth = $auth->authRoute(Route::create([str_ireplace(Autoload::CONTROLLER_SUFFIX, '', $reflectClass->getName()),$method]), $authLevel, $reflectClass, $reflectMethod);
+
 				}
-				elseif(array_search($method, $this->openMethods) !== FALSE)		//Is the requested method open?
+				elseif(stripos($methodComments, Auth::AUTH_FLAG_LEVEL) !== false)
 				{
-					return true;
+					$levelSplit = explode(Auth::AUTH_FLAG_LEVEL, $methodComments);
+					$eolSplit = explode($levelSplit[1], '\n');
+					$authLevel = trim($eolSplit[0]);
+					$routeAuth = $auth->authRoute(Route::create([str_ireplace(Autoload::CONTROLLER_SUFFIX, '', $reflectClass->getName()),$method]), $authLevel, $reflectClass, $reflectMethod);
 				}
-				elseif(Auth::get()->isAuthed() && Auth::get()->getAuthLevel() >= $this->_authLevel($method))	//Does the authed user have the required access level?
+
+				//Auth Protection
+				if(stripos($classComments, Auth::AUTH_FLAG_PROTECTED) !== false)			//The entire Controller is protected.
 				{
-					return true;
+					if(stripos($methodComments, Auth::AUTH_FLAG_OPEN) !== false)					//Provider is protected but the method is open.
+						return true;
+					return $auth->isAuthed() && $routeAuth;
 				}
+				elseif(stripos($methodComments, Auth::AUTH_FLAG_PROTECTED) !== false)    //The method is protected.
+				{
+					return $auth->isAuthed() && $routeAuth;
+				}
+				return true;
 			}
 			else
 			{
-				throw new Exception('Authentication Validation Error', Error::AUTH_ERROR);
+				throw new AuthException('Authentication Validation Error', Error::AUTH_ERROR);
 			}
 		}
-		return false;
-	}
-	
-	/**
-	 * 
-	 * Returns the access level required for this method.
-	 * @param string | array $method
-	 * @throws Exception
-	 * @return int
-	 */
-	public function _authLevel($method)
-	{
-		$method = (string)$method;
-		if(!ctype_alnum($method))
-		{
-			throw new Exception('Authentication Validation Error: Invalid Method', Error::AUTH_ERROR);
-		}
-		else
-		{
-			if(method_exists($this,$method))
-			{
-				if(array_key_exists($method, $this->accessLevels) === true)
-				{
-					return (int)$this->accessLevels[$method];
-				}
-				else
-				{
-					//return default auth level if non assigned.
-					return 1;
-					//throw new Exception('Authentication Validation Error: No Auth Level', Error::AUTH_ERROR);
-				}
-			}
-			else
-			{
-				throw new Exception('Authentication Validation Error: Method Not Found', Error::AUTH_ERROR);
-			}
-		}
-	}
-	
-	/**
-	 * 
-	 * Replaces the default permission level with the specified permission level. All method
-	 * specific access levels will be overwritten. This should be called in controller startup.
-	 * @param int $level
-	 */
-	protected function _requiredControllerAccessLevel($level)
-	{
-		$methods = get_class_methods(get_class($this));
-		foreach($methods as $acMethod)
-		{
-			if(substr($acMethod, 0,1) != '_')
-			{
-				$this->accessLevels[$acMethod] = (int)$level;
-			}
-		}
-		$this->openMethods = array();
-	}
-	
-	/**
-	 * Specifies the required access level for the specified action. This should be called
-	 * in the Controller startup.
-	 * @param string $for
-	 * @param int $level
-	 * @throws Exception
-	 */
-	protected function _requiredActionAccessLevel($for,$level)
-	{
-		$level = (int)$level;
-		$for = (string)$for;
-		if(!ctype_alnum($for))
-		{
-			throw new Exception('Cannot change method permissions.', Error::AUTH_ERROR);
-		}
-		else
-		{
-			if(method_exists($this, $for))
-			{
-				if($level < 0)
-				{
-					throw new Exception('Cannot change method permissions.', Error::AUTH_ERROR);
-				}
-				else
-				{
-					if($level == 0)
-					{
-						$this->_openMethod($for);
-						if(array_key_exists($for, $this->accessLevels))
-						{
-							unset($this->accessLevels[$for]);
-						}
-					}
-					else
-					{
-						$this->accessLevels[$for] = $level;
-					}
-				}
-			}
-			else 
-			{
-				throw new Exception('Cannot change method permissions on a non-existant method.', Error::AUTH_ERROR);
-			}
-		}
-	}
-	
-	/**
-	 * Sent a string it allows one method to be accessed without authentication. When sent
-	 * an array, it allows all the values method names without authentication.
-	 * @param string | array $method
-	 * @throws Exception
-	 * @return bool
-	 */
-	protected function _openMethod($method)
-	{
-		if(is_array($method))
-		{
-			foreach($method as $mName)
-			{
-				if(!ctype_alnum($mName))
-				{
-					throw new Exception('Cannot change method permissions.', Error::AUTH_ERROR);
-				}
-				else
-				{
-					if(array_search($mName, $this->openMethods) === false)
-					{
-						$this->openMethods[] = $mName;
-						$this->accessLevels[$mName] = 0;
-					}
-				}
-			}
-			return true;
-		}
-		else
-		{
-			if(!ctype_alnum($method))
-			{
-				throw new Exception('Cannot change method permissions.', Error::AUTH_ERROR);
-			}
-			else
-			{
-				if(array_search($method, $this->openMethods) === false)
-				{
-					$this->openMethods[] = $method;
-					$this->accessLevels[$method] = 0;
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-	
-	/**
-	 * This function opens the entire controller to be accessed without authentication.
-	 */
-	protected function _openAll()
-	{
-		$methods = get_class_methods(get_class($this));
-		foreach($methods as $acMethod)
-		{
-			if(substr($acMethod, 0,1) != '_')
-			{
-				$this->accessLevels[$acMethod] = 0;
-			}
-		}
-		$this->open = true;
 	}
 
 	/*----------------------------------------Routing Functions----------------------------------------*/
@@ -303,7 +160,7 @@ abstract class RestfulController
 	 * @throws PageNotFoundException
 	 * @throws RoutingException
 	 */
-	public function _route(array $route = [])
+	public function route(array $route = [])
 	{
 		//Set the Action
 		if(count($route) >= 1)
@@ -338,29 +195,18 @@ abstract class RestfulController
 				//Run the startup method
 				$this->_start();
 
-				//Check if global Auth is enabled.
-				if(Config::getValue('auth', 'enabled') != 0)
+				//check for auth on the requested method.
+				if($this->auth($method) === true)
 				{
-					//Check the sub-controller for access to the method
-					if($this->_auth($method) === true)
-					{
-						//Everything went well, dispatch the controller.
-						$this->before();
-						$this->_dispatch($method, $params);
-						$this->after();
-					}
-					else
-					{
-						//No Authentication
-						throw new AuthException('Not Authorized', Error::AUTH_ERROR);
-					}
+					//Everything went well, dispatch the provider.
+					$this->before();
+					$this->dispatch($method, $params);
+					$this->after();
 				}
 				else
 				{
-					//No authentication needed, dispatch the controller
-					$this->before();
-					$this->_dispatch($method, $params);
-					$this->after();
+					//No Authentication
+					throw new AuthException('Not Authorized', Error::AUTH_ERROR);
 				}
 
 				//Return true so that we don't hit the exception.
@@ -382,82 +228,89 @@ abstract class RestfulController
 		}
 
 		//If a valid page cannot be found, throw page not found exception
-		throw new PageNotFoundException('Page Not Found',Error::PAGE_NOT_FOUND);
+		throw new PageNotFoundException();
 	}
 
 	/**
-	 * Function executes a controller action passing parameters using call_user_func_array().
+	 * Function executes a provider action passing parameters using call_user_func_array().
 	 * It also builds the view for the route.
 	 *
 	 * @param string $method
 	 * @param array $params
 	 * @throws RoutingException
 	 */
-	protected function _dispatch(string $method, array $params)
+	protected function dispatch(string $method, array $params)
 	{
-		//Call the controller action
-		$actionMethod = new \ReflectionMethod($this,$method);
-		$return = $actionMethod->invokeArgs($this, $params);
-
-		if($return instanceof View)		//Check for a returned View object
+		try
 		{
-			//If the view does not have a controller name set, set it to the currently executing controller.
-			if(!$return->hasController())
+			//Call the action
+			$actionMethod = new \ReflectionMethod($this, $method);
+			$return = $actionMethod->invokeArgs($this, $params);
+
+			if($return instanceof View)        //Check for a returned View object
 			{
-				$loader = Main::get()->getLoader();
-				$conString = get_class($this);
+				//If the view does not have a controller name set, set it to the currently executing controller.
+				if(!$return->hasController())
+				{
+					$loader = Main::get()->getLoader();
+					$conString = get_class($this);
 
-				$return->setController(substr($conString,0,strlen($conString)-strlen($loader::PROVIDER_SUFFIX)));
+					$return->setController(substr($conString, 0, strlen($conString) - strlen($loader::PROVIDER_SUFFIX)));
+				}
+
+				//If the view doesn't have a view set, use the route's action.
+				if(!$return->hasView())
+				{
+					$return->setView($method);
+				}
+
+				$return->build();
 			}
-
-			//If the view doesn't have a view set, use the route's action.
-			if(!$return->hasView())
-			{
-				$return->setView($method);
-			}
-
-			$return->build();
-		}
-		elseif ($return instanceof Json)	//Check for a Json object to be converted and echoed.
-		{
-			echo json_encode($return);
-		}
-		elseif ($return instanceof Route)	//Allow a controller to return a route to redirect the program execution to.
-		{
-			Main::get()->run($return);
-		}
-		elseif ($return instanceof Link)	//Redirect to a link location.
-		{
-			header('Location: '.$return);
-		}
-		elseif (is_object($return))		//Check for another object type
-		{
-			//If the object is stringable, covert it to a string and output it.
-			$class = new \ReflectionClass($return);
-			if ($class->implementsInterface('JsonSerializable'))
+			elseif($return instanceof Json)    //Check for a Json object to be converted and echoed.
 			{
 				echo json_encode($return);
 			}
-			//If the object is stringable, covert to a string and output it.
-			elseif((!is_array($return)) &&
-				((!is_object($return) && settype($return, 'string') !== false) ||
-					(is_object($return) && method_exists($return, '__toString'))))
+			elseif($return instanceof Route)    //Allow a provider to return a route to redirect the program execution to.
 			{
-				echo (string)$return;
+				Main::get()->run($return);
 			}
-			//If nothing else works, echo the object through the dump method.
-			else
+			elseif($return instanceof Link)    //Redirect to a link location.
 			{
-				Dev::dump($return);
+				header('Location: ' . $return);
+			}
+			elseif(is_object($return))        //Check for another object type
+			{
+				//If the object is stringable, covert it to a string and output it.
+				$class = new \ReflectionClass($return);
+				if($class->implementsInterface('JsonSerializable'))
+				{
+					echo json_encode($return);
+				}
+				//If the object is stringable, covert to a string and output it.
+				elseif((!is_array($return)) &&
+					((!is_object($return) && settype($return, 'string') !== false) ||
+						(is_object($return) && method_exists($return, '__toString'))))
+				{
+					echo (string)$return;
+				}
+				//If nothing else works, echo the object through the dump method.
+				else
+				{
+					Dev::dump($return);
+				}
+			}
+			elseif(is_string($return))        //If the return value was simply a string, echo it out.
+			{
+				echo $return;
 			}
 		}
-		elseif(is_string($return))		//If the return value was simply a string, echo it out.
+		catch(AuthException $e)
 		{
-			echo $return;
+			echo Json::authError($e->getMessage());
 		}
-		else
+		catch(Exception $e)
 		{
-			return;
+			echo Json::error($e->getMessage());
 		}
 	}
 

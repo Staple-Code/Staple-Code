@@ -32,6 +32,9 @@ use Staple\Session\Session;
 
 class Auth
 {
+	const AUTH_FLAG_PROTECTED = '@protected';
+	const AUTH_FLAG_OPEN = '@open';
+	const AUTH_FLAG_LEVEL = '@auth-level';
 	/**
 	 * 
 	 * Holds the singleton instance for the Auth class
@@ -52,12 +55,6 @@ class Auth
 	 * @var bool
 	 */
 	private $authed = false;
-	/**
-	 * 
-	 * The level of authorization as set by the AuthAdapter for this session.
-	 * @var int
-	 */
-	private $authLevel = 0;
 	
 	/**
 	 * 
@@ -134,15 +131,28 @@ class Auth
 	{
 		return $this->authed;
 	}
+
+	/**
+	 * This is a pass-through method to the AuthAdapter authRoute() method.
+	 * @param Route $route
+	 * @param $requiredLevel
+	 * @param \ReflectionClass $reflectionClass
+	 * @param \ReflectionMethod $reflectionMethod
+	 * @return bool
+	 */
+	public function authRoute(Route $route, $requiredLevel, \ReflectionClass $reflectionClass, \ReflectionMethod $reflectionMethod)
+	{
+		return $this->adapter->authRoute($route, $requiredLevel, $reflectionClass, $reflectionMethod);
+	}
 	
 	/**
 	 * Returns and integer representing the level of access. Defaults to 0 for no auth and 1 
 	 * for general authorization. This is derived from information gathered by the AuthAdapter.
-	 * @return int
+	 * @return mixed
 	 */
 	public function getAuthLevel()
 	{
-		return (int)$this->authLevel;
+		return $this->adapter->getLevel();
 	}
 	
 	/**
@@ -219,7 +229,6 @@ class Auth
 		{
 			Session::getInstance()->regenerate(true);
 			$this->authed = true;
-			$this->authLevel = $this->adapter->getLevel();
 			$this->message = "Authentication Successful";
 			self::writeSession();
 			return true;
@@ -227,7 +236,6 @@ class Auth
 		else
 		{
 			$this->authed = false;
-			$this->authLevel = 0;
 			$this->message = "Authentication Failed";
 			self::writeSession();
 			return false;
@@ -319,7 +327,6 @@ class Auth
 	{
 		$this->createAuthAdapter();
 		$this->authed = false;
-		$this->authLevel = 0;
 		$this->message = 'Logged Out';
 	}
 	

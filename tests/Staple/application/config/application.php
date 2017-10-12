@@ -71,18 +71,14 @@ return [
 	],
 
 	'auth'	=>	[
-		'enabled'			=>	0,
-		'adapter'			=>	'Staple\Auth\DBAuthAdapter',
-		'controller'		=>	'accountController',
+		'adapter'			=>	'Staple\Auth\DBAuthAdapter'
+	],
+
+	'DBAuthAdapter' => [
 		'authtable'			=>	'accounts',
 		'uidfield'			=>	'username',
 		'pwfield'			=>	'password',
-		'rolefield'			=>	'accountType',
-		'pwenctype'			=>	'SHA1',
-		'allowedRoute' 		=> [
-			'index/index'
-		],
-		//'ADDefaultPrivs' => '10',
+		'rolefield'			=>	'accountType'
 	],
 
 	'encrypt'	=>	[

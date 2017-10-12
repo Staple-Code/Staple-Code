@@ -180,7 +180,7 @@ class Json implements \JsonSerializable
 	 * @param mixed $details
 	 * @return string
 	 */
-	public static function authError($message = null, int $code = self::DEFAULT_ERROR_CODE, $details = null)
+	public static function authError($message = null, int $code = self::DEFAULT_AUTH_ERROR_CODE, $details = null)
 	{
 		http_response_code($code);
 
