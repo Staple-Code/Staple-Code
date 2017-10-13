@@ -26,5 +26,5 @@ namespace Staple\Exception;
 
 class ModelNotFoundException extends \Exception
 {
-	
+	protected $message = 'Model Not Found';
 }

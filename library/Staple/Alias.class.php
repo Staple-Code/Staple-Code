@@ -27,11 +27,11 @@ class Alias
 {
 	protected static $class_map = array(
 		//Primary Staple Object Aliases
-		'ActiveDirectory'				=>	'\\Staple\\ActiveDirectory',
+		'ActiveDirectory'					=>	'\\Staple\\ActiveDirectory',
 		'Alias'							=>	'\\Staple\\Alias',
 		'Autoload'						=>	'\\Staple\\Autoload',
 		'Config'						=>	'\\Staple\\Config',
-		'Controller'					=>	'\\Staple\\Controller\\Controller',
+		'Controller'						=>	'\\Staple\\Controller\\Controller',
 		'DB'							=>	'\\Staple\\DB',
 		'Dev'							=>	'\\Staple\\Dev',
 		'Encrypt'						=>	'\\Staple\\Encrypt',
@@ -53,15 +53,15 @@ class Alias
 		'View'							=>	'\\Staple\\View',
 
 		//Auth
-		'Auth'							=>	'\\Staple\\Auth\\Auth',
+		'Auth'						=>	'\\Staple\\Auth\\Auth',
 		'AuthAdapter'					=>	'\\Staple\\Auth\\AuthAdapter',
-		'ActiveDirectoryAuthAdapter'	=>	'\\Staple\\Auth\\ActiveDirectoryAuthAdapter',
+		'ActiveDirectoryAuthAdapter'			=>	'\\Staple\\Auth\\ActiveDirectoryAuthAdapter',
 		'DBAuthAdapter'					=>	'\\Staple\\Auth\\DBAuthAdapter',
 
 		//Form Class Aliases
 		'ButtonElement'					=>	'\\Staple\\Form\\ButtonElement',
 		'CheckboxElement'				=>	'\\Staple\\Form\\CheckboxElement',
-		'CheckboxGroupElement'			=>	'\\Staple\\Form\\CheckboxGroupElement',
+		'CheckboxGroupElement'				=>	'\\Staple\\Form\\CheckboxGroupElement',
 		'FieldElement'					=>	'\\Staple\\Form\\FieldElement',
 		'FieldFilter'					=>	'\\Staple\\Form\\FieldFilter',
 		'FieldValidator'				=>	'\\Staple\\Form\\FieldValidator',
@@ -77,13 +77,13 @@ class Alias
 
 		//Validator Class Aliases
 		'AlnumValidator'				=>	'\\Staple\\Form\\Validate\AlnumValidator',
-		'BetweenFloatValidator'			=>	'\\Staple\\Form\\Validate\BetweenFloatValidator',
+		'BetweenFloatValidator'				=>	'\\Staple\\Form\\Validate\BetweenFloatValidator',
 		'BetweenValidator'				=>	'\\Staple\\Form\\Validate\BetweenValidator',
 		'DateValidator'					=>	'\\Staple\\Form\\Validate\DateValidator',
 		'EmailValidator'				=>	'\\Staple\\Form\\Validate\EmailValidator',
 		'EqualValidator'				=>	'\\Staple\\Form\\Validate\EqualValidator',
 		'FloatValidator'				=>	'\\Staple\\Form\\Validate\FloatValidator',
-		'IdenticalFieldValidator'		=>	'\\Staple\\Form\\Validate\IdenticalFieldValidator',
+		'IdenticalFieldValidator'			=>	'\\Staple\\Form\\Validate\IdenticalFieldValidator',
 		'InArrayValidator'				=>	'\\Staple\\Form\\Validate\InArrayValidator',
 		'LengthValidator'				=>	'\\Staple\\Form\\Validate\LengthValidator',
 		'NotEqualValidator'				=>	'\\Staple\\Form\\Validate\NotEqualValidator',
@@ -107,16 +107,16 @@ class Alias
 		'DoubleLinkedList'			=>	'\\Staple\\Data\\DoubleLinkedList',
 		'LinkedList'				=>	'\\Staple\\Data\\LinkedList',
 		'LinkedListNode'			=>	'\\Staple\\Data\\LinkedListNode',
-		'LinkedListNodeDouble'		=>	'\\Staple\\Data\\LinkedListNodeDouble',
-		'Queue'						=>	'\\Staple\\Data\\Queue',
-		'Stack'						=>	'\\Staple\\Data\\Stack',
+		'LinkedListNodeDouble'			=>	'\\Staple\\Data\\LinkedListNodeDouble',
+		'Queue'					=>	'\\Staple\\Data\\Queue',
+		'Stack'					=>	'\\Staple\\Data\\Stack',
 
 		//Query Builder Classes
-		'QueryCondition'				=>	'\\Staple\\Query\\Condition',
-		'QueryDataSet'					=>	'\\Staple\\Query\\DataSet',
+		'QueryCondition'					=>	'\\Staple\\Query\\Condition',
+		'QueryDataSet'						=>	'\\Staple\\Query\\DataSet',
 		'Delete'						=>	'\\Staple\\Query\\Delete',
 		'Insert'						=>	'\\Staple\\Query\\Insert',
-		'InsertMultiple'				=>	'\\Staple\\Query\\InsertMultiple',
+		'InsertMultiple'					=>	'\\Staple\\Query\\InsertMultiple',
 		'QueryJoin'						=>	'\\Staple\\Query\\Join',
 		'Query'							=>	'\\Staple\\Query\\Query',
 		'Select'						=>	'\\Staple\\Query\\Select',
@@ -124,7 +124,7 @@ class Alias
 		'Update'						=>	'\\Staple\\Query\\Update',
 
 		//Exception Class Aliases
-		'PageNotFoundException'		=>	'\\Staple\\Exception\\PageNotFoundException',
+		'PageNotFoundException'			=>	'\\Staple\\Exception\\PageNotFoundException',
 		'RoutingException'			=>	'\\Staple\\Exception\\RoutingException',
 
 		//Trait Aliases
@@ -137,8 +137,8 @@ class Alias
 		'FormBootstrapViewAdapter'		=> '\\Staple\\Form\\ViewAdapters\\BootstrapViewAdapter',
 
 		//Session Classes
-		'Session'						=>	'\\Staple\\Session\\Session',
-		'SessionHandler'				=>	'\\Staple\\Session\\Handler',
+		'Session'				=>	'\\Staple\\Session\\Session',
+		'SessionHandler'			=>	'\\Staple\\Session\\Handler',
 		'SessionFileHandler'			=>	'\\Staple\\Session\\FileHandler',
 		'SessionDatabaseHandler'		=>	'\\Staple\\Session\\DatabaseHandler',
 		'SessionRedisHandler'			=>	'\\Staple\\Session\\RedisHandler',

@@ -175,7 +175,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 		elseif(strtolower(substr($name, 0, 3)) == 'set')
 		{
 			$dataName = Utility::snakeCase(substr($name, 3));
-			$this->_data[$dataName] = (string)array_shift($arguments);
+			$this->_data[$dataName] = array_shift($arguments);
 			return $this;
 		}
 
