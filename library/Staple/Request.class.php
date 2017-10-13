@@ -84,10 +84,11 @@ class Request
 	 */
 	public static function get()
 	{
-		if (!isset(self::$inst)) {
-            $c = __CLASS__;
-            self::$inst = new $c();
-        }
+		if (!isset(self::$inst)) 
+		{
+	            $c = __CLASS__;
+	            self::$inst = new $c();
+	        }
 		return self::$inst;
 	}
 

@@ -47,7 +47,7 @@ class JsonTest extends TestCase
 		$code = http_response_code();
 
 		$this->assertEquals(500, $code);
-		$this->assertEquals('{"message":"Invalid document.","details":"The supplied data did not make sense."}', $response);
+		$this->assertEquals('{"code":500,"message":"Invalid document.","details":"The supplied data did not make sense."}', (string)$response);
 	}
 
 	public function testReturnJsend()
@@ -62,6 +62,6 @@ class JsonTest extends TestCase
 		$code = http_response_code();
 
 		$this->assertEquals(200, $code);
-		$this->assertEquals('{"status":"success","data":{"kingdom":"Animalia","phylum":"Mollusca","class":"Cephalopoda","order":"Octopoda"},"message":"This is an Octopus."}', $response);
+		$this->assertEquals('{"status":"success","data":{"kingdom":"Animalia","phylum":"Mollusca","class":"Cephalopoda","order":"Octopoda"},"message":"This is an Octopus."}', (string)$response);
 	}
 }
