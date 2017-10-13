@@ -41,13 +41,13 @@ class Json implements \JsonSerializable
 	 * An array of dynamic properties that will be converted to a JSON object.
 	 * @var array
 	 */
-	protected $properties = [];
+	protected $_properties = [];
 
 	/**
 	 * The data to encode for the JSON response.
 	 * @var mixed
 	 */
-	protected $data;
+	protected $_data;
 
 	/**
 	 * Allows dynamic setting of properties
@@ -58,7 +58,7 @@ class Json implements \JsonSerializable
 	public function __set($name, $value)
 	{
 		//Set the property dynamically
-		$this->properties[$name] = $value;
+		$this->_properties[$name] = $value;
 	}
 
 	/**
@@ -69,7 +69,7 @@ class Json implements \JsonSerializable
 	 */
 	public function __get($name)
 	{
-		return $this->properties[$name] ?? null;
+		return $this->_properties[$name] ?? null;
 	}
 
 	/**
@@ -84,7 +84,7 @@ class Json implements \JsonSerializable
 		if(strtolower(substr($name, 0, 3)) == 'get')
 		{
 			$dataName = Utility::snakeCase(substr($name, 3));
-			if(isset($this->properties[$dataName]))
+			if(isset($this->_properties[$dataName]))
 			{
 				return $this->_data[$dataName];
 			}
@@ -92,7 +92,7 @@ class Json implements \JsonSerializable
 		elseif(strtolower(substr($name, 0, 3)) == 'set')
 		{
 			$dataName = Utility::snakeCase(substr($name, 3));
-			$this->properties[$dataName] = array_shift($arguments);
+			$this->_properties[$dataName] = array_shift($arguments);
 			return $this;
 		}
 
@@ -107,7 +107,7 @@ class Json implements \JsonSerializable
 	 */
 	public function __isset($name)
 	{
-		return isset($this->properties[$name]);
+		return isset($this->_properties[$name]);
 	}
 
 	/**
@@ -116,8 +116,8 @@ class Json implements \JsonSerializable
 	 */
 	public function __unset($name)
 	{
-		if(isset($this->properties[$name]))
-			unset($this->properties[$name]);
+		if(isset($this->_properties[$name]))
+			unset($this->_properties[$name]);
 	}
 
 	/**
@@ -135,12 +135,12 @@ class Json implements \JsonSerializable
 	 */
 	function jsonSerialize()
 	{
-		if(isset($this->data))
-			return $this->data;
+		if(isset($this->_data))
+			return $this->_data;
 		else
 		{
 			$obj = new \stdClass();
-			foreach($this->properties as $key => $value)
+			foreach($this->_properties as $key => $value)
 			{
 				$obj->$key = $value;
 			}
@@ -164,12 +164,12 @@ class Json implements \JsonSerializable
 
 	/**
 	 * Set the data/structure for the JSON object.
-	 * @param $data
+	 * @param $_data
 	 * @return $this
 	 */
-	public function setData($data)
+	public function setData($_data)
 	{
-		$this->data = $data;
+		$this->_data = $_data;
 		return $this;
 	}
 
@@ -212,7 +212,7 @@ class Json implements \JsonSerializable
 	{
 		$json = new static();
 		$json->setResponseCode($code);
-		$json->data = $data;
+		$json->_data = $data;
 		return $json;
 	}
 
