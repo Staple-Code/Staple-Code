@@ -1,7 +1,7 @@
 ---
 layout: document
 title: "Authentication Adapters"
-date: 2017-03-15 17:28:56
+date: 2017-10-10 17:28:56
 categories: Authentication
 ---
 
@@ -51,6 +51,28 @@ an integer, string, array or even an object depending on your use case.
 
 ```php?start_inline=1
 public function getUserId();
+```
+
+#### `authRoute()` Method
+
+The `authRoute()` method determines if a route should be allowed to proceed taking
+into consideration the route requested the current level of the authed user and
+any other custom notations on the containing class or method.
+
+**Method Signature**
+```php?start_inline=1
+public function authRoute(Route $route, $requiredLevel, \ReflectionClass $reflectionClass = null, \ReflectionMethod $reflectionMethod = null): bool;
+```
+
+You can add the default `authRoute` definition to your custom `AuthAdapter` by using
+the `AuthRoute` trait.
+
+```php?start_inline=1
+class MyAuthAdapter implements AuthAdapter
+{
+    use AuthRoute;
+    ...
+}
 ```
 
 For more implementation details refer to the framework's `DBAuthAdapter`.

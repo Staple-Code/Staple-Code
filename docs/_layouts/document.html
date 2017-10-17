@@ -19,7 +19,7 @@ layout: default
 <div class="oss docs main ui vertical segment">
   <div class="ui dividing left rail">
     <div class="ui vertical following fluid text menu">
-      {% assign sorted_cats = site.categories | sort %}
+      {% assign sorted_cats = site.categories %}
       {% for category in sorted_cats %}
       {% assign sorted_posts = category[1] | sort  %}
       <div class="title">
