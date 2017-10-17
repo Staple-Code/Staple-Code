@@ -30,13 +30,24 @@ class Autoload
 {
     const STAPLE_NAMESPACE = 'Staple';
 	const CONTROLLER_SUFFIX = 'Controller';
+	const PROVIDER_SUFFIX = 'Provider';
 	const FORM_SUFFIX = 'Form';
 	const MODEL_SUFFIX = 'Model';
 	const PHP_FILE_EXTENSION = '.php';
 	const CLASS_FILE_EXTENSION = '.class.php';
 	const TRAIT_FILE_EXTENSION = '.trait.php';
 	const VIEW_FILE_EXTENSION = '.phtml';
-	
+
+	/**
+	 * Controller Class Suffix Value
+	 * @var string
+	 */
+	protected $providerSuffix;
+	/**
+	 * Array of search directories for the models
+	 * @var array[string]
+	 */
+	protected $providerSearchDirectories = array();
 	/**
 	 * Controller Class Suffix Value
 	 * @var string
@@ -103,6 +114,10 @@ class Autoload
 			$this->setThrowOnFailure(Config::getValue('application','throw_on_loader_failure'));
 		}
 
+		//Add the default provider location
+		$this->addProviderSearchDirectory(PROVIDER_ROOT,false);
+		$this->setProviderSuffix(self::PROVIDER_SUFFIX);
+
 		//Add the default controller location
 		$this->addControllerSearchDirectory(CONTROLLER_ROOT,false);
 		$this->setControllerSuffix(self::CONTROLLER_SUFFIX);
@@ -134,6 +149,11 @@ class Autoload
 		if(!is_null($namespacedClass = Alias::checkAlias($class_name)))					//Look for aliased classes
 		{
     			return $this->loadLibraryClass($namespacedClass, $class_name);
+		}
+		elseif(substr($class_name,strlen($class_name)-strlen($this->getProviderSuffix()),strlen($this->getProviderSuffix())) == $this->getProviderSuffix()
+			&& strlen($class_name) != strlen($this->getProviderSuffix()))				//Look for Providers
+		{
+			return $this->loadProvider($class_name);
 		}
 		elseif(substr($class_name,strlen($class_name)-strlen($this->getControllerSuffix()),strlen($this->getControllerSuffix())) == $this->getControllerSuffix() 
 			&& strlen($class_name) != strlen($this->getControllerSuffix()))				//Look for Controllers
@@ -244,7 +264,36 @@ class Autoload
 			throw new Exception('Error Loading Library Class: '.$class_name, 501);
 		}
 	}
-	
+
+	/**
+	 * Load a custom controller into the application
+	 * @param string $class_name
+	 * @throws Exception
+	 * @return bool
+	 */
+	protected function loadProvider($class_name)
+	{
+		$include = PROVIDER_ROOT.$class_name.static::PHP_FILE_EXTENSION;
+		if(file_exists($include))
+		{
+			require_once $include;
+		}
+		else
+		{
+			$include = PROVIDER_ROOT.ucfirst($class_name).static::PHP_FILE_EXTENSION;
+			if(file_exists($include))
+			{
+				require_once $include;
+			}
+			elseif($this->throwOnFailure === true)
+			{
+				throw new PageNotFoundException();
+			}
+		}
+
+		return true;
+	}
+
 	/**
 	 * Load a custom controller into the application
 	 * @param string $class_name
@@ -265,9 +314,9 @@ class Autoload
 			{
 				require_once $include;
 			}
-			elseif($this->throwOnFailure === true)
+			else
 			{
-				throw new PageNotFoundException('Page Not Found',Error::PAGE_NOT_FOUND);
+				throw new PageNotFoundException();
 			}
 		}
 
@@ -344,6 +393,20 @@ class Autoload
 			{
 				return $theView;
 			}
+			else
+			{
+				//Try Method-Casing the View and Controller.
+				$theView = $dir;
+				if(substr($theView,strlen($theView)-2) == DIRECTORY_SEPARATOR)
+				{
+					$theView .= DIRECTORY_SEPARATOR;
+				}
+				$theView .= Link::methodCase(lcfirst($controller)).DIRECTORY_SEPARATOR.Link::methodCase(lcfirst($view)).static::VIEW_FILE_EXTENSION;
+				if(file_exists($theView))
+				{
+					return $theView;
+				}
+			}
 		}
 		if($required === true)
 		{
@@ -396,6 +459,15 @@ class Autoload
 		$this->throwOnFailure = (bool)$throwOnFailure;
 		return $this;
 	}
+
+	/**
+	 * @return string $providerSuffix
+	 */
+	public function getProviderSuffix()
+	{
+		return $this->providerSuffix;
+	}
+
 	/**
 	 * @return string $controllerSuffix
 	 */
@@ -418,6 +490,16 @@ class Autoload
 	public function getModelSuffix()
 	{
 		return $this->modelSuffix;
+	}
+
+	/**
+	 * @param string $providerSuffix
+	 * @return $this
+	 */
+	private function setProviderSuffix($providerSuffix)
+	{
+		$this->providerSuffix = $providerSuffix;
+		return $this;
 	}
 
 	/**
@@ -449,7 +531,26 @@ class Autoload
 		$this->modelSuffix = $modelSuffix;
 		return $this;
 	}
-	
+
+	/**
+	 * Add a search directory for the application to look for provider class files. The second parameter will make the new directory take precedence
+	 * over any previous directories. It is the default to add new directories as the primary directory.
+	 * @param string $dir
+	 * @param bool $primary
+	 * @return $this
+	 */
+	public function addProviderSearchDirectory($dir, $primary = true)
+	{
+		if($primary === true)
+		{
+			array_unshift($this->providerSearchDirectories, $dir);
+		}
+		else
+		{
+			array_push($this->providerSearchDirectories, $dir);
+		}
+		return $this;
+	}
 	
 	/**
 	 * Add a search directory for the application to look for controller class files. The second parameter will make the new directory take precedence

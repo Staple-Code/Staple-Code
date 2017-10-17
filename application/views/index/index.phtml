@@ -1,3 +1,42 @@
-<h1>Staple-Code</h1>
+<h1>It Works!</h1>
 
-<p>It Works!</p>
+<p>You're up and running! This is the opening page for your new site.</p>
+
+<h2 id="installation">Make Pages</h2>
+
+<p>Now it's time to make some more pages for your site! You can add actions to the IndexController or you can make your own controller.</p>
+
+<div class="language-bash highlighter-rouge">
+    <pre class="highlight"><code>class IndexController extends Controller
+{
+    public function index()
+    {
+        //This is where you are.
+        return View::create();
+    }
+
+    //Make a new action here.
+    public function newAction()
+    {
+        return View::create();
+    }
+}</code></pre>
+</div>
+
+<h2 id="composer">Composer</h2>
+
+<p>STAPLE also has support for composer. It has no dependencies out of the gate, so composer is an optional feature
+    to add any dependencies that you might require. Simply add the dependencies to the included composer.json file.</p>
+
+<p>More information about composer can be found here: https://getcomposer.org/</p>
+
+<div class="ui hidden divider"></div>
+
+<div class="ui center aligned grid last">
+    <a class="ui huge button" href="http://staplecode.org/docs/">
+        <div class="visible content">Keep Reading <i class="right angle icon"></i></div>
+        <div class="hidden content">
+            Documentation <i class="book icon"></i>
+        </div>
+    </a>
+</div>

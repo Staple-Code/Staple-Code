@@ -1,8 +1,8 @@
 <?php
 
 /** 
- * The Staple_AuthAdapter interface creates a preset list of functions that must be implemented
- * to allow authentication to pass through Staple_Auth. Adapters sent to Staple_Auth must
+ * The AuthAdapter interface creates a preset list of functions that must be implemented
+ * to allow authentication to pass through Staple\Auth\Auth. Adapters sent to Staple\Auth\Auth must
  * implement this class or an error will occur. 
  *  
  * @author Ironpilot
@@ -24,7 +24,9 @@
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-namespace Staple;
+namespace Staple\Auth;
+
+use Staple\Route;
 
 interface AuthAdapter
 {
@@ -33,22 +35,33 @@ interface AuthAdapter
 	 * at hand. The function must return a boolean true for the Staple_Auth object to view
 	 * authentication as successful. If a non-boolean true is returned, authentication will
 	 * fail.
+	 * @param mixed $credentials
 	 * @return bool
 	 */
-	public function getAuth($credentials);
+	public function getAuth($credentials): bool;
 	/**
 	 * 
 	 * This function must be implemented to return a numeric level of access. This level is
 	 * used to determine feature access based on account type.
-	 * @return int
+	 * @return mixed
 	 */
-	public function getLevel($uid);
-	
+	public function getLevel();
 	/**
-	 * Returns the userid from the adapater
-	 * @return string
+	 * Returns the User ID from the adapter.
+	 * @return mixed
 	 */
 	public function getUserId();
+	/**
+	 * This method should return a boolean true or false if the supplied auth level is able
+	 * to access the supplied route. Additionally the reflection for the class and method
+	 * are also supplied to this method for further verification. If there are no roles or
+	 * levels in the supplied application, this method can simply return true to disable this
+	 * check.
+	 * @param Route $route
+	 * @param $requiredLevel
+	 * @param \ReflectionClass|null $reflectionClass
+	 * @param \ReflectionMethod|null $reflectionMethod
+	 * @return bool
+	 */
+	public function authRoute(Route $route, $requiredLevel, \ReflectionClass $reflectionClass = null, \ReflectionMethod $reflectionMethod = null): bool;
 }
-
-?>

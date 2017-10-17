@@ -1,11 +1,9 @@
 <?php
-use Staple\Auth;
-use Staple\AuthController;
-
 /** 
+ * Returns only the Base Name of a path.
+ * 
  * @author Ironpilot
  * @copyright Copyright (c) 2011, STAPLE CODE
- *  
  * 
  * This file is part of the STAPLE Framework.
  * 
@@ -21,36 +19,27 @@ use Staple\AuthController;
  * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
- * 
  */
-class accountController extends AuthController
+namespace Staple\Form\Filter;
+
+use Staple\Form\FieldFilter;
+
+class BaseNameFilter extends FieldFilter
 {
-	public function _start()
+	/**
+	 * 
+	 * @see Staple_Form_Filter::filter()
+	 */
+	public function filter($text)
 	{
-		parent::_start();
-		$this->_openMethod('signin');
+		return basename($text);
 	}
-	public function index()
+	/* (non-PHPdoc)
+	 * @see Staple_Form_Filter::getName()
+	 */
+	public function getName()
 	{
-		$this->view->message = Auth::get()->getMessage();
+		return 'basename';
 	}
-	public function signin()
-	{
-		$username = $_POST['user'];
-		$password = $_POST['pass'];
-		
-		$auth = Auth::get();
-		$granted = $auth->doAuth(array(
-				'username'=>$username,
-				'password'=>$password,
-				));
-		if($granted === true)
-		{
-			$this->_redirect('index/index');
-		}
-		else
-		{
-			$this->_redirect('account/index');
-		}
-	}
+
 }

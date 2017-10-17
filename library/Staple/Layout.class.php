@@ -23,11 +23,11 @@
  */
 namespace Staple;
 
-use \Exception;
+use Exception;
 
 class Layout
 {
-	use \Staple\Traits\Helpers;
+	use Traits\Helpers;
 
 	const DOC_HTML4_TRANS = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">';
 	const DOC_HTML4_STRICT = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">';
@@ -180,6 +180,7 @@ class Layout
 	/**
 	 * Retrieves a stored property.
 	 * @param string | int $key
+	 * @return mixed
 	 */
 	public function __get($key)
 	{
@@ -193,6 +194,9 @@ class Layout
 		}
 	}
 
+	/**
+	 * @return string[]
+	 */
 	public function __sleep()
 	{
 		return array('name','scripts','styles','metas','view','title','doctype');
@@ -252,6 +256,11 @@ class Layout
 		return $this;
 	}
 
+	/**
+	 * @param string $style
+	 * @param string $media
+	 * @return $this
+	 */
 	public function removeStylesheet($style, $media)
 	{
 		if(array_key_exists($media, $this->styles))
@@ -267,6 +276,11 @@ class Layout
 		return $this;
 	}
 
+	/**
+	 * @param string $name
+	 * @param string $content
+	 * @return $this
+	 */
 	public function addMeta($name, $content)
 	{
 		if(!(array_key_exists($name, $this->metas)))
@@ -276,6 +290,10 @@ class Layout
 		return $this;
 	}
 
+	/**
+	 * @param string $name
+	 * @return $this
+	 */
 	public function removeMeta($name)
 	{
 		if(array_key_exists($name, $this->metas))
@@ -286,7 +304,7 @@ class Layout
 	}
 
 	/**
-	 * @return the $metas
+	 * @return string[]|null $metas
 	 */
 	public function getMetas($name)
 	{
@@ -303,6 +321,7 @@ class Layout
 	/**
 	 * @param string $name
 	 * @param string $content
+	 * @return Layout
 	 */
 	public function setMetas($name,$content)
 	{
@@ -356,6 +375,7 @@ class Layout
 
 	/**
 	 * @param string $title
+	 * @return Layout
 	 */
 	public function setTitle($title)
 	{
@@ -375,6 +395,7 @@ class Layout
 	 * Set the Layout Name
 	 * @param string $name
 	 * @throws Exception
+	 * @return Layout
 	 */
 	public function setName($name)
 	{
@@ -503,6 +524,7 @@ class Layout
 
 	/**
 	 * Build the layout into PHP output.
+	 * @param string $buffer
 	 * @param View $view
 	 * @throws Exception
 	 */

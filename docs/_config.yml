@@ -48,7 +48,7 @@ If you're already familiar with other PHP MVC frameworks then setup will be a br
 logo: "/assets/staplecode-logo.svg"        #/images/path/to/logo
 
 # Version and license
-version: 2.0.10.17  # http://semver.org/
+version: 3.0.10.17  # http://semver.org/
 license: GNU LGPLv3 # https://www.gnu.org/licenses/lgpl-3.0.en.html
 
 # Where is your product available?

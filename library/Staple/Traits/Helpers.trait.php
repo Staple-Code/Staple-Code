@@ -1,14 +1,31 @@
 <?php
-
 /**
  * Encapsulate all the helper functions into a trait that we can apply to multiple classes.
- * PHP 5.4 Functionality
- * @author ironpilot
- *        
+ *
+ * @author Ironpilot
+ * @copyright Copyright (c) 2011, STAPLE CODE
+ *
+ * This file is part of the STAPLE Framework.
+ *
+ * The STAPLE Framework is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your option)
+ * any later version.
+ *
+ * The STAPLE Framework is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
 namespace Staple\Traits;
 
-use \DateTime, Staple, Staple\Link, Staple\Dev;
+use DateTime;
+use Staple;
+use Staple\Dev;
+use Staple\Link;
 
 trait Helpers
 {

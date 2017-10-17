@@ -22,17 +22,26 @@
  */
 namespace Staple;
 
-use \Exception;
+use Exception;
 
 class Request
 {
+	const METHOD_GET = 'GET';
+	const METHOD_POST = 'POST';
+	const METHOD_PUT = 'PUT';
+	const METHOD_PATCH = 'PATCH';
+	const METHOD_DELETE = 'DELETE';
+	const METHOD_OPTIONS = 'OPTIONS';
+
 	protected static $inst;
-	
+
+	/** @var string */
 	protected $uri;
-	protected $sport;
-	protected $rport;
+	protected $server_port;
+	protected $remote_port;
 	protected $path;
-	
+
+	/** @var string */
 	protected $method;
 	protected static $secure;
 	
@@ -42,30 +51,22 @@ class Request
 	
 	protected $auth;
 	
-	public function __construct()
+	protected function __construct()
 	{
-		$this->uri = $_SERVER['REQUEST_URI'];
-		$this->sport = $_SERVER['SERVER_PORT'];
-		$this->rport = $_SERVER['REMOTE_PORT'];
-		$this->method = $_SERVER['REQUEST_METHOD'];
-		if(array_key_exists('PATH_INFO', $_SERVER))
-		{
-			$this->path = trim($_SERVER['PATH_INFO']);
-		}
-		$this->IP = $_SERVER['REMOTE_ADDR'];
-		$this->userAgent = $_SERVER['HTTP_USER_AGENT'];
-		if(array_key_exists('HTTP_REFERER', $_SERVER))
-		{
-			$this->referrer = $_SERVER['HTTP_REFERER'];
-		}
+		$this->setUri($_SERVER['REQUEST_URI'] ?? '');
+		$this->server_port = $_SERVER['SERVER_PORT'] ?? null;
+		$this->remote_port = $_SERVER['REMOTE_PORT'] ?? null;
+		$this->setMethod($_SERVER['REQUEST_METHOD'] ?? self::METHOD_GET);
+		$this->path = trim($_SERVER['PATH_INFO'] ?? '');
+		$this->IP = $_SERVER['REMOTE_ADDR'] ?? null;
+		$this->userAgent = $_SERVER['HTTP_USER_AGENT'] ?? null;
+		$this->referrer = $_SERVER['HTTP_REFERER'] ?? null;
 		$this->isSecure();
-		$this->auth = array();
-		if(array_key_exists('PHP_AUTH_USER', $_SERVER))
-			$this->auth['basicuser'] = $_SERVER['PHP_AUTH_USER'];
-		if(array_key_exists('PHP_AUTH_PW', $_SERVER))			 
-			$this->auth['basicpw'] = $_SERVER['PHP_AUTH_PW'];
-		if(array_key_exists('PHP_AUTH_DIGEST', $_SERVER)) 
-			$this->auth['digest'] = $_SERVER['PHP_AUTH_DIGEST'];
+		$this->auth = [
+			'basicuser' => $_SERVER['PHP_AUTH_USER'] ?? null,
+			'basicpw' => $_SERVER['PHP_AUTH_PW'] ?? null,
+			'digest' => $_SERVER['PHP_AUTH_DIGEST'] ?? null
+		];
 	}
 	
 	public function __get($name)
@@ -77,13 +78,31 @@ class Request
 		}
 		return $this->$method();
 	}
-	
-	public function Get()
+
+	/**
+	 * @return Request
+	 */
+	public static function get()
 	{
-		if (!isset(self::$inst)) {
-            $c = __CLASS__;
-            self::$inst = new $c();
-        }
+		if (!isset(self::$inst)) 
+		{
+	            $c = __CLASS__;
+	            self::$inst = new $c();
+	        }
+		return self::$inst;
+	}
+
+	/**
+	 * Make a fake request object for testing. Should be refactored to an interface and new object in the future.
+	 * @param string $uri
+	 * @param string $method
+	 * @return Request
+	 */
+	public static function fake($uri, $method)
+	{
+		self::$inst = new self();
+		self::$inst->setUri($uri);
+		self::$inst->setMethod($method);
 		return self::$inst;
 	}
 	
@@ -173,5 +192,59 @@ class Request
 		}
 		header('Location: '.$to);
 		exit(0);
+	}
+
+	/**
+	 * Grab the contents of the POST body.
+	 * @return bool|string
+	 */
+	public static function BodyContent()
+	{
+		return file_get_contents('php://input');
+	}
+
+	/**
+	 * Grab the content of the request and JSON decode it to a PHP object or array.
+	 * @return \stdClass|array|null
+	 */
+	public static function JsonContent()
+	{
+		$post = self::BodyContent();
+		return ($post === false) ? null : json_decode($post);
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getUri()
+	{
+		return $this->uri;
+	}
+
+	/**
+	 * @param string $uri
+	 * @return Request
+	 */
+	protected function setUri(string $uri)
+	{
+		$this->uri = $uri;
+
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getMethod()
+	{
+		return $this->method;
+	}
+
+	/**
+	 * @param string $method
+	 */
+	protected function setMethod(string $method)
+	{
+		$this->method = $method;
 	}
 }

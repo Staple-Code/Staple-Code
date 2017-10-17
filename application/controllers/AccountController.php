@@ -1,9 +1,14 @@
 <?php
+
+use Staple\Auth\Auth;
+use Staple\Controller\Controller;
+use Staple\Route;
+use Staple\View;
+
 /** 
- * Returns only the Base Name of a path.
- * 
  * @author Ironpilot
  * @copyright Copyright (c) 2011, STAPLE CODE
+ *  
  * 
  * This file is part of the STAPLE Framework.
  * 
@@ -19,29 +24,41 @@
  * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
+ * 
  */
-namespace Staple\Form\Filter;
-
-use \Staple\Form\FieldFilter;
-
-class BaseNameFilter extends FieldFilter
+class AccountController extends Controller
 {
 	/**
-	 * 
-	 * @see Staple_Form_Filter::filter()
+	 * @protected
+	 * @return View
 	 */
-	public function filter($text)
+	public function index()
 	{
-		return basename($text);
-	}
-	/* (non-PHPdoc)
-	 * @see Staple_Form_Filter::getName()
-	 */
-	public function getName()
-	{
-		return 'basename';
+		return View::create()->data([
+			'message' => Auth::get()->getMessage()
+		]);
 	}
 
+	/**
+	 * @return Route
+	 */
+	public function signin()
+	{
+		$username = $_POST['user'] ?? null;
+		$password = $_POST['pass'] ?? null;
+		
+		$auth = Auth::get();
+		$granted = $auth->doAuth([
+				'username'=>$username,
+				'password'=>$password,
+				]);
+		if($granted === true)
+		{
+			return Route::create('index/index');
+		}
+		else
+		{
+			return Route::create('account/index');
+		}
+	}
 }
-
-?>

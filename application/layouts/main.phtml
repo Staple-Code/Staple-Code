@@ -1,11 +1,76 @@
 <?php echo $this->doctype; ?>
 <html>
-	<head>
-		<title><?php echo $this->title; ?></title>
-		<?php $this->styles(); ?>
-		<?php $this->scripts();	?>
-	</head>
-	<body>
-		<?php $this->content();?>
-	</body>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title><?php echo $this->title; ?></title>
+    <meta name="description" content=" If you're already familiar with other PHP MVC frameworks then setup will be a breeze. If you're literally just getting started with MVC frameworks, no worries! Our documentation site can answer many questions and provides a wealth of examples.">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,600|Shrikhand">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/semantic-ui/2.2.4/semantic.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+	<?php $this->styles(); ?>
+	<?php $this->scripts();	?>
+</head>
+
+<body>
+<div class="oss landing ui vertical center aligned one column grid masthead">
+    <div class="ui text container">
+
+
+        <a href="https://github.com/Staple-Code/Staple-Code" class="ui red right corner huge label">
+            <i class="github alt icon"></i>
+        </a>
+
+
+
+        <div class="logo">
+            <img src="/img/staplecode-logo.svg" alt="StapleCode" />
+        </div>
+        <h1>An Open Source PHP Framework</h1>
+
+        <hr>
+        <div class="tag-line"></div>
+
+        <a class="ui large inverted icon button" href="https://github.com/Staple-Code/Staple-Code">View on Github <i class="hand rock icon"></i></a>
+        <a class="ui large inverted icon button" href="http://staplecode.org">Getting Started <i class="hand paper icon"></i></a>
+        <a class="ui large inverted icon button" href="http://staplecode.org/docs/">Documentation <i class="hand scissors icon"></i></a>
+
+    </div>
+
+</div>
+
+<div class="ui stacked text container oss introduction">
+    <div class="ui hidden divider"></div>
+    <?php $this->content(); ?>
+</div>
+
+
+
+<footer class="ui text container">
+
+    <div class="ui horizontal divider">
+        <a href="https://github.com/Staple-Code/Staple-Code"><i class="large github icon"></i></a>
+
+
+    </div>
+
+    <p>&copy;<time></time> StapleCode</p>
+
+    <p class="versioning">
+        <span>Version: 3.0.10.17</span>
+        <span>License: GNU LGPLv3</span>
+    </p>
+
+</footer>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.0.0/jquery.min.js" integrity="sha384-THPy051/pYDQGanwU6poAc/hOdQxjnOEXzbT+OuUAFqNqFjL+4IGLBgCJC3ZOShY" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/semantic-ui/2.2.4/semantic.min.js"></script>
+<script src="/js/main.js"></script>
+
+
+</body>
 </html>
