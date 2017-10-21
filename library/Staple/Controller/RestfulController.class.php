@@ -28,6 +28,7 @@ use Staple\Autoload;
 use Staple\Dev;
 use Staple\Error;
 use Staple\Exception\AuthException;
+use Staple\Exception\NotAuthorizedException;
 use Staple\Exception\PageNotFoundException;
 use Staple\Exception\RoutingException;
 use Staple\Json;
@@ -307,6 +308,10 @@ abstract class RestfulController
 		catch(AuthException $e)
 		{
 			echo Json::authError($e->getMessage());
+		}
+		catch(NotAuthorizedException $e)
+		{
+			echo Json::error($e->getMessage(), $e->getCode());
 		}
 		catch(Exception $e)
 		{

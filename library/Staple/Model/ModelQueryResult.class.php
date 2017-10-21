@@ -123,7 +123,7 @@ class ModelQueryResult implements \Iterator, \ArrayAccess, \JsonSerializable
 	 * Returns the first retrieved Model object, returns null on failure
 	 * @return Model|null
 	 */
-	public function firstOrNull() : Model
+	public function firstOrNull()
 	{
 		if(count($this->results) >= 1)
 		{

@@ -1,6 +1,6 @@
 <?php
 /**
- * An exception class to handle model loading errors.
+ * An exception class to handle page not found errors.
  *
  * @author Ironpilot
  * @copyright Copyright (c) 2011, STAPLE CODE
@@ -24,8 +24,8 @@
 namespace Staple\Exception;
 
 
-class ModelNotFoundException extends \Exception
+class NotAuthorizedException extends \Exception
 {
-	protected $message = 'Model Not Found';
-	protected $code = 404;
+	protected $message = 'Not Authorized';
+	protected $code = 403;
 }
