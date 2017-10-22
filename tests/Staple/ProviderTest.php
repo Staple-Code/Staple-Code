@@ -26,8 +26,6 @@ class FakeProviderAuthAdapter implements AuthAdapter
 
 	/** @var mixed */
 	private $userId;
-	/** @var int */
-	private $userLevel = 0;
 
 	/**
 	 * This function must be implemented to check the authorization based on the adapter
@@ -55,15 +53,7 @@ class FakeProviderAuthAdapter implements AuthAdapter
 	 */
 	public function getLevel()
 	{
-		return $this->userLevel;
-	}
-
-	/**
-	 * @param $level
-	 */
-	private function setUserLevel($level)
-	{
-		$this->userLevel = (int)$level;
+		return 1;
 	}
 
 	/**
@@ -73,15 +63,7 @@ class FakeProviderAuthAdapter implements AuthAdapter
 	 */
 	public function getUserId()
 	{
-		return $this->userId;
-	}
-
-	/**
-	 * @param mixed $user
-	 */
-	private function setUserId($user)
-	{
-		$this->userId = $user;
+		return 'Authed';
 	}
 }
 
