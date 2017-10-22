@@ -24,10 +24,12 @@ namespace Staple\Controller;
 
 use Exception;
 use Staple\Auth\Auth;
+use Staple\Auth\IAuthService;
 use Staple\Autoload;
 use Staple\Dev;
 use Staple\Error;
 use Staple\Exception\AuthException;
+use Staple\Exception\NotAuthorizedException;
 use Staple\Exception\PageNotFoundException;
 use Staple\Exception\RoutingException;
 use Staple\Json;
@@ -43,30 +45,21 @@ abstract class RestfulController
 	use \Staple\Traits\Helpers;
 
 	const DEFAULT_ACTION = 'index';
-	
-	protected $openMethods = array();
-	protected $accessLevels = array();
-	protected $open = false;
+
+	/** @var IAuthService $_authService */
+	private $_authService;
 
 	private $_headerCorsAllowedMethodsSent = false;
 	private $_headerCorsAllowedOriginSent = false;
 	private $_headerCorsAllowHeadersSent = false;
-	
+
 	/**
-	 * 
-	 * RestfulController constructor
+	 * Default Constructor
+	 * @var IAuthService $authService
 	 */
-	public function __construct()
+	public function __construct(IAuthService $authService)
 	{
-		//Set default access levels
-		$methods = get_class_methods(get_class($this));
-		foreach($methods as $acMethod)
-		{
-			if(substr($acMethod, 0,1) != '_')
-			{
-				$this->accessLevels[$acMethod] = 1;
-			}
-		}
+		$this->_authService = $authService;
 	}
 	
 	/**
@@ -95,10 +88,9 @@ abstract class RestfulController
 	 * @return bool
 	 * @throws Exception
 	 */
-	protected function auth($method)
+	protected function auth(string $method)
 	{
-		$method = (string)$method;
-		if(!ctype_alnum($method))
+		if(!ctype_alnum($method))		//Non-routable method check
 		{
 			throw new Exception('Authentication Validation Error', Error::AUTH_ERROR);
 		}
@@ -119,7 +111,7 @@ abstract class RestfulController
 					$levelSplit = explode(Auth::AUTH_FLAG_LEVEL, $classComments);
 					$eolSplit = explode($levelSplit[1], '\n');
 					$authLevel = trim($eolSplit[0]);
-					$routeAuth = $auth->authRoute(Route::create([str_ireplace(Autoload::CONTROLLER_SUFFIX, '', $reflectClass->getName()),$method]), $authLevel, $reflectClass, $reflectMethod);
+					$routeAuth = $auth->authRoute(Route::create([str_ireplace(Autoload::CONTROLLER_SUFFIX, '', $reflectClass->getName()), $method]), $authLevel, $reflectClass, $reflectMethod);
 
 				}
 				elseif(stripos($methodComments, Auth::AUTH_FLAG_LEVEL) !== false)
@@ -127,21 +119,11 @@ abstract class RestfulController
 					$levelSplit = explode(Auth::AUTH_FLAG_LEVEL, $methodComments);
 					$eolSplit = explode($levelSplit[1], '\n');
 					$authLevel = trim($eolSplit[0]);
-					$routeAuth = $auth->authRoute(Route::create([str_ireplace(Autoload::CONTROLLER_SUFFIX, '', $reflectClass->getName()),$method]), $authLevel, $reflectClass, $reflectMethod);
+					$routeAuth = $auth->authRoute(Route::create([str_ireplace(Autoload::CONTROLLER_SUFFIX, '', $reflectClass->getName()), $method]), $authLevel, $reflectClass, $reflectMethod);
 				}
 
 				//Auth Protection
-				if(stripos($classComments, Auth::AUTH_FLAG_PROTECTED) !== false)			//The entire Controller is protected.
-				{
-					if(stripos($methodComments, Auth::AUTH_FLAG_OPEN) !== false)					//Provider is protected but the method is open.
-						return true;
-					return $auth->isAuthed() && $routeAuth;
-				}
-				elseif(stripos($methodComments, Auth::AUTH_FLAG_PROTECTED) !== false)    //The method is protected.
-				{
-					return $auth->isAuthed() && $routeAuth;
-				}
-				return true;
+				return $auth->isAuthed() && $routeAuth;
 			}
 			else
 			{
@@ -149,6 +131,44 @@ abstract class RestfulController
 			}
 		}
 	}
+
+	/**
+	 * Check for auth flags to see if we need to authenticate the method before routing.
+	 * @param string $method
+	 * @return bool
+	 * @throws Exception
+	 */
+	protected function isAuthRequired(string $method)
+	{
+		if(!ctype_alnum($method))		//Non-routable method check
+		{
+			throw new Exception('Authentication Validation Error', Error::AUTH_ERROR);
+		}
+		else
+		{
+			if(method_exists($this, $method))
+			{
+				$reflectMethod = new \ReflectionMethod($this, $method);
+				$reflectClass = new \ReflectionClass($this);
+				$classComments = $reflectClass->getDocComment();
+				$methodComments = $reflectMethod->getDocComment();
+
+				//Auth Protection
+				if(stripos($classComments, Auth::AUTH_FLAG_PROTECTED) !== false)            //The entire Controller is protected.
+				{
+					if(stripos($methodComments, Auth::AUTH_FLAG_OPEN) !== false)                    //Provider is protected but the method is open.
+						return false;
+					return true;
+				}
+				elseif(stripos($methodComments, Auth::AUTH_FLAG_PROTECTED) !== false)    //The method is protected.
+				{
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 
 	/*----------------------------------------Routing Functions----------------------------------------*/
 
@@ -195,18 +215,31 @@ abstract class RestfulController
 				//Run the startup method
 				$this->_start();
 
-				//check for auth on the requested method.
-				if($this->auth($method) === true)
+				//Check if we need to run auth for the requested method
+				if($this->isAuthRequired($method))
 				{
-					//Everything went well, dispatch the provider.
-					$this->before();
-					$this->dispatch($method, $params);
-					$this->after();
+					if($this->_authService->doAuth(Request::get()))
+					{
+						//check for auth on the requested method.
+						if($this->auth($method) === true)
+						{
+							//Everything went well, dispatch the provider action.
+							$this->before();
+							$this->dispatch($method, $params);
+							$this->after();
+							return true;
+						}
+					}
+
+					//No Authentication
+					throw new AuthException('Not Authorized', Error::AUTH_ERROR);
 				}
 				else
 				{
-					//No Authentication
-					throw new AuthException('Not Authorized', Error::AUTH_ERROR);
+					//dispatch the provider action.
+					$this->before();
+					$this->dispatch($method, $params);
+					$this->after();
 				}
 
 				//Return true so that we don't hit the exception.
@@ -306,11 +339,18 @@ abstract class RestfulController
 		}
 		catch(AuthException $e)
 		{
-			echo Json::authError($e->getMessage());
+			$details = ($this->isInDevMode()) ? $e->getTraceAsString() : null;
+			echo Json::authError($e->getMessage(), null, $details);
+		}
+		catch(NotAuthorizedException $e)
+		{
+			$details = ($this->isInDevMode()) ? $e->getTraceAsString() : null;
+			echo Json::error($e->getMessage(), $e->getCode(), $details);
 		}
 		catch(Exception $e)
 		{
-			echo Json::error($e->getMessage());
+			$details = ($this->isInDevMode()) ? $e->getTraceAsString() : null;
+			echo Json::error($e->getMessage(), Json::DEFAULT_ERROR_CODE, $details);
 		}
 	}
 

@@ -26,6 +26,7 @@ use DateTime;
 use Staple;
 use Staple\Dev;
 use Staple\Link;
+use Staple\Config;
 
 trait Helpers
 {
@@ -80,5 +81,14 @@ trait Helpers
 	public static function dump()
 	{
 	    Dev::dump(func_get_args());
+	}
+
+	/**
+	 * Returns a boolean if in development mode.
+	 * @return bool
+	 */
+	protected static function isInDevMode()
+	{
+		return (bool)Config::getValue('errors','devmode');
 	}
 }

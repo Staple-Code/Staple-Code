@@ -118,9 +118,9 @@ class ModelQuery implements IQuery
 
 	/**
 	 * Alias of the model query first() method
-	 * @return Model
+	 * @return Model | null
 	 */
-	public function firstOrNull() : Model
+	public function firstOrNull()
 	{
 		return $this->get()->firstOrNull();
 	}

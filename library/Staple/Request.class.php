@@ -37,6 +37,11 @@ class Request
 
 	/** @var string */
 	protected $uri;
+	/**
+	 * Array of headers for the request
+	 * @var array $headers
+	 */
+	protected $headers;
 	protected $server_port;
 	protected $remote_port;
 	protected $path;
@@ -54,6 +59,8 @@ class Request
 	protected function __construct()
 	{
 		$this->setUri($_SERVER['REQUEST_URI'] ?? '');
+		if(function_exists('getallheaders'))
+			$this->headers = getallheaders() ?: [];
 		$this->server_port = $_SERVER['SERVER_PORT'] ?? null;
 		$this->remote_port = $_SERVER['REMOTE_PORT'] ?? null;
 		$this->setMethod($_SERVER['REQUEST_METHOD'] ?? self::METHOD_GET);
@@ -96,13 +103,15 @@ class Request
 	 * Make a fake request object for testing. Should be refactored to an interface and new object in the future.
 	 * @param string $uri
 	 * @param string $method
+	 * @param string[] $headers
 	 * @return Request
 	 */
-	public static function fake($uri, $method)
+	public static function fake($uri, $method, array $headers = [])
 	{
 		self::$inst = new self();
 		self::$inst->setUri($uri);
 		self::$inst->setMethod($method);
+		self::$inst->headers = $headers;
 		return self::$inst;
 	}
 	
@@ -246,5 +255,24 @@ class Request
 	protected function setMethod(string $method)
 	{
 		$this->method = $method;
+	}
+
+	/**
+	 * Get all the request headers as an array.
+	 * @return array|false
+	 */
+	public function getHeaders()
+	{
+		return $this->headers;
+	}
+
+	/**
+	 * Find a header by the key.
+	 * @param string $key
+	 * @return mixed|null
+	 */
+	public function findHeader(string $key)
+	{
+		return $this->headers[$key] ?? null;
 	}
 }
