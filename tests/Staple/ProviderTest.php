@@ -22,10 +22,7 @@ class FakeProviderAuthAdapter implements AuthAdapter
 {
 	use AuthRoute;
 
-	const USER_KEY = 'username';
-	const PASS_KEY = 'password';
-	const TEST_USERNAME = 'testusername';
-	const TEST_PASSWORD = 'test&P@ssword';
+	const AUTHORIZATION_TOKEN = '68E769C73E6BD6EA64CEFCF1ED8BC';
 
 	/** @var mixed */
 	private $userId;
@@ -38,27 +35,15 @@ class FakeProviderAuthAdapter implements AuthAdapter
 	 * authentication as successful. If a non-boolean true is returned, authentication will
 	 * fail.
 	 *
-	 * @param mixed $credentials
+	 * @param Request $request
 	 * @return bool
 	 */
-	public function getAuth($credentials): bool
+	public function getAuth($request): bool
 	{
-		if(is_array($credentials))
-		{
-			if(strlen($credentials[self::USER_KEY]) > 0 && strlen($credentials[self::PASS_KEY]) > 0)
-			{
-				$hashedPass = password_hash(self::TEST_PASSWORD, PASSWORD_DEFAULT);
-				if(strtolower($credentials[self::USER_KEY]) == self::TEST_USERNAME)
-				{
-					if(password_verify($credentials[self::PASS_KEY], $hashedPass))
-					{
-						$this->setUserId($credentials);
-						$this->setUserLevel(1);
-						return true;
-					}
-				}
-			}
-		}
+		$authHeader = $request->findHeader('Authorization');
+		$token = trim(str_ireplace('Bearer','', $authHeader));
+		if($token == self::AUTHORIZATION_TOKEN)
+			return true;
 		return false;
 	}
 
@@ -211,13 +196,11 @@ class ProviderTest extends TestCase
 	{
 		//Setup Auth Object
 		$auth = Auth::get();
-		$auth->implementAuthAdapter(new FakeCtrlAuthAdapter());
+		$auth->implementAuthAdapter(new FakeProviderAuthAdapter());
 
-		$auth->doAuth([
-			'username' => 'testusername',
-			'password' => 'test&P@ssword'
+		Request::fake(self::ROUTE_PROTECTED, Request::METHOD_GET, [
+			'Authorization' => 'Bearer '.FakeProviderAuthAdapter::AUTHORIZATION_TOKEN
 		]);
-		Request::fake(self::ROUTE_PROTECTED, Request::METHOD_GET);
 		$route = Route::create(self::ROUTE_PROTECTED);
 		ob_start();
 		$route->execute();

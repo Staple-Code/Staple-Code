@@ -71,6 +71,12 @@ return [
 		'adapter' 			=> 'DBAuthAdapter',
 	],
 
+	'oauth'	=> [
+		'supported_algs' => ['RS256'],
+		'valid_audiences' => [],
+		'authorized_iss' => [],
+	],
+
 	//Configuration Values for the DBAuthAdapter
 	'DBAuthAdapter' => [
 		'authtable' 		=> 'accounts',

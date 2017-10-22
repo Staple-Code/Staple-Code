@@ -300,7 +300,7 @@ class Route
 	 */
 	private function routeToProvider($providerClass)
 	{
-		$providerObject = new $providerClass();
+		$providerObject = new $providerClass(Auth::get());
 		if($providerObject instanceof RestfulController)
 		{
 			$route = array_merge([$this->getAction()], $this->getParams());

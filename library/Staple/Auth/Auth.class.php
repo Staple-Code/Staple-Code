@@ -30,7 +30,7 @@ use Staple\Exception\AuthException;
 use Staple\Route;
 use Staple\Session\Session;
 
-class Auth
+class Auth implements IAuthService
 {
 	const AUTH_FLAG_PROTECTED = '@protected';
 	const AUTH_FLAG_OPEN = '@open';
