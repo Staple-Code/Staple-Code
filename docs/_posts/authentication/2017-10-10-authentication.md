@@ -1,7 +1,7 @@
 ---
 layout: document
 title: "Integrated Authentication"
-date: 2017-03-15 17:28:56
+date: 2017-10-10 17:28:56
 categories: Authentication
 ---
 
