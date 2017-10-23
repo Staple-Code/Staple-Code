@@ -14,7 +14,7 @@ defined('APPLICATION_ROOT')
 defined('MODULES_ROOT')
 	|| define('MODULES_ROOT', FOLDER_ROOT . DIRECTORY_SEPARATOR . 'modules' . DIRECTORY_SEPARATOR);
 
-require_once LIBRARY_ROOT . 'Staple' . DIRECTORY_SEPARATOR . 'Main.class.php';
+require_once LIBRARY_ROOT . 'Staple' . DIRECTORY_SEPARATOR . 'Main.php';
 
 $main = \Staple\Main::get();
 $main->run();
