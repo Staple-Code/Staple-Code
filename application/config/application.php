@@ -7,8 +7,6 @@ return [
 	],
 
 	'page'	=>	[
-		'header' 	=>	'', //Deprecated - MODULES_ROOT'header.php'
-		'footer' 	=>	'', //Deprecated - MODULES_ROOT'footer.php'
 		'title' 	=>	'STAPLE Code - A PHP 5 Model-View-Controller Framework for Rapid Application Development',
 	],
 
@@ -26,7 +24,7 @@ return [
 
 		//File Session Handler
 		'handler' 			=> 'Staple\Session\FileHandler',
-		//file_location => ''
+		'file_location' 	=> __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'tmp',
 
 		//Redis Session Handler
 		//'handler' 			=> 'Staple\Session\RedisHandler',
@@ -40,7 +38,7 @@ return [
 	],
 
 	'layout' => [
-		'default' => 'bootstrap',
+		'default' => 'main',
 		'scripts' => [
 			'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js',
 			'https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js',
@@ -70,17 +68,21 @@ return [
 	],
 
 	'auth' => [
-		'enabled' 			=> 0,
 		'adapter' 			=> 'DBAuthAdapter',
-		'controller' 		=> 'accountController',
+	],
+
+	'oauth'	=> [
+		'supported_algs' => ['RS256'],
+		'valid_audiences' => [],
+		'authorized_iss' => [],
+	],
+
+	//Configuration Values for the DBAuthAdapter
+	'DBAuthAdapter' => [
 		'authtable' 		=> 'accounts',
 		'uidfield' 			=> 'username',
 		'pwfield' 			=> 'password',
 		'rolefield' 		=> 'accountType',
-		'pwenctype' 		=> 'SHA1',
-		'allowedRoute' 		=> [
-			'index/index'
-		],
 		//'ADDefaultPrivs' => '10',
 	],
 

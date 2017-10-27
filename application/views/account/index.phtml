@@ -1,6 +1,6 @@
 <p style="color:red;"><?php echo $this->escape($this->message);?></p>
 <form action="<?php echo $this->link(array('account','signin')); ?>" method="post">
-	Username: <input type="text" name="user"><br>
-	Password: <input type="password" name="pass"><br>
+	<label>Username: <input type="text" name="user"></label><br>
+	<label>Password: <input type="password" name="pass"></label><br>
 	<input type="submit" value="Sign In">
 </form>
