@@ -36,4 +36,4 @@ location @staple
 STAPLE also has support for composer. It has no dependencies out of the gate, so composer is an optional feature
 to add any dependencies that you might require. Simply add the dependencies to the included composer.json file.
 
-More information about composer can be found here: https://getcomposer.org/
+More information about composer can be found at [getcomposer.org](https://getcomposer.org/).
