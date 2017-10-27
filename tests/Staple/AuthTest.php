@@ -11,7 +11,7 @@ namespace Staple\Tests;
 use PHPUnit\Framework\TestCase;
 use Staple\Auth\Auth;
 use Staple\Auth\AuthAdapter;
-use Staple\Traits\AuthRoute;
+use Staple\Auth\AuthRoute;
 
 class FakeAuthAdapter implements AuthAdapter
 {

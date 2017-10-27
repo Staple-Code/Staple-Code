@@ -11,12 +11,12 @@ namespace Staple\Tests;
 use PHPUnit\Framework\TestCase;
 use Staple\Auth\Auth;
 use Staple\Auth\AuthAdapter;
+use Staple\Auth\AuthRoute;
 use Staple\Exception\AuthException;
 use Staple\Exception\PageNotFoundException;
 use Staple\Exception\RoutingException;
 use Staple\Request;
 use Staple\Route;
-use Staple\Traits\AuthRoute;
 
 class FakeProviderAuthAdapter implements AuthAdapter
 {
