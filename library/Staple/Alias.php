@@ -112,14 +112,18 @@ class Alias
 		'Stack'					=>	'\\Staple\\Data\\Stack',
 
 		//Query Builder Classes
+		'Connection'					=>	'\\Staple\\Query\\Connection',
 		'QueryCondition'					=>	'\\Staple\\Query\\Condition',
 		'QueryDataSet'						=>	'\\Staple\\Query\\DataSet',
 		'Delete'						=>	'\\Staple\\Query\\Delete',
 		'Insert'						=>	'\\Staple\\Query\\Insert',
 		'InsertMultiple'					=>	'\\Staple\\Query\\InsertMultiple',
+		'MockConnection'				=>	'\\Staple\\Query\\MockConnection',
+		'MockStatement'					=>	'\\Staple\\Query\\MockStatement',
 		'QueryJoin'						=>	'\\Staple\\Query\\Join',
 		'Query'							=>	'\\Staple\\Query\\Query',
 		'Select'						=>	'\\Staple\\Query\\Select',
+		'Statement'						=>	'\\Staple\\Query\\Statement',
 		'Union'							=>	'\\Staple\\Query\\Union',
 		'Update'						=>	'\\Staple\\Query\\Update',
 
