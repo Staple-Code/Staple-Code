@@ -533,6 +533,7 @@ class Select extends Query implements ISelectQuery
 	 * @param mixed $start
 	 * @param mixed $end
 	 * @return $this
+	 * @throws QueryException
 	 */
 	public function havingBetween($column, $start, $end)
 	{

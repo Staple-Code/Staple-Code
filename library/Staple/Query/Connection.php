@@ -28,6 +28,7 @@ use PDOStatement;
 use SplObjectStorage;
 use SplObserver;
 use Staple\Config;
+use Staple\Exception\ConfigurationException;
 
 class Connection extends PDO implements IConnection
 {
@@ -322,6 +323,7 @@ class Connection extends PDO implements IConnection
 	/**
 	 * Get the default database instance.
 	 * @return $this
+	 * @throws ConfigurationException
 	 */
 	public static function getInstance()
 	{
@@ -345,6 +347,7 @@ class Connection extends PDO implements IConnection
 	 * Create or return a named connection
 	 * @param $namedInstance
 	 * @return mixed
+	 * @throws ConfigurationException
 	 */
 	public static function getNamedConnection($namedInstance)
 	{
@@ -614,6 +617,33 @@ class Connection extends PDO implements IConnection
 
 		//Return the result
 		return $result;
+	}
+
+	/**
+	 * @param string $query
+	 * @param array $fields
+	 * @return bool|PDOStatement
+	 */
+	public function prepareAndExecute(string $query, array $fields)
+	{
+		//Log the query
+		$this->addQueryToLog((string)$query);
+
+		$statement = parent::prepare($query, $this->getDriverOptions());
+
+		//Execute the query and check for errors
+		if($statement->execute($fields) === false)
+		{
+			//Notify the observers that an error has occurred.
+			$this->notify();
+		}
+
+		//Assign the driver type in the statement object
+		if ($statement instanceof Statement)
+			$statement->setDriver($this->getDriver());
+
+		//Return the result
+		return $statement;
 	}
 
 	/*-------------------------------------------------Observer Methods-------------------------------------------------*/
