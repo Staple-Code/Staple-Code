@@ -1,6 +1,6 @@
 <?php
 /**
- * An exception class to handle exceptions in queries.
+ * An exception class to handle RESTful errors.
  *
  * @author Ironpilot
  * @copyright Copyright (c) 2011, STAPLE CODE
@@ -20,10 +20,12 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 namespace Staple\Exception;
 
-class QueryException extends \Exception
+
+use \Exception;
+
+class RestException extends Exception
 {
 
 }
