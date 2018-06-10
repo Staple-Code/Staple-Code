@@ -724,7 +724,7 @@ class Route
 	 * @return Route
 	 * @throws RoutingException
 	 */
-	public static function add(string $route, callable $func, bool $protected = false, array $options = [])
+	public static function add(string $route, callable $func, bool $protected = false, array $options = []) : Route
 	{
 		// Valid character check
 		if(!self::functionalRouteContainsAllowedCharacters($route))
@@ -806,7 +806,7 @@ class Route
 	 * @return Route
 	 * @throws PageNotFoundException
 	 */
-	public static function getFunctionalRouteObject($route) : ?Route
+	public static function getFunctionalRouteObject($route) : Route
 	{
 		if(is_array($route))
 		{
