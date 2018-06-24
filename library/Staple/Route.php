@@ -28,6 +28,8 @@ use ReflectionMethod;
 use Staple\Auth\Auth;
 use Staple\Controller\Controller;
 use Staple\Controller\RestfulController;
+use Staple\Exception\AuthException;
+use Staple\Exception\ConfigurationException;
 use Staple\Exception\PageNotFoundException;
 use Staple\Exception\RoutingException;
 
@@ -60,7 +62,12 @@ class Route
 	 * @var int
 	 */
 	protected $type;
-	
+
+	/**
+	 * Route constructor.
+	 * @param mixed $link
+	 * @throws RoutingException
+	 */
 	public function __construct($link = NULL)
 	{
 		if(is_array($link))
@@ -119,6 +126,10 @@ class Route
 
 	/**
 	 * Execute the route
+	 * @throws PageNotFoundException
+	 * @throws RoutingException
+	 * @throws AuthException
+	 * @throws \Exception
 	 */
 	public function execute()
 	{
@@ -211,6 +222,7 @@ class Route
 	 * It also builds the view for the route.
 	 *
 	 * @throws RoutingException
+	 * @throws \Exception
 	 */
 	protected function dispatchController()
 	{
@@ -297,6 +309,7 @@ class Route
 	 * Push the route to a Restful Controller
 	 * @param $providerClass
 	 * @throws RoutingException
+	 * @throws \Exception
 	 */
 	private function routeToProvider($providerClass)
 	{
@@ -315,6 +328,7 @@ class Route
 	
 	/**
 	 * Redirect to the route location.
+	 * @throws ConfigurationException
 	 */
 	public function redirect()
 	{
