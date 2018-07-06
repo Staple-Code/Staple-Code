@@ -30,6 +30,8 @@ use Staple\Autoload;
 use Staple\Config;
 use Staple\Error;
 use Staple\Exception\AuthException;
+use Staple\Exception\ConfigurationException;
+use Staple\Exception\RoutingException;
 use Staple\Layout;
 use Staple\Route;
 use Staple\Traits\Helpers;
@@ -50,6 +52,7 @@ abstract class Controller
 	 * Controller constructor creates an instance of View and saves it in the $view
 	 * property. It then calls the overridable method _start() for additional boot time
 	 * procedures.
+	 * @throws ConfigurationException
 	 */
 	public function __construct()
 	{
@@ -82,14 +85,16 @@ abstract class Controller
 	 * before being dispatched from the front controller.
 	 * @param string $method
 	 * @return bool
-	 * @throws Exception
+	 * @throws AuthException
+	 * @throws \ReflectionException
+	 * @throws RoutingException
 	 */
 	public function _auth($method)
 	{
 		$method = (string)$method;
 		if(!ctype_alnum($method))
 		{
-			throw new Exception('Authentication Validation Error', Error::AUTH_ERROR);
+			throw new AuthException('Authentication Validation Error', Error::AUTH_ERROR);
 		}
 		else
 		{

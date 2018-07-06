@@ -26,6 +26,10 @@
 namespace Staple;
 
 use Staple\Controller\Controller;
+use Staple\Exception\AuthException;
+use Staple\Exception\ConfigurationException;
+use Staple\Exception\PageNotFoundException;
+use Staple\Exception\RoutingException;
 use Staple\Session\Session;
 
 class Main
@@ -61,6 +65,8 @@ class Main
 	 * FORMS_ROOT, MODEL_ROOT, CONTROLLER_ROOT, VIEW_ROOT, and SCRIPT_ROOT. All of these constants exist as folders inside of the
 	 * APPLICATION_ROOT directory. The constructor loads and checks configuration, sets up the autoloader, sets custom error handlers
 	 * and begins a session.
+	 * @throws ConfigurationException
+	 * @throws \Exception
 	 */
 	private function __construct()
 	{
@@ -178,6 +184,9 @@ class Main
 		{
 			Dev::startTimer();
 		}
+
+		//Add Functional Routes
+		$this->addRoutes();
 	}
 	
 	/**
@@ -203,7 +212,11 @@ class Main
 		
 		return $this;
 	}
-	
+
+	/**
+	 * @return bool
+	 * @throws ConfigurationException
+	 */
 	public function inDevMode()
 	{
 	    return (bool)Config::getValue('errors', 'devmode');
@@ -293,6 +306,9 @@ class Main
 	 * Executes the application process.
 	 * @param Route | string $route
 	 * @return boolean
+	 * @throws RoutingException
+	 * @throws AuthException
+	 * @throws \Exception
 	 */
 	public function run($route = NULL)
 	{
@@ -330,10 +346,22 @@ class Main
 		//Include the boot file.
 		include_once APPLICATION_ROOT.'boot.php';
 	}
+
+	/**
+	 * Include the routes file.
+	 */
+	private function addRoutes()
+	{
+		include_once APPLICATION_ROOT.'routes.php';
+	}
 	
 	/**
 	 * Execute the current route
 	 * @return boolean
+	 * @throws PageNotFoundException
+	 * @throws RoutingException
+	 * @throws AuthException
+	 * @throws \Exception
 	 */
 	protected function executeRoute()
 	{
@@ -351,6 +379,9 @@ class Main
 	 * redirect as a routing string. This can be generated using the Staple_Link::get() function.
 	 * 
 	 * @param mixed $newRoute
+	 * @throws RoutingException
+	 * @throws PageNotFoundException
+	 * @throws AuthException
 	 */
 	public function redirect($newRoute)
 	{
