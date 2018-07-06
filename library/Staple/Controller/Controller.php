@@ -22,8 +22,6 @@
  */
 namespace Staple\Controller;
 
-use Exception;
-use const PHP_EOL;
 use Staple\Auth\Auth;
 use Staple\Auth\AuthHelpers;
 use Staple\Autoload;
