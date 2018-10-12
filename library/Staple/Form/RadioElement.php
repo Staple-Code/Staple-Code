@@ -24,8 +24,9 @@ namespace Staple\Form;
 
 use Exception;
 use Staple\Error;
+use Staple\Exception\FormBuildException;
 
-class RadioElement extends FieldElement
+class RadioElement extends FieldElement implements IFieldElement
 {
 	const SORT_VALUES = 1;
 	const SORT_LABELS_ALPHA = 2;
@@ -77,21 +78,16 @@ class RadioElement extends FieldElement
 	 * options.
 	 * 
 	 * @param array $options
-	 * @param boolean $labelvalues
-	 * @throws Exception
+	 * @param boolean $labelValues
 	 * @return $this
 	 */
-	public function addButtonsArray(array $options, $labelvalues = FALSE)
+	public function addButtonsArray(array $options, $labelValues = FALSE)
 	{
 		foreach($options as $value=>$label)
 		{
-			if(is_array($value) || is_resource($value))
+			if(!is_array($value) && !is_resource($value))
 			{
-				throw new Exception('Select values must be strings or integers.', Error::APPLICATION_ERROR);
-			}
-			else
-			{
-				if($labelvalues === true)
+				if($labelValues === true)
 				{
 					$this->buttons[$label] = $label;
 				}
@@ -169,6 +165,7 @@ class RadioElement extends FieldElement
 	/**
 	 * @param mixed $insert
 	 * @return RadioElement
+     * @throws FormBuildException
 	 */
 	public function setValue($insert)
 	{

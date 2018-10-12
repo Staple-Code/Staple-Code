@@ -25,7 +25,7 @@ namespace Staple\Form;
 
 use Staple;
 
-class TextElement extends FieldElement
+class TextElement extends FieldElement implements IFieldElement
 {
 	/**
  	* HTML5 input type

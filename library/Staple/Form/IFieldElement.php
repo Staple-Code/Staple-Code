@@ -24,7 +24,9 @@
 namespace Staple\Form;
 
 
-interface FieldElementInterface
+use Staple\Validate\IValidator;
+
+interface IFieldElement
 {
 	//Factory Method
 	public static function create($name, $label = NULL, $id = NULL, array $attrib = array());
@@ -55,7 +57,7 @@ interface FieldElementInterface
 
 	//Filters and Validators
 	public function addFilter(FieldFilter $filter);
-	public function addValidator(FieldValidator $validator);
+	public function addValidator(IValidator $validator);
 	public function clearValidators();
 	public function getErrors();
 	public function isValid();

@@ -28,6 +28,7 @@ use Exception;
 use Staple\Config;
 use Staple\Encrypt;
 use Staple\Error;
+use Staple\Exception\ConfigurationException;
 use Staple\Exception\FormBuildException;
 use Staple\Form\ViewAdapters\ElementViewAdapter;
 use Staple\Session\Session;
@@ -118,20 +119,6 @@ class Form
 	 */
 	protected $classes = array();
 	/**
-	 * Holds a title for the form.
-	 *
-	 * @var string
-	 * @deprecated
-	 */
-	protected $title;
-	/**
-	 * Holds the form layout name.
-	 *
-	 * @var string
-	 * @deprecated
-	 */
-	protected $layout;
-	/**
 	 * The Form View Object
 	 * @var View
 	 */
@@ -143,7 +130,7 @@ class Form
 	 */
 	protected $elementViewAdapter;
 	/**
-	 * Dynamic datastore.
+	 * Dynamic data store.
 	 *
 	 * @var array
 	 */
@@ -153,6 +140,8 @@ class Form
 	 * @param string $name
 	 * @param string $action
 	 * @param View $view
+     * @throws ConfigurationException
+     * @throws FormBuildException
 	 */
 	public function __construct($name = null, $action = null, View $view = null)
 	{
@@ -254,6 +243,7 @@ class Form
 
 	/**
 	 * The toString magic method calls the forms build function to output the form to the website.
+     * @throws ConfigurationException
 	 */
 	public function __toString()
 	{
@@ -284,6 +274,8 @@ class Form
 	/**
 	 * Creates the ident field, adds it to the form and save the value in the session. This is used
 	 * to verify the form has been submitted and also aids in preventing CSRF form attacks.
+     * @return bool
+     * @throws FormBuildException
 	 */
 	protected function createIdentifier()
 	{
@@ -386,6 +378,7 @@ class Form
 	 *
 	 * @param array $data
 	 * @return $this
+     * @throws FormBuildException
 	 */
 	public function addData(array $data)
 	{
@@ -396,6 +389,7 @@ class Form
 	 * @param array $data
 	 * @param FieldElement[] | array $target
 	 * @return $this
+     * @throws FormBuildException
 	 */
 	private function addDataToTarget(array $data, $target)
 	{
@@ -552,98 +546,6 @@ class Form
 		}
 
 		return false;
-	}
-
-	/**
-	 * Never Completed
-	 * @deprecated
-	 */
-	public function clientJS()
-	{
-		
-	}
-
-	/**
-	 * @return string
-	 * @throws Exception
-	 * @deprecated
-	 */
-	public function clientJQuery()
-	{
-		$script = <<<JS
-var {$this->name}validated = false;
-$(function (){
-	$('#{$this->name}_form').submit(function (){
-	var errors = [];
-JS;
-
-		foreach($this->fields as $field)
-		{
-			if($field instanceof FieldElement)
-			{
-				if($field->isRequired())
-				{
-					$script .= $field->clientJQuery();
-				}
-			}
-			elseif(is_array($field))    //Limited Recursion here.
-			{
-				foreach($field as $subField)
-				{
-					if($subField instanceof FieldElement)
-					{
-						if($subField->isRequired())
-						{
-							$script .= $subField->clientJQuery();
-						}
-					}
-					else
-					{
-						throw new Exception('Form Error', Error::FORM_ERROR);
-					}
-				}
-			}
-			else
-			{
-				throw new Exception('Form Error', Error::FORM_ERROR);
-			}
-		}
-
-		$script .= <<<JS
-	if(errors.length > 0)
-	{
-		var msg  = 'Please correct these form errors:\\n';
-		var count = 0;
-		for(var x in errors)
-		{
-			count++;
-			if(count <= 10)
-			{
-				msg += '\\n'+errors[x];
-			}
-		}
-		if(count > 10)
-		{
-			msg += '\\nAnd '+count+' more...';
-		}
-		alert(msg);
-		//jQuery UI Dialog
-		//$('<div class="form_validation_dialog" title="Form Errors">'+msg+'</div>').dialog({modal:true, buttons: {'Ok': function(){ $(this).dialog('close'); }}});
-		{$this->name}validated = false;
-		return false;
-	}
-	else
-	{
-		{$this->name}validated = true;
-	}
-	})
-});
-JS;
-		$script .= "";
-		$script .= "";
-
-		//$script = "$('#{$this->name}_form').submit(false);\n";
-		return $script;
 	}
 
 	/**
@@ -899,6 +801,7 @@ JS;
 	 *
 	 * @param string $name
 	 * @return Form
+     * @throws FormBuildException
 	 */
 	public function setName($name)
 	{
@@ -942,35 +845,6 @@ JS;
 				$this->enctype = $enctype;
 				break;
 		}
-
-		return $this;
-	}
-
-	/**
-	 * @return string $title
-	 * @deprecated
-	 */
-	public function getTitle()
-	{
-		return $this->title;
-	}
-
-	/**
-	 * @return string $layout
-	 * @deprecated
-	 */
-	public function getLayout()
-	{
-		return $this->layout;
-	}
-
-	/**
-	 * @param string $layout
-	 * @return $this
-	 */
-	public function setLayout($layout)
-	{
-		$this->layout = $layout;
 
 		return $this;
 	}
@@ -1045,17 +919,6 @@ JS;
 					$field->setElementViewAdapter($elementViewAdapter);
 			}
 		}
-
-		return $this;
-	}
-
-	/**
-	 * @param string $title
-	 * @return $this
-	 */
-	public function setTitle($title)
-	{
-		$this->title = $title;
 
 		return $this;
 	}
@@ -1164,15 +1027,6 @@ JS;
 	}
 
 	/**
-	 * @deprecated
-	 * @return string
-	 */
-	public function title()
-	{
-		return $this->title;
-	}
-
-	/**
 	 * Build out all of the form fields, excluding the identifier field.
 	 *
 	 * @return string
@@ -1209,25 +1063,9 @@ JS;
 			$buf = ob_get_contents();
 			ob_end_clean();
 		}
-		elseif(isset($this->layout))
-		{
-			$layoutLocation = FORMS_ROOT . 'layouts/' . basename($this->layout) . '.phtml';
-			if(file_exists($layoutLocation))
-			{
-				ob_start();
-				include $layoutLocation;
-				$buf = ob_get_contents();
-				ob_end_clean();
-			}
-			else
-			{
-				throw new Exception('Unable to load form layout.', Error::FORM_ERROR);
-			}
-		}
 		else
 		{
 			$buf .= $this->formstart();
-			$buf .= $this->title();
 			$buf .= $this->fields();
 			$buf .= $this->formend();
 		}
@@ -1244,6 +1082,8 @@ JS;
 	 * @param string $action
 	 * @param string $method
 	 * @return Form
+     * @throws FormBuildException
+     * @throws ConfigurationException
 	 */
 	public static function create($name = null, $action = null, $method = self::METHOD_POST)
 	{

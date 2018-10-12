@@ -22,7 +22,7 @@
  */
 namespace Staple\Form;
 
-class TextareaElement extends FieldElement
+class TextareaElement extends FieldElement implements IFieldElement
 {
 	protected $rows;
 	protected $cols;
