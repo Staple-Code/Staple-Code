@@ -23,7 +23,7 @@ namespace Staple\Form;
 use Exception;
 use Staple\Form\ViewAdapters\ElementViewAdapter;
 
-class CheckboxGroupElement extends FieldElement
+class CheckboxGroupElement extends FieldElement implements IFieldElement
 {
 	/**
 	 * An array that holds the Checkbox elements.

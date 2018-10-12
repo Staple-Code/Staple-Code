@@ -22,7 +22,7 @@
  */
 namespace Staple\Form;
 
-class ImageElement extends FieldElement
+class ImageElement extends FieldElement implements IFieldElement
 {
 	protected $src;
 	

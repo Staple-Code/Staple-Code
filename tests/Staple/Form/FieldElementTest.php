@@ -25,7 +25,7 @@ namespace Staple\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Staple\Form\FieldElement;
-use Staple\Form\FieldValidator;
+use Staple\Validate\BaseValidator;
 
 class dummyFieldElement extends FieldElement
 {
@@ -55,7 +55,7 @@ class dummyFieldElement extends FieldElement
 
 }
 
-class dummyFieldElementValidator extends FieldValidator
+class dummyFieldElementValidator extends BaseValidator
 {
 	protected $value;
 
@@ -71,7 +71,7 @@ class dummyFieldElementValidator extends FieldValidator
 	 * @param mixed $data
 	 * @return bool
 	 */
-	public function check($data)
+	public function check($data): bool
 	{
 		if($data == $this->value)
 			return true;
