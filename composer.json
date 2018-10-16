@@ -1,9 +1,31 @@
 {
+  "name": "staple/staple-code",
+  "description": "A PHP 7 MVC framework for rapid application development",
+  "authors": [
+    {
+      "name": "Scott Henscheid"
+    },
+    {
+      "name": "Hans Heeling"
+    },
+    {
+      "name": "Adam Day"
+    }
+  ],
   "require": {
+    "php": ">=7.0",
     "twig/twig":"~2.0",
-    "phpunit/phpunit": "~6.0",
+    "phpunit/phpunit": "^6.0",
     "predis/predis":"1.1.*@dev",
     "codacy/coverage": "dev-master",
     "auth0/auth0-php": "^5.0"
+  },
+  "suggest": {
+    "ext-ctype": "Provide ctype function support for installs without the ctype extension."
+  },
+  "autoload": {
+    "psr-0": {
+      "Staple": "library/"
+    }
   }
 }
