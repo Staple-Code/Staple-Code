@@ -25,9 +25,12 @@ namespace Staple;
 
 use Exception;
 use Staple\Exception\PageNotFoundException;
+use Staple\Traits\Factory;
 
 class Autoload
 {
+	use Factory;
+
     const STAPLE_NAMESPACE = 'Staple';
 	const CONTROLLER_SUFFIX = 'Controller';
 	const PROVIDER_SUFFIX = 'Provider';
@@ -146,7 +149,7 @@ class Autoload
 		//Check for an aliased class name
 		if(!is_null($namespacedClass = Alias::checkAlias($class_name)))					//Look for aliased classes
 		{
-    			return $this->loadLibraryClass($namespacedClass, $class_name);
+    			return $this->loadAliasClass($namespacedClass, $class_name);
 		}
 		elseif(substr($class_name,strlen($class_name)-strlen($this->getProviderSuffix()),strlen($this->getProviderSuffix())) == $this->getProviderSuffix()
 			&& strlen($class_name) != strlen($this->getProviderSuffix()))				//Look for Providers
@@ -172,18 +175,11 @@ class Autoload
 		{
 			//Correct for a leading \ character
 			if(substr($class_name, 0,1) == '\\') $class_name = substr($class_name, 1);
-			
-			//Split the class into it's namespace components.
-			$namespace = explode('\\',$class_name);
 
 			//Correct for paths in Linux and Windows
 			$pathname = str_replace('\\',DIRECTORY_SEPARATOR,$class_name);
 
-			if($namespace[0] == static::STAPLE_NAMESPACE)
-			{
-				return $this->loadLibraryClass($class_name);
-			}
-			elseif(file_exists(MODULES_ROOT.$pathname.static::PHP_FILE_EXTENSION))
+			if(file_exists(MODULES_ROOT.$pathname.static::PHP_FILE_EXTENSION))
 			{
 				require_once MODULES_ROOT.$pathname.static::PHP_FILE_EXTENSION;
 			}
@@ -206,7 +202,7 @@ class Autoload
 	 * @throws Exception
 	 * @return boolean
 	 */
-	protected function loadLibraryClass($class_name, $alias = NULL)
+	protected function loadAliasClass($class_name, $alias = NULL)
 	{
 		//Correct for a leading \ character
 		if(substr($class_name, 0,1) == '\\') $class_name = substr($class_name, 1);
@@ -238,11 +234,8 @@ class Autoload
 			//Return true on success
 			return true;
 		}
-		else
-		{
-			//Throw exception when we can't load the class
-			throw new Exception('Error Loading Library Class: '.$class_name, 501);
-		}
+
+		return false;
 	}
 
 	/**

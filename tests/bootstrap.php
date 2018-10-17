@@ -48,10 +48,6 @@ defined('SCRIPT_ROOT')
 defined('STAPLE_ROOT')
 || define('STAPLE_ROOT',LIBRARY_ROOT . 'Staple/');
 
-require_once LIBRARY_ROOT . 'Staple/Alias.php';
-require_once LIBRARY_ROOT . 'Staple/Config.php';
-require_once LIBRARY_ROOT . 'Staple/Autoload.php';
-
 //Staple AutoLoader
 $loader = new \Staple\Autoload(false);
 
