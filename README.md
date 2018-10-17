@@ -92,3 +92,18 @@ run the Jekyll site navigate to `/docs` and type:
 ```cmd
 bundle exec jekyll serve
 ```
+
+#### Install Jekyll (If you haven't already)
+
+If you haven't already you should install bundler and the jekyll Ruby
+Gems:
+
+```cmd
+gem install bundler jekyll
+```
+
+Then you should install the dependencies with:
+
+```cmd
+bundle install
+```
