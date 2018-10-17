@@ -169,10 +169,10 @@ class FormTest extends TestCase
 		$form3 = Form::create('MyTestForm');
 		$form4 = new Form('myForm', 'test/action');
 
-		$this->assertInstanceOf('Form', $form1);
-		$this->assertInstanceOf('Form', $form2);
-		$this->assertInstanceOf('Form', $form3);
-		$this->assertInstanceOf('Form', $form4);
+		$this->assertInstanceOf('\\Staple\\Form\\Form', $form1);
+		$this->assertInstanceOf('\\Staple\\Form\\Form', $form2);
+		$this->assertInstanceOf('\\Staple\\Form\\Form', $form3);
+		$this->assertInstanceOf('\\Staple\\Form\\Form', $form4);
 	}
 
 	/**

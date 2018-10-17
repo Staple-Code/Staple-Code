@@ -214,7 +214,7 @@ class Autoload
 		$className = $namespace[count($namespace)-1];
 		
 		//Path for classes
-		$path = LIBRARY_ROOT;
+		$path = '';
 		for($i = 0; $i < count($namespace)-1; $i++)
 		{
 			$path .= $namespace[$i].DIRECTORY_SEPARATOR;
