@@ -22,7 +22,7 @@
  */
 namespace Staple\Form;
 
-class CheckboxElement extends FieldElement
+class CheckboxElement extends FieldElement implements IFieldElement
 {
 	private $changed = false;
 	
@@ -61,6 +61,7 @@ class CheckboxElement extends FieldElement
 	 * Sets the starting value for the checkbox
 	 * @param boolean $val
 	 * @return CheckboxElement
+     * @throws \Exception
 	 */
 	public function setValue($val)
 	{

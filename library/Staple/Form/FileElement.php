@@ -22,7 +22,7 @@
  */
 namespace Staple\Form;
 
-class FileElement extends FieldElement
+class FileElement extends FieldElement implements IFieldElement
 {
 	/**
 	 * Holds the MIME for the HTML Accept property

@@ -20,15 +20,21 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Staple\Form\Validate;
+namespace Staple\Validate;
 
-use Staple\Form\FieldElement;
-use Staple\Form\FieldValidator;
-
-class BetweenValidator extends FieldValidator
+class BetweenValidator extends BaseValidator
 {
 	const DEFAULT_ERROR = 'Field is not between minimum and maximum values.';
+
+    /**
+     * Minimum Value.
+     * @var int
+     */
 	protected $min = 0;
+    /**
+     * Maximum Value.
+     * @var int
+     */
 	protected $max;
 	
 	/**
@@ -37,9 +43,9 @@ class BetweenValidator extends FieldValidator
 	 * 
 	 * @param int $limit1
 	 * @param int $limit2
-	 * @param string $usermsg
+	 * @param string $userMessage
 	 */
-	public function __construct($limit1, $limit2, $usermsg = NULL)
+	public function __construct($limit1, $limit2, $userMessage = NULL)
 	{
 		$this->min = (int)$limit1;
 		if(isset($limit2))
@@ -54,13 +60,13 @@ class BetweenValidator extends FieldValidator
 				$this->max = (int)$limit1;
 			}
 		}
-		parent::__construct($usermsg);
+		parent::__construct($userMessage);
 	}
 	
 	/**
 	 * @return int $min
 	 */
-	public function getMin()
+	public function getMin(): int
 	{
 		return $this->min;
 	}
@@ -68,7 +74,7 @@ class BetweenValidator extends FieldValidator
 	/**
 	 * @return int $max
 	 */
-	public function getMax()
+	public function getMax(): int
 	{
 		return $this->max;
 	}
@@ -77,7 +83,7 @@ class BetweenValidator extends FieldValidator
 	 * @param int $min
 	 * @return $this
 	 */
-	public function setMin($min)
+	public function setMin($min): BetweenValidator
 	{
 		$this->min = $min;
 		return $this;
@@ -87,7 +93,7 @@ class BetweenValidator extends FieldValidator
 	 * @param int $max
 	 * @return $this
 	 */
-	public function setMax($max)
+	public function setMax($max): BetweenValidator
 	{
 		$this->max = $max;
 		return $this;
@@ -98,7 +104,7 @@ class BetweenValidator extends FieldValidator
 	 * @param mixed $data
 	 * @return boolean
 	 */
-	public function check($data)
+	public function check($data): bool
 	{
 		$data = (int)$data;
 		if($data <= $this->max && $data >= $this->min)
@@ -110,41 +116,5 @@ class BetweenValidator extends FieldValidator
 			$this->addError();
 		}
 		return false;
-	}
-	
-	/**
-	 * (non-PHPdoc)
-	 * @see Staple_Form_Validator::clientJQuery()
-	 */
-	public function clientJQuery($fieldType, FieldElement $field)
-	{
-		switch ($fieldType)
-		{
-			case 'Staple_Form_SelectElement':
-				$fieldid = "#{$field->getId()}";
-				$valstring = "#{$field->getId()} option:selected";
-				break;
-			case 'Staple_Form_RadioGroup':
-				$fieldid = "input:radio[name={$field->getName()}]";
-				$valstring = "input:radio[name={$field->getName()}]:checked";
-				break;
-			case 'Staple_Form_CheckboxElement':
-				return '';
-				break;
-			default:
-				$fieldid = "#{$field->getId()}";
-				$valstring = $fieldid;
-		}
-		
-		$script = "\t//Between Validator for ".addslashes($field->getLabel())."\n";
-		$script .= "\tif($('$valstring').val() > {$this->getMax()} || $('$valstring').val() < {$this->getMin()})\n";
-		$script .= "\t{\n";
-		$script .= "\t\terrors.push('".addslashes($field->getLabel()).": \\n{$this->clientJSError()}\\n');\n";
-		$script .= "\t\t$('$fieldid').addClass('form_error');\n";
-		$script .= "\t}\n";
-		$script .= "\telse {\n";
-		$script .= "\t\t$('$fieldid').removeClass('form_error');\n";
-		$script .= "\t}\n";
-		return $script;
 	}
 }

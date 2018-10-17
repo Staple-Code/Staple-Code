@@ -20,11 +20,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Staple\Form;
+namespace Staple\Validate;
 
-use Staple;
-
-abstract class FieldValidator
+abstract class BaseValidator implements iValidator
 {
 	/**
 	 * This class constant defines the default error message for the validator. Each child class should customize this value.
@@ -40,55 +38,34 @@ abstract class FieldValidator
 	 * A string that holds the user-defined error message when validation fails.
 	 * @var string
 	 */
-	protected $usermsg;
+	protected $userMessage;
 	
 	/**
 	 * Default Constructor. Supports and optional user defined error message.
-	 * @param string $usermsg
+	 * @param string $userMessage
 	 */
-	public function __construct($usermsg = NULL)
+	public function __construct(string $userMessage = NULL)
 	{
-		if(isset($usermsg))
+		if(isset($userMessage))
 		{
-			$this->setUserErrorMessage($usermsg);
+			$this->setUserErrorMessage($userMessage);
 		}
 	}
 	
 	/**
 	 * Factory function to create objects.
-	 * @param string $usermsg
-	 * @return static
+	 * @param string $userMessage
+	 * @return BaseValidator
 	 */
-	public static function create($usermsg = NULL)
+	public static function create(string $userMessage = NULL): IValidator
 	{
-		return new static($usermsg);
-	}
-	
-	/*
-	public function getError()
-	{
-		return $this->error;
-	}*/
-	
-	/**
-	 * Gets the error message for client side checking.
-	 */
-	public function clientJSError()
-	{
-		if(isset($this->usermsg))
-		{
-			return $this->usermsg;
-		}
-		else 
-		{
-			return static::DEFAULT_ERROR;
-		}
+		return new static($userMessage);
 	}
 	
 	/**
 	 * Clears all the errors in the errors array.
 	 */
-	public function clearErrors()
+	public function clearErrors(): IValidator
 	{
 		$this->error = array();
 		return $this;
@@ -96,51 +73,52 @@ abstract class FieldValidator
 
 	/**
 	 * Adds a custom error or adds the default error to the errors array.
-	 * @param string $err
+	 * @param string $error
 	 * @return $this
 	 */
-	public function addError($err = NULL)
+	public function addError(string $error = null): IValidator
 	{
-		if(isset($err))
+		if(isset($error))
 		{
-			$this->error[] = $err;
+			$pushError = $error;
 		}
-		elseif(isset($this->usermsg))
+		elseif(isset($this->userMessage))
 		{
-			$this->error[] = $this->usermsg;
+			$pushError = $this->userMessage;
 		}
 		else
 		{
-			$this->error[] = static::DEFAULT_ERROR;
+			$pushError = static::DEFAULT_ERROR;
 		}
+
+        if(array_search($pushError, $this->error) === false)
+		    array_push($this->error, $pushError);
 		return $this;
 	}
 	/**
-	 * @return string $usermsg
+	 * @return string $userMessage
 	 */
-	public function getErrorsAsString()
+	public function getErrorsAsString(): string
 	{
 		$eString = implode("\n", $this->error);
-		if(isset($this->usermsg))
-		{
-			$eString = $this->usermsg."\n".$eString;
-		}
 		return $eString;
 	}
 
 	/**
-	 * @param string $usermsg
+	 * @param string $userMessage
+     * @return static
 	 */
-	public function setUserErrorMessage($usermsg)
+	public function setUserErrorMessage(string $userMessage): IValidator
 	{
-		$this->usermsg = $usermsg;
+		$this->userMessage = $userMessage;
+		return $this;
 	}
 
 	/**
 	 * Return the errors array
 	 * @return array
 	 */
-	public function getErrors()
+	public function getErrors(): array
 	{
 		return $this->error;
 	}
@@ -149,40 +127,10 @@ abstract class FieldValidator
 	 * Returns the name of the validator
 	 * @return string
 	 */
-	public function getName()
+	public function getName(): string
 	{
 		$c = get_class($this);
 		$c = str_replace('Staple_Form_Validate_', '', $c);
 		return $c;
 	}
-	
-	/**
-	 * Function for client side form checking. Must be overridden in the child class.
-	 * @param string $fieldType
-	 * @param FieldElement $field
-	 * @return string
-	 */
-	public function clientJS($fieldType, FieldElement $field)
-	{
-		return '';
-	}
-	
-	/**
-	 * Function for client side form checking. Must be overridden in the child class. This one is specific to JQuery.
-	 * @param string $fieldType
-	 * @param FieldElement $field
-	 * @return string
-	 */
-	public function clientJQuery($fieldType, FieldElement $field)
-	{
-		return '';
-	}
-	
-	/**
-	 * 
-	 * Returns a boolean true or false on success or failure of the validation check.
-	 * @param mixed $data
-	 * @return bool
-	 */
-	abstract public function check($data);
 }

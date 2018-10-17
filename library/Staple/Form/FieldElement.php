@@ -25,10 +25,12 @@ namespace Staple\Form;
 
 use Exception;
 use Staple\Error;
+use Staple\Exception\FormBuildException;
 use Staple\Form\ViewAdapters\ElementViewAdapter;
 use Staple\Traits\Helpers;
+use Staple\Validate\IValidator;
 
-abstract class FieldElement implements FieldElementInterface
+abstract class FieldElement implements IFieldElement
 {
 	use Helpers;
 
@@ -90,7 +92,7 @@ abstract class FieldElement implements FieldElementInterface
 	protected $filters = array();
 	/**
 	 * An array that holds the validator objects assigned to the form field.
-	 * @var FieldValidator[]
+	 * @var IValidator[]
 	 */
 	protected $validators = array();
 	/**
@@ -242,10 +244,10 @@ abstract class FieldElement implements FieldElementInterface
 
 	/**
 	 * Adds a field validator to the form field.
-	 * @param FieldValidator $validator
+	 * @param IValidator $validator
 	 * @return $this
 	 */
-	public function addValidator(FieldValidator $validator)
+	public function addValidator(IValidator $validator)
 	{
 		$this->validators[] = $validator;
 		return $this;
@@ -358,52 +360,6 @@ abstract class FieldElement implements FieldElementInterface
 		}
 	}
 
-	/**
-	 * This function queries all of the validators for javascript to verify their data.
-	 * @throws Exception
-	 * @return string
-	 * @deprecated
-	 */
-	public function clientJQuery()
-	{
-		$script = '';
-		foreach ($this->validators as $val)
-		{
-			if ($val instanceof FieldValidator)
-			{
-				$script .= $val->clientJQuery(get_class($this), $this);
-			}
-			else
-			{
-				throw new Exception('Form Error', Error::FORM_ERROR);
-			}
-		}
-		return $script;
-	}
-
-	/**
-	 * This function queries all of the validators for javascript to verify their data.
-	 * @throws Exception
-	 * @return string
-	 * @deprecated
-	 */
-	public function clientJS()
-	{
-		$script = '';
-		foreach ($this->validators as $val)
-		{
-			if ($val instanceof FieldValidator)
-			{
-				$script .= $val->clientJS(get_class($this), $this);
-			}
-			else
-			{
-				throw new Exception('Form Error', Error::FORM_ERROR);
-			}
-		}
-		return $script;
-	}
-
 	/*
 	 * -------------------------------------SET/GET FUNCTIONS-------------------------------------
 	 */
@@ -457,7 +413,7 @@ abstract class FieldElement implements FieldElementInterface
 	/**
 	 * Sets the field value, if field is not read only.
 	 * @param mixed $insert
-	 * @throws Exception
+	 * @throws FormBuildException
 	 * @return $this
 	 */
 	public function setValue($insert)
@@ -473,7 +429,7 @@ abstract class FieldElement implements FieldElementInterface
 				}
 				else
 				{
-					throw new Exception('Filter Error', Error::FORM_ERROR);
+					throw new FormBuildException('Filter Error', Error::FORM_ERROR);
 				}
 			}
 

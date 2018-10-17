@@ -24,8 +24,9 @@ namespace Staple\Form;
 
 use Staple\Exception\FormBuildException;
 use Staple\Form\ViewAdapters\ElementViewAdapter;
+use Staple\Validate\IValidator;
 
-class SubmitElement extends FieldElement
+class SubmitElement extends FieldElement implements IFieldElement
 {
 	public function __construct($name, $value = NULL, $id = NULL, array $attrib = array(), $label = NULL)
 	{
@@ -88,11 +89,11 @@ class SubmitElement extends FieldElement
 
 	/**
 	 * Throws an exception because validators are not allowed on this element.
-	 * @param FieldValidator $validator
+	 * @param IValidator $validator
 	 * @return $this
 	 * @throws FormBuildException
 	 */
-	public function addValidator(FieldValidator $validator)
+	public function addValidator(IValidator $validator)
 	{
 		throw new FormBuildException('Submit elements do not have validators.');
 	}

@@ -10,7 +10,7 @@ namespace Staple\Tests;
 
 
 use PHPUnit\Framework\TestCase;
-use Staple\Form\Validate\DateValidator;
+use Staple\Validate\DateValidator;
 
 class DateValidatorTest extends TestCase
 {
@@ -49,4 +49,20 @@ class DateValidatorTest extends TestCase
 		$this->assertFalse($validator->check('19l6.11.23'));		//Embedded characters
 		$this->assertFalse($validator->check('2000-02-30'));		//Invalid Day Value for February
 	}
+
+	public function testGetMatches()
+    {
+        $validator = $this->getDateValidator();
+
+        $this->assertTrue($validator->check('1956/10/23'));
+        $this->assertEquals([
+            0 => '1956/10/23',
+            1 => '1956',
+            2 => '19',
+            3 => '10/23',
+            4 => '10/23',
+            5 => '10',
+            6 => '23',
+        ], $validator->getMatches());
+    }
 }
