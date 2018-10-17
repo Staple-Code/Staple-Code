@@ -241,7 +241,7 @@ class Autoload
 		else
 		{
 			//Throw exception when we can't load the class
-			throw new Exception('Error Loading Library Class: '.$class_name, 501);
+			throw new Exception('Error Loading Library Class: '.$class_name.' Looked in: '.$include, 501);
 		}
 	}
 
