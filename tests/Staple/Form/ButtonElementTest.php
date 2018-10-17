@@ -27,7 +27,7 @@ namespace Staple\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Staple\Form\ButtonElement;
-use Staple\Form\Validate\EqualValidator;
+use Staple\Validate\EqualValidator;
 use Staple\Form\ViewAdapters\BootstrapViewAdapter;
 use Staple\Form\ViewAdapters\FoundationViewAdapter;
 
