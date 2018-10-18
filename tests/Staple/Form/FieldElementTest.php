@@ -25,7 +25,7 @@ namespace Staple\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Staple\Form\FieldElement;
-use Staple\Validate\BaseValidator;
+use Staple\Form\Validate\BaseFieldValidator;
 
 class dummyFieldElement extends FieldElement
 {
@@ -55,7 +55,7 @@ class dummyFieldElement extends FieldElement
 
 }
 
-class dummyFieldElementValidator extends BaseValidator
+class dummyFieldElementValidator extends BaseFieldValidator
 {
 	protected $value;
 

@@ -22,7 +22,7 @@
  */
 namespace Staple\Validate;
 
-abstract class BaseValidator implements iValidator
+abstract class BaseValidator implements IValidator
 {
 	/**
 	 * This class constant defines the default error message for the validator. Each child class should customize this value.
