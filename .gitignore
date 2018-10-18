@@ -5,3 +5,5 @@
 /vendor
 composer.phar
 composer.lock
+docs/Gemfile.lock
+tmp/

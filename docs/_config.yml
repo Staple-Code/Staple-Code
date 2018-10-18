@@ -27,7 +27,7 @@ github_username:  ironpilot
 # Build settings
 markdown: kramdown
 
-gems:
+plugins:
   - jekyll-feed
 exclude:
   - Gemfile
