@@ -24,7 +24,7 @@
  */
 namespace Staple\Form;
 
-class PasswordElement extends FieldElement
+class PasswordElement extends FieldElement implements IFieldElement
 {
 	private $releaseValue = false;
 	/**

@@ -22,10 +22,9 @@
  */
 namespace Staple\Form\Validate;
 
-use Staple\Form\FieldElement;
-use Staple\Form\FieldValidator;
+use Staple\Form\IFieldElement;
 
-class DependentFieldValidator extends FieldValidator
+class DependentFieldValidator extends BaseFieldValidator
 {
 	const DEFAULT_ERROR = 'Field Comparison Error';
 
@@ -39,11 +38,6 @@ class DependentFieldValidator extends FieldValidator
 	const GREATERTHANEQUALTO = 5;
 
 	/**
-	 * @var FieldElement
-	 */
-	protected $field;
-
-	/**
 	 * @var
 	 *
 	 * Check operation to perform
@@ -51,11 +45,11 @@ class DependentFieldValidator extends FieldValidator
 	protected $operation = self::EQUAL;
 
 	/**
-	 * @param FieldElement $field
+	 * @param IFieldElement $field
 	 * @param $operation
 	 * @param string $userMsg
 	 */
-	public function __construct(FieldElement $field, $operation = self::EQUAL, $userMsg = NULL)
+	public function __construct(IFieldElement $field, $operation = self::EQUAL, $userMsg = NULL)
 	{
 		$this->field = $field;
 		$this->operation = $operation;
@@ -63,25 +57,10 @@ class DependentFieldValidator extends FieldValidator
 		parent::__construct($userMsg);
 	}
 
-	/**
-	 * @return FieldElement
-	 */
-	public function getField()
-	{
-		return $this->field;
-	}
-
-	/**
-	 * @param FieldElement $field
-	 * @return $this
-	 */
-	public function setField(FieldElement $field)
-	{
-		$this->field = $field;
-		return $this;
-	}
-
-	public function getFieldValue()
+    /**
+     * @return string
+     */
+	public function getFieldValue(): string
 	{
 		return $this->field->getValue();
 	}
@@ -98,7 +77,7 @@ class DependentFieldValidator extends FieldValidator
 	 * @param $operation
 	 * @return $this
 	 */
-	public function setOperation($operation)
+	public function setOperation($operation): DependentFieldValidator
 	{
 		$this->operation = $operation;
 		return $this;
@@ -109,61 +88,61 @@ class DependentFieldValidator extends FieldValidator
 	 */
 
 	/**
-	 * @param FieldElement $field
+	 * @param IFieldElement $field
 	 * @param string|null $userMsg
 	 * @return DependentFieldValidator
 	 *
 	 * Instantiates DependentFieldValidator for an equal to comparison between fields
 	 */
-	public static function equal(FieldElement $field, $userMsg = NULL)
+	public static function equal(IFieldElement $field, $userMsg = NULL): DependentFieldValidator
 	{
 		return new self($field, self::EQUAL, $userMsg);
 	}
 
 	/**
-	 * @param FieldElement $field
+	 * @param IFieldElement $field
 	 * @param string|null $userMsg
 	 * @return DependentFieldValidator
 	 *
 	 * Instantiates DependentFieldValidator for a less than comparison between two fields. Compares strings by string length.
 	 */
-	public static function lessThan(FieldElement $field, $userMsg = NULL)
+	public static function lessThan(IFieldElement $field, $userMsg = NULL)
 	{
 		return new self($field, self::LESSTHAN, $userMsg);
 	}
 
 	/**
-	 * @param FieldElement $field
+	 * @param IFieldElement $field
 	 * @param string|null $userMsg
 	 * @return DependentFieldValidator
 	 *
 	 * Instantiates DependentFieldValidator for a greater than comparison between two fields. Compares strings by string length.
 	 */
-	public static function greaterThan(FieldElement $field, $userMsg = NULL)
+	public static function greaterThan(IFieldElement $field, $userMsg = NULL)
 	{
 		return new self($field, self::GREATERTHAN, $userMsg);
 	}
 
 	/**
-	 * @param FieldElement $field
-	 * @param string|null $userMsg
+	 * @param IFieldElement $field
+	 * @param string|null $userMessage
 	 * @return DependentFieldValidator
 	 *
 	 * Instantiates DependentFieldValidator for a less than or equal to comparison between two fields. Compares strings by string length.
 	 */
-	public static function lessThanEqualTo(FieldElement $feild, $userMsg = NULL)
+	public static function lessThanEqualTo(IFieldElement $field, $userMessage = NULL): DependentFieldValidator
 	{
-		return new self($feild, self::LESSTHANEQUALTO, $userMsg);
+		return new self($field, self::LESSTHANEQUALTO, $userMessage);
 	}
 
 	/**
-	 * @param FieldElement $field
+	 * @param IFieldElement $field
 	 * @param string|null $userMsg
 	 * @return DependentFieldValidator
 	 *
 	 * Instantiates DependentFieldValidator for a greater than or equal to comparison between two fields. Compares strings by string length.
 	 */
-	public static function greaterThanEqualTo(FieldElement $field, $userMsg = NULL)
+	public static function greaterThanEqualTo(IFieldElement $field, $userMsg = NULL): DependentFieldValidator
 	{
 		return new self($field, self::GREATERTHANEQUALTO, $userMsg);
 	}
@@ -175,7 +154,7 @@ class DependentFieldValidator extends FieldValidator
 	 *
 	 * Method to perform actual data check
 	 */
-	public function check($data)
+	public function check($data): bool
 	{
 		switch ($this->getOperation())
 		{
@@ -200,7 +179,7 @@ class DependentFieldValidator extends FieldValidator
 				break;
 		}
 		$this->addError();
-		return FALSE;
+		return false;
 	}
 
 	/**
@@ -213,7 +192,7 @@ class DependentFieldValidator extends FieldValidator
 	 *
 	 * Equal to comparison check
 	 */
-	private function equalComparison($data)
+	private function equalComparison($data): bool
 	{
 		if($data == $this->getFieldValue())
 		{
@@ -229,7 +208,7 @@ class DependentFieldValidator extends FieldValidator
 	 *
 	 * Less than comparison check
 	 */
-	private function lessThanComparison($data)
+	private function lessThanComparison($data): bool
 	{
 		if(is_numeric($data))
 		{
@@ -255,7 +234,7 @@ class DependentFieldValidator extends FieldValidator
 	 *
 	 * Greater than comparison check
 	 */
-	private function greaterThanComparison($data)
+	private function greaterThanComparison($data): bool
 	{
 		if(is_numeric($data))
 		{
@@ -281,7 +260,7 @@ class DependentFieldValidator extends FieldValidator
 	 *
 	 * Less than or Equal to comparison check
 	 */
-	private function lessThanEqualToComparison($data)
+	private function lessThanEqualToComparison($data): bool
 	{
 		if(is_numeric($data))
 		{
@@ -307,7 +286,7 @@ class DependentFieldValidator extends FieldValidator
 	 *
 	 * Greater than or Equal to comparison check
 	 */
-	private function greaterThanEqualToComparison($data)
+	private function greaterThanEqualToComparison($data): bool
 	{
 		if(is_numeric($data))
 		{

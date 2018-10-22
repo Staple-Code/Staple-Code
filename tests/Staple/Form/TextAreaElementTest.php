@@ -27,10 +27,10 @@ namespace Staple\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Staple\Form\TextareaElement;
-use Staple\Form\Validate\AlnumValidator;
-use Staple\Form\Validate\DateValidator;
-use Staple\Form\Validate\EmailValidator;
-use Staple\Form\Validate\LengthValidator;
+use Staple\Validate\AlnumValidator;
+use Staple\Validate\DateValidator;
+use Staple\Validate\EmailValidator;
+use Staple\Validate\LengthValidator;
 use Staple\Form\ViewAdapters\BootstrapViewAdapter;
 use Staple\Form\ViewAdapters\FoundationViewAdapter;
 

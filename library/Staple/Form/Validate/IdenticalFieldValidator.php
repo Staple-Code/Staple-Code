@@ -20,33 +20,31 @@
  */
 namespace Staple\Form\Validate;
 
-use Staple\Form\FieldElement;
-use Staple\Form\FieldValidator;
+use Staple\Form\IFieldElement;
 
-class IdenticalFieldValidator extends FieldValidator
+class IdenticalFieldValidator extends BaseFieldValidator
 {
 	const DEFAULT_ERROR = 'Data is not equal.';
-	
+
+    /**
+     * Boolean to use a strict comparison or not.
+     * @var bool
+     */
 	protected $strict = false;
-	/**
-	 * The form element to validate against.
-	 * @var FieldElement
-	 */
-	protected $field;
 
 	/**
-	 * @param FieldElement $field
+	 * @param IFieldElement $field
 	 * @param bool $strict
-	 * @param string $usermsg
+	 * @param string $userMessage
 	 */
-	public function __construct(FieldElement $field = NULL, $strict = false, $usermsg = NULL)
+	public function __construct(IFieldElement $field = NULL, $strict = false, $userMessage = NULL)
 	{
 		if(isset($field))
 		{
 			$this->setField($field);
 		}
 		$this->strict = (bool)$strict;
-		parent::__construct($usermsg);
+		parent::__construct($userMessage);
 	}
 
 	/**
@@ -54,7 +52,7 @@ class IdenticalFieldValidator extends FieldValidator
 	 * @return  bool
 	 * @see Staple_Form_Validator::check()
 	 */
-	public function check($data)
+	public function check($data): bool
 	{
 		if($this->strict === true)
 		{
@@ -90,82 +88,12 @@ class IdenticalFieldValidator extends FieldValidator
 	}
 
 	/**
-	 * @return FieldElement $field
-	 */
-	public function getField()
-	{
-		return $this->field;
-	}
-
-	/**
 	 * @param bool $strict
 	 * @return $this
 	 */
-	public function setStrict($strict)
+	public function setStrict(bool $strict): IdenticalFieldValidator
 	{
-		$this->strict = (bool)$strict;
+		$this->strict = $strict;
 		return $this;
-	}
-
-	/**
-	 * @param FieldElement $field
-	 * @return $this
-	 */
-	public function setField(FieldElement $field)
-	{
-		$this->field = $field;
-		return $this;
-	}
-
-	/**
-	 * @param string $fieldType
-	 * @param FieldElement $field
-	 * @return string
-	 */
-	public function clientJQuery($fieldType, FieldElement $field)
-	{
-		switch ($fieldType)
-		{
-			case 'Staple_Form_SelectElement':
-				$fieldid = "#{$field->getId()}";
-				$valstring = "#{$field->getId()} option:selected";
-				break;
-			case 'Staple_Form_RadioGroup':
-				$fieldid = "input:radio[name={$field->getName()}]";
-				$valstring = "input:radio[name={$field->getName()}]:checked";
-				break;
-			case 'Staple_Form_CheckboxElement':
-				return '';
-				break;
-			default:
-				$fieldid = "#{$field->getId()}";
-				$valstring = $fieldid;
-		}
-		
-		switch (get_class($this->field))
-		{
-			case 'Staple_Form_SelectElement':
-				$identstring = "#{$field->getId()} option:selected";
-				break;
-			case 'Staple_Form_RadioGroup':
-				$identstring = "input:radio[name={$field->getName()}]:checked";
-				break;
-			case 'Staple_Form_CheckboxElement':
-				return '';
-				break;
-			default:
-				$identstring = $fieldid;
-		}
-		
-		$script = "\t//Identical Validator for ".addslashes($field->getLabel())."\n";
-		$script .= "\tif(!($('$valstring').val() == $('$identstring').val()))\n\t{\n";
-		$script .= "\t\terrors.push('".addslashes($field->getLabel()).": \\n{$this->clientJSError()}\\n');\n";
-		$script .= "\t\t$('$fieldid').addClass('form_error');\n";
-		$script .= "\t}\n";
-		$script .= "\telse {\n";
-		$script .= "\t\t$('$fieldid').removeClass('form_error');\n";
-		$script .= "\t}\n";
-		
-		return $script;
 	}
 }

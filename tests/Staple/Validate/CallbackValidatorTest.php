@@ -10,14 +10,14 @@ namespace Staple\Tests;
 
 
 use PHPUnit\Framework\TestCase;
-use Staple\Form\Validate\CallbackValidator;
+use Staple\Validate\CallbackValidator;
 
 class CallbackValidatorTest extends TestCase
 {
 	/**
 	 * @test
 	 * 
-	 * Verifies CallbackValidator instanciates
+	 * Verifies CallbackValidator instantiates
 	 */
 	public function testCreate()
 	{
@@ -25,7 +25,7 @@ class CallbackValidatorTest extends TestCase
 			return TRUE;
 		});
 		
-		$this->assertInstanceOf('Staple\Form\Validate\CallbackValidator', $CallbackValidator);
+		$this->assertInstanceOf('Staple\Validate\CallbackValidator', $CallbackValidator);
 	}
 
 	/**

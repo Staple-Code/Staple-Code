@@ -22,11 +22,16 @@
  */
 namespace Staple\Form;
 
-class HiddenElement extends FieldElement
+class HiddenElement extends FieldElement implements IFieldElement
 {
-	/* (non-PHPdoc)
-	 * @see Staple_Form_Element::Create()
-	 */
+    /**
+     * @param string $name
+     * @param string $value
+     * @param string $id
+     * @param array $attrib
+     * @return FieldElement
+     * @throws \Staple\Exception\FormBuildException
+     */
 	public static function create($name, $value = NULL, $id = NULL, array $attrib = array())
 	{
 		$result = parent::create($name, NULL, $id, $attrib);
@@ -37,9 +42,14 @@ class HiddenElement extends FieldElement
 		return $result;
 	}
 
-	/* (non-PHPdoc)
-	 * @see Staple_Form_Element::__construct()
-	 */
+    /**
+     * HiddenElement constructor.
+     * @param string $name
+     * @param string $value
+     * @param string $id
+     * @param array $attrib
+     * @throws \Staple\Exception\FormBuildException
+     */
 	public function __construct($name, $value = NULL, $id = NULL, array $attrib = array())
 	{
 		if(isset($value))
