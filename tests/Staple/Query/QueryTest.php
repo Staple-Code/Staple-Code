@@ -30,6 +30,8 @@ use Staple\Query\MockConnection;
 
 class QueryTest extends TestCase
 {
+	const PARAMETERIZED_QUERY_STRING = "SELECT\n* \nFROM customers\nWHERE city = :city AND age = :age";
+
 	private function getMockConnection()
 	{
 		return new MockConnection(NULL);
@@ -39,6 +41,10 @@ class QueryTest extends TestCase
 		return new MockConnection('sqlite::memory:');
 	}
 
+	/**
+	 * @test
+	 * @throws \Staple\Exception\QueryException
+	 */
 	public function testMySQLQueryCreation()
 	{
 		//Setup
@@ -119,5 +125,41 @@ class QueryTest extends TestCase
 		Query::procedure('GetCustomers',['first_name'=>'John','last_name'=>'Smith'],$connection);
 
 		$this->assertEquals('EXEC GetCustomers @first_name = ?, @last_name = ?', $connection->getLastQuery());
+	}
+
+	/**
+	 * @test
+	 */
+	public function testParameterizedQuery()
+	{
+		$connection = $this->getMockConnection();
+		$connection->setDriver(Connection::DRIVER_MYSQL);
+
+		$query = Query::select('customers', null, $connection)
+			->whereEqual('city', 'Memphis')
+			->whereEqual('age', 20);
+
+		$queryString = $query->build();
+
+		$this->assertEquals(self::PARAMETERIZED_QUERY_STRING, $queryString);
+
+		$params = $query->getParams();
+
+		$this->assertEquals([':age'=>20], $params);
+	}
+
+	/**
+	 * @test
+	 */
+	public function testParameterizedQueryToStringConversion()
+	{
+		$connection = $this->getMockConnection();
+		$connection->setDriver(Connection::DRIVER_MYSQL);
+
+		$query = Query::select('customers', null, $connection)
+			->whereEqual('city', 'Memphis')
+			->whereEqual('age', 20);
+
+		$this->assertEquals(self::PARAMETERIZED_QUERY_STRING, (string)$query);
 	}
 }

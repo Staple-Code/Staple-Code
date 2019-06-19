@@ -24,6 +24,7 @@
 namespace Staple\Query;
 
 use Exception;
+use Staple\Exception\ConfigurationException;
 use Staple\Exception\QueryException;
 
 class Condition
@@ -40,6 +41,8 @@ class Condition
 	const BETWEEN = "BETWEEN";
 	const LIKE = "LIKE";
 	const NOTLIKE = "NOT LIKE";
+	const PARAMETERIZED_QUERY = true;
+	const NON_PARAMETERIZED_QUERY = false;
 
 	/**
 	 * The column for the where
@@ -56,6 +59,16 @@ class Condition
 	 * @var mixed
 	 */
 	protected $value;
+	/**
+	 * The name of the parameter for a parameterized query.
+	 * @var string
+	 */
+	protected $paramName;
+	/**
+	 * Flag to
+	 * @var bool
+	 */
+	protected $parameterized = true;
 	/**
 	 * An override statement that represents the WHERE clause.
 	 * @var string
@@ -111,7 +124,12 @@ class Condition
 		$this->statement = (string)$where;
 		return $this;
 	}
-	
+
+	/**
+	 * @param Connection $connection
+	 * @return string
+	 * @throws QueryException
+	 */
 	public function build(Connection $connection)
 	{
 		if(isset($this->statement))
@@ -144,13 +162,33 @@ class Condition
 				}
 				$value .= ")";
 			}
-			elseif (strtoupper($this->operator) == self::BETWEEN)
+			elseif(strtoupper($this->operator) === self::BETWEEN || $this->columnJoin === true)
 			{
-				$value = $this->getValue();
+				if($this->parameterized)
+				{
+					if(strlen($this->paramName) > 0)
+						$value = $this->getParamName();
+					else
+						$value = '?';
+				}
+				else
+				{
+					$value = $this->getValue();
+				}
 			}
-			else 
+			else
 			{
-				$value = $this->columnJoin ? $this->value : Query::convertTypes($this->value,$connection);
+				if($this->parameterized)
+				{
+					if(strlen($this->paramName) > 0)
+						$value = $this->getParamName();
+					else
+						$value = '?';
+				}
+				else
+				{
+					$value = Query::convertTypes($this->value, $connection);
+				}
 			}
 			return $this->column.' '.$this->operator.' '.$value;
 		}
@@ -242,15 +280,52 @@ class Condition
 	 * @param bool $columnJoin
 	 * @return $this
 	 */
-	public function setColumnJoin($columnJoin)
+	public function setColumnJoin(bool $columnJoin)
 	{
-		$this->columnJoin = (bool)$columnJoin;
+		$this->columnJoin = $columnJoin;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getParamName(): string
+	{
+		return $this->paramName;
+	}
+
+	/**
+	 * @param string $paramName
+	 * @return Condition
+	 */
+	public function setParamName(string $paramName): Condition
+	{
+		$this->paramName = $paramName;
+		return $this;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function parameterized(): bool
+	{
+		return $this->parameterized;
+	}
+
+	/**
+	 * @param bool $parameterized
+	 * @return Condition
+	 */
+	public function setParameterized(bool $parameterized): Condition
+	{
+		$this->parameterized = $parameterized;
 		return $this;
 	}
 
 	/**
 	 * Return the currently set connection or attempt to retrieve the default connection if non specified.
 	 * @return Connection
+	 * @throws ConfigurationException
 	 */
 	public function getConnection()
 	{
@@ -309,18 +384,24 @@ class Condition
 	 * Setup a SQL WHERE clause where a column is equal to a value.
 	 * @param string $column
 	 * @param mixed $value
+	 * @param string $paramName
 	 * @param bool $columnJoin
+	 * @param bool $parameterized
 	 * @return Condition
 	 */
-	public static function equal($column, $value, $columnJoin = NULL)
+	public static function equal($column, $value, string $paramName = null, $columnJoin = NULL, $parameterized = true)
 	{
 		/** @var Condition $obj */
 		$obj = new static();
 		$obj->setColumn($column)
-			->setValue($value);
+			->setValue($value)
+			->setParameterized($parameterized);
 		
 		//Check for NULLS
 		is_null($value) ? $obj->setOperator(self::IS) :	$obj->setOperator(self::EQUAL);
+
+		if(is_null($paramName))
+			$obj->setParamName(":".$column);
 		
 		if(isset($columnJoin))
 			$obj->setColumnJoin($columnJoin);

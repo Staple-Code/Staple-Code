@@ -28,8 +28,10 @@ namespace Staple\Query;
 use DateTime;
 use Exception;
 use PDO;
+use PDOException;
 use PDOStatement;
 use Staple\Error;
+use Staple\Exception\ConfigurationException;
 use Staple\Exception\QueryException;
 use Staple\Pager;
 
@@ -58,6 +60,12 @@ abstract class Query implements IQuery
 	 * @var Condition[]
 	 */
 	protected $where = array();
+
+	/**
+	 * Set a flag if the query is to be parameterized.
+	 * @var bool
+	 */
+	protected $parameterized = true;
 
 	/**
 	 * @param string $table
@@ -191,26 +199,44 @@ abstract class Query implements IQuery
 	}
 
 	/**
+	 * @return bool
+	 */
+	public function isParameterized(): bool
+	{
+		return $this->parameterized;
+	}
+
+	/**
+	 * @param bool $parameterized
+	 * @return IQuery
+	 */
+	public function setParameterized(bool $parameterized): IQuery
+	{
+		$this->parameterized = $parameterized;
+		foreach($this->where as $condition) {
+			$condition->setParameterized($parameterized);
+		}
+		return $this;
+	}
+
+	/**
+	 * @param bool $parameterized
 	 * @return string
 	 */
-	abstract function build();
+	abstract function build(bool $parameterized = null);
 	
 	/**
 	 * Executes the query and returns the result.
 	 * @param IConnection $connection - the database connection to execute the quote upon.
 	 * @return Statement | bool
-	 * @throws Exception
+	 * @throws QueryException
 	 */
 	public function execute(IConnection $connection = NULL)
 	{
 		if(isset($connection))
 			$this->setConnection($connection);
 
-		if($this->connection instanceof IConnection)
-		{
-			return $this->connection->query($this);
-		}
-		else
+		if(!($this->connection instanceof IConnection))
 		{
 			try 
 			{
@@ -220,12 +246,73 @@ abstract class Query implements IQuery
 			{
 				throw new QueryException('No Database Connection', Error::DB_ERROR);
 			}
-			if($this->connection instanceof IConnection)
-			{
-				return $this->connection->query($this);
-			}
 		}
-		return false;
+
+		$statement = $this->connection->prepare($this->build(true));
+		if($statement !== false)
+		{
+			$this->bindParametersToStatement($statement);
+			if($statement->execute() === true)
+				return $statement;
+			else
+				throw new QueryException(json_encode($statement->errorInfo()));
+		}
+		else
+			throw new QueryException('Failed to prepare statement for execution.');
+	}
+
+	/**
+	 * @param IStatement $statement
+	 * @throws QueryException
+	 */
+	private function bindParametersToStatement(IStatement &$statement)
+	{
+		foreach($this->getParams() as $name=>$value)
+		{
+			switch(gettype($value))
+			{
+				case "boolean":
+					$type = PDO::PARAM_BOOL;
+					break;
+				case "integer":
+					$type = PDO::PARAM_INT;
+					break;
+				case "double":
+					break;
+				case "string":
+					$type = PDO::PARAM_STR;
+					break;
+				case "array":
+					$value = implode(',', $value);
+					$type = PDO::PARAM_STR;
+					break;
+				case "object":
+					try
+					{
+						$value = (string)$value;
+					}
+					catch(Exception $e) {
+						throw new QueryException('Could not convert object to string for query.', 0, $e);
+					}
+					$type = PDO::PARAM_STR;
+					break;
+				case "resource":
+				case "resource (closed)":
+					throw new QueryException('Cannot supply a resource to a query.');
+					break;
+				case "NULL":
+					$type = PDO::PARAM_NULL;
+					break;
+				default:
+					throw new QueryException('Unable to determine parameter type.');
+			}
+
+			//Check for a large value
+			if($type === PDO::PARAM_STR && strlen($value) > 4000)
+				$type = PDO::PARAM_LOB;
+
+			$statement->bindParam($name, $value, $type);
+		}
 	}
 
 	/**
@@ -234,7 +321,7 @@ abstract class Query implements IQuery
 	 * @param IConnection $connection
 	 * @return Statement
 	 * @throws QueryException
-	 * @throws \PDOException
+	 * @throws PDOException
 	 */
 	public function prepareAndExecute(IConnection $connection = null)
 	{
@@ -284,6 +371,7 @@ abstract class Query implements IQuery
 	 * This method gets either the default framework connection or a predefined named connection.
 	 * @param string $namedConnection
 	 * @return Connection
+	 * @throws Exception
 	 */
 	public static function connection($namedConnection = NULL)
 	{
@@ -334,12 +422,16 @@ abstract class Query implements IQuery
 	 * SQL WHERE =
 	 * @param string $column
 	 * @param mixed $value
-	 * @param boolean $columnJoin
+	 * @param string $paramName
+	 * @param bool $columnJoin
+	 * @param bool $parameterized
 	 * @return $this
 	 */
-	public function whereEqual($column, $value, $columnJoin = NULL)
+	public function whereEqual(string $column, $value, string $paramName = null, $columnJoin = null, bool $parameterized = null)
 	{
-		$this->addWhere(Condition::equal($column, $value, $columnJoin));
+		if(!isset($parameterized))
+			$parameterized = $this->isParameterized();
+		$this->addWhere(Condition::equal($column, $value, $paramName, $columnJoin, $parameterized));
 		return $this;
 	}
 
@@ -409,6 +501,7 @@ abstract class Query implements IQuery
 	 * @param mixed $start
 	 * @param mixed $end
 	 * @return $this
+	 * @throws Exception
 	 */
 	public function whereBetween($column, $start, $end)
 	{
@@ -484,6 +577,7 @@ abstract class Query implements IQuery
 	 *
 	 * @param string $table
 	 * @return static
+	 * @throws QueryException
 	 */
 	public static function table($table)
 	{
@@ -498,11 +592,13 @@ abstract class Query implements IQuery
 	 * @param IConnection $db
 	 * @param array | string $order
 	 * @param Pager | int $limit
+	 * @param bool $parameterized
 	 * @return Select
+	 * @throws QueryException
 	 */
-	public static function select($table = NULL, array $columns = NULL, IConnection $db = NULL, $order = NULL, $limit = NULL)
+	public static function select($table = NULL, array $columns = NULL, IConnection $db = NULL, $order = NULL, $limit = NULL, bool $parameterized = null)
 	{
-		return new Select($table, $columns, $db, $order, $limit);
+		return new Select($table, $columns, $db, $order, $limit, $parameterized);
 	}
 
 	/**
@@ -512,11 +608,13 @@ abstract class Query implements IQuery
 	 * @param array $data
 	 * @param IConnection
 	 * @param string $priority
+	 * @param bool $parameterized
 	 * @return Insert
+	 * @throws QueryException
 	 */
-	public static function insert($table = NULL, $data = NULL, IConnection $db = NULL, $priority = NULL)
+	public static function insert($table = NULL, $data = NULL, IConnection $db = NULL, $priority = NULL, bool $parameterized = null)
 	{
-		return new Insert($table, $data, $db, $priority);
+		return new Insert($table, $data, $db, $priority, $parameterized);
 	}
 
 	/**
@@ -527,11 +625,13 @@ abstract class Query implements IQuery
 	 * @param IConnection $db
 	 * @param array | string $order
 	 * @param Pager | int $limit
+	 * @param bool $parameterized
 	 * @return Update
+	 * @throws QueryException
 	 */
-	public static function update($table = NULL, array $data = NULL, IConnection $db = NULL, $order = NULL, $limit = NULL)
+	public static function update($table = NULL, array $data = NULL, IConnection $db = NULL, $order = NULL, $limit = NULL, bool $parameterized = null)
 	{
-		return new Update($table, $data, $db, $order, $limit);
+		return new Update($table, $data, $db, $order, $limit, $parameterized);
 	}
 
 	/**
@@ -539,11 +639,13 @@ abstract class Query implements IQuery
 	 *
 	 * @param string $table
 	 * @param IConnection $db
+	 * @param bool $parameterized
 	 * @return Delete
+	 * @throws QueryException
 	 */
-	public static function delete($table = NULL, IConnection $db = NULL)
+	public static function delete($table = NULL, IConnection $db = NULL, bool $parameterized = null)
 	{
-		return new Delete($table, $db);
+		return new Delete($table, $db, $parameterized);
 	}
 
 	/**
@@ -552,6 +654,7 @@ abstract class Query implements IQuery
 	 * @param array $queries
 	 * @param IConnection $db
 	 * @return Union
+	 * @throws QueryException
 	 */
 	public static function union(array $queries = array(), IConnection $db = NULL)
 	{
@@ -575,6 +678,7 @@ abstract class Query implements IQuery
      * @param string | Query $statement
      * @param IConnection $connection
      * @return Statement
+	 * @throws ConfigurationException
      */
 	public static function raw($statement, IConnection $connection = NULL)
 	{
@@ -592,6 +696,7 @@ abstract class Query implements IQuery
 	 * @param array $driverOptions
 	 * @return PDOStatement
 	 * @throws QueryException
+	 * @throws ConfigurationException
 	 */
 	public static function procedure($procedureName, array $parameters = NULL, IConnection $connection = NULL, array $driverOptions = [])
 	{

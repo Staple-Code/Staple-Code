@@ -72,10 +72,10 @@ class Union
 	/**
 	 * Constructor accepts an array of Select elements and a database connection.
 	 * @param array $queries
-	 * @param Connection $connection
+	 * @param IConnection $connection
 	 * @throws QueryException
 	 */
-	public function __construct(array $queries = array(), Connection $connection = NULL)
+	public function __construct(array $queries = array(), IConnection $connection = NULL)
 	{
 		//Process Database connection
 		if($connection instanceof Connection)
@@ -485,7 +485,7 @@ class Union
 		{
 			try 
 			{
-				$this->db = Connection::get();
+				$this->connection = Connection::get();
 			}
 			catch (Exception $e)
 			{

@@ -25,6 +25,7 @@ namespace Staple\Tests;
 
 use PHPUnit\Framework\TestCase;
 use SplObserver;
+use Staple\Config;
 use Staple\Exception\ModelNotFoundException;
 use Staple\Model;
 use Staple\Query\Condition;
@@ -65,7 +66,11 @@ class MockTestConnection extends Connection implements IConnection
 
 	public function __construct()
 	{
-
+		try
+		{
+			parent::__construct(Config::getValue('db', 'dsn'));
+		}
+		catch(\Exception $e) {}
 	}
 
 	public function exec($statement)

@@ -36,4 +36,5 @@ interface IStatement
 	public function bindColumn($column, &$param, $type = NULL, $maxlen = NULL, $driverdata = NULL);
 	public function bindParam($parameter, &$variable, $data_type = PDO::PARAM_STR, $length = NULL, $driver_options = NULL);
 	public function bindValue($parameter, $value, $data_type = PDO::PARAM_STR);
+	public function execute ($bound_input_params = NULL);
 }

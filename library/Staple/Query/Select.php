@@ -54,6 +54,12 @@ class Select extends Query implements ISelectQuery
 	 * @var array[string]
 	 */
 	public $columns = array();
+
+	/**
+	 * An array to hold all of the parameters of the query.
+	 * @var string[]
+	 */
+	private $params = [];
 	/**
 	 * Holds the order of the SQL query. It can be either a string or an array of the columns to order by.
 	 * @var string | array
@@ -91,9 +97,10 @@ class Select extends Query implements ISelectQuery
 	 * @param IConnection $db
 	 * @param array | string $order
 	 * @param Pager | int $limit
+	 * @param bool $parameterized
 	 * @throws QueryException
 	 */
-	public function __construct($table = NULL, array $columns = NULL, IConnection $db = NULL, $order = NULL, $limit = NULL)
+	public function __construct($table = NULL, array $columns = NULL, IConnection $db = NULL, $order = NULL, $limit = NULL, bool $parameterized = null)
 	{
 		parent::__construct(NULL, $db);
 		
@@ -116,6 +123,11 @@ class Select extends Query implements ISelectQuery
 		if(isset($limit))
 		{
 			$this->limit($limit);
+		}
+		//Set Paramterized
+		if(isset($parameterized))
+		{
+			$this->setParameterized($parameterized);
 		}
 	}
 
@@ -157,6 +169,34 @@ class Select extends Query implements ISelectQuery
 	public function getColumns()
 	{
 		return $this->columns;
+	}
+
+	/**
+	 * Return the parameter list.
+	 * @return string[]
+	 */
+	public function getParams(): array
+	{
+		return $this->params;
+	}
+
+	/**
+	 * Set the value of a named parameter on the query.
+	 * @param string $paramName
+	 * @param mixed $value
+	 * @return $this
+	 * @throws QueryException
+	 */
+	public function setParam(string $paramName, $value): IQuery
+	{
+		if(is_resource($value)) {
+			throw new QueryException('Cannot use a resource as a value in query.');
+		}
+		if(substr($paramName,0,1) !== ':') {
+			$paramName = ':'.$paramName;
+		}
+		$this->params[$paramName] = $value;
+		return $this;
 	}
 
 	/**
@@ -645,10 +685,14 @@ class Select extends Query implements ISelectQuery
 	/**
 	 * Builds the query and returns the string.
 	 * @see Staple_Query::build()
+	 * @param bool $parameterized
 	 * @return string
 	 */
-	function build()
+	function build(bool $parameterized = null)
 	{
+		if(isset($parameterized))
+			$this->setParameterized($parameterized);
+
 		$stmt = 'SELECT';
 
 		//Flags

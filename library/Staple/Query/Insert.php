@@ -24,6 +24,7 @@ namespace Staple\Query;
 
 use Exception;
 use Staple\Error;
+use Staple\Exception\ConfigurationException;
 use Staple\Exception\QueryException;
 use Staple\Traits\Factory;
 
@@ -83,18 +84,25 @@ class Insert
 	protected $columns;
 
 	/**
+	 * Set the flag for query parameterization
+	 * @var bool
+	 */
+	protected $parameterized = true;
+
+	/**
 	 * @param string $table
 	 * @param array $data
-	 * @param Connection $db
+	 * @param IConnection $db
 	 * @param string $priority
+	 * @param bool $parameterized
 	 * @throws QueryException
 	 */
-	public function __construct($table = NULL, $data = NULL, Connection $db = NULL, $priority = NULL)
+	public function __construct($table = null, $data = null, IConnection $db = null, $priority = null, bool $parameterized = null)
 	{
 		$this->data = new DataSet();
 		
 		//Process Database connection
-		if($db instanceof Connection)
+		if($db instanceof IConnection)
 		{
 			$this->setConnection($db);
 		}
@@ -104,7 +112,7 @@ class Insert
 				$db = Connection::get();
 				$this->setConnection($db);
 			}
-			catch (QueryException $e)
+			catch (ConfigurationException $e)
 			{
 				throw new QueryException('Unable to find a database connection.', Error::DB_ERROR, $e);
 			}
@@ -134,6 +142,12 @@ class Insert
 		{
 			$this->setPriority($priority);
 		}
+
+		//Set Priority
+		if(isset($parameterized))
+		{
+			$this->setParameterized($parameterized);
+		}
 	}
 	
 	/**
@@ -152,11 +166,14 @@ class Insert
 	}
 	
 	/**
-	 * 
 	 * @see Staple_Query::build()
+	 * @param bool $parameterized
+	 * @return string
 	 */
-	function build()
+	function build(bool $parameterized = null)
 	{
+		if(isset($parameterized))
+			$this->setParameterized($parameterized);
 		//Statement Start
 		$stmt = "INSERT ";
 		
@@ -239,7 +256,6 @@ class Insert
 			}
 			catch (Exception $e)
 			{
-				//@todo try for a default connection if no staple connection
 				throw new QueryException('No Database Connection', Error::DB_ERROR);
 			}
 			if($this->connection instanceof Connection)
@@ -285,6 +301,7 @@ class Insert
 	 * @param string $column
 	 * @param string $value
 	 * @return $this
+	 * @throws QueryException
 	 */
 	public function addLiteralColumn($column, $value)
 	{
@@ -389,12 +406,30 @@ class Insert
 
 		return $this;
 	}
+
+	/**
+	 * @return bool
+	 */
+	public function isParameterized(): bool
+	{
+		return $this->parameterized;
+	}
+
+	/**
+	 * @param bool $parameterized
+	 * @return Insert
+	 */
+	public function setParameterized(bool $parameterized): Insert
+	{
+		$this->parameterized = $parameterized;
+		return $this;
+	}
 	
 	/**
-	 * @param Connection $connection
+	 * @param IConnection $connection
 	 * @return $this
 	 */
-	public function setConnection(Connection $connection)
+	public function setConnection(IConnection $connection)
 	{
 		$this->connection = $connection;
 		return $this;

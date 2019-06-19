@@ -106,4 +106,12 @@ class MockStatement implements IStatement
 		return true;
 	}
 
+	/**
+	 * @param null $bound_input_params
+	 * @return mixed
+	 */
+	public function execute($bound_input_params = NULL)
+	{
+		return true;
+	}
 }

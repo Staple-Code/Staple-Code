@@ -23,6 +23,8 @@
  */
 namespace Staple\Query;
 
+use Staple\Exception\QueryException;
+
 class Delete extends Query
 {
 	const IGNORE = 'IGNORE';
@@ -33,21 +35,31 @@ class Delete extends Query
 	 * Additional Query Flags
 	 * @var array[string]
 	 */
-	protected $flags = array();
+	protected $flags = [];
 	/**
 	 * Array of Staple_Query_Join objects that represent table joins on the query
 	 * @var Join[]
 	 */
-	protected $joins = array();
+	protected $joins = [];
+
+	/**
+	 * The array of parameters
+	 * @var array
+	 */
+	protected $params = [];
 
 	/**
 	 * @param string $table
-	 * @param Connection $db
-	 * @throws \Exception
+	 * @param IConnection $db
+	 * @param bool $parameterized
+	 * @throws QueryException
 	 */
-	public function __construct($table = NULL, Connection $db = NULL)
+	public function __construct($table = NULL, IConnection $db = NULL, bool $parameterized = null)
 	{
 		parent::__construct($table, $db);
+
+		if(isset($parameterized))
+			$this->setParameterized($parameterized);
 	}
 	
 	public function addFlag($flag)
@@ -105,15 +117,41 @@ class Delete extends Query
 	{
 		return $this->joins;
 	}
-	
+
+	/**
+	 * @return array
+	 */
+	public function getParams(): array
+	{
+		return $this->params;
+	}
+
+	/**
+	 * @param string $paramName
+	 * @param mixed $value
+	 * @return $this|IQuery
+	 */
+	public function setParam(string $paramName, $value): IQuery
+	{
+		$this->params[$paramName] = $value;
+		return $this;
+	}
+
+
+
 	/*-----------------------------------------------BUILD FUNCTION-----------------------------------------------*/
 	
 	/**
 	 * 
 	 * @see Staple_Query::build()
+	 * @param bool $parameterized
+	 * @return string
 	 */
-	function build()
+	function build(bool $parameterized = null)
 	{
+		if(isset($parameterized))
+			$this->setParameterized($parameterized);
+
 		$stmt = 'DELETE ';
 		
 		//Flags

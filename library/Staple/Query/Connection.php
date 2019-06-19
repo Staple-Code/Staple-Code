@@ -129,6 +129,7 @@ class Connection extends PDO implements IConnection
 		if(!isset($this->driver)) $this->setDriver(self::getDriverFromDsn($dsn));
 
 		$this->setAttribute(PDO::ATTR_STATEMENT_CLASS,array('\Staple\Query\Statement'));
+		$this->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 		if(isset($username))
 			$this->setUsername($username);
@@ -337,6 +338,8 @@ class Connection extends PDO implements IConnection
 	/**
 	 * This is an alias of the getInstance() method.
 	 * @alias getInstance()
+	 * @return static
+	 * @throws ConfigurationException
 	 */
 	public static function get()
 	{
@@ -667,6 +670,7 @@ class Connection extends PDO implements IConnection
 	 * A static call to attach an observer to the connection class.
 	 * @param SplObserver $observer
 	 * @return self
+	 * @throws ConfigurationException
 	 */
 	public static function attachObserver(SplObserver $observer)
 	{
@@ -694,6 +698,7 @@ class Connection extends PDO implements IConnection
 	 * Static method to detach an observer from the connection class.
 	 * @param SplObserver $observer
 	 * @return self
+	 * @throws ConfigurationException
 	 */
 	public static function detachObserver(SplObserver $observer)
 	{

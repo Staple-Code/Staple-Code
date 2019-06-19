@@ -43,6 +43,11 @@ class Update extends Query
 	 */
 	public $data = array();
 	/**
+	 * The array of Parameters
+	 * @var array
+	 */
+	protected $params = [];
+	/**
 	 * Holds the order of the SQL query. It can be either a string or an array of the columns to order by.
 	 * @var string | array
 	 */
@@ -69,9 +74,10 @@ class Update extends Query
 	 * @param IConnection $db
 	 * @param array | string $order
 	 * @param Pager | int $limit
-	 * @throws Exception
+	 * @param bool $parameterized
+	 * @throws QueryException
 	 */
-	public function __construct($table = NULL, array $data = NULL, IConnection $db = NULL, $order = NULL, $limit = NULL)
+	public function __construct($table = NULL, array $data = NULL, IConnection $db = NULL, $order = NULL, $limit = NULL, bool $parameterized = null)
 	{
 		parent::__construct($table, $db);
 
@@ -90,6 +96,9 @@ class Update extends Query
 		{
 			$this->limit($limit);
 		}
+
+		if(isset($parameterized))
+			$this->setParameterized($parameterized);
 	}
 	
 	public function addFlag($flag)
@@ -181,8 +190,26 @@ class Update extends Query
 		return $this->limitOffset;
 	}
 
-	
-	
+	/**
+	 * @return array
+	 */
+	public function getParams(): array
+	{
+		return $this->params;
+	}
+
+	/**
+	 * @param string $paramName
+	 * @param mixed $value
+	 * @return $this|IQuery
+	 */
+	public function setParam(string $paramName, $value): IQuery
+	{
+		$this->params[$paramName] = $value;
+		return $this;
+	}
+
+
 	/**
 	 * Set the order.
 	 * @param string | array $order
@@ -208,7 +235,7 @@ class Update extends Query
 	 * Sets the $data
 	 * @param DataSet
 	 * @return $this
-	 * @throws Exception
+	 * @throws QueryException
 	 */
 	public function setData($data)
 	{
@@ -223,7 +250,7 @@ class Update extends Query
 		}
 		else
 		{
-			throw new Exception('Data must be an instance of Staple_Query_DataSet or an array', Error::APPLICATION_ERROR);
+			throw new QueryException('Data must be an instance of Staple_Query_DataSet or an array', Error::APPLICATION_ERROR);
 		}
 		return $this;
 	}
@@ -233,7 +260,6 @@ class Update extends Query
 	 * @param string $column
 	 * @param mixed $data
 	 * @param bool $literal
-	 * @throws Exception
 	 * @return $this
 	 */
 	public function setDataColumn($column,$data,$literal = false)
@@ -272,6 +298,8 @@ class Update extends Query
 	/**
 	 * Alias of setOrder()
 	 * @see self::setOrder()
+	 * @param mixed $order;
+	 * @return $this
 	 */
 	public function orderBy($order)
 	{
@@ -313,11 +341,16 @@ class Update extends Query
 	/*-----------------------------------------------BUILD FUNCTION-----------------------------------------------*/
 	
 	/**
-	 * 
 	 * @see Staple_Query::build()
+	 * @param bool $parameterized
+	 * @throws QueryException
+	 * @return string
 	 */
-	function build()
+	function build(bool $parameterized = null)
 	{
+		if(isset($parameterized))
+			$this->setParameterized($parameterized);
+
 		$stmt = 'UPDATE';
 		
 		//Flags

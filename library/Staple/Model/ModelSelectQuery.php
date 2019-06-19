@@ -65,10 +65,12 @@ class ModelSelectQuery extends ModelQuery implements ISelectQuery
 	/**
 	 * @param $column
 	 * @param $value
+	 * @param string $paramName
 	 * @param null $columnJoin
+	 * @param bool $parameterized
 	 * @return ModelSelectQuery
 	 */
-	public function whereEqual($column, $value, $columnJoin = NULL)
+	public function whereEqual(string $column, $value, string $paramName = null, $columnJoin = NULL, bool $parameterized = null)
 	{
 		$this->queryObject->whereEqual($column, $value, $columnJoin);
 		return $this;

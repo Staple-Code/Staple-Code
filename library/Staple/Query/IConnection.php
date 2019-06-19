@@ -33,6 +33,7 @@ interface IConnection extends SplSubject
 	public function setLastQuery($lastQuery);
 	public function exec($statement);
 	public function query($statement);
+	public function prepare($statement, $driver_options = null);
 	public function getDriverOptions();
 	public function errorInfo();
 	public function errorCode();

@@ -70,6 +70,15 @@ return [
 		'options'	=>	[],     		//Specify any additional options here
 	],
 
+	'db-mysql'	=>	[
+		'driver'	=>	'mysql',    	//specify the database connection type
+		'host'		=> 	'127.0.0.1',
+		'username'	=>	'root',
+		'password'	=>	NULL,
+		'db'		=>	'staple',
+		'options'	=>	[],     		//Specify any additional options here
+	],
+
 	'auth'	=>	[
 		'adapter'			=>	'Staple\Auth\DBAuthAdapter'
 	],

@@ -35,7 +35,7 @@ interface ISelectQuery extends IQuery
 	//An open ended where statement
 	public function whereStatement($statement);
 	//SQL WHERE =
-	public function whereEqual($column, $value, $columnJoin = NULL);
+	public function whereEqual(string $column, $value, string $paramName = null, $columnJoin = null, bool $parameterized = null);
 	//SQL WHERE <>
 	public function whereNotEqual($column, $value, $columnJoin = NULL);
 	//SQL LIKE Clause

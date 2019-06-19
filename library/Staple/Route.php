@@ -25,6 +25,7 @@ namespace Staple;
 
 use ReflectionClass;
 use ReflectionMethod;
+use ReflectionException;
 use Staple\Auth\Auth;
 use Staple\Controller\Controller;
 use Staple\Controller\RestfulController;
@@ -286,7 +287,7 @@ class Route
 	 * It also builds the view for the route.
 	 *
 	 * @throws RoutingException
-	 * @throws \Exception
+	 * @throws ReflectionException
 	 */
 	protected function dispatchController()
 	{

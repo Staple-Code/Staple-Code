@@ -48,6 +48,6 @@ class DeleteTest extends TestCase
 
 		//Assert
 		$expected = "DELETE FROM myschema.".self::TABLE_NAME."\nWHERE id = 5";
-		$this->assertEquals($expected,(string)$query);
+		$this->assertEquals($expected, $query->build());
 	}
 }
