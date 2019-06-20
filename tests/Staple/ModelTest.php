@@ -78,6 +78,16 @@ class MockTestConnection extends Connection implements IConnection
 		// TODO: Implement exec() method.
 	}
 
+	/**
+	 * @param string $statement
+	 * @param array|null $driver_options
+	 * @return bool|\PDOStatement|void
+	 */
+	public function prepare($statement, $driver_options = null)
+	{
+		// TODO: Implement prepare() method.
+	}
+
 	public function query($statement)
 	{
 		switch(get_class($statement))

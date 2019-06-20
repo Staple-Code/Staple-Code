@@ -37,7 +37,7 @@ use Staple\Pager;
 
 abstract class Query implements IQuery
 {
-	
+	const PARAM_NAME_VALID_CHARACTERS = '/[^a-zA-Z0-9_]/';
 	/**
 	 * Table to act upon.
 	 * @var mixed
@@ -54,6 +54,12 @@ abstract class Query implements IQuery
 	 * @var IConnection
 	 */
 	protected $connection;
+
+	/**
+	 * An array to hold all of the parameters of the query.
+	 * @var string[]
+	 */
+	protected $params = [];
 	
 	/**
 	 * An array of Where Clauses. The clauses are additive, using the AND  conjunction.
@@ -196,6 +202,75 @@ abstract class Query implements IQuery
 	{
 		$this->connection = $connection;
 		return $this;
+	}
+
+	/**
+	 * Return the parameter list.
+	 * @return string[]
+	 */
+	public function getParams(): array
+	{
+		return $this->params;
+	}
+
+	/**
+	 * Set the value of a named parameter on the query.
+	 * @param string $paramName
+	 * @param mixed $value
+	 * @return $this
+	 * @throws QueryException
+	 */
+	public function setParam(string $paramName, $value): IQuery
+	{
+		if(is_resource($value)) {
+			throw new QueryException('Cannot use a resource as a value in query.');
+		}
+
+		if(substr($paramName,0,1) === ':')
+			$paramName = substr($paramName, 1);
+
+		$this->params[$paramName] = $value;
+		return $this;
+	}
+
+	/**
+	 * Check for name conflicts on param names
+	 * @param string $paramName
+	 * @return bool
+	 */
+	protected function checkParamNameConflict(string $paramName): bool
+	{
+		if(substr($paramName,0,1) === ':')
+			$paramName = substr($paramName, 1);
+
+		return array_key_exists($paramName, $this->params);
+	}
+
+	protected function generateIncrementalParamName(string $paramName): string
+	{
+		if(substr($paramName,0,1) === ':')
+			$paramName = substr($paramName, 1);
+
+		if($this->checkParamNameConflict($paramName))
+		{
+			$nameSections = explode('_', $paramName);
+			$finalSection = array_pop($nameSections);
+			if(ctype_digit($finalSection)) {
+				$finalSection = (int)$finalSection + 1;
+				array_push($nameSections, $finalSection);
+			}
+			else
+			{
+				array_push($nameSections, $finalSection, "1");
+			}
+
+			$newParamName = implode('_', $nameSections);
+			return $this->generateIncrementalParamName($newParamName);
+		}
+		else
+		{
+			return $paramName;
+		}
 	}
 
 	/**
@@ -388,10 +463,23 @@ abstract class Query implements IQuery
 	}
 	
 	/*-----------------------------------------------WHERE CLAUSES-----------------------------------------------*/
-	
+
+	/**
+	 * @param Condition $where
+	 * @return $this
+	 * @throws QueryException
+	 */
 	public function addWhere(Condition $where)
 	{
 		$this->where[] = $where;
+
+		//Check for column name conflicts
+		if($where->getColumnJoin() === false && $where->isParameterized() === true)
+		{
+			$newParamName = $this->generateIncrementalParamName($where->getParamName());
+			$this->setParam($newParamName, $where->getValue());
+			$where->setParamName($newParamName);
+		}
 		return $this;
 	}
 	
@@ -400,17 +488,82 @@ abstract class Query implements IQuery
 		$this->where = array();
 		return $this;
 	}
-	
-	public function whereCondition($column, $operator, $value, $columnJoin = NULL)
+
+	/**
+	 * Additive conditional WHERE clause
+	 * @param $column
+	 * @param $operator
+	 * @param $value
+	 * @param string $paramName
+	 * @param bool|null $columnJoin
+	 * @param bool $parameterized
+	 * @return $this
+	 * @throws QueryException
+	 */
+	public function where($column, $operator, $value, bool $columnJoin = NULL, string $paramName = null, bool $parameterized = true)
 	{
-		$this->addWhere(Condition::get($column, $operator, $value, $columnJoin));
+		$this->addWhere(Condition::get($column, $operator, $value, $columnJoin, $paramName, Condition::SQL_AND, $parameterized));
+		return $this;
+	}
+
+	/**
+	 * Alternative (OR) conditional WHERE clause
+	 * @param $column
+	 * @param $operator
+	 * @param $value
+	 * @param bool|null $columnJoin
+	 * @param string|null $paramName
+	 * @param bool $parameterized
+	 * @return $this
+	 * @throws QueryException
+	 */
+	public function orWhere($column, $operator, $value, bool $columnJoin = NULL, string $paramName = null, bool $parameterized = true)
+	{
+		$this->addWhere(Condition::get($column, $operator, $value, $columnJoin, $paramName, Condition::SQL_OR, $parameterized));
+		return $this;
+	}
+
+	/**
+	 * Additive Custom conditional WHERE (ex. less than, or greater than)
+	 * @param $column
+	 * @param $operator
+	 * @param $value
+	 * @param bool|null $columnJoin
+	 * @param string $paramName
+	 * @param bool $parameterized
+	 * @return $this
+	 * @throws QueryException
+	 * @deprecated
+	 */
+	public function whereCondition($column, $operator, $value, bool $columnJoin = NULL, string $paramName = null, bool $parameterized = true)
+	{
+		return $this->where($column, $operator, $value, $columnJoin, $paramName, $parameterized);
+	}
+
+	/**
+	 * Alternative (OR) Custom conditional WHERE (ex. less than, or greater than)
+	 * @param $column
+	 * @param $operator
+	 * @param $value
+	 * @param bool|null $columnJoin
+	 * @param string|null $paramName
+	 * @param bool $parameterized
+	 * @return $this
+	 * @throws QueryException
+	 * @deprecated
+	 */
+	public function orWhereCondition($column, $operator, $value, bool $columnJoin = NULL, string $paramName = null, bool $parameterized = true)
+	{
+		$this->orWhere($column, $operator, $value, $columnJoin, $paramName, $parameterized);
 		return $this;
 	}
 	
 	/**
-	 * An open ended where statement
+	 * An open ended raw where statement. Use this with caution as you are responsible for sanitizing the SQL that
+	 * is supplied to this method.
 	 * @param string | Select $statement
 	 * @return $this
+	 * @throws QueryException
 	 */
 	public function whereStatement($statement)
 	{
@@ -419,44 +572,86 @@ abstract class Query implements IQuery
 	}
 	
 	/**
-	 * SQL WHERE =
+	 * Additive SQL WHERE =
 	 * @param string $column
 	 * @param mixed $value
-	 * @param string $paramName
 	 * @param bool $columnJoin
+	 * @param string|null $paramName
 	 * @param bool $parameterized
 	 * @return $this
+	 * @throws QueryException
 	 */
-	public function whereEqual(string $column, $value, string $paramName = null, $columnJoin = null, bool $parameterized = null)
+	public function whereEqual($column, $value, bool $columnJoin = null, string $paramName = null, bool $parameterized = true)
 	{
 		if(!isset($parameterized))
 			$parameterized = $this->isParameterized();
-		$this->addWhere(Condition::equal($column, $value, $paramName, $columnJoin, $parameterized));
+		$this->addWhere(Condition::equal($column, $value, $columnJoin, $paramName, Condition::SQL_AND, $parameterized));
 		return $this;
 	}
 
 	/**
-	 * SQL WHERE <>
+	 * SQL OR WHERE =
 	 * @param string $column
 	 * @param mixed $value
-	 * @param boolean $columnJoin
+	 * @param bool $columnJoin
+	 * @param string|null $paramName
+	 * @param bool $parameterized
 	 * @return $this
+	 * @throws QueryException
 	 */
-	public function whereNotEqual($column, $value, $columnJoin = NULL)
+	public function orWhereEqual($column, $value, bool $columnJoin = null, string $paramName = null, bool $parameterized = true)
 	{
-		$this->addWhere(Condition::notEqual($column, $value, $columnJoin));
+		if(!isset($parameterized))
+			$parameterized = $this->isParameterized();
+		$this->addWhere(Condition::equal($column, $value, $columnJoin, $paramName, Condition::SQL_OR, $parameterized));
+		return $this;
+	}
+
+	/**
+	 * Additive SQL WHERE <>
+	 * @param string $column
+	 * @param mixed $value
+	 * @param bool $columnJoin
+	 * @param string|null $paramName
+	 * @param bool $parameterized
+	 * @return $this
+	 * @throws QueryException
+	 */
+	public function whereNotEqual($column, $value, bool $columnJoin = NULL, string $paramName = null, bool $parameterized = true)
+	{
+		$this->addWhere(Condition::notEqual($column, $value, $columnJoin, $paramName, Condition::SQL_AND, $parameterized));
+		return $this;
+	}
+
+	/**
+	 * Alternative SQL WHERE <>
+	 * @param string $column
+	 * @param mixed $value
+	 * @param bool|null $columnJoin
+	 * @param string|null $paramName
+	 * @param bool $parameterized
+	 * @return $this
+	 * @throws QueryException
+	 */
+	public function orWhereNotEqual($column, $value, bool $columnJoin = NULL, string $paramName = null, bool $parameterized = true)
+	{
+		$this->addWhere(Condition::notEqual($column, $value, $columnJoin, $paramName, Condition::SQL_OR, $parameterized));
 		return $this;
 	}
 	
 	/**
-	 * SQL LIKE Clause
+	 * Additive SQL LIKE Clause
 	 * @param string $column
 	 * @param mixed $value
+	 * @param bool $columnJoin
+	 * @param string $paramName
+	 * @param bool $parameterized
 	 * @return $this
+	 * @throws QueryException
 	 */
-	public function whereLike($column, $value)
+	public function whereLike($column, $value, bool $columnJoin = null, string $paramName = null, bool $parameterized = true)
 	{
-		$this->addWhere(Condition::like($column, $value));
+		$this->addWhere(Condition::like($column, $value, $columnJoin, $paramName, Condition::SQL_AND, $parameterized));
 		return $this;
 	}
 
@@ -464,11 +659,15 @@ abstract class Query implements IQuery
 	 * SQL NOT LIKE Clause
 	 * @param string $column
 	 * @param mixed $value
+	 * @param bool|null $columnJoin
+	 * @param string|null $paramName
+	 * @param bool $parameterized
 	 * @return $this
+	 * @throws QueryException
 	 */
-	public function whereNotLike($column, $value)
+	public function whereNotLike($column, $value, bool $columnJoin = null, string $paramName = null, bool $parameterized = true)
 	{
-		$this->addWhere(Condition::notLike($column, $value));
+		$this->addWhere(Condition::notLike($column, $value, $columnJoin, $paramName, Condition::SQL_AND, $parameterized));
 		return $this;
 	}
 	
@@ -476,6 +675,7 @@ abstract class Query implements IQuery
 	 * SQL IS NULL Clause
 	 * @param string $column
 	 * @return $this
+	 * @throws QueryException
 	 */
 	public function whereNull($column)
 	{
@@ -487,11 +687,14 @@ abstract class Query implements IQuery
 	 * SQL IN Clause
 	 * @param string $column
 	 * @param array | Select $values
+	 * @param string|null $paramName
+	 * @param bool $parameterized
 	 * @return $this
+	 * @throws QueryException
 	 */
-	public function whereIn($column, $values)
+	public function whereIn($column, $values, string $paramName = null, bool $parameterized = true)
 	{
-		$this->addWhere(Condition::in($column, $values));
+		$this->addWhere(Condition::in($column, $values, $paramName, Condition::SQL_AND, $parameterized));
 		return $this;
 	}
 	
@@ -500,12 +703,15 @@ abstract class Query implements IQuery
 	 * @param string $column
 	 * @param mixed $start
 	 * @param mixed $end
+	 * @param string $startParamName
+	 * @param string $endParamName
+	 * @param bool $parameterized
 	 * @return $this
 	 * @throws Exception
 	 */
-	public function whereBetween($column, $start, $end)
+	public function whereBetween($column, $start, $end, string $startParamName = null, string $endParamName = null, bool $parameterized = true)
 	{
-		$this->addWhere(Condition::between($column, $start, $end));
+		$this->addWhere(Condition::between($column, $start, $end, $startParamName, $endParamName, Condition::SQL_AND, $parameterized));
 		return $this;
 	}
 	
@@ -845,5 +1051,17 @@ abstract class Query implements IQuery
 		ksort($parameters);
 
 		return 'EXEC '.$procedureName.$params;
+	}
+
+	/**
+	 * Eliminate any invalid characters from the parameter name.
+	 * @param string $paramName
+	 * @return string
+	 */
+	public static function sanitizeParamName(string $paramName): string
+	{
+		if(substr($paramName,0,1) === ':')
+			$paramName = substr($paramName, 1);
+		return preg_replace(self::PARAM_NAME_VALID_CHARACTERS, '_', $paramName);
 	}
 }

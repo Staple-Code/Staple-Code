@@ -25,7 +25,7 @@ namespace Staple\Query;
 
 use Staple\Exception\QueryException;
 
-class Delete extends Query
+class Delete extends Query implements IQuery
 {
 	const IGNORE = 'IGNORE';
 	const LOW_PRIORITY = 'LOW_PRIORITY';
@@ -101,15 +101,15 @@ class Delete extends Query
 		return false;
 	}
 	
-	public function leftJoin($table, $condition)
+	public function leftJoin($table, $condition, $alias = null, $schema = null)
 	{
-		$this->addJoin(Join::left($table, $condition));
+		$this->addJoin(Join::left($table, $condition, $alias, $schema));
 		return $this;
 	}
 	
-	public function innerJoin($table, $condition)
+	public function innerJoin($table, $condition, $alias = null, $schema = null)
 	{
-		$this->addJoin(Join::inner($table, $condition));
+		$this->addJoin(Join::inner($table, $condition, $alias, $schema));
 		return $this;
 	}
 	

@@ -43,6 +43,8 @@ class Condition
 	const NOTLIKE = "NOT LIKE";
 	const PARAMETERIZED_QUERY = true;
 	const NON_PARAMETERIZED_QUERY = false;
+	const SQL_AND = 'AND';
+	const SQL_OR = 'OR';
 
 	/**
 	 * The column for the where
@@ -79,6 +81,12 @@ class Condition
 	 * @var bool
 	 */
 	protected $columnJoin = false;
+
+	/**
+	 * SQL Conditional Conjunction (AND/OR)
+	 * @var string
+	 */
+	protected $conjunction;
 	/**
 	 * Reference to the connection object in use for this clause.
 	 * @var Connection
@@ -167,9 +175,13 @@ class Condition
 				if($this->parameterized)
 				{
 					if(strlen($this->paramName) > 0)
-						$value = $this->getParamName();
+					{
+						$value = ':' . $this->getParamName();
+					}
 					else
+					{
 						$value = '?';
+					}
 				}
 				else
 				{
@@ -181,9 +193,13 @@ class Condition
 				if($this->parameterized)
 				{
 					if(strlen($this->paramName) > 0)
-						$value = $this->getParamName();
+					{
+						$value = ':' . $this->getParamName();
+					}
 					else
+					{
 						$value = '?';
+					}
 				}
 				else
 				{
@@ -307,7 +323,7 @@ class Condition
 	/**
 	 * @return bool
 	 */
-	public function parameterized(): bool
+	public function isParameterized(): bool
 	{
 		return $this->parameterized;
 	}
@@ -351,21 +367,37 @@ class Condition
 	/*-----------------------------------------------CONDITION ENCAPSULATORS-----------------------------------------------*/
 
 	/**
-	 * @param $column
+	 * @param string|Query $column
 	 * @param $operator
-	 * @param $value
-	 * @param bool $columnJoin
+	 * @param mixed $value
+	 * @param bool|null $columnJoin
+	 * @param string|null $paramName
+	 * @param string $conjunction
+	 * @param bool $parameterized
 	 * @return static
 	 */
-	public static function get($column, $operator, $value, $columnJoin = NULL)
+	public static function get($column, $operator, $value, bool $columnJoin = NULL, string $paramName = null, $conjunction = self::SQL_AND, bool $parameterized = true)
 	{
 		/** @var Condition $obj */
 		$obj = new static();
 		$obj->setColumn($column)
 			->setOperator($operator)
-			->setValue($value);
+			->setValue($value)
+			->setParameterized($parameterized);
+
+		//Query Parameter Name
+		if(is_null($paramName))
+			$obj->setParamName(Query::sanitizeParamName($column));
+		else
+			$obj->setParamName(Query::sanitizeParamName($paramName));
+
+		//Column Join
 		if(isset($columnJoin))
 			$obj->setColumnJoin($columnJoin);
+
+		//Where Conjunction
+		$obj->conjunction = (strtoupper($conjunction) === self::SQL_OR) ? self::SQL_OR : self::SQL_AND;
+
 		return $obj;
 	}
 
@@ -384,12 +416,13 @@ class Condition
 	 * Setup a SQL WHERE clause where a column is equal to a value.
 	 * @param string $column
 	 * @param mixed $value
-	 * @param string $paramName
 	 * @param bool $columnJoin
+	 * @param string $paramName
+	 * @param string $conjunction
 	 * @param bool $parameterized
 	 * @return Condition
 	 */
-	public static function equal($column, $value, string $paramName = null, $columnJoin = NULL, $parameterized = true)
+	public static function equal($column, $value, bool $columnJoin = NULL, string $paramName = null, $conjunction = self::SQL_AND, bool $parameterized = true)
 	{
 		/** @var Condition $obj */
 		$obj = new static();
@@ -400,11 +433,19 @@ class Condition
 		//Check for NULLS
 		is_null($value) ? $obj->setOperator(self::IS) :	$obj->setOperator(self::EQUAL);
 
+		//Query Parameter Name
 		if(is_null($paramName))
-			$obj->setParamName(":".$column);
-		
+			$obj->setParamName(Query::sanitizeParamName($column));
+		else
+			$obj->setParamName(Query::sanitizeParamName($paramName));
+
+		//Column Join
 		if(isset($columnJoin))
 			$obj->setColumnJoin($columnJoin);
+
+		//Where Conjunction
+		$obj->conjunction = (strtoupper($conjunction) === self::SQL_OR) ? self::SQL_OR : self::SQL_AND;
+
 		return $obj;
 	}
 
@@ -413,38 +454,69 @@ class Condition
 	 * @param string $column
 	 * @param mixed $value
 	 * @param bool $columnJoin
+	 * @param string $paramName
+	 * @param string $conjunction
+	 * @param bool $parameterized
 	 * @return Condition
 	 */
-	public static function notEqual($column, $value, $columnJoin = NULL)
+	public static function notEqual($column, $value, bool $columnJoin = NULL, string $paramName = null, $conjunction = self::SQL_AND, bool $parameterized = true)
 	{
 		/** @var Condition $obj */
 		$obj = new static();
 		$obj->setColumn($column)
-			->setValue($value);
+			->setValue($value)
+			->setParameterized($parameterized);
 
 		//Check for NULLS
 		is_null($value) ? $obj->setOperator(self::IS_NOT) :	$obj->setOperator(self::NOTEQUAL);
 
+		//Query Parameter Name
+		if(is_null($paramName))
+			$obj->setParamName(Query::sanitizeParamName($column));
+		else
+			$obj->setParamName(Query::sanitizeParamName($paramName));
+
+		//Column Join
 		if(isset($columnJoin))
 			$obj->setColumnJoin($columnJoin);
+
+		//Where Conjunction
+		$obj->conjunction = (strtoupper($conjunction) === self::SQL_OR) ? self::SQL_OR : self::SQL_AND;
+
 		return $obj;
 	}
 
 	/**
-	 * @param $column
-	 * @param $value
+	 * @param string $column
+	 * @param mixed $value
 	 * @param bool $columnJoin
+	 * @param string $paramName
+	 * @param string $conjunction
+	 * @param bool $parameterized
 	 * @return static
 	 */
-	public static function like($column, $value, $columnJoin = NULL)
+	public static function like($column, $value, $columnJoin = NULL, string $paramName = null, $conjunction = self::SQL_AND, bool $parameterized = true)
 	{
 		/** @var Condition $obj */
 		$obj = new static();
 		$obj->setColumn($column)
 			->setOperator(self::LIKE)
-			->setValue($value);
+			->setValue($value)
+			->setParameterized($parameterized);
+
+		//Query Parameter Name
+		if(is_null($paramName))
+			$obj->setParamName(Query::sanitizeParamName($column));
+		else
+			$obj->setParamName(Query::sanitizeParamName($paramName));
+
+		//Column Join
 		if(isset($columnJoin))
 			$obj->setColumnJoin($columnJoin);
+
+		//Where Conjunction
+		$obj->conjunction = (strtoupper($conjunction) === self::SQL_OR) ? self::SQL_OR : self::SQL_AND;
+
 		return $obj;
 	}
 
@@ -452,61 +524,96 @@ class Condition
 	 * @param $column
 	 * @param $value
 	 * @param bool $columnJoin
+	 * @param string|null $paramName
+	 * @param $conjunction
+	 * @param bool $parameterized
 	 * @return static
 	 */
-	public static function notLike($column, $value, $columnJoin = NULL)
+	public static function notLike($column, $value, bool $columnJoin = NULL, string $paramName = null, $conjunction = self::SQL_AND, bool $parameterized = true)
 	{
 		/** @var Condition $obj */
 		$obj = new static();
 		$obj->setColumn($column)
 			->setOperator(self::NOTLIKE)
-			->setValue($value);
+			->setValue($value)
+			->setParameterized($parameterized);
+
+		//Query Parameter Name
+		if(is_null($paramName))
+			$obj->setParamName(Query::sanitizeParamName($column));
+		else
+			$obj->setParamName(Query::sanitizeParamName($paramName));
+
+		//Columns Join
 		if(isset($columnJoin))
 			$obj->setColumnJoin($columnJoin);
+
+		//Where Conjunction
+		$obj->conjunction = (strtoupper($conjunction) === self::SQL_OR) ? self::SQL_OR : self::SQL_AND;
+
 		return $obj;
 	}
 
 	/**
-	 * @param $column
+	 * @param string|Query $column
+	 * @param string $conjunction
 	 * @return static
 	 */
-	public static function null($column)
+	public static function null($column, $conjunction = Condition::SQL_AND)
 	{
 		/** @var Condition $obj */
 		$obj = new static();
 		$obj->setColumn($column)
 			->setOperator(self::IS)
 			->setValue(NULL);
+
+		//Where Conjunction
+		$obj->conjunction = (strtoupper($conjunction) === self::SQL_OR) ? self::SQL_OR : self::SQL_AND;
+
 		return $obj;
 	}
 
 	/**
 	 * @param $column
 	 * @param $values
-	 * @param bool $columnJoin
+	 * @param string|null $paramName
+	 * @param string $conjunction
+	 * @param bool $parameterized
 	 * @return static
 	 */
-	public static function in($column, $values, $columnJoin = NULL)
+	public static function in($column, $values, string $paramName = null, $conjunction = self::SQL_AND, bool $parameterized = true)
 	{
 		/** @var Condition $obj */
 		$obj = new static();
 		$obj->setColumn($column)
 			->setOperator(self::IN)
-			->setValue($values);
-		if(isset($columnJoin)) 
-			$obj->setColumnJoin($columnJoin);
+			->setValue($values)
+			->setParameterized($parameterized);
+
+		//Query Parameter Name
+		if(is_null($paramName))
+			$obj->setParamName(Query::sanitizeParamName($column));
+		else
+			$obj->setParamName(Query::sanitizeParamName($paramName));
+
+		//Where Conjunction
+		$obj->conjunction = (strtoupper($conjunction) === self::SQL_OR) ? self::SQL_OR : self::SQL_AND;
+
 		return $obj;
 	}
 
 	/**
 	 * @param $column
-	 * @param $start
-	 * @param $end
-	 * @param IConnection $connection
+	 * @param mixed $start
+	 * @param mixed $end
+	 * @param string $startParamName
+	 * @param string $endParamName
+	 * @param string $conjunction
+	 * @param bool $parameterized
 	 * @return static
 	 * @throws QueryException
 	 */
-	public static function between($column, $start, $end, IConnection $connection = NULL)
+	public static function between($column, $start, $end, string $startParamName = null, string $endParamName = null, $conjunction = self::SQL_AND, bool $parameterized = true)
 	{
 		/** @var Condition $obj */
 		$obj = new static();
@@ -514,9 +621,21 @@ class Condition
 			->setOperator(self::BETWEEN)
 			->setValue(Query::convertTypes($start)." AND ".Query::convertTypes($end))
 			->setColumnJoin(true);
-		
-		if(isset($connection))
-			$obj->setConnection($connection);
+
+		//Start Parameter Name
+		if(is_null($startParamName))
+			$obj->setParamName(Query::sanitizeParamName($column.'_start'));
+		else
+			$obj->setParamName(Query::sanitizeParamName($startParamName));
+
+		//End Parameter Name
+		if(is_null($endParamName))
+			$obj->setParamName(Query::sanitizeParamName($column.'_end'));
+		else
+			$obj->setParamName(Query::sanitizeParamName($endParamName));
+
+		//Where Conjunction
+		$obj->conjunction = (strtoupper($conjunction) === self::SQL_OR) ? self::SQL_OR : self::SQL_AND;
 		
 		return $obj;
 	}

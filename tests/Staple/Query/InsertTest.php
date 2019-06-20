@@ -54,7 +54,7 @@ class InsertTest extends TestCase
 				'created'
 			])
 			->setTable('article_categories')
-			->whereEqual('id', 'articles.cat', true);
+			->whereEqual('id', 'articles.cat', null, true);
 
 		$insertSelect = Insert::create()
 			->setTable('categories')
@@ -77,7 +77,7 @@ class InsertTest extends TestCase
 				'created'
 			])
 			->setTable('article_categories')
-			->whereEqual('id', 'articles.cat', true);
+			->whereEqual('id', 'articles.cat', null, true);
 
 		$insertSelect = Insert::create()
 			->setColumns([

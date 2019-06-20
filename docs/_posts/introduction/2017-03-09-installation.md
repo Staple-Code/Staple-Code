@@ -13,8 +13,14 @@ to start serving a website.
 
 You will need a few things for the server to be able to process your site:
 
- - PHP 7.0 or higher.
+ - PHP 7.1 or higher.
  - A URL rewrite module.
+ 
+You should also have a few PHP extensions enabled, if you want to use those features:
+
+- PDO (for your desired database)
+- FileInfo Extension (For File Upload Verification)
+- GD2 (Image Manipulation)
 
 Both IIS (web.config) and Apache (.htaccess) rewrite rules are included in the repository. For nginx, you will
 have to add the following in your server configuration for nginx:

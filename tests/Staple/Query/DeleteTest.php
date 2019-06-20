@@ -47,7 +47,12 @@ class DeleteTest extends TestCase
 			->whereEqual('id', 5);
 
 		//Assert
-		$expected = "DELETE FROM myschema.".self::TABLE_NAME."\nWHERE id = 5";
+		$expected = "DELETE FROM myschema.".self::TABLE_NAME."\nWHERE id = :id";
+		$expectedParamArray = [
+			'id' => 5
+		];
+
 		$this->assertEquals($expected, $query->build());
+		$this->assertEquals($expectedParamArray, $query->getParams());
 	}
 }

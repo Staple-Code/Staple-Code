@@ -225,9 +225,17 @@ class ModelSelectQuery extends ModelQuery implements ISelectQuery
 		return $this;
 	}
 
-	public function havingEqual($column, $value, $columnJoin = NULL)
+	/**
+	 * @param string $column
+	 * @param mixed $value
+	 * @param string $paramName
+	 * @param string $columnJoin
+	 * @param bool|null $parameterized
+	 * @return $this
+	 */
+	public function havingEqual($column, $value, $paramName = null, $columnJoin = NULL, bool $parameterized = null)
 	{
-		$this->queryObject->havingEqual($column, $value, $columnJoin);
+		$this->queryObject->havingEqual($column, $value, $paramName, $columnJoin, $parameterized);
 		return $this;
 	}
 

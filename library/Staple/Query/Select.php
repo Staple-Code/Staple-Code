@@ -56,11 +56,6 @@ class Select extends Query implements ISelectQuery
 	public $columns = array();
 
 	/**
-	 * An array to hold all of the parameters of the query.
-	 * @var string[]
-	 */
-	private $params = [];
-	/**
 	 * Holds the order of the SQL query. It can be either a string or an array of the columns to order by.
 	 * @var string | array
 	 */
@@ -169,34 +164,6 @@ class Select extends Query implements ISelectQuery
 	public function getColumns()
 	{
 		return $this->columns;
-	}
-
-	/**
-	 * Return the parameter list.
-	 * @return string[]
-	 */
-	public function getParams(): array
-	{
-		return $this->params;
-	}
-
-	/**
-	 * Set the value of a named parameter on the query.
-	 * @param string $paramName
-	 * @param mixed $value
-	 * @return $this
-	 * @throws QueryException
-	 */
-	public function setParam(string $paramName, $value): IQuery
-	{
-		if(is_resource($value)) {
-			throw new QueryException('Cannot use a resource as a value in query.');
-		}
-		if(substr($paramName,0,1) !== ':') {
-			$paramName = ':'.$paramName;
-		}
-		$this->params[$paramName] = $value;
-		return $this;
 	}
 
 	/**
@@ -523,12 +490,14 @@ class Select extends Query implements ISelectQuery
 	 * Add A HAVING EQUAL clause to the SELECT statement
 	 * @param string $column
 	 * @param mixed $value
+	 * @param string $paramName
 	 * @param string $columnJoin
+	 * @param bool $parameterized
 	 * @return $this
 	 */
-	public function havingEqual($column, $value, $columnJoin = NULL)
+	public function havingEqual($column, $value, $paramName = null, $columnJoin = NULL, bool $parameterized = null)
 	{
-		$this->addHaving(Condition::equal($column, $value, $columnJoin));
+		$this->addHaving(Condition::equal($column, $value, $paramName, $columnJoin, Condition::SQL_AND, $parameterized));
 		return $this;
 	}
 
@@ -663,11 +632,12 @@ class Select extends Query implements ISelectQuery
 	 * @param string $table
 	 * @param string $condition
 	 * @param string|null $alias
+	 * @param string|null $schema
 	 * @return $this
 	 */
-	public function join($table, $condition, $alias = NULL)
+	public function join($table, $condition, $alias = NULL, $schema = null)
 	{
-		$this->addJoin(Join::inner($table,$condition,$alias));
+		$this->addJoin(Join::inner($table, $condition, $alias, $schema));
 		return $this;
 	}
 	
