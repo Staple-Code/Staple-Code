@@ -91,19 +91,19 @@ interface ISelectQuery extends IQuery
 
 	public function clearHaving();
 	//Add A HAVING clause to the SELECT statement using the Condition object
-	public function havingCondition($column, $operator, $value, $columnJoin = NULL);
+	public function havingCondition($column, $operator, $value, bool $columnJoin = null, string $paramName = null, bool $parameterized = true);
 	//Add A raw HAVING clause to the SELECT statement
 	public function havingStatement($statement);
 	//Add A HAVING EQUAL clause to the SELECT statement
-	public function havingEqual($column, $value, $paramName = null, $columnJoin = null, bool $parameterized = null);
+	public function havingEqual($column, $value, bool $columnJoin = null, string $paramName = null, bool $parameterized = true);
 	//Add A HAVING LIKE clause to the SELECT statement
-	public function havingLike($column, $value);
+	public function havingLike($column, $value, bool $columnJoin = null, string $paramName = null, bool $parameterized = true);
 	//Add A HAVING NULL clause to the SELECT statement
 	public function havingNull($column);
 	//Add A HAVING IN clause to the SELECT statement
-	public function havingIn($column, array $values);
+	public function havingIn($column, array $values, string $paramName = null, bool $parameterized = true);
 	//Add A HAVING BETWEEN clause to the SELECT statement
-	public function havingBetween($column, $start, $end);
+	public function havingBetween($column, $start, $end, string $startParamName = null, string $endParamName = null, bool $parameterized = true);
 
 	/*-----------------------------------------------JOIN FUNCTIONS-----------------------------------------------*/
 

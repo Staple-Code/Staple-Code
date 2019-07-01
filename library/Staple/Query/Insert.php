@@ -23,6 +23,7 @@
 namespace Staple\Query;
 
 use Exception;
+use PDO;
 use Staple\Error;
 use Staple\Exception\ConfigurationException;
 use Staple\Exception\QueryException;
@@ -169,11 +170,14 @@ class Insert
 	 * @see Staple_Query::build()
 	 * @param bool $parameterized
 	 * @return string
+	 * @throws QueryException
+	 * @throws ConfigurationException
 	 */
 	function build(bool $parameterized = null)
 	{
 		if(isset($parameterized))
 			$this->setParameterized($parameterized);
+
 		//Statement Start
 		$stmt = "INSERT ";
 		
@@ -202,7 +206,7 @@ class Insert
 		//Column List
 		if(isset($this->columns))
 		{
-			$stmt .= '('.implode(',',$this->getColumns()).') ';
+			$stmt .= '('.implode(', ', $this->getColumns()).') ';
 		}
 
 		//Data
@@ -228,7 +232,7 @@ class Insert
 				}
 				else
 				{
-					$stmt .= ',';
+					$stmt .= ', ';
 				}
 				$stmt .= " $ucol=VALUES($ucol)";
 			}
@@ -240,17 +244,15 @@ class Insert
 	/**
 	 * Executes the query.
 	 * @throws QueryException
+	 * @throws ConfigurationException
 	 * @return Statement | bool
 	 */
 	public function execute()
 	{
-		if($this->connection instanceof Connection)
+		//Make sure we have a connection object
+		if(!($this->connection instanceof Connection))
 		{
-			return $this->connection->query($this->build());
-		}
-		else
-		{
-			try 
+			try
 			{
 				$this->setConnection(Connection::get());
 			}
@@ -258,12 +260,108 @@ class Insert
 			{
 				throw new QueryException('No Database Connection', Error::DB_ERROR);
 			}
-			if($this->connection instanceof Connection)
-			{
-				return $this->connection->query($this->build());
-			}
 		}
-		return false;
+
+		if($this->parameterized !== true)
+		{
+			//Run raw query string.
+			return $this->connection->query($this->build());
+		}
+		else
+		{
+			$statement = $this->connection->prepare($this->build(true));
+			if($statement !== false && $statement !== null)
+			{
+				$this->bindParametersToStatement($statement);
+				if($statement->execute() === true)
+					return $statement;
+				else
+					throw new QueryException(json_encode($statement->errorInfo()));
+			}
+			else
+				throw new QueryException('Failed to prepare statement for execution.');
+		}
+	}
+
+	/**
+	 * @return array|string[]
+	 * @throws QueryException
+	 */
+	public function getParams()
+	{
+		if($this->data instanceof DataSet)
+		{
+			$dataSet = $this->data;
+
+			$data = array_filter($this->data->getData(), function($key) use($dataSet) {
+				return !$dataSet->isLiteral($key);
+			}, ARRAY_FILTER_USE_KEY );
+
+			return $data;
+		}
+		elseif($this->data instanceof Select)
+		{
+			return $this->data->getParams();
+		}
+		else
+		{
+			throw new QueryException('Insert Data is stored as a non-supported format.');
+		}
+	}
+
+	/**
+	 * Bind the query parameters to the supplied statement object.
+	 * @param IStatement $statement
+	 * @throws QueryException
+	 */
+	private function bindParametersToStatement(&$statement)
+	{
+		foreach($this->getParams() as $name=>$value)
+		{
+			switch(gettype($value))
+			{
+				case "boolean":
+					$type = PDO::PARAM_BOOL;
+					break;
+				case "integer":
+					$type = PDO::PARAM_INT;
+					break;
+				case "double":
+					break;
+				case "string":
+					$type = PDO::PARAM_STR;
+					break;
+				case "array":
+					$value = implode(',', $value);
+					$type = PDO::PARAM_STR;
+					break;
+				case "object":
+					try
+					{
+						$value = (string)$value;
+					}
+					catch(Exception $e) {
+						throw new QueryException('Could not convert object to string for query.', 0, $e);
+					}
+					$type = PDO::PARAM_STR;
+					break;
+				case "resource":
+				case "resource (closed)":
+					throw new QueryException('Cannot supply a resource to a query.');
+					break;
+				case "NULL":
+					$type = PDO::PARAM_NULL;
+					break;
+				default:
+					throw new QueryException('Unable to determine parameter type.');
+			}
+
+			//Check for a large value
+			if($type === PDO::PARAM_STR && strlen($value) > 4000)
+				$type = PDO::PARAM_LOB;
+
+			$statement->bindParam($name, $value, $type);
+		}
 	}
 	
 	
@@ -454,7 +552,7 @@ class Insert
 		}
 		else
 		{
-			throw new QueryException('Data must be an instance of Staple_Query_DataSet, an instance of Staple_Query_Select or an array', Error::APPLICATION_ERROR);
+			throw new QueryException('Data must be an instance of \Staple\Query\DataSet, an instance of \Staple\Query\Select or an array', Error::APPLICATION_ERROR);
 		}
 		return $this;
 	}

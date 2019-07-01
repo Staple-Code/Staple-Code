@@ -193,6 +193,56 @@ class Union
 	}
 
 	/**
+	 * @return array
+	 */
+	public function getParams()
+	{
+		$params = [];
+		foreach($this->getQueries() as $query)
+		{
+			$queryParams = $query->getParams();
+			foreach($queryParams as $name=>$value)
+			{
+				$params[$this->generateIncrementalParamName($name, $params)] = $value;
+			}
+		}
+		return $params;
+	}
+
+	/**
+	 * Generate a unique parameter name
+	 * @param string $paramName
+	 * @param array $masterParamList
+	 * @return string
+	 */
+	protected function generateIncrementalParamName(string $paramName, array $masterParamList): string
+	{
+		if(substr($paramName,0,1) === ':')
+			$paramName = substr($paramName, 1);
+
+		if(array_key_exists($paramName, $masterParamList))
+		{
+			$nameSections = explode('_', $paramName);
+			$finalSection = array_pop($nameSections);
+			if(ctype_digit($finalSection)) {
+				$finalSection = (int)$finalSection + 1;
+				array_push($nameSections, $finalSection);
+			}
+			else
+			{
+				array_push($nameSections, $finalSection, "1");
+			}
+
+			$newParamName = implode('_', $nameSections);
+			return $this->generateIncrementalParamName($newParamName, $masterParamList);
+		}
+		else
+		{
+			return $paramName;
+		}
+	}
+
+	/**
 	 * Add a select flag on the query.
 	 * @param $flag
 	 * @return $this

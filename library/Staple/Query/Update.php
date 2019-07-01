@@ -24,6 +24,7 @@ namespace Staple\Query;
 
 use Exception;
 use Staple\Error;
+use Staple\Exception\ConfigurationException;
 use Staple\Exception\QueryException;
 use Staple\Pager;
 
@@ -39,7 +40,7 @@ class Update extends Query
 	protected $flags = array();
 	/**
 	 * The data with which to update.
-	 * @var DataSet[]
+	 * @var DataSet
 	 */
 	public $data = array();
 	/**
@@ -158,7 +159,7 @@ class Update extends Query
 	//----------------------------------------------GETTERS AND SETTERS----------------------------------------------
 	
 	/**
-	 * @return DataSet[] $columns
+	 * @return DataSet $columns
 	 */
 	public function getData()
 	{
@@ -192,10 +193,21 @@ class Update extends Query
 
 	/**
 	 * @return array
+	 * @throws QueryException
 	 */
 	public function getParams(): array
 	{
-		return $this->params;
+		$params = $this->params;
+		if(!($this->data instanceof DataSet))
+		{
+			throw new QueryException('Invalid data format. ');
+		}
+		$data = $this->data->getData();
+		foreach($data as $key=>$value)
+		{
+			$params[$this->generateIncrementalParamName($key)] = $value;
+		}
+		return $params;
 	}
 
 	/**
@@ -344,6 +356,7 @@ class Update extends Query
 	 * @see Staple_Query::build()
 	 * @param bool $parameterized
 	 * @throws QueryException
+	 * @throws ConfigurationException
 	 * @return string
 	 */
 	function build(bool $parameterized = null)

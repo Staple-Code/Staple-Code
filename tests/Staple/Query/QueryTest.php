@@ -24,6 +24,8 @@
 namespace Staple\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Staple\Exception\ConfigurationException;
+use Staple\Exception\QueryException;
 use Staple\Query\Connection;
 use Staple\Query\Query;
 use Staple\Query\MockConnection;
@@ -60,9 +62,9 @@ class QueryTest extends TestCase
 		$this->assertInstanceOf('\Staple\Query\Select',$select);
 		$this->assertEquals("SELECT\n* \nFROM customers",(string)$select);
 		$this->assertInstanceOf('\Staple\Query\Insert',$insert);
-		$this->assertEquals("INSERT \nINTO customers (id) \nVALUES (1) ",(string)$insert);
+		$this->assertEquals("INSERT \nINTO customers (id) \nVALUES (:id) ",(string)$insert);
 		$this->assertInstanceOf('\Staple\Query\Update',$update);
-		$this->assertEquals("UPDATE customers\nSET name='Larry'",(string)$update);
+		$this->assertEquals("UPDATE customers\nSET name=:name",(string)$update);
 		$this->assertInstanceOf('\Staple\Query\Delete',$delete);
 		$this->assertEquals("DELETE FROM customers",(string)$delete);
 	}
@@ -80,6 +82,8 @@ class QueryTest extends TestCase
 	/**
 	 * Test that we can construct a stored procedure call to MySQL
 	 * @test
+	 * @throws QueryException
+	 * @throws ConfigurationException
 	 */
 	public function testStoredMySqlProcedureConstruction()
 	{
@@ -116,6 +120,8 @@ class QueryTest extends TestCase
 	/**
 	 * Test that we can construct a stored procedure call to SQL Server
 	 * @test
+	 * @throws QueryException
+	 * @throws ConfigurationException
 	 */
 	public function testStoredSqlSrvProcedureConstruction()
 	{
@@ -129,6 +135,7 @@ class QueryTest extends TestCase
 
 	/**
 	 * @test
+	 * @throws QueryException
 	 */
 	public function testParameterizedQuery()
 	{
@@ -145,11 +152,12 @@ class QueryTest extends TestCase
 
 		$params = $query->getParams();
 
-		$this->assertEquals([':age'=>20], $params);
+		$this->assertEquals(['city'=>'Memphis','age'=>20], $params);
 	}
 
 	/**
 	 * @test
+	 * @throws QueryException
 	 */
 	public function testParameterizedQueryToStringConversion()
 	{

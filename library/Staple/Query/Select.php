@@ -466,12 +466,14 @@ class Select extends Query implements ISelectQuery
 	 * @param string $column
 	 * @param string $operator
 	 * @param mixed $value
-	 * @param null $columnJoin
+	 * @param bool|null $columnJoin
+	 * @param string|null $paramName
+	 * @param bool $parameterized
 	 * @return $this
 	 */
-	public function havingCondition($column, $operator, $value, $columnJoin = NULL)
+	public function havingCondition($column, $operator, $value, bool $columnJoin = null, string $paramName = null, bool $parameterized = true)
 	{
-		$this->addHaving(Condition::get($column, $operator, $value, $columnJoin));
+		$this->addHaving(Condition::get($column, $operator, $value, $columnJoin, $paramName, Condition::SQL_AND, $parameterized));
 		return $this;
 	}
 
@@ -490,14 +492,14 @@ class Select extends Query implements ISelectQuery
 	 * Add A HAVING EQUAL clause to the SELECT statement
 	 * @param string $column
 	 * @param mixed $value
-	 * @param string $paramName
-	 * @param string $columnJoin
+	 * @param bool|null $columnJoin
+	 * @param string|null $paramName
 	 * @param bool $parameterized
 	 * @return $this
 	 */
-	public function havingEqual($column, $value, $paramName = null, $columnJoin = NULL, bool $parameterized = null)
+	public function havingEqual($column, $value, bool $columnJoin = null, string $paramName = null, bool $parameterized = true)
 	{
-		$this->addHaving(Condition::equal($column, $value, $paramName, $columnJoin, Condition::SQL_AND, $parameterized));
+		$this->addHaving(Condition::equal($column, $value, $columnJoin, $paramName, Condition::SQL_AND, $parameterized));
 		return $this;
 	}
 
@@ -505,11 +507,14 @@ class Select extends Query implements ISelectQuery
 	 * Add A HAVING LIKE clause to the SELECT statement
 	 * @param string $column
 	 * @param mixed $value
+	 * @param bool|null $columnJoin
+	 * @param string|null $paramName
+	 * @param bool $parameterized
 	 * @return $this
 	 */
-	public function havingLike($column, $value)
+	public function havingLike($column, $value, bool $columnJoin = null, string $paramName = null, bool $parameterized = true)
 	{
-		$this->addHaving(Condition::like($column, $value));
+		$this->addHaving(Condition::like($column, $value, $columnJoin, $paramName, Condition::SQL_AND, $parameterized));
 		return $this;
 	}
 
@@ -528,11 +533,13 @@ class Select extends Query implements ISelectQuery
 	 * Add A HAVING IN clause to the SELECT statement
 	 * @param string $column
 	 * @param array $values
+	 * @param string|null $paramName
+	 * @param bool $parameterized
 	 * @return $this
 	 */
-	public function havingIn($column, array $values)
+	public function havingIn($column, array $values, string $paramName = null, bool $parameterized = true)
 	{
-		$this->addHaving(Condition::in($column, $values));
+		$this->addHaving(Condition::in($column, $values, $paramName, Condition::SQL_AND, $parameterized));
 		return $this;
 	}
 
@@ -541,12 +548,15 @@ class Select extends Query implements ISelectQuery
 	 * @param string $column
 	 * @param mixed $start
 	 * @param mixed $end
+	 * @param string|null $startParamName
+	 * @param string|null $endParamName
+	 * @param bool $parameterized
 	 * @return $this
 	 * @throws QueryException
 	 */
-	public function havingBetween($column, $start, $end)
+	public function havingBetween($column, $start, $end, string $startParamName = null, string $endParamName = null, bool $parameterized = true)
 	{
-		$this->addHaving(Condition::between($column, $start, $end));
+		$this->addHaving(Condition::between($column, $start, $end, $startParamName, $endParamName, Condition::SQL_AND, $parameterized));
 		return $this;
 	}
 	

@@ -13,10 +13,15 @@ use PDO;
 class MockStatement implements IStatement
 {
 	/**
+	 * The Query String
+	 * @var string
+	 */
+	public $queryString;
+	/**
 	 * Result rows.
 	 * @var array
 	 */
-	protected $rows;
+	protected $rows = [];
 	/**
 	 * The database driver that is currently in use.
 	 * @var string

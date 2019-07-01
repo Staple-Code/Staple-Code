@@ -246,6 +246,11 @@ abstract class Query implements IQuery
 		return array_key_exists($paramName, $this->params);
 	}
 
+	/**
+	 * Generate a unique parameter name
+	 * @param string $paramName
+	 * @return string
+	 */
 	protected function generateIncrementalParamName(string $paramName): string
 	{
 		if(substr($paramName,0,1) === ':')
@@ -323,24 +328,32 @@ abstract class Query implements IQuery
 			}
 		}
 
-		$statement = $this->connection->prepare($this->build(true));
-		if($statement !== false)
+		if($this->isParameterized() !== true)
 		{
-			$this->bindParametersToStatement($statement);
-			if($statement->execute() === true)
-				return $statement;
-			else
-				throw new QueryException(json_encode($statement->errorInfo()));
+			return $this->connection->query($this->build());
 		}
 		else
-			throw new QueryException('Failed to prepare statement for execution.');
+		{
+			$statement = $this->connection->prepare($this->build(true));
+			if($statement !== false && $statement !== null)
+			{
+				$this->bindParametersToStatement($statement);
+				if($statement->execute() === true)
+					return $statement;
+				else
+					throw new QueryException(json_encode($statement->errorInfo()));
+			}
+			else
+				throw new QueryException('Failed to prepare statement for execution.');
+		}
 	}
 
 	/**
+	 * Bind the query parameters to the supplied statement object.
 	 * @param IStatement $statement
 	 * @throws QueryException
 	 */
-	private function bindParametersToStatement(IStatement &$statement)
+	private function bindParametersToStatement(&$statement)
 	{
 		foreach($this->getParams() as $name=>$value)
 		{
@@ -474,7 +487,7 @@ abstract class Query implements IQuery
 		$this->where[] = $where;
 
 		//Check for column name conflicts
-		if($where->getColumnJoin() === false && $where->isParameterized() === true)
+		if($where->getColumnJoin() === false && $where->isParameterized() === true && !is_null($where->getParamName()))
 		{
 			$newParamName = $this->generateIncrementalParamName($where->getParamName());
 			$this->setParam($newParamName, $where->getValue());

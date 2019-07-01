@@ -31,8 +31,10 @@ use Staple\Model;
 use Staple\Query\Condition;
 use Staple\Query\Connection;
 use Staple\Query\IConnection;
+use Staple\Query\IStatement;
 use Staple\Query\MockStatement;
 use Staple\Query\Select;
+use Exception;
 
 class userModel extends Model
 {
@@ -70,7 +72,7 @@ class MockTestConnection extends Connection implements IConnection
 		{
 			parent::__construct(Config::getValue('db', 'dsn'));
 		}
-		catch(\Exception $e) {}
+		catch(Exception $e) {}
 	}
 
 	public function exec($statement)
@@ -81,11 +83,13 @@ class MockTestConnection extends Connection implements IConnection
 	/**
 	 * @param string $statement
 	 * @param array|null $driver_options
-	 * @return bool|\PDOStatement|void
+	 * @return IStatement
 	 */
 	public function prepare($statement, $driver_options = null)
 	{
-		// TODO: Implement prepare() method.
+		$statement = new MockStatement();
+		$statement->queryString = $statement;
+		return $statement;
 	}
 
 	public function query($statement)
@@ -273,6 +277,10 @@ class ModelTest extends TestCase
 		$this->assertInstanceOf('Staple\\Tests\\productListCategoryModel',productListCategoryModel::make());
 	}
 
+	/**
+	 * @test
+	 * @throws ModelNotFoundException
+	 */
 	public function testFind()
 	{
 		/** @var userModel $user */
@@ -312,6 +320,11 @@ class ModelTest extends TestCase
 		}
 	}
 
+	/**
+	 * @test
+	 * @throws ModelNotFoundException
+	 * @throws \Staple\Exception\QueryException
+	 */
 	public function testFindAll()
 	{
 		/** @var userModel[] $users */

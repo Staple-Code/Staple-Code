@@ -62,10 +62,20 @@ class Condition
 	 */
 	protected $value;
 	/**
+	 * An array of values used for IN and BETWEEN operators
+	 * @var array
+	 */
+	protected $valueArray;
+	/**
 	 * The name of the parameter for a parameterized query.
 	 * @var string
 	 */
 	protected $paramName;
+	/**
+	 * An array of parameter names used for the IN and BETWEEN operators
+	 * @var string[]
+	 */
+	protected $paramArray;
 	/**
 	 * Flag to
 	 * @var bool
@@ -149,15 +159,33 @@ class Condition
 			if(strtoupper($this->operator) == self::IN)
 			{
 				$value = "(";
+
 				if(is_array($this->value))
 				{
-					foreach($this->value as $aValue)
+					if($this->isParameterized())
 					{
-						if(strlen($value) > 1)
+						$count = 0;
+						foreach($this->value as $aValue)
 						{
-							$value .= ",";
+							$count++;
+							$value .=
+								$this->columnJoin ?
+									$aValue :
+									(strlen($this->paramName) > 0) ?
+										':' . $this->getParamName() . '_in_' . $count  :
+										'?';
 						}
-						$value .= $this->columnJoin ? $aValue : Query::convertTypes($aValue,$connection);
+					}
+					else
+					{
+						foreach($this->value as $aValue)
+						{
+							if(strlen($value) > 1)
+							{
+								$value .= ", ";
+							}
+							$value .= $this->columnJoin ? $aValue : Query::convertTypes($aValue, $connection);
+						}
 					}
 				}
 				elseif($this->value instanceof Select)
@@ -166,21 +194,28 @@ class Condition
 				}
 				else
 				{
-					$value = $this->columnJoin ? $this->value : Query::convertTypes($this->value,$connection);
-				}
-				$value .= ")";
-			}
-			elseif(strtoupper($this->operator) === self::BETWEEN || $this->columnJoin === true)
-			{
-				if($this->parameterized)
-				{
-					if(strlen($this->paramName) > 0)
+					if($this->isParameterized())
 					{
-						$value = ':' . $this->getParamName();
+						$value .= (strlen($this->paramName) > 0) ? ':' . $this->getParamName() : '?';
 					}
 					else
 					{
-						$value = '?';
+						$value .= $this->columnJoin ? $this->value : Query::convertTypes($this->value, $connection);
+					}
+				}
+				$value .= ")";
+			}
+			elseif(strtoupper($this->operator) === self::BETWEEN)
+			{
+				if($this->isParameterized())
+				{
+					if(strlen($this->paramArray['start']) > 0 && strlen($this->paramArray['end']) > 0)
+					{
+						$value = ':' . $this->paramArray['start'] . ' AND :'. $this->paramArray['end'];
+					}
+					else
+					{
+						$value = '? AND ?';
 					}
 				}
 				else
@@ -188,9 +223,19 @@ class Condition
 					$value = $this->getValue();
 				}
 			}
+			//Use the column value in th
+			elseif($this->columnJoin === true)
+			{
+				$value = $this->getValue();
+			}
+			//Don't parameterize a NULL value
+			elseif((strtoupper($this->operator) === self::IS || strtoupper($this->operator) === self::IS_NOT) && is_null($this->value))
+			{
+				$value = Query::convertTypes($this->value, $connection);
+			}
 			else
 			{
-				if($this->parameterized)
+				if($this->isParameterized())
 				{
 					if(strlen($this->paramName) > 0)
 					{
@@ -305,7 +350,7 @@ class Condition
 	/**
 	 * @return string
 	 */
-	public function getParamName(): string
+	public function getParamName(): ?string
 	{
 		return $this->paramName;
 	}
@@ -317,6 +362,26 @@ class Condition
 	public function setParamName(string $paramName): Condition
 	{
 		$this->paramName = $paramName;
+		return $this;
+	}
+
+	/**
+	 * @param string $paramName
+	 * @return Condition
+	 */
+	public function setStartParamName(string $paramName): Condition
+	{
+		$this->paramArray['start'] = $paramName;
+		return $this;
+	}
+
+	/**
+	 * @param string $paramName
+	 * @return Condition
+	 */
+	public function setEndParamName(string $paramName): Condition
+	{
+		$this->paramArray['end'] = $paramName;
 		return $this;
 	}
 
@@ -620,19 +685,20 @@ class Condition
 		$obj->setColumn($column)
 			->setOperator(self::BETWEEN)
 			->setValue(Query::convertTypes($start)." AND ".Query::convertTypes($end))
-			->setColumnJoin(true);
+			->setColumnJoin(true)
+			->setParameterized($parameterized);
 
 		//Start Parameter Name
 		if(is_null($startParamName))
-			$obj->setParamName(Query::sanitizeParamName($column.'_start'));
+			$obj->setStartParamName(Query::sanitizeParamName($column.'_start'));
 		else
-			$obj->setParamName(Query::sanitizeParamName($startParamName));
+			$obj->setStartParamName(Query::sanitizeParamName($startParamName));
 
 		//End Parameter Name
 		if(is_null($endParamName))
-			$obj->setParamName(Query::sanitizeParamName($column.'_end'));
+			$obj->setEndParamName(Query::sanitizeParamName($column.'_end'));
 		else
-			$obj->setParamName(Query::sanitizeParamName($endParamName));
+			$obj->setEndParamName(Query::sanitizeParamName($endParamName));
 
 		//Where Conjunction
 		$obj->conjunction = (strtoupper($conjunction) === self::SQL_OR) ? self::SQL_OR : self::SQL_AND;
