@@ -29,6 +29,12 @@ class MockStatement implements IStatement
 	protected $driver;
 
 	/**
+	 * The Connection object
+	 * @var IConnection
+	 */
+	protected $connection;
+
+	/**
 	 * @return array
 	 */
 	public function getRows()
@@ -78,6 +84,11 @@ class MockStatement implements IStatement
 		return $this->getCount();
 	}
 
+	public function errorInfo()
+	{
+		return [];
+	}
+
 	/**
 	 * Get the driver string
 	 * @return string
@@ -94,6 +105,24 @@ class MockStatement implements IStatement
 	public function setDriver($driver)
 	{
 		$this->driver = $driver;
+	}
+
+	/**
+	 * @return IConnection
+	 */
+	public function getConnection(): IConnection
+	{
+		return $this->connection;
+	}
+
+	/**
+	 * @param IConnection $connection
+	 * @return IStatement
+	 */
+	public function setConnection(IConnection $connection): IStatement
+	{
+		$this->connection = $connection;
+		return $this;
 	}
 
 	public function bindColumn($column, &$param, $type = null, $maxlen = null, $driverdata = null)

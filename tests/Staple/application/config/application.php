@@ -66,7 +66,7 @@ return [
 		'username'	=>	NULL,
 		'password'	=>	NULL,
 		'db'		=>	'staple',
-		'schema'	=>	'schemestaple',
+		//'schema'	=>	'schemestaple',
 		'options'	=>	[],     		//Specify any additional options here
 	],
 

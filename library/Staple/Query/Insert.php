@@ -188,6 +188,10 @@ class Insert
 		}
 		if($this->ignore === TRUE)
 		{
+			if($this->connection->getDriver() === Connection::DRIVER_SQLITE)
+			{
+				$stmt .= 'OR ';
+			}
 			$stmt .= 'IGNORE ';
 		}
 		
@@ -245,7 +249,7 @@ class Insert
 	 * Executes the query.
 	 * @throws QueryException
 	 * @throws ConfigurationException
-	 * @return Statement | bool
+	 * @return IStatement | bool
 	 */
 	public function execute()
 	{
@@ -318,7 +322,16 @@ class Insert
 	{
 		foreach($this->getParams() as $name=>$value)
 		{
-			switch(gettype($value))
+			$varType = gettype($value);
+
+			//Don't bind nulls because they are converted to IS NULL by the query builder.
+			if($varType === 'NULL')
+			{
+				continue;
+			}
+
+			//Bind other types.
+			switch($varType)
 			{
 				case "boolean":
 					$type = PDO::PARAM_BOOL;
@@ -340,7 +353,8 @@ class Insert
 					{
 						$value = (string)$value;
 					}
-					catch(Exception $e) {
+					catch(Exception $e)
+					{
 						throw new QueryException('Could not convert object to string for query.', 0, $e);
 					}
 					$type = PDO::PARAM_STR;
@@ -360,7 +374,7 @@ class Insert
 			if($type === PDO::PARAM_STR && strlen($value) > 4000)
 				$type = PDO::PARAM_LOB;
 
-			$statement->bindParam($name, $value, $type);
+			$statement->bindValue($name, $value, $type);
 		}
 	}
 	

@@ -357,7 +357,16 @@ abstract class Query implements IQuery
 	{
 		foreach($this->getParams() as $name=>$value)
 		{
-			switch(gettype($value))
+			$varType = gettype($value);
+
+			//Don't bind nulls because they are converted to IS NULL by the query builder.
+			if($varType === 'NULL')
+			{
+				continue;
+			}
+
+			//Bind other types.
+			switch($varType)
 			{
 				case "boolean":
 					$type = PDO::PARAM_BOOL;
@@ -388,9 +397,6 @@ abstract class Query implements IQuery
 				case "resource (closed)":
 					throw new QueryException('Cannot supply a resource to a query.');
 					break;
-				case "NULL":
-					$type = PDO::PARAM_NULL;
-					break;
 				default:
 					throw new QueryException('Unable to determine parameter type.');
 			}
@@ -399,7 +405,7 @@ abstract class Query implements IQuery
 			if($type === PDO::PARAM_STR && strlen($value) > 4000)
 				$type = PDO::PARAM_LOB;
 
-			$statement->bindParam($name, $value, $type);
+			$statement->bindValue($name, $value, $type);
 		}
 	}
 

@@ -538,7 +538,7 @@ class Connection extends PDO implements IConnection
 	 * @param $query
 	 * @return $this
 	 */
-	protected function addQueryToLog($query)
+	public function addQueryToLog($query)
 	{
 		$this->queryLog[] = $query;
 		$this->setLastQuery($query);
@@ -620,6 +620,20 @@ class Connection extends PDO implements IConnection
 
 		//Return the result
 		return $result;
+	}
+
+	/**
+	 * @param string $statement
+	 * @param array|null $driver_options
+	 * @return IStatement
+	 */
+	public function prepare($statement, $driver_options = [])
+	{
+		/** @var IStatement $statement */
+		$statement = parent::prepare($statement, $driver_options);
+		$statement->setDriver($this->getDriver());
+		$statement->setConnection($this);
+		return $statement;
 	}
 
 	/**

@@ -32,11 +32,11 @@ use DateTime;
 
 class InsertTest extends TestCase
 {
-	const INSERT_IGNORE_STATEMENT = "INSERT HIGH_PRIORITY IGNORE \nINTO schemestaple.categories (id, name, summary, rank, cat, created) \nVALUES (:id, :name, :summary, :rank, :cat, :created) ";
-	const INSERT_SELECT_STATEMENT = "INSERT \nINTO schemestaple.categories \nSELECT\nname, summary, rank, category_id AS cat, created \nFROM schemestaple.article_categories\nWHERE id = articles.cat";
-	const INSERT_SELECT_COLUMNS_STATEMENT = "INSERT \nINTO schemestaple.categories (name, summary, rank, cat, created) \nSELECT\nname, summary, rank, category_id AS cat, created \nFROM schemestaple.article_categories\nWHERE id = articles.cat";
+	const INSERT_IGNORE_STATEMENT = "INSERT HIGH_PRIORITY OR IGNORE \nINTO categories (id, name, summary, rank, cat, created) \nVALUES (:id, :name, :summary, :rank, :cat, :created) ";
+	const INSERT_SELECT_STATEMENT = "INSERT \nINTO categories \nSELECT\nname, summary, rank, category_id AS cat, created \nFROM article_categories\nWHERE id = articles.cat";
+	const INSERT_SELECT_COLUMNS_STATEMENT = "INSERT \nINTO categories (name, summary, rank, cat, created) \nSELECT\nname, summary, rank, category_id AS cat, created \nFROM article_categories\nWHERE id = articles.cat";
 	const INSERT_SCHEMA_STATEMENT = "INSERT \nINTO myschema.categories \nSELECT\nname, summary, rank, category_id AS cat, created \nFROM myschema.article_categories\nWHERE id = articles.cat";
-	const INSERT_DATA_STATEMENT = "INSERT \nINTO schemestaple.customer (first_name, last_name, address, city, state, zip, active, created, modified) \nVALUES (:first_name, :last_name, :address, :city, :state, :zip, :active, :created, NOW()) ";
+	const INSERT_DATA_STATEMENT = "INSERT \nINTO customer (first_name, last_name, address, city, state, zip, active, created, modified) \nVALUES (:first_name, :last_name, :address, :city, :state, :zip, :active, :created, NOW()) ";
 
 	private function getMockConnection()
 	{
