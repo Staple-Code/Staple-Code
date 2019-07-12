@@ -23,7 +23,9 @@
 
 namespace Staple\Model;
 
-
+use PDO;
+use Staple\Exception\ModelNotFoundException;
+use Staple\Exception\QueryException;
 use Staple\Model;
 use Staple\Query\IConnection;
 use Staple\Query\IQuery;
@@ -46,6 +48,7 @@ class ModelQuery implements IQuery
 	 * ModelQuery constructor.
 	 * @param Model $model
 	 * @param IConnection $connection
+	 * @throws QueryException
 	 */
 	public function __construct(Model $model, IConnection $connection = NULL)
 	{
@@ -65,6 +68,7 @@ class ModelQuery implements IQuery
 	 * @param Model $model
 	 * @param IConnection $connection
 	 * @return static
+	 * @throws QueryException
 	 */
 	public static function create(Model $model, IConnection $connection = NULL)
 	{
@@ -110,6 +114,7 @@ class ModelQuery implements IQuery
 	/**
 	 * Alias of the model query first() method
 	 * @return Model
+	 * @throws ModelNotFoundException
 	 */
 	public function first() : Model
 	{
@@ -149,7 +154,7 @@ class ModelQuery implements IQuery
 		$query = $this->getQueryObject()->getConnection()->getLastQuery();
 		if($result !== false)
 		{
-			while(($row = $result->fetch(\PDO::FETCH_ASSOC)) !== false)
+			while(($row = $result->fetch(PDO::FETCH_ASSOC)) !== false)
 			{
 				$model = $this->getModel()->create();
 				$model->_setData($row);
@@ -198,9 +203,29 @@ class ModelQuery implements IQuery
 	}
 
 	/**
+	 * @return array
+	 */
+	public function getParams(): array
+	{
+		return $this->queryObject->getParams();
+	}
+
+	/**
+	 * @param string $paramName
+	 * @param mixed $value
+	 * @return $this|IQuery
+	 */
+	public function setParam(string $paramName, $value): IQuery
+	{
+		return $this->queryObject->setParam($paramName, $value);
+	}
+
+
+	/**
+	 * @param bool $parameterized
 	 * @return string
 	 */
-	public function build() : string
+	public function build(bool $parameterized = null) : string
 	{
 		return $this->queryObject->build();
 	}

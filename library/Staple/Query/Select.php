@@ -54,6 +54,7 @@ class Select extends Query implements ISelectQuery
 	 * @var array[string]
 	 */
 	public $columns = array();
+
 	/**
 	 * Holds the order of the SQL query. It can be either a string or an array of the columns to order by.
 	 * @var string | array
@@ -91,9 +92,10 @@ class Select extends Query implements ISelectQuery
 	 * @param IConnection $db
 	 * @param array | string $order
 	 * @param Pager | int $limit
+	 * @param bool $parameterized
 	 * @throws QueryException
 	 */
-	public function __construct($table = NULL, array $columns = NULL, IConnection $db = NULL, $order = NULL, $limit = NULL)
+	public function __construct($table = NULL, array $columns = NULL, IConnection $db = NULL, $order = NULL, $limit = NULL, bool $parameterized = null)
 	{
 		parent::__construct(NULL, $db);
 		
@@ -116,6 +118,11 @@ class Select extends Query implements ISelectQuery
 		if(isset($limit))
 		{
 			$this->limit($limit);
+		}
+		//Set Paramterized
+		if(isset($parameterized))
+		{
+			$this->setParameterized($parameterized);
 		}
 	}
 
@@ -459,12 +466,14 @@ class Select extends Query implements ISelectQuery
 	 * @param string $column
 	 * @param string $operator
 	 * @param mixed $value
-	 * @param null $columnJoin
+	 * @param bool|null $columnJoin
+	 * @param string|null $paramName
+	 * @param bool $parameterized
 	 * @return $this
 	 */
-	public function havingCondition($column, $operator, $value, $columnJoin = NULL)
+	public function havingCondition($column, $operator, $value, bool $columnJoin = null, string $paramName = null, bool $parameterized = true)
 	{
-		$this->addHaving(Condition::get($column, $operator, $value, $columnJoin));
+		$this->addHaving(Condition::get($column, $operator, $value, $columnJoin, $paramName, Condition::SQL_AND, $parameterized));
 		return $this;
 	}
 
@@ -483,12 +492,14 @@ class Select extends Query implements ISelectQuery
 	 * Add A HAVING EQUAL clause to the SELECT statement
 	 * @param string $column
 	 * @param mixed $value
-	 * @param string $columnJoin
+	 * @param bool|null $columnJoin
+	 * @param string|null $paramName
+	 * @param bool $parameterized
 	 * @return $this
 	 */
-	public function havingEqual($column, $value, $columnJoin = NULL)
+	public function havingEqual($column, $value, bool $columnJoin = null, string $paramName = null, bool $parameterized = true)
 	{
-		$this->addHaving(Condition::equal($column, $value, $columnJoin));
+		$this->addHaving(Condition::equal($column, $value, $columnJoin, $paramName, Condition::SQL_AND, $parameterized));
 		return $this;
 	}
 
@@ -496,11 +507,14 @@ class Select extends Query implements ISelectQuery
 	 * Add A HAVING LIKE clause to the SELECT statement
 	 * @param string $column
 	 * @param mixed $value
+	 * @param bool|null $columnJoin
+	 * @param string|null $paramName
+	 * @param bool $parameterized
 	 * @return $this
 	 */
-	public function havingLike($column, $value)
+	public function havingLike($column, $value, bool $columnJoin = null, string $paramName = null, bool $parameterized = true)
 	{
-		$this->addHaving(Condition::like($column, $value));
+		$this->addHaving(Condition::like($column, $value, $columnJoin, $paramName, Condition::SQL_AND, $parameterized));
 		return $this;
 	}
 
@@ -519,11 +533,13 @@ class Select extends Query implements ISelectQuery
 	 * Add A HAVING IN clause to the SELECT statement
 	 * @param string $column
 	 * @param array $values
+	 * @param string|null $paramName
+	 * @param bool $parameterized
 	 * @return $this
 	 */
-	public function havingIn($column, array $values)
+	public function havingIn($column, array $values, string $paramName = null, bool $parameterized = true)
 	{
-		$this->addHaving(Condition::in($column, $values));
+		$this->addHaving(Condition::in($column, $values, $paramName, Condition::SQL_AND, $parameterized));
 		return $this;
 	}
 
@@ -532,11 +548,15 @@ class Select extends Query implements ISelectQuery
 	 * @param string $column
 	 * @param mixed $start
 	 * @param mixed $end
+	 * @param string|null $startParamName
+	 * @param string|null $endParamName
+	 * @param bool $parameterized
 	 * @return $this
+	 * @throws QueryException
 	 */
-	public function havingBetween($column, $start, $end)
+	public function havingBetween($column, $start, $end, string $startParamName = null, string $endParamName = null, bool $parameterized = true)
 	{
-		$this->addHaving(Condition::between($column, $start, $end));
+		$this->addHaving(Condition::between($column, $start, $end, $startParamName, $endParamName, Condition::SQL_AND, $parameterized));
 		return $this;
 	}
 	
@@ -622,11 +642,12 @@ class Select extends Query implements ISelectQuery
 	 * @param string $table
 	 * @param string $condition
 	 * @param string|null $alias
+	 * @param string|null $schema
 	 * @return $this
 	 */
-	public function join($table, $condition, $alias = NULL)
+	public function join($table, $condition, $alias = NULL, $schema = null)
 	{
-		$this->addJoin(Join::inner($table,$condition,$alias));
+		$this->addJoin(Join::inner($table, $condition, $alias, $schema));
 		return $this;
 	}
 	
@@ -644,10 +665,14 @@ class Select extends Query implements ISelectQuery
 	/**
 	 * Builds the query and returns the string.
 	 * @see Staple_Query::build()
+	 * @param bool $parameterized
 	 * @return string
 	 */
-	function build()
+	function build(bool $parameterized = null)
 	{
+		if(isset($parameterized))
+			$this->setParameterized($parameterized);
+
 		$stmt = 'SELECT';
 
 		//Flags

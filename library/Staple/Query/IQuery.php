@@ -49,7 +49,21 @@ interface IQuery
 	 */
 	public function setConnection(IConnection $connection);
 	//Build the query into a string.
-	public function build();
+	public function build(bool $parameterized = null);
 	//Execute the query and returns the result.
 	public function execute(IConnection $connection = NULL);
+
+	/**
+	 * Get the parameter list.
+	 * @return array
+	 */
+	public function getParams(): array;
+
+	/**
+	 * Set the value of a named parameter on the query.
+	 * @param string $paramName
+	 * @param mixed $value
+	 * @return $this
+	 */
+	public function setParam(string $paramName, $value): IQuery;
 }

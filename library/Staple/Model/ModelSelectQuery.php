@@ -43,12 +43,59 @@ class ModelSelectQuery extends ModelQuery implements ISelectQuery
 	 * @param $column
 	 * @param $operator
 	 * @param $value
-	 * @param null $columnJoin
+	 * @param bool|NULL $columnJoin
+	 * @param string|null $paramName
+	 * @param bool $parameterized
 	 * @return ModelSelectQuery
 	 */
-	public function whereCondition($column, $operator, $value, $columnJoin = NULL) : ModelSelectQuery
+	public function where($column, $operator, $value, bool $columnJoin = null, string $paramName = null, bool $parameterized = true)
 	{
-		$this->queryObject->whereCondition($column, $operator, $value, $columnJoin);
+		$this->queryObject->where($column, $operator, $value, $columnJoin, $paramName, $parameterized);
+		return $this;
+	}
+
+	/**
+	 * @param $column
+	 * @param $operator
+	 * @param $value
+	 * @param bool|NULL $columnJoin
+	 * @param string|null $paramName
+	 * @param bool $parameterized
+	 * @return ModelSelectQuery
+	 */
+	public function orWhere($column, $operator, $value, bool $columnJoin = NULL, string $paramName = null, bool $parameterized = true)
+	{
+		$this->queryObject->orWhere($column, $operator, $value, $columnJoin, $paramName, $parameterized);
+		return $this;
+	}
+
+	/**
+	 * @param $column
+	 * @param $operator
+	 * @param $value
+	 * @param bool|null $columnJoin
+	 * @param string|null $paramName
+	 * @param bool $parameterized
+	 * @return ModelSelectQuery
+	 */
+	public function whereCondition($column, $operator, $value, bool $columnJoin = null, string $paramName = null, bool $parameterized = true) : ModelSelectQuery
+	{
+		$this->queryObject->whereCondition($column, $operator, $value, $columnJoin, $paramName, $parameterized);
+		return $this;
+	}
+
+	/**
+	 * @param $column
+	 * @param $operator
+	 * @param $value
+	 * @param bool|NULL $columnJoin
+	 * @param string|null $paramName
+	 * @param bool $parameterized
+	 * @return ModelSelectQuery
+	 */
+	public function orWhereCondition($column, $operator, $value, bool $columnJoin = NULL, string $paramName = null, bool $parameterized = true)
+	{
+		$this->queryObject->orWhereCondition($column, $operator, $value, $columnJoin, $paramName, $parameterized);
 		return $this;
 	}
 
@@ -65,52 +112,90 @@ class ModelSelectQuery extends ModelQuery implements ISelectQuery
 	/**
 	 * @param $column
 	 * @param $value
-	 * @param null $columnJoin
+	 * @param bool|null $columnJoin
+	 * @param string|null $paramName
+	 * @param bool $parameterized
 	 * @return ModelSelectQuery
 	 */
-	public function whereEqual($column, $value, $columnJoin = NULL)
+	public function whereEqual($column, $value, bool $columnJoin = null, string $paramName = null, bool $parameterized = null)
 	{
-		$this->queryObject->whereEqual($column, $value, $columnJoin);
+		$this->queryObject->whereEqual($column, $value, $columnJoin, $paramName, $parameterized);
 		return $this;
 	}
 
 	/**
 	 * @param $column
 	 * @param $value
-	 * @param null $columnJoin
+	 * @param bool|null $columnJoin
+	 * @param string|null $paramName
+	 * @param bool $parameterized
 	 * @return ModelSelectQuery
 	 */
-	public function whereNotEqual($column, $value, $columnJoin = NULL)
+	public function orWhereEqual($column, $value, bool $columnJoin = null,  string $paramName = null, bool $parameterized = true)
 	{
-		$this->queryObject->whereNotEqual($column, $value, $columnJoin);
+		$this->queryObject->orWhereEqual($column, $value, $columnJoin, $paramName, $parameterized);
 		return $this;
 	}
 
 	/**
 	 * @param $column
 	 * @param $value
+	 * @param bool|null $columnJoin
+	 * @param string|null $paramName
+	 * @param bool $parameterized
 	 * @return ModelSelectQuery
 	 */
-	public function whereLike($column, $value)
+	public function whereNotEqual($column, $value, bool $columnJoin = null, string $paramName = null, bool $parameterized = null)
 	{
-		$this->queryObject->whereLike($column, $value);
+		$this->queryObject->whereNotEqual($column, $value, $columnJoin, $paramName, $parameterized);
 		return $this;
 	}
 
 	/**
 	 * @param $column
 	 * @param $value
+	 * @param bool|null $columnJoin
+	 * @param string|null $paramName
+	 * @param bool $parameterized
 	 * @return $this
 	 */
-	public function whereNotLike($column, $value)
+	public function orWhereNotEqual($column, $value, bool $columnJoin = null, string $paramName = null, bool $parameterized = true)
 	{
-		$this->queryObject->whereNotLike($column, $value);
+		$this->queryObject->orWhereNotEqual($column, $value, $columnJoin, $paramName, $parameterized);
 		return $this;
 	}
 
 	/**
 	 * @param $column
-	 * @return $this
+	 * @param $value
+	 * @param bool|null $columnJoin
+	 * @param string|null $paramName
+	 * @param bool $parameterized
+	 * @return ModelSelectQuery
+	 */
+	public function whereLike($column, $value, bool $columnJoin = null, string $paramName = null, bool $parameterized = true)
+	{
+		$this->queryObject->whereLike($column, $value, $columnJoin, $paramName, $parameterized);
+		return $this;
+	}
+
+	/**
+	 * @param $column
+	 * @param $value
+	 * @param bool|null $columnJoin
+	 * @param string|null $paramName
+	 * @param bool $parameterized
+	 * @return ModelSelectQuery
+	 */
+	public function whereNotLike($column, $value, bool $columnJoin = null, string $paramName = null, bool $parameterized = true)
+	{
+		$this->queryObject->whereNotLike($column, $value, $columnJoin, $paramName, $parameterized);
+		return $this;
+	}
+
+	/**
+	 * @param $column
+	 * @return ModelSelectQuery
 	 */
 	public function whereNull($column)
 	{
@@ -121,11 +206,13 @@ class ModelSelectQuery extends ModelQuery implements ISelectQuery
 	/**
 	 * @param $column
 	 * @param $values
-	 * @return $this
+	 * @param string|null $paramName
+	 * @param bool $parameterized
+	 * @return ModelSelectQuery
 	 */
-	public function whereIn($column, $values)
+	public function whereIn($column, $values, string $paramName = null, bool $parameterized = true)
 	{
-		$this->queryObject->whereIn($column, $values);
+		$this->queryObject->whereIn($column, $values, $paramName, $parameterized);
 		return $this;
 	}
 
@@ -133,18 +220,21 @@ class ModelSelectQuery extends ModelQuery implements ISelectQuery
 	 * @param $column
 	 * @param $start
 	 * @param $end
-	 * @return $this
+	 * @param string|null $startParamName
+	 * @param string|null $endParamName
+	 * @param bool $parameterized
+	 * @return ModelSelectQuery
 	 */
-	public function whereBetween($column, $start, $end)
+	public function whereBetween($column, $start, $end, string $startParamName = null, string $endParamName = null, bool $parameterized = true)
 	{
-		$this->queryObject->whereBetween($column, $start, $end);
+		$this->queryObject->whereBetween($column, $start, $end, $startParamName, $endParamName, $parameterized);
 		return $this;
 	}
 
 	/**
 	 * @param mixed $limit
 	 * @param int $offset
-	 * @return $this
+	 * @return ModelSelectQuery
 	 */
 	public function limit($limit, $offset = NULL)
 	{
@@ -168,7 +258,7 @@ class ModelSelectQuery extends ModelQuery implements ISelectQuery
 
 	/**
 	 * @param array $columns
-	 * @return $this
+	 * @return ModelSelectQuery
 	 */
 	public function columns(array $columns)
 	{
@@ -176,6 +266,10 @@ class ModelSelectQuery extends ModelQuery implements ISelectQuery
 		return $this;
 	}
 
+	/**
+	 * @param string[] $columns
+	 * @return ModelSelectQuery
+	 */
 	public function addColumnsArray(array $columns)
 	{
 		$this->queryObject->addColumnsArray($columns);
@@ -184,7 +278,7 @@ class ModelSelectQuery extends ModelQuery implements ISelectQuery
 
 	/**
 	 * @param $order
-	 * @return $this
+	 * @return ModelSelectQuery
 	 */
 	public function orderBy($order)
 	{
@@ -194,7 +288,7 @@ class ModelSelectQuery extends ModelQuery implements ISelectQuery
 
 	/**
 	 * @param $group
-	 * @return $this
+	 * @return ModelSelectQuery
 	 */
 	public function groupBy($group)
 	{
@@ -203,7 +297,7 @@ class ModelSelectQuery extends ModelQuery implements ISelectQuery
 	}
 
 	/**
-	 * @return $this
+	 * @return ModelSelectQuery
 	 */
 	public function clearHaving()
 	{
@@ -211,7 +305,16 @@ class ModelSelectQuery extends ModelQuery implements ISelectQuery
 		return $this;
 	}
 
-	public function havingCondition($column, $operator, $value, $columnJoin = NULL)
+	/**
+	 * @param $column
+	 * @param $operator
+	 * @param $value
+	 * @param bool|NULL $columnJoin
+	 * @param string|null $paramName
+	 * @param bool|null $parameterized
+	 * @return $this
+	 */
+	public function havingCondition($column, $operator, $value, bool $columnJoin = NULL, string $paramName = null, bool $parameterized = true)
 	{
 		$this->queryObject->havingCondition($column, $operator, $value, $columnJoin);
 		return $this;
@@ -223,15 +326,31 @@ class ModelSelectQuery extends ModelQuery implements ISelectQuery
 		return $this;
 	}
 
-	public function havingEqual($column, $value, $columnJoin = NULL)
+	/**
+	 * @param $column
+	 * @param $value
+	 * @param bool|null $columnJoin
+	 * @param string|null $paramName
+	 * @param bool|null $parameterized
+	 * @return $this
+	 */
+	public function havingEqual($column, $value, bool $columnJoin = null, string $paramName = null, bool $parameterized = true)
 	{
-		$this->queryObject->havingEqual($column, $value, $columnJoin);
+		$this->queryObject->havingEqual($column, $value, $columnJoin, $paramName, $parameterized);
 		return $this;
 	}
 
-	public function havingLike($column, $value)
+	/**
+	 * @param $column
+	 * @param $value
+	 * @param bool|null $columnJoin
+	 * @param string|null $paramName
+	 * @param bool|null $parameterized
+	 * @return $this
+	 */
+	public function havingLike($column, $value, bool $columnJoin = null, string $paramName = null, bool $parameterized = true)
 	{
-		$this->queryObject->havingLike($column, $value);
+		$this->queryObject->havingLike($column, $value, $columnJoin, $paramName, $parameterized);
 		return $this;
 	}
 
@@ -241,33 +360,33 @@ class ModelSelectQuery extends ModelQuery implements ISelectQuery
 		return $this;
 	}
 
-	public function havingIn($column, array $values)
+	public function havingIn($column, array $values, string $paramName = null, bool $parameterized = true)
 	{
-		$this->queryObject->havingIn($column, $values);
+		$this->queryObject->havingIn($column, $values, $paramName, $parameterized);
 		return $this;
 	}
 
-	public function havingBetween($column, $start, $end)
+	public function havingBetween($column, $start, $end, string $startParamName = null, string $endParamName = null, bool $parameterized = true)
 	{
-		$this->queryObject->havingBetween($column, $start, $end);
+		$this->queryObject->havingBetween($column, $start, $end, $startParamName, $endParamName, $parameterized);
 		return $this;
 	}
 
-	public function leftJoin($table, $condition, $alias = NULL)
+	public function leftJoin($table, $condition, $alias = NULL, $schema = null)
 	{
-		$this->queryObject->leftJoin($table, $condition, $alias);
+		$this->queryObject->leftJoin($table, $condition, $alias, $schema);
 		return $this;
 	}
 
-	public function innerJoin($table, $condition, $alias = NULL)
+	public function innerJoin($table, $condition, $alias = NULL, $schema = null)
 	{
-		$this->queryObject->innerJoin($table, $condition, $alias);
+		$this->queryObject->innerJoin($table, $condition, $alias, $schema);
 		return $this;
 	}
 
-	public function join($table, $condition, $alias = NULL)
+	public function join($table, $condition, $alias = NULL, $schema = null)
 	{
-		$this->queryObject->join($table, $condition, $alias);
+		$this->queryObject->join($table, $condition, $alias, $schema);
 		return $this;
 	}
 

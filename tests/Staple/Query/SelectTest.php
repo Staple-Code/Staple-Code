@@ -148,4 +148,43 @@ class SelectTest extends TestCase
 		$expected = "SELECT\nfirst_name, last_name, address, city, state, zip \nFROM myschema.".self::TABLE_NAME." AS myTable\nINNER JOIN myschema.orders ON orders.customer_id = ".self::TABLE_NAME.".id";
 		$this->assertEquals($expected,(string)$query);
 	}
+
+	public function testParameterizedQueryWithSameFieldNames()
+	{
+		//Setup
+		$conn = $this->getMockConnection();
+
+		//Act
+		$columns = [
+			'first_name',
+			'last_name',
+			'address',
+			'city',
+			'state',
+			'zip'
+		];
+		try
+		{
+			$query = Query::select(self::TABLE_NAME, $columns, $conn)
+				->innerJoin('orders', 'orders.customer_id = ' . self::TABLE_NAME . '.id')
+				->whereEqual('orders.type', 'new')
+				->orWhereEqual('orders.type', 'renewal')
+				->whereNotEqual('orders.type', 'cancelled');
+		}
+		catch(QueryException $e)
+		{
+			$this->fail('Query build should not throw exception.');
+		}
+
+		//Assert
+		$expected = "SELECT\nfirst_name, last_name, address, city, state, zip \nFROM ".self::TABLE_NAME."\nINNER JOIN orders ON orders.customer_id = ".self::TABLE_NAME.".id\nWHERE orders.type = :orders_type AND orders.type = :orders_type_1 AND orders.type <> :orders_type_2";
+		$expectedParamArray = [
+			'orders_type' => 'new',
+			'orders_type_1' => 'renewal',
+			'orders_type_2' => 'cancelled'
+		];
+
+		$this->assertEquals($expected,(string)$query);
+		$this->assertEquals($expectedParamArray, $query->getParams());
+	}
 }

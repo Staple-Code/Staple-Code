@@ -24,15 +24,20 @@
 namespace Staple\Tests;
 
 use PHPUnit\Framework\TestCase;
-use SplObserver;
+use Staple\Exception\ConfigurationException;
 use Staple\Exception\ModelNotFoundException;
+use Staple\Exception\QueryException;
 use Staple\Model;
-use Staple\Query\Condition;
 use Staple\Query\Connection;
-use Staple\Query\IConnection;
-use Staple\Query\MockStatement;
-use Staple\Query\Select;
+use Staple\Query\Query;
 
+/**
+ * Class userModel
+ * @package Staple\Tests
+ * @method int getId()
+ * @method string getName()
+ * @method string getEmail()
+ */
 class userModel extends Model
 {
 	protected $userKey = '12345';
@@ -48,163 +53,42 @@ class clientModel extends Model
 	protected $_table = 'customers';
 }
 
-class MockTestConnection extends Connection implements IConnection
-{
-	private $data = [
-		[
-			'id'	=>	1,
-			'name'	=>	"Joe",
-			'email'	=>	'joe@aol.com'
-		],
-		[
-			'id'	=>	2,
-			'name'	=>	"Tom",
-			'email'	=>	'tom@hotmail.com'
-		],
-	];
-
-	public function __construct()
-	{
-
-	}
-
-	public function exec($statement)
-	{
-		// TODO: Implement exec() method.
-	}
-
-	public function query($statement)
-	{
-		switch(get_class($statement))
-		{
-			case 'Staple\Query\Select':
-				/** @var Select $statement */
-				$mockStatement = new MockStatement();
-				$results = [];
-				foreach($this->data as $row)
-				{
-					$remove = false;
-					/** @var Condition $where */
-					foreach($statement->getWhere() as $where)
-					{
-						switch($where->getOperator())
-						{
-							case $where::EQUAL:
-							case Condition::IS:
-								if($row[$where->getColumn()] != $where->getValue())
-									$remove = true;
-								break;
-							case Condition::GREATER:
-								if($row[$where->getColumn()] <= $where->getValue())
-									$remove = true;
-								break;
-							case Condition::GREATER_EQUAL:
-								if($row[$where->getColumn()] < $where->getValue())
-									$remove = true;
-								break;
-							case Condition::LESS:
-								if($row[$where->getColumn()] >= $where->getValue())
-									$remove = true;
-								break;
-							case Condition::LESS_EQUAL:
-								if($row[$where->getColumn()] > $where->getValue())
-									$remove = true;
-								break;
-							case Condition::IN:
-								if(!in_array($where->getValue(),$row[$where->getColumn()]))
-									$remove = true;
-								break;
-							case Condition::NOTEQUAL:
-							case Condition::IS_NOT:
-								if($row[$where->getColumn()] == $where->getValue())
-									$remove = true;
-								break;
-						}
-					}
-
-					if($remove !== true)
-					{
-						$results[] = $row;
-					}
-				}
-				$mockStatement->setRows($results);
-				break;
-			default:
-				$mockStatement = false;
-		}
-
-		return $mockStatement;
-	}
-
-	/**
-	 * (PHP 5 &gt;= 5.1.0)<br/>
-	 * Attach an SplObserver
-	 * @link http://php.net/manual/en/splsubject.attach.php
-	 * @param SplObserver $observer <p>
-	 * The <b>SplObserver</b> to attach.
-	 * </p>
-	 * @return void
-	 */
-	public function attach(SplObserver $observer)
-	{
-		// TODO: Implement attach() method.
-	}
-
-	/**
-	 * (PHP 5 &gt;= 5.1.0)<br/>
-	 * Detach an observer
-	 * @link http://php.net/manual/en/splsubject.detach.php
-	 * @param SplObserver $observer <p>
-	 * The <b>SplObserver</b> to detach.
-	 * </p>
-	 * @return void
-	 */
-	public function detach(SplObserver $observer)
-	{
-		// TODO: Implement detach() method.
-	}
-
-	/**
-	 * (PHP 5 &gt;= 5.1.0)<br/>
-	 * Notify an observer
-	 * @link http://php.net/manual/en/splsubject.notify.php
-	 * @return void
-	 */
-	public function notify()
-	{
-		// TODO: Implement notify() method.
-	}
-
-	public function getLastQuery()
-	{
-		// TODO: Implement getLastQuery() method.
-	}
-
-	public function setLastQuery($lastQuery)
-	{
-		// TODO: Implement setLastQuery() method.
-	}
-
-	public function getDriver()
-	{
-		return $this->driver;
-	}
-
-	public function getDriverOptions()
-	{
-		return NULL;
-	}
-}
-
 
 class ModelTest extends TestCase
 {
 	/**
-	 * @return MockTestConnection
+	 * @throws ConfigurationException
+	 * @throws QueryException
 	 */
-	protected function getMockConnection()
+	protected function setUp()
 	{
-		return new MockTestConnection();
+		$conn = Connection::get();
+		$conn->query('CREATE TABLE IF NOT EXISTS users (id INT PRIMARY KEY, name VARCHAR(50), email VARCHAR(50))');
+
+		Query::insert('users', [
+			'id' => 1,
+			'name' => 'Joe',
+			'email' => 'joe@aol.com',
+		])
+			->setIgnore(true)
+			->execute();
+
+		Query::insert('users', [
+			'id' => 2,
+			'name' => 'Tom',
+			'email' => 'tom@hotmail.com',
+		])
+			->setIgnore(true)
+			->execute();
+	}
+
+	/**
+	 * @throws ConfigurationException
+	 */
+	protected function tearDown()
+	{
+		$conn = Connection::get();
+		$conn->query('DROP TABLE IF EXISTS users');
 	}
 
 	protected function getTestUserModelObject()
@@ -258,12 +142,16 @@ class ModelTest extends TestCase
 		$this->assertInstanceOf('Staple\\Tests\\productListCategoryModel',productListCategoryModel::make());
 	}
 
+	/**
+	 * @test
+	 * @throws ModelNotFoundException
+	 */
 	public function testFind()
 	{
 		/** @var userModel $user */
-		$user = userModel::find(1, $this->getMockConnection());
+		$user = userModel::find(1);
 		/** @var userModel $user2 */
-		$user2 = userModel::find(2, $this->getMockConnection());
+		$user2 = userModel::find(2);
 
 
 		//Assert user 1 results
@@ -287,7 +175,7 @@ class ModelTest extends TestCase
 		try
 		{
 			/** @var bool $user3 */
-			userModel::find(3, $this->getMockConnection());
+			userModel::find(3);
 			$this->hasFailed();
 		}
 		catch(ModelNotFoundException $e)
@@ -297,10 +185,15 @@ class ModelTest extends TestCase
 		}
 	}
 
+	/**
+	 * @test
+	 * @throws ModelNotFoundException
+	 * @throws QueryException
+	 */
 	public function testFindAll()
 	{
 		/** @var userModel[] $users */
-		$users = userModel::findAll(NULL,NULL,$this->getMockConnection());
+		$users = userModel::findAll();
 
 		$this->assertCount(2, $users);
 		foreach($users as $user)

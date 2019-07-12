@@ -33,6 +33,7 @@ use Staple\Exception\RoutingException;
 use Staple\Layout;
 use Staple\Route;
 use Staple\Traits\Helpers;
+use ReflectionException, ReflectionMethod, ReflectionClass;
 
 abstract class Controller
 {
@@ -84,8 +85,8 @@ abstract class Controller
 	 * @param string $method
 	 * @return bool
 	 * @throws AuthException
-	 * @throws \ReflectionException
 	 * @throws RoutingException
+	 * @throws ReflectionException
 	 */
 	public function _auth($method)
 	{
@@ -99,8 +100,8 @@ abstract class Controller
 			if(method_exists($this,$method))
 			{
 				$auth = Auth::get();
-				$reflectMethod = new \ReflectionMethod($this, $method);
-				$reflectClass = new \ReflectionClass($this);
+				$reflectMethod = new ReflectionMethod($this, $method);
+				$reflectClass = new ReflectionClass($this);
 				$classComments = $reflectClass->getDocComment();
 				$methodComments = $reflectMethod->getDocComment();
 

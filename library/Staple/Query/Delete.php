@@ -23,7 +23,9 @@
  */
 namespace Staple\Query;
 
-class Delete extends Query
+use Staple\Exception\QueryException;
+
+class Delete extends Query implements IQuery
 {
 	const IGNORE = 'IGNORE';
 	const LOW_PRIORITY = 'LOW_PRIORITY';
@@ -33,21 +35,31 @@ class Delete extends Query
 	 * Additional Query Flags
 	 * @var array[string]
 	 */
-	protected $flags = array();
+	protected $flags = [];
 	/**
 	 * Array of Staple_Query_Join objects that represent table joins on the query
 	 * @var Join[]
 	 */
-	protected $joins = array();
+	protected $joins = [];
+
+	/**
+	 * The array of parameters
+	 * @var array
+	 */
+	protected $params = [];
 
 	/**
 	 * @param string $table
-	 * @param Connection $db
-	 * @throws \Exception
+	 * @param IConnection $db
+	 * @param bool $parameterized
+	 * @throws QueryException
 	 */
-	public function __construct($table = NULL, Connection $db = NULL)
+	public function __construct($table = NULL, IConnection $db = NULL, bool $parameterized = null)
 	{
 		parent::__construct($table, $db);
+
+		if(isset($parameterized))
+			$this->setParameterized($parameterized);
 	}
 	
 	public function addFlag($flag)
@@ -89,15 +101,15 @@ class Delete extends Query
 		return false;
 	}
 	
-	public function leftJoin($table, $condition)
+	public function leftJoin($table, $condition, $alias = null, $schema = null)
 	{
-		$this->addJoin(Join::left($table, $condition));
+		$this->addJoin(Join::left($table, $condition, $alias, $schema));
 		return $this;
 	}
 	
-	public function innerJoin($table, $condition)
+	public function innerJoin($table, $condition, $alias = null, $schema = null)
 	{
-		$this->addJoin(Join::inner($table, $condition));
+		$this->addJoin(Join::inner($table, $condition, $alias, $schema));
 		return $this;
 	}
 	
@@ -105,15 +117,41 @@ class Delete extends Query
 	{
 		return $this->joins;
 	}
-	
+
+	/**
+	 * @return array
+	 */
+	public function getParams(): array
+	{
+		return $this->params;
+	}
+
+	/**
+	 * @param string $paramName
+	 * @param mixed $value
+	 * @return $this|IQuery
+	 */
+	public function setParam(string $paramName, $value): IQuery
+	{
+		$this->params[$paramName] = $value;
+		return $this;
+	}
+
+
+
 	/*-----------------------------------------------BUILD FUNCTION-----------------------------------------------*/
 	
 	/**
 	 * 
 	 * @see Staple_Query::build()
+	 * @param bool $parameterized
+	 * @return string
 	 */
-	function build()
+	function build(bool $parameterized = null)
 	{
+		if(isset($parameterized))
+			$this->setParameterized($parameterized);
+
 		$stmt = 'DELETE ';
 		
 		//Flags

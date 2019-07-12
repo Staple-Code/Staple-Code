@@ -12,6 +12,9 @@ use PHPUnit\Framework\TestCase;
 use Staple\Auth\Auth;
 use Staple\Auth\AuthAdapter;
 use Staple\Auth\AuthRoute;
+use Staple\Exception\ConfigurationException;
+use Staple\Query\Connection;
+use \Exception;
 
 class FakeAuthAdapter implements AuthAdapter
 {
@@ -97,13 +100,33 @@ class FakeAuthAdapter implements AuthAdapter
 
 class AuthTest extends TestCase
 {
+	/**
+	 * @throws ConfigurationException
+	 */
+	protected function setUp()
+	{
+		$conn = Connection::get();
+		$conn->query('CREATE TABLE IF NOT EXISTS accounts (id INT PRIMARY KEY, username VARCHAR(50), password VARCHAR(50), accountType VARCHAR(10))');
+	}
 
+	/**
+	 * @throws ConfigurationException
+	 */
+	protected function tearDown()
+	{
+		$conn = Connection::get();
+		$conn->query('DROP TABLE IF EXISTS accounts');
+	}
 
 	public function getAuth()
 	{
 		return new Auth();
 	}
 
+	/**
+	 * @test
+	 * @throws Exception
+	 */
 	public function testLoginWithArrayOfCredentials()
 	{
 		$auth = $this->getAuth();
@@ -120,6 +143,10 @@ class AuthTest extends TestCase
 		$this->assertTrue($auth->isAuthed());
 	}
 
+	/**
+	 * @test
+	 * @throws Exception
+	 */
 	public function testFailedLoginWithArrayOfCredentials()
 	{
 		$auth = $this->getAuth();
@@ -136,6 +163,10 @@ class AuthTest extends TestCase
 		$this->assertFalse($auth->isAuthed());
 	}
 
+	/**
+	 * @test
+	 * @throws Exception
+	 */
 	public function testLoginAndLogOut()
 	{
 		$auth = $this->getAuth();

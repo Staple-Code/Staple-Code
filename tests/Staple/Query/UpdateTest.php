@@ -22,6 +22,10 @@ class UpdateTest extends TestCase
 		return new MockConnection($driver);
 	}
 
+	/**
+	 * @test
+	 * @throws QueryException
+	 */
 	public function testQueryWithSchema()
 	{
 		//Setup
@@ -50,12 +54,30 @@ class UpdateTest extends TestCase
 			'state'=>'MA',
 			'zip'=>'02110'
 		];
-		$query = Query::update(self::TABLE_NAME,$columns,$connSqlSrv)
-			->setSchema('myschema')
-			->whereEqual('id', 5);
+		try
+		{
+			$query = Query::update(self::TABLE_NAME, $columns, $connSqlSrv)
+				->setSchema('myschema')
+				->whereEqual('id', 5);
+		}
+		catch(QueryException $e)
+		{
+			$this->fail('Query Builder should not throw an exception: '.$e->getMessage());
+			return;
+		}
 
 		//Assert
-		$expected = "UPDATE myschema.".self::TABLE_NAME."\nSET first_name='Larry', last_name='Smith', address='123 1st St.', city='Boston', state='MA', zip='02110'\nWHERE id = 5";
-		$this->assertEquals($expected,(string)$query);
+		$expected = "UPDATE myschema.".self::TABLE_NAME."\nSET first_name=:first_name, last_name=:last_name, address=:address, city=:city, state=:state, zip=:zip\nWHERE id = :id";
+		$expectedParamArray = [
+			'first_name'=>'Larry',
+			'last_name'=>'Smith',
+			'address'=>'123 1st St.',
+			'city'=>'Boston',
+			'state'=>'MA',
+			'zip'=>'02110',
+			'id' => 5,
+		];
+		$this->assertEquals($expected, (string)$query);
+		$this->assertEquals($expectedParamArray, $query->getParams());
 	}
 }

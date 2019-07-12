@@ -80,8 +80,10 @@ class InsertMultiple extends Insert
 	/**
 	 * (non-PHPdoc)
 	 * @see Staple_Query_Insert::build()
+	 * @param bool $parameterized
+	 * @return string
 	 */
-	public function build()
+	public function build(bool $parameterized = null)
 	{
 		//Statement start
 		$stmt = "INSERT ";
