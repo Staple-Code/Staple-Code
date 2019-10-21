@@ -113,8 +113,17 @@ class Layout
 				$this->doctype = self::DOC_HTML5;
 		}
 
-		$settings = Config::get('layout');
+		$pageConfig = Config::get('page');
+		if(is_array($pageConfig))
+		{
+			//Add the default title to the layout
+			if (array_key_exists('title', $pageConfig))
+			{
+				$this->setTitle($pageConfig['title']);
+			}
+		}
 
+		$settings = Config::get('layout');
 		if(is_array($settings))
 		{
 			//Add the default title to the layout

@@ -17,4 +17,9 @@ class TestController extends Controller
 	{
 		return View::create();
 	}
+
+	public function underscored_route($param = '')
+	{
+		return 'Underscored Route'.htmlentities($param);
+	}
 }

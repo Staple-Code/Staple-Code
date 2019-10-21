@@ -398,7 +398,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 
 		//check for a new ID and apply it to the data set.
 		/** @var Insert $query */
-		if($query instanceof Insert)
+		if($query instanceof Insert && $result != false)
 			$this->_data[$this->_primaryKey] = $query->getInsertId();
 
 		//Return the boolean of success or failure.
