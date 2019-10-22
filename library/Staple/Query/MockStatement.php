@@ -13,15 +13,26 @@ use PDO;
 class MockStatement implements IStatement
 {
 	/**
+	 * The Query String
+	 * @var string
+	 */
+	public $queryString;
+	/**
 	 * Result rows.
 	 * @var array
 	 */
-	protected $rows;
+	protected $rows = [];
 	/**
 	 * The database driver that is currently in use.
 	 * @var string
 	 */
 	protected $driver;
+
+	/**
+	 * The Connection object
+	 * @var IConnection
+	 */
+	protected $connection;
 
 	/**
 	 * @return array
@@ -73,6 +84,11 @@ class MockStatement implements IStatement
 		return $this->getCount();
 	}
 
+	public function errorInfo()
+	{
+		return [];
+	}
+
 	/**
 	 * Get the driver string
 	 * @return string
@@ -91,6 +107,24 @@ class MockStatement implements IStatement
 		$this->driver = $driver;
 	}
 
+	/**
+	 * @return IConnection
+	 */
+	public function getConnection(): IConnection
+	{
+		return $this->connection;
+	}
+
+	/**
+	 * @param IConnection $connection
+	 * @return IStatement
+	 */
+	public function setConnection(IConnection $connection): IStatement
+	{
+		$this->connection = $connection;
+		return $this;
+	}
+
 	public function bindColumn($column, &$param, $type = null, $maxlen = null, $driverdata = null)
 	{
 		return true;
@@ -106,4 +140,12 @@ class MockStatement implements IStatement
 		return true;
 	}
 
+	/**
+	 * @param null $bound_input_params
+	 * @return mixed
+	 */
+	public function execute($bound_input_params = NULL)
+	{
+		return true;
+	}
 }

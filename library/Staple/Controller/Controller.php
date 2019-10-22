@@ -85,8 +85,8 @@ abstract class Controller
 	 * @param string $method
 	 * @return bool
 	 * @throws AuthException
-	 * @throws ReflectionException
 	 * @throws RoutingException
+	 * @throws ReflectionException
 	 */
 	public function _auth($method)
 	{

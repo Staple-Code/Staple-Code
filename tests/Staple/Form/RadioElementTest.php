@@ -11,13 +11,13 @@ namespace Staple\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Staple\Form\RadioElement;
-use Staple\Form\Validate\AlnumValidator;
-use Staple\Form\Validate\DateValidator;
-use Staple\Form\Validate\EmailValidator;
-use Staple\Form\Validate\InArrayValidator;
-use Staple\Form\Validate\LengthValidator;
+use Staple\Validate\AlnumValidator;
+use Staple\Validate\DateValidator;
+use Staple\Validate\EmailValidator;
+use Staple\Validate\LengthValidator;
 use Staple\Form\ViewAdapters\BootstrapViewAdapter;
 use Staple\Form\ViewAdapters\FoundationViewAdapter;
+use Staple\Validate\InArrayValidator;
 
 class RadioElementTest extends TestCase
 {
@@ -204,7 +204,7 @@ class RadioElementTest extends TestCase
 		];
 
 		//Validate In Array
-		$element->addValidator(InArrayValidator::create(array_keys($array)));
+		$element->addValidator(InArrayValidator::create(null, array_keys($array)));
 		$element->setValue(4);
 		$this->assertTrue($element->isValid());
 		$element->setValue('2');

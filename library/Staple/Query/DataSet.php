@@ -22,7 +22,11 @@
  */
 namespace Staple\Query;
 
-class DataSet implements \ArrayAccess, \Iterator, \Countable
+use Staple\Exception\ConfigurationException;
+use Staple\Exception\QueryException;
+use ArrayAccess, Iterator, Countable;
+
+class DataSet implements ArrayAccess, Iterator, Countable
 {
 	/**
 	 * Array of data contained in the set
@@ -41,10 +45,17 @@ class DataSet implements \ArrayAccess, \Iterator, \Countable
 	protected $connection;
 
 	/**
+	 * Parameterized Flag
+	 * @var bool
+	 */
+	protected $parameterized = true;
+
+	/**
 	 * @param array $data
 	 * @param IConnection $connection
+	 * @param bool $parameterized
 	 */
-	public function __construct(array $data = NULL, IConnection $connection = NULL)
+	public function __construct(array $data = NULL, IConnection $connection = NULL, bool $parameterized = true)
 	{
 		if(isset($data))
 		{
@@ -52,11 +63,15 @@ class DataSet implements \ArrayAccess, \Iterator, \Countable
 		}
 		if(isset($connection))
 			$this->setConnection($connection);
+
+		//Set Parameterized Flag
+		$this->setParameterized($parameterized);
 	}
 
 	/**
 	 * Return the currently set connection or attempt to retrieve the default connection if non specified.
 	 * @return IConnection
+	 * @throws ConfigurationException
 	 */
 	public function getConnection()
 	{
@@ -74,6 +89,24 @@ class DataSet implements \ArrayAccess, \Iterator, \Countable
 	public function setConnection(IConnection $connection)
 	{
 		$this->connection = $connection;
+		return $this;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isParameterized(): bool
+	{
+		return $this->parameterized;
+	}
+
+	/**
+	 * @param bool $parameterized
+	 * @return DataSet
+	 */
+	public function setParameterized(bool $parameterized): DataSet
+	{
+		$this->parameterized = $parameterized;
 		return $this;
 	}
 	
@@ -251,6 +284,19 @@ class DataSet implements \ArrayAccess, \Iterator, \Countable
 	}
 
 	/**
+	 * Return a bool if the column is a literal column.
+	 * @param $column
+	 * @return bool
+	 */
+	public function isLiteral($column)
+	{
+		if(array_key_exists($column, $this->literal))
+			if($this->literal[$column] === true)
+				return true;
+		return false;
+	}
+
+	/**
 	 * @param $column
 	 * @param $data
 	 * @return $this
@@ -279,25 +325,31 @@ class DataSet implements \ArrayAccess, \Iterator, \Countable
 	/**
 	 * Get the INSERT string for the data in this object.
 	 * @return string
+	 * @throws ConfigurationException
+	 * @throws QueryException
 	 */
 	public function getInsertString()
 	{
-		$stmt = '('.implode(',',$this->getColumns()).') ';
+		$stmt = '('.implode(', ', $this->getColumns()).') ';
 		$stmt .= "\nVALUES (";
 		$colCount = 0;
 		foreach ($this->data as $name=>$col)
 		{
 			if($colCount > 0)
 			{
-				$stmt .= ',';
+				$stmt .= ', ';
 			}
 			if($this->literal[$name] === true)
 			{
 				$stmt .= $col;
 			}
-			else
+			elseif($this->parameterized !== true)
 			{
 				$stmt .= Query::convertTypes($col,$this->getConnection());
+			}
+			else
+			{
+				$stmt .= $this->makeParameterizedName($name);
 			}
 			$colCount++;
 		}
@@ -308,6 +360,8 @@ class DataSet implements \ArrayAccess, \Iterator, \Countable
 	/**
 	 * Get the multi-insert string for the data in this object.
 	 * @return string
+	 * @throws ConfigurationException
+	 * @throws QueryException
 	 */
 	public function getInsertMultipleString()
 	{
@@ -317,15 +371,19 @@ class DataSet implements \ArrayAccess, \Iterator, \Countable
 		{
 			if($colCount > 0)
 			{
-				$stmt .= ',';
+				$stmt .= ', ';
 			}
 			if($this->literal[$name] === true)
 			{
 				$stmt .= $col;
 			}
-			else
+			elseif($this->parameterized !== true)
 			{
 				$stmt .= Query::convertTypes($col,$this->getConnection());
+			}
+			else
+			{
+				$stmt .= $this->makeParameterizedName($name);
 			}
 			$colCount++;
 		}
@@ -336,6 +394,8 @@ class DataSet implements \ArrayAccess, \Iterator, \Countable
 	/**
 	 * Get the UPDATE string for the data in this object.
 	 * @return string
+	 * @throws ConfigurationException
+	 * @throws QueryException
 	 */
 	public function getUpdateString()
 	{
@@ -352,12 +412,30 @@ class DataSet implements \ArrayAccess, \Iterator, \Countable
 			{
 				$stmt .= $col;
 			}
-			else
+			elseif($this->parameterized !== true)
 			{
 				$stmt .= Query::convertTypes($col,$this->getConnection());
+			}
+			else
+			{
+				$stmt .= $this->makeParameterizedName($name);
 			}
 			$colCount++;
 		}
 		return $stmt;
+	}
+
+	/**
+	 * @param $paramName
+	 * @return bool|string
+	 */
+	private function makeParameterizedName($paramName)
+	{
+		$paramName = Query::sanitizeParamName($paramName);
+
+		if(substr($paramName,0,1) !== ':')
+			$paramName = ':' . $paramName;
+
+		return $paramName;
 	}
 }

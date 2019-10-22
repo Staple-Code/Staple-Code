@@ -24,8 +24,9 @@ namespace Staple\Form;
 
 use Exception;
 use Staple\Error;
+use Staple\Exception\FormBuildException;
 
-class SelectElement extends FieldElement
+class SelectElement extends FieldElement implements IFieldElement
 {
 	const SORT_VALUES = 1;
 	const SORT_LABELS_ALPHA = 2;
@@ -93,6 +94,7 @@ class SelectElement extends FieldElement
 	 * Sets the value for the select box
 	 * @param mixed $val
 	 * @return static
+     * @throws FormBuildException
 	 */
 	public function setValue($val)
 	{
@@ -155,21 +157,16 @@ class SelectElement extends FieldElement
 	 * options.
 	 * 
 	 * @param array $options
-	 * @param boolean $labelvalues
-	 * @throws Exception
+	 * @param boolean $labelValues
 	 * @return $this
 	 */
-	public function addOptionsArray(array $options, $labelvalues = FALSE)
+	public function addOptionsArray(array $options, $labelValues = FALSE)
 	{
 		foreach($options as $value=>$label)
 		{
-			if(is_array($value) || is_resource($value))
+			if(!is_array($value) && !is_resource($value))
 			{
-				throw new Exception('Select values must be strings or integers.', Error::APPLICATION_ERROR);
-			}
-			else
-			{
-				if($labelvalues === true)
+				if($labelValues === true)
 				{
 					$this->options[$label] = $label;
 				}
@@ -269,7 +266,7 @@ class SelectElement extends FieldElement
 	public function build()
 	{
 		$buf = '';
-		$view = FORMS_ROOT.'/fields/SelectElement.phtml';
+		$view = FORMS_ROOT.'fields/SelectElement.phtml';
 		if(file_exists($view))
 		{
 			ob_start();

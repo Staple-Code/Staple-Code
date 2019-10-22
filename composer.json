@@ -13,7 +13,9 @@
     }
   ],
   "require": {
-    "php": ">=7.0",
+    "php": ">=7.1",
+    "ext-pdo": "*",
+    "ext-json": "*",
     "twig/twig":"~2.0",
     "phpunit/phpunit": "^6.0",
     "predis/predis":"1.1.*@dev",
@@ -28,5 +30,8 @@
     "psr-0": {
       "Staple": "library/"
     }
+  },
+  "require-dev": {
+    "codacy/coverage": "dev-master"
   }
 }

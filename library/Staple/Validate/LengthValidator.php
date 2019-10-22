@@ -20,12 +20,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Staple\Form\Validate;
+namespace Staple\Validate;
 
-use Staple\Form\FieldElement;
-use Staple\Form\FieldValidator;
-
-class LengthValidator extends FieldValidator
+class LengthValidator extends BaseValidator
 {
 	const DEFAULT_ERROR = 'Field does not meet length requirements.';
 	const MIN_LENGTH_ERROR = 'Minimum length not met.';
@@ -40,9 +37,9 @@ class LengthValidator extends FieldValidator
 	 * 
 	 * @param int $limit1
 	 * @param int $limit2
-	 * @param string $usermsg
+	 * @param string $userMessage
 	 */
-	public function __construct($limit1, $limit2 = NULL, $usermsg = NULL)
+	public function __construct($limit1, $limit2 = NULL, $userMessage = NULL)
 	{
 		$this->min = (int)$limit1;
 		if(isset($limit2))
@@ -57,13 +54,13 @@ class LengthValidator extends FieldValidator
 				$this->max = (int)$limit1;
 			}
 		}
-		parent::__construct($usermsg);
+		parent::__construct($userMessage);
 	}
 	
 	/**
 	 * @return int $min
 	 */
-	public function getMin()
+	public function getMin(): int
 	{
 		return $this->min;
 	}
@@ -71,7 +68,7 @@ class LengthValidator extends FieldValidator
 	/**
 	 * @return int $max
 	 */
-	public function getMax()
+	public function getMax(): int
 	{
 		return $this->max;
 	}
@@ -80,7 +77,7 @@ class LengthValidator extends FieldValidator
 	 * @param int $min
 	 * @return $this
 	 */
-	public function setMin($min)
+	public function setMin(int $min): LengthValidator
 	{
 		$this->min = $min;
 		return $this;
@@ -90,7 +87,7 @@ class LengthValidator extends FieldValidator
 	 * @param int $max
 	 * @return $this
 	 */
-	public function setMax($max)
+	public function setMax(int $max): LengthValidator
 	{
 		$this->max = $max;
 		return $this;
@@ -101,7 +98,7 @@ class LengthValidator extends FieldValidator
 	 * @param mixed $data
 	 * @return boolean
 	 */
-	public function check($data)
+	public function check($data): bool
 	{
 		$data = (string)$data;
 		if(strlen($data) >= $this->min)
@@ -116,51 +113,14 @@ class LengthValidator extends FieldValidator
 			}
 			else 
 			{
-				$this->addError(self::MAX_LENGTH_ERROR);
+				$this->addError($this->userMessage ?? self::MAX_LENGTH_ERROR);
 			}
 		}
 		else
 		{
-			$this->addError(self::MIN_LENGTH_ERROR);
+			$this->addError($this->userMessage ?? self::MIN_LENGTH_ERROR);
 		}
 
 		return false;
-	}
-
-	/**
-	 * @param string $fieldType
-	 * @param FieldElement $field
-	 * @return string
-	 */
-	public function clientJQuery($fieldType, FieldElement $field)
-	{
-		switch ($fieldType)
-		{
-			case 'Staple_Form_SelectElement':
-				$fieldid = "#{$field->getId()}";
-				$valstring = "#{$field->getId()} option:selected";
-				break;
-			case 'Staple_Form_RadioGroup':
-				$fieldid = "input:radio[name={$field->getName()}]";
-				$valstring = "input:radio[name={$field->getName()}]:checked";
-				break;
-			case 'Staple_Form_CheckboxElement':
-				return '';
-				break;
-			default:
-				$fieldid = "#{$field->getId()}";
-				$valstring = $fieldid;
-		}
-		
-		$script = "\t//Length Validator for ".addslashes($field->getLabel())."\n";
-		$script .= "\tif($('$valstring').val().length > {$this->getMax()} || $('$valstring').val().length < {$this->getMin()})\n";
-		$script .= "\t{\n";
-		$script .= "\t\terrors.push('".addslashes($field->getLabel()).": \\n{$this->clientJSError()}\\n');\n";
-		$script .= "\t\t$('$fieldid').addClass('form_error');\n";
-		$script .= "\t}\n";
-		$script .= "\telse {\n";
-		$script .= "\t\t$('$fieldid').removeClass('form_error');\n";
-		$script .= "\t}\n";
-		return $script;
 	}
 }

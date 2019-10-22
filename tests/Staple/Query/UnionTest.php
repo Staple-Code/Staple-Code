@@ -8,6 +8,7 @@
 
 namespace Staple\Tests;
 
+use Staple\Exception\QueryException;
 use Staple\Query\MockConnection;
 use Staple\Query\Query;
 use PHPUnit\Framework\TestCase;
@@ -21,6 +22,10 @@ class UnionTest extends TestCase
 		return new MockConnection($driver);
 	}
 
+	/**
+	 * @test
+	 * @throws QueryException
+	 */
 	public function testQueryWithSchema()
 	{
 		//Setup
@@ -49,7 +54,10 @@ class UnionTest extends TestCase
 			->orderBy(['last_name','first_name']);
 
 		//Assert
-		$expected = "SELECT \n\t*\n\tFROM (SELECT\nfirst_name, last_name, address, city, state, zip \nFROM myschema.customers\nINNER JOIN myschema.orders ON orders.customer_id = customers.id\nWHERE deleted IS NULL\nUNION \nSELECT\nfirst_name, last_name, address, city, state, zip \nFROM myschema.customers\nINNER JOIN myschema.orders ON orders.customer_id = customers.id\nWHERE id = 10) AS stapleunion\nORDER BY last_name,first_name";
+		$expected = "SELECT \n\t*\n\tFROM (SELECT\nfirst_name, last_name, address, city, state, zip \nFROM myschema.customers\nINNER JOIN myschema.orders ON orders.customer_id = customers.id\nWHERE deleted IS NULL\nUNION \nSELECT\nfirst_name, last_name, address, city, state, zip \nFROM myschema.customers\nINNER JOIN myschema.orders ON orders.customer_id = customers.id\nWHERE id = :id) AS stapleunion\nORDER BY last_name,first_name";
 		$this->assertEquals($expected,(string)$query);
+
+		$expectedParams = ['id' => 10];
+		$this->assertEquals($expectedParams, $query->getParams());
 	}
 }

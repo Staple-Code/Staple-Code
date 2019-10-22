@@ -1,8 +1,8 @@
 <?php
 /** 
- * Validates against callback
+ * Validate that a field is equal to a value.
  * 
- * @author Hans Heeling
+ * @author Ironpilot
  * @copyright Copyright (c) 2011, STAPLE CODE
  * 
  * This file is part of the STAPLE Framework.
@@ -20,56 +20,49 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Staple\Form\Validate;
+namespace Staple\Validate;
 
-use Staple\Form\FieldElement;
-use Staple\Form\FieldValidator;
-
-class CallbackValidator extends FieldValidator
+class EqualValidator extends BaseValidator
 {
-	const DEFAULT_ERROR = 'Field Error';
-
-	/**
-	 * @var callable
-	 */
-	protected $callback;
-
-	/**
-	 * Callback validator for field validation
-	 * 
-	 * @param callable $callback
-	 * @param string $usermsg
-	 */
-	public function __construct(callable $callback, $usermsg = NULL)
+	const DEFAULT_ERROR = 'Data is not equal.';
+	protected $strict;
+	protected $equal;
+	
+	public function __construct($equal, $strict = false, $userMessage = NULL)
 	{
-		$this->callback = $callback;
-		parent::__construct($usermsg);
+		$this->equal = $equal;
+		$this->strict = (bool)$strict;
+		parent::__construct($userMessage);
 	}
 
 	/**
-	 * Check for data validity using given callback.
 	 * @param mixed $data
-	 * @return boolean
+	 * @return bool
 	 */
-	public function check($data)
+	public function check($data): bool
 	{
-		if(call_user_func($this->callback, $data))
+		if($this->strict === true)
 		{
-			return true;
+			if($this->equal === $data)
+			{
+				return true;
+			}
+			else
+			{
+				$this->addError();
+			}
 		}
 		else
 		{
-			$this->addError();
+			if($this->equal == $data)
+			{
+				return true;
+			}
+			else
+			{
+				$this->addError();
+			}
 		}
 		return false;
-	}
-	
-	/**
-	 * (non-PHPdoc)
-	 * @see Staple_Form_Validator::clientJQuery()
-	 */
-	public function clientJQuery($fieldType, FieldElement $field)
-	{
-		return NULL;
 	}
 }

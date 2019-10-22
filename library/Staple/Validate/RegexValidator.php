@@ -19,12 +19,9 @@
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-namespace Staple\Form\Validate;
+namespace Staple\Validate;
 
-use Staple\Form\FieldElement;
-use Staple\Form\FieldValidator;
-
-class RegexValidator extends FieldValidator
+class RegexValidator extends BaseValidator
 {
 	/**
 	 * Constant for validating usernames. Usernames must be 6-50 characters and include only letters, numbers and underscores.
@@ -52,12 +49,12 @@ class RegexValidator extends FieldValidator
 	/**
 	 * Constructor sets the regex value to validate against and supports an optional user message.
 	 * @param string $regex
-	 * @param string $usermsg
+	 * @param string $userMessage
 	 */
-	function __construct($regex,$usermsg = NULL)
+	function __construct($regex, $userMessage = NULL)
 	{
 		$this->setRegex($regex);
-		parent::__construct($usermsg);
+		parent::__construct($userMessage);
 	}
 	
 	/**
@@ -65,7 +62,7 @@ class RegexValidator extends FieldValidator
 	 * @param string $regex
 	 * @return $this
 	 */
-	public function setRegex($regex)
+	public function setRegex($regex): RegexValidator
 	{
 		$this->regex = $regex;
 		return $this;
@@ -75,7 +72,7 @@ class RegexValidator extends FieldValidator
 	 * Returns the regex value
 	 * @return string $regex
 	 */
-	public function getRegex()
+	public function getRegex(): string
 	{
 		return $this->regex;
 	}
@@ -83,7 +80,7 @@ class RegexValidator extends FieldValidator
 	/**
 	 * @return array
 	 */
-	public function getMatches()
+	public function getMatches(): array
 	{
 		return $this->matches;
 	}
@@ -93,7 +90,7 @@ class RegexValidator extends FieldValidator
 	 * @return  bool
 	 * @see Staple_Form_Validator::check()
 	 */
-	public function check($data)
+	public function check($data): bool
 	{
 		if(preg_match($this->regex, $data, $this->matches) >= 1)
 		{
@@ -104,42 +101,5 @@ class RegexValidator extends FieldValidator
 			$this->addError();
 			return false;
 		}
-	}
-
-	/**
-	 * @param string $fieldType
-	 * @param FieldElement $field
-	 * @return string
-	 */
-	public function clientJQuery($fieldType, FieldElement $field)
-	{
-		switch ($fieldType)
-		{
-			case 'Staple_Form_SelectElement':
-				$fieldid = "#{$field->getId()}";
-				$valstring = "#{$field->getId()} option:selected";
-				break;
-			case 'Staple_Form_RadioGroup':
-				$fieldid = "input:radio[name={$field->getName()}]";
-				$valstring = "input:radio[name={$field->getName()}]:checked";
-				break;
-			case 'Staple_Form_CheckboxElement':
-				return '';
-				break;
-			default:
-				$fieldid = "#{$field->getId()}";
-				$valstring = $fieldid;
-		}
-		
-		$script = "\t//Regex Validator for ".addslashes($field->getLabel())."\n";
-		$script .= "\tif(!(".$this->getRegex().".test($('$valstring').val())))\n\t{\n";
-		$script .= "\t\terrors.push('".addslashes($field->getLabel()).": \\n{$this->clientJSError()}\\n');\n";
-		$script .= "\t\t$('$fieldid').addClass('form_error');\n";
-		$script .= "\t}\n";
-		$script .= "\telse {\n";
-		$script .= "\t\t$('$fieldid').removeClass('form_error');\n";
-		$script .= "\t}\n";
-		
-		return $script;
 	}
 }

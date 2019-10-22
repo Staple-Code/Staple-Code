@@ -21,43 +21,42 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Staple\Form\Validate;
+namespace Staple\Validate;
 
 use finfo;
-use Staple\Form\FieldValidator;
 
-class UploadedFileValidator extends FieldValidator
+class UploadedFileValidator extends BaseValidator
 {
 	const DEFAULT_ERROR = 'File is not valid.';
 
-	/** @var string|string[] $mimeCheck */
+	/** @var string[] $mimeCheck */
 	protected $mimeCheck = NULL;
 	
-	public function __construct($mimetype = NULL, $usermsg = NULL)
+	public function __construct(array $mimeType = NULL, $userMessage = NULL)
 	{
-		if(isset($usermsg))
+		if(isset($userMessage))
 		{
-			parent::__construct($usermsg);
+			parent::__construct($userMessage);
 		}
-		if(isset($mimetype))
+		if(isset($mimeType))
 		{
-			$this->setMimeCheck($mimetype);
+			$this->setMimeCheck($mimeType);
 		}
 	}
 
 	/**
-	 * @return string $mimeCheck
+	 * @return array $mimeCheck
 	 */
-	public function getMimeCheck()
+	public function getMimeCheck(): array
 	{
 		return $this->mimeCheck;
 	}
 
 	/**
-	 * @param string $mimeCheck
+	 * @param array $mimeCheck
 	 * @return $this
 	 */
-	public function setMimeCheck($mimeCheck)
+	public function setMimeCheck(array $mimeCheck): UploadedFileValidator
 	{
 		$this->mimeCheck = $mimeCheck;
 		return $this;
@@ -65,11 +64,11 @@ class UploadedFileValidator extends FieldValidator
 
 	/**
 	 * Run the validation
-	 * @param  mixed $data
+	 * @param array $data
 	 * @return  bool
 	 * @see Staple_Form_Validator::check()
 	 */
-	public function check($data)
+	public function check($data): bool
 	{
 		if(is_array($data))
 		{
