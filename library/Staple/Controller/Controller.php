@@ -91,7 +91,7 @@ abstract class Controller
 	public function _auth($method)
 	{
 		$method = (string)$method;
-		if(!ctype_alnum($method))
+		if(!ctype_alnum(str_ireplace('_', '', $method)))
 		{
 			throw new AuthException('Authentication Validation Error', Error::AUTH_ERROR);
 		}
