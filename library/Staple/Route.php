@@ -33,7 +33,7 @@ use Staple\Exception\AuthException;
 use Staple\Exception\ConfigurationException;
 use Staple\Exception\PageNotFoundException;
 use Staple\Exception\RoutingException;
-use ReflectionException, Exception;
+use Exception;
 
 class Route
 {
