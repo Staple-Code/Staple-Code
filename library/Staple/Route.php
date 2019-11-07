@@ -33,6 +33,7 @@ use Staple\Exception\AuthException;
 use Staple\Exception\ConfigurationException;
 use Staple\Exception\PageNotFoundException;
 use Staple\Exception\RoutingException;
+use Exception;
 
 class Route
 {
@@ -44,6 +45,7 @@ class Route
 	const PROVIDER_SUFFIX = "Provider";
 	const DEFAULT_ACTION = 'index';
 	const DEFAULT_CONTROLLER = 'index';
+	const ACCEPTABLE_ROUTE_SPECIAL_CHARACTERS = ['-','_'];
 	const ACCEPTABLE_FUNCTION_ROUTE_CHARACTERS = ['{','}','_','-','/'];
 
 	/**
@@ -177,6 +179,7 @@ class Route
 	 * @throws RoutingException
 	 * @throws PageNotFoundException
 	 * @throws AuthException
+	 * @throws ReflectionException
 	 */
 	public function execute()
 	{
@@ -288,6 +291,7 @@ class Route
 	 *
 	 * @throws RoutingException
 	 * @throws ReflectionException
+	 * @throws Exception
 	 */
 	protected function dispatchController()
 	{
@@ -300,7 +304,7 @@ class Route
 			{
 				$actionMethod = new ReflectionMethod($controller, $this->getAction());
 			}
-			catch(\ReflectionException $e)
+			catch(ReflectionException $e)
 			{
 				throw new RoutingException('Failed Controller Method Reflection', $e->getCode(), $e);
 			}
@@ -368,7 +372,7 @@ class Route
 						Dev::dump($return);
 					}
 				}
-				catch (\ReflectionException $e)
+				catch (ReflectionException $e)
 				{
 					throw new RoutingException('Failed Controller Class Reflection', $e->getCode(), $e);
 				}
@@ -388,7 +392,7 @@ class Route
 	 * Push the route to a Restful Controller
 	 * @param $providerClass
 	 * @throws RoutingException
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	private function routeToProvider($providerClass)
 	{
@@ -697,7 +701,7 @@ class Route
 		
 		//Check the Action Value and Set a valid value
 		$action = str_replace(['{','}'], '', array_shift($splitRoute));
-		if(ctype_alnum(str_replace('-', '', $action)) && ctype_alpha(substr($action, 0, 1)))
+		if(ctype_alnum(str_replace(self::ACCEPTABLE_ROUTE_SPECIAL_CHARACTERS, '', $action)) && ctype_alpha(substr($action, 0, 1)))
 		{
 			$this->setAction(Link::methodCase($action));
 		}
@@ -912,7 +916,7 @@ class Route
 					Dev::dump($return);
 				}
 			}
-			catch (\ReflectionException $e)
+			catch (ReflectionException $e)
 			{
 				throw new RoutingException('Failed Controller Class Reflection', $e->getCode(), $e);
 			}

@@ -28,6 +28,12 @@ use Staple\Auth\AuthAdapter;
 use Staple\Auth\AuthRoute;
 use Staple\Request;
 use Staple\Route;
+use \Staple\Exception\AuthException;
+use \Staple\Exception\ConfigurationException;
+use \Staple\Exception\PageNotFoundException;
+use \Staple\Exception\RoutingException;
+use \Staple\Exception\SessionException;
+use \Staple\Exception\SystemException;
 
 class FakeCtrlAuthAdapter implements AuthAdapter
 {
@@ -117,13 +123,24 @@ class ControllerTest extends TestCase
 	const ROUTE_AUTHENTICATED = 'test/authenticated';
 	const ROUTE_PROTECTED = 'protected/data';
 	const ROUTE_UNPROTECTED_VIEW = 'protected/index';
+	const NOINDEX_ROUTE1_RESULT = 'Account List...';
 
+	/**
+	 * @throws ConfigurationException
+	 * @throws SessionException
+	 * @throws SystemException
+	 */
 	protected function setUp()
 	{
 		//Clear auth before each test.
 		Auth::get()->clearAuth();
 	}
 
+	/**
+	 * @throws AuthException
+	 * @throws PageNotFoundException
+	 * @throws RoutingException
+	 */
 	public function testRouting()
 	{
 		//View Route
@@ -136,6 +153,15 @@ class ControllerTest extends TestCase
 		$this->assertEquals('This is a test View.', $textBuffer);
 	}
 
+	/**
+	 * @test
+	 * @throws AuthException
+	 * @throws ConfigurationException
+	 * @throws PageNotFoundException
+	 * @throws RoutingException
+	 * @throws SessionException
+	 * @throws SystemException
+	 */
 	public function testAuthenticatedRouting()
 	{
 		//Setup Auth Object
@@ -167,6 +193,15 @@ class ControllerTest extends TestCase
 		$this->assertTrue($auth->isAuthed());
 	}
 
+	/**
+	 * @test
+	 * @throws AuthException
+	 * @throws ConfigurationException
+	 * @throws PageNotFoundException
+	 * @throws RoutingException
+	 * @throws SessionException
+	 * @throws SystemException
+	 */
 	public function testAuthenticatedRoutingWithGlobalControllerProtection()
 	{
 		//View Route
@@ -205,5 +240,48 @@ class ControllerTest extends TestCase
 
 		$this->assertEquals('Authenticated Content', $textBuffer);
 		$this->assertTrue($auth->isAuthed());
+	}
+
+	/**
+	 * @test
+	 * @throws AuthException
+	 * @throws PageNotFoundException
+	 * @throws RoutingException
+	 */
+	public function testIndexNotRequired()
+	{
+		$route1 = new Route('no-index/account');
+		$route2 = new Route('no-index/index');
+		$route3 = new Route('no-index');
+
+		//Route 1
+		ob_start();
+		$route1->execute();
+		$route1Result = ob_get_contents();
+		ob_end_clean();
+
+		//Route 2
+		try
+		{
+			$route2->execute();
+			$this->fail('Should Throw PageNotFoundException');
+		}
+		catch (PageNotFoundException $e)
+		{
+			$this->assertInstanceOf('\Staple\Exception\PageNotFoundException', $e);
+		}
+
+		//Route 3
+		try
+		{
+			$route3->execute();
+			$this->fail('Should Throw PageNotFoundException');
+		}
+		catch (PageNotFoundException $e)
+		{
+			$this->assertInstanceOf('\Staple\Exception\PageNotFoundException', $e);
+		}
+
+		$this->assertEquals(self::NOINDEX_ROUTE1_RESULT, $route1Result);
 	}
 }

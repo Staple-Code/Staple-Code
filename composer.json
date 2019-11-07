@@ -19,7 +19,9 @@
     "twig/twig":"~2.0",
     "phpunit/phpunit": "^6.0",
     "predis/predis":"1.1.*@dev",
-    "auth0/auth0-php": "^5.0"
+    "codacy/coverage": "dev-master",
+    "auth0/auth0-php": "^5.0",
+    "ext-json": "*"
   },
   "suggest": {
     "ext-ctype": "Provide ctype function support for installs without the ctype extension."
