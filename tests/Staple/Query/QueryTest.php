@@ -26,13 +26,16 @@ namespace Staple\Tests;
 use PHPUnit\Framework\TestCase;
 use Staple\Exception\ConfigurationException;
 use Staple\Exception\QueryException;
+use Staple\Query\Condition;
 use Staple\Query\Connection;
+use Staple\Query\MockStatement;
 use Staple\Query\Query;
 use Staple\Query\MockConnection;
+use \DateTime;
 
 class QueryTest extends TestCase
 {
-	const PARAMETERIZED_QUERY_STRING = "SELECT\n* \nFROM customers\nWHERE city = :city AND age = :age";
+	const PARAMETERIZED_QUERY_STRING = "SELECT\n* \nFROM customers\nWHERE city = :city AND age = :age AND created <= :created";
 
 	private function getMockConnection()
 	{
@@ -142,9 +145,12 @@ class QueryTest extends TestCase
 		$connection = $this->getMockConnection();
 		$connection->setDriver(Connection::DRIVER_MYSQL);
 
+		$createdEpoch = new DateTime('1-1-1970');
+
 		$query = Query::select('customers', null, $connection)
 			->whereEqual('city', 'Memphis')
-			->whereEqual('age', 20);
+			->whereEqual('age', 20)
+			->where('created', Condition::LESS_EQUAL, $createdEpoch);
 
 		$queryString = $query->build();
 
@@ -152,7 +158,11 @@ class QueryTest extends TestCase
 
 		$params = $query->getParams();
 
-		$this->assertEquals(['city'=>'Memphis','age'=>20], $params);
+		$this->assertEquals(['city'=>'Memphis','age'=>20, 'created' => $createdEpoch], $params);
+
+		$result = $query->execute();
+
+		$this->assertInstanceOf(MockStatement::class, $result);
 	}
 
 	/**
@@ -164,9 +174,12 @@ class QueryTest extends TestCase
 		$connection = $this->getMockConnection();
 		$connection->setDriver(Connection::DRIVER_MYSQL);
 
+		$createdEpoch = new DateTime('1-1-1970');
+
 		$query = Query::select('customers', null, $connection)
 			->whereEqual('city', 'Memphis')
-			->whereEqual('age', 20);
+			->whereEqual('age', 20)
+			->where('created', Condition::LESS_EQUAL, $createdEpoch);
 
 		$this->assertEquals(self::PARAMETERIZED_QUERY_STRING, (string)$query);
 	}
