@@ -386,7 +386,7 @@ abstract class Query implements IQuery
 				case "object":
 					try
 					{
-						$value = self::convertTypes($value);
+						$value = ($value instanceof DateTime) ? $value->format('Y-m-d H:i:s') : (string)$value;
 					}
 					catch(\Error $e)
 					{
