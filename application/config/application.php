@@ -52,8 +52,8 @@ return [
 	],
 
 	'forms'	=> [
-		//'elementViewAdapter' => 'FormBootstrapViewAdapter',
-		//'elementViewAdapter' => 'FormFoundationViewAdapter',
+		//'elementViewAdapter' => 'Staple\Form\ViewAdapters\BootstrapViewAdapter',
+		//'elementViewAdapter' => 'Staple\Form\ViewAdapters\FoundationViewAdapter',
 	],
 
 	'db' => [
@@ -68,7 +68,7 @@ return [
 	],
 
 	'auth' => [
-		'adapter' 			=> 'DBAuthAdapter',
+		'adapter' 			=> 'Staple\Auth\DBAuthAdapter',
 	],
 
 	'oauth'	=> [
