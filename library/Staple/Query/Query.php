@@ -386,9 +386,14 @@ abstract class Query implements IQuery
 				case "object":
 					try
 					{
-						$value = (string)$value;
+						$value = self::convertTypes($value);
 					}
-					catch(Exception $e) {
+					catch(\Error $e)
+					{
+						throw new QueryException('Could not convert object to string for query.', 0, $e);
+					}
+					catch(Exception $e)
+					{
 						throw new QueryException('Could not convert object to string for query.', 0, $e);
 					}
 					$type = PDO::PARAM_STR;
