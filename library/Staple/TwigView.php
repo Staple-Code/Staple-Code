@@ -25,8 +25,8 @@
  */
 namespace Staple;
 
-use Twig_Environment;
-use Twig_Loader_Array;
+use Twig\Environment;
+use Twig\Loader\ArrayLoader;
 
 class TwigView extends View
 {
@@ -70,8 +70,8 @@ class TwigView extends View
 					$viewContents = file_get_contents($view);
 
 					//Make a Twig
-					$twigLoader = new Twig_Loader_Array(['view.html'=>$viewContents]);
-					$twig = new Twig_Environment($twigLoader);
+					$twigLoader = new ArrayLoader(['view.html'=>$viewContents]);
+					$twig = new Environment($twigLoader);
 
 					//include the view
 					$twig->display('view.html',(array)$this->_store);

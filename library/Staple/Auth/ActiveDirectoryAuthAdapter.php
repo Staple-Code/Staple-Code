@@ -74,11 +74,12 @@ class ActiveDirectoryAuthAdapter implements AuthAdapter
 		}
 
 	}
-	
+
 	/**
 	 * getAuth checks Active Directory for valid credentials and returns true if they are found.
-	 * @param array $cred
+	 * @param mixed $cred
 	 * @return bool
+	 * @throws Exception
 	 * @see Staple_AuthAdapter::getAuth()
 	 */
 	public function getAuth($cred): bool
@@ -108,6 +109,7 @@ class ActiveDirectoryAuthAdapter implements AuthAdapter
 	/**
 	 * Gets the access level for the current $uid.
 	 * @return int
+	 * @throws Exception
 	 * @see Staple_AuthAdapter::getLevel()
 	 */
 	public function getLevel()
