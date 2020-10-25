@@ -49,9 +49,7 @@ class PhoneFormatFilter extends FieldFilter
 	 */
 	public function getName()
 	{
-		return 'phonefilter';
+		return 'phone';
 	}
 
 }
-
-?>

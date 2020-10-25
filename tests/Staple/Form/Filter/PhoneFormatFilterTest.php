@@ -1,6 +1,6 @@
 <?php
 /**
- * Converts a string to a DateTime Object.
+ * Unit Tests for \Staple\Form\Filter\PhoneFormatFilter object
  *
  * @author Ironpilot
  * @copyright Copyright (c) 2011, STAPLE CODE
@@ -20,37 +20,24 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Staple\Form\Filter;
-
-use DateTime;
-use Exception;
-use Staple\Form\FieldFilter;
-
-class ToDateTimeFilter extends FieldFilter
+namespace Staple\Tests;
+use PHPUnit\Framework\TestCase;
+use Staple\Form\Filter\PhoneFormatFilter;
+class PhoneFormatFilterTest extends TestCase
 {
-	/**
-	 * @param string $text
-	 * @return DateTime
-	 * @throws Exception
-	 */
-	public function filter($text)
-	{
-		try {
-			return new DateTime($text);
-		}
-		catch (Exception $e)
-		{
-			return new DateTime();
-		}
-	}
+    private function getTestObject()
+    {
+        return new PhoneFormatFilter();
+    }
+    /**
+     * Test the ability to format a phone number
+     */
+    public function testPhoneFilter()
+    {
+        $number = '1.123.456.7890';
+        $format = $this->getTestObject();
+        $this->assertEquals('1 (123) 456-7890',$format->filter($number));
 
-	/* (non-PHPdoc)
-	 * @see Staple_Form_Filter::getName()
-	 */
-	public function getName()
-	{
-		return 'datetime';
-	}
-
-
+        $this->assertEquals('phone', $format->getName());
+    }
 }
