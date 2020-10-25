@@ -23,6 +23,8 @@
 namespace Staple\Controller;
 
 use Exception;
+use ReflectionClass;
+use ReflectionMethod;
 use Staple\Auth\Auth;
 use Staple\Auth\IAuthService;
 use Staple\Autoload;
@@ -38,11 +40,12 @@ use Staple\Main;
 use Staple\Request;
 use Staple\Response;
 use Staple\Route;
+use Staple\Traits\Helpers;
 use Staple\View;
 
 abstract class RestfulController
 {
-	use \Staple\Traits\Helpers;
+	use Helpers;
 
 	const DEFAULT_ACTION = 'index';
 
@@ -99,8 +102,8 @@ abstract class RestfulController
 			if(method_exists($this,$method))
 			{
 				$auth = Auth::get();
-				$reflectMethod = new \ReflectionMethod($this, $method);
-				$reflectClass = new \ReflectionClass($this);
+				$reflectMethod = new ReflectionMethod($this, $method);
+				$reflectClass = new ReflectionClass($this);
 				$classComments = $reflectClass->getDocComment();
 				$methodComments = $reflectMethod->getDocComment();
 
@@ -148,8 +151,8 @@ abstract class RestfulController
 		{
 			if(method_exists($this, $method))
 			{
-				$reflectMethod = new \ReflectionMethod($this, $method);
-				$reflectClass = new \ReflectionClass($this);
+				$reflectMethod = new ReflectionMethod($this, $method);
+				$reflectClass = new ReflectionClass($this);
 				$classComments = $reflectClass->getDocComment();
 				$methodComments = $reflectMethod->getDocComment();
 
@@ -179,6 +182,7 @@ abstract class RestfulController
 	 * @throws AuthException
 	 * @throws PageNotFoundException
 	 * @throws RoutingException
+	 * @throws Exception
 	 */
 	public function route(array $route = [])
 	{
@@ -218,7 +222,7 @@ abstract class RestfulController
 				//Check if we need to run auth for the requested method
 				if($this->isAuthRequired($method))
 				{
-					if($this->_authService->doAuth(Request::get()))
+					if($this->_authService->doAuth(Request::BodyContent()))
 					{
 						//check for auth on the requested method.
 						if($this->auth($method) === true)
@@ -270,14 +274,13 @@ abstract class RestfulController
 	 *
 	 * @param string $method
 	 * @param array $params
-	 * @throws RoutingException
 	 */
 	protected function dispatch(string $method, array $params)
 	{
 		try
 		{
 			//Call the action
-			$actionMethod = new \ReflectionMethod($this, $method);
+			$actionMethod = new ReflectionMethod($this, $method);
 			$return = $actionMethod->invokeArgs($this, $params);
 
 			if($return instanceof View)        //Check for a returned View object
@@ -314,7 +317,7 @@ abstract class RestfulController
 			elseif(is_object($return))        //Check for another object type
 			{
 				//If the object is stringable, covert it to a string and output it.
-				$class = new \ReflectionClass($return);
+				$class = new ReflectionClass($return);
 				if($class->implementsInterface('JsonSerializable'))
 				{
 					echo json_encode($return);

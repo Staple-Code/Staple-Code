@@ -112,7 +112,7 @@ class MyViewAdapter extends ElementViewAdapter
 
 class FormTest extends TestCase
 {
-	protected function setUp()
+	protected function setUp(): void
 	{
 		parent::setUp();
 		Config::changeEnvironment(Config::DEFAULT_CONFIG_SET);

@@ -31,7 +31,10 @@
  */
 namespace Staple\Auth;
 
+use PDO;
 use Staple\Config;
+use Staple\Exception\ConfigurationException;
+use Staple\Exception\QueryException;
 use Staple\Query\Query;
 
 class DBAuthAdapter implements AuthAdapter
@@ -42,16 +45,17 @@ class DBAuthAdapter implements AuthAdapter
 	 * @var string
 	 */
 	private $uid;
-	
+
 	/**
 	 * getAuth checks the database for valid credentials and returns true if they are found.
-	 * @param array $cred
+	 * @param mixed $cred
 	 * @return bool
+	 * @throws ConfigurationException|QueryException
 	 * @see Staple_AuthAdapter::getAuth()
 	 */
 	public function getAuth($cred): bool
 	{
-		if(array_key_exists('username', $cred) AND array_key_exists('password', $cred))
+		if(isset($cred['username']) AND isset($cred['password']))
 		{
 			switch(Config::getValue('DBAuthAdapter','pwenctype', false))
 			{
@@ -70,7 +74,7 @@ class DBAuthAdapter implements AuthAdapter
 				->whereEqual(Config::getValue('DBAuthAdapter','uidfield'), $cred['username']);
 			if(($result = $query->execute()) !== false)
 			{
-				$row = $result->fetch(\PDO::FETCH_ASSOC);
+				$row = $result->fetch(PDO::FETCH_ASSOC);
 				//Secondary check to make sure the results did not differ from MySQL's response.
 				if(strtolower($row[Config::getValue('DBAuthAdapter','uidfield')]) == strtolower($cred['username'])
 					&& password_verify($pass, $row[Config::getValue('DBAuthAdapter','pwfield')]))
@@ -86,6 +90,7 @@ class DBAuthAdapter implements AuthAdapter
 	/**
 	 * Gets the access level for the supplied $uid.
 	 * @return int
+	 * @throws QueryException|ConfigurationException
 	 */
 	public function getLevel()
 	{

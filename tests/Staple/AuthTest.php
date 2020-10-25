@@ -103,7 +103,7 @@ class AuthTest extends TestCase
 	/**
 	 * @throws ConfigurationException
 	 */
-	protected function setUp()
+	protected function setUp(): void
 	{
 		$conn = Connection::get();
 		$conn->query('CREATE TABLE IF NOT EXISTS accounts (id INT PRIMARY KEY, username VARCHAR(50), password VARCHAR(50), accountType VARCHAR(10))');
@@ -112,7 +112,7 @@ class AuthTest extends TestCase
 	/**
 	 * @throws ConfigurationException
 	 */
-	protected function tearDown()
+	protected function tearDown(): void
 	{
 		$conn = Connection::get();
 		$conn->query('DROP TABLE IF EXISTS accounts');
