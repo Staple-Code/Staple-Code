@@ -48,9 +48,4 @@ class AliasTest extends TestCase
 		//Test that the alias is returned when checked for.
 		$this->assertEquals($this->alias->checkAlias('MyNewClass'),'\\MyNamespace\\MyNewClass');
 	}
-
-	public function testLoad()
-	{
-		$this->markTestIncomplete();
-	}
 }
