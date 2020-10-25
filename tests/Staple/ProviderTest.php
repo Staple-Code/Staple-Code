@@ -38,7 +38,7 @@ class FakeProviderAuthAdapter implements AuthAdapter
 	 */
 	public function getAuth($request): bool
 	{
-		$authHeader = $request->findHeader('Authorization');
+		$authHeader = Request::get()->findHeader('Authorization');
 		$token = trim(str_ireplace('Bearer','', $authHeader));
 		if($token == self::AUTHORIZATION_TOKEN)
 			return true;
@@ -75,7 +75,7 @@ class ProviderTest extends TestCase
 	const ROUTE_OPTIONS = 'test/options-test';
 	const ROUTE_PROTECTED = 'test/protected';
 
-	protected function setUp()
+	protected function setUp(): void
 	{
 		//Clear auth before each test.
 		Auth::get()->clearAuth();

@@ -60,7 +60,7 @@ class ModelTest extends TestCase
 	 * @throws ConfigurationException
 	 * @throws QueryException
 	 */
-	protected function setUp()
+	protected function setUp(): void
 	{
 		$conn = Connection::get();
 		$conn->query('CREATE TABLE IF NOT EXISTS users (id INT PRIMARY KEY, name VARCHAR(50), email VARCHAR(50))');
@@ -85,7 +85,7 @@ class ModelTest extends TestCase
 	/**
 	 * @throws ConfigurationException
 	 */
-	protected function tearDown()
+	protected function tearDown(): void
 	{
 		$conn = Connection::get();
 		$conn->query('DROP TABLE IF EXISTS users');

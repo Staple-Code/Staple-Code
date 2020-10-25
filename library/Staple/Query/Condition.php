@@ -169,11 +169,9 @@ class Condition
 						{
 							$count++;
 							$value .=
-								$this->columnJoin ?
-									$aValue :
-									(strlen($this->paramName) > 0) ?
-										':' . $this->getParamName() . '_in_' . $count  :
-										'?';
+								$this->columnJoin ? $aValue : ((strlen($this->paramName) > 0) ?
+									':' . $this->getParamName() . '_in_' . $count :
+									'?');
 						}
 					}
 					else
