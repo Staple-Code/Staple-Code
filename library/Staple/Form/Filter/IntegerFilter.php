@@ -1,6 +1,6 @@
 <?php
 /** 
- * Strips any HTML tags from a form field.
+ * Converts values to integers
  * 
  * @author Ironpilot
  * @copyright Copyright (c) 2011, STAPLE CODE
@@ -40,9 +40,7 @@ class IntegerFilter extends FieldFilter
 	 */
 	public function getName()
 	{
-		return 'tags';
+		return 'integer';
 	}
 
 }
-
-?>

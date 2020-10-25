@@ -1,6 +1,6 @@
 <?php
 /** 
- * Strips any HTML tags from a form field.
+ * Converts values to floating point numbers
  * 
  * @author Ironpilot
  * @copyright Copyright (c) 2011, STAPLE CODE
@@ -24,7 +24,7 @@ namespace Staple\Form\Filter;
 
 use Staple\Form\FieldFilter;
 
-class TagsFilter extends FieldFilter
+class FloatingPointFilter extends FieldFilter
 {
 	/**
 	 * 
@@ -32,7 +32,7 @@ class TagsFilter extends FieldFilter
 	 */
 	public function filter($text)
 	{
-		return strip_tags($text);
+		return (float)$text;
 	}
 	/**
 	 * 
@@ -40,7 +40,7 @@ class TagsFilter extends FieldFilter
 	 */
 	public function getName()
 	{
-		return 'tags';
+		return 'float';
 	}
 
 }

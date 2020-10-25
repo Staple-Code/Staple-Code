@@ -1,6 +1,6 @@
 <?php
 /**
- * Converts a string to a DateTime Object.
+ * Test Cases for SelectElement Class
  *
  * @author Ironpilot
  * @copyright Copyright (c) 2011, STAPLE CODE
@@ -19,38 +19,41 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
-namespace Staple\Form\Filter;
 
-use DateTime;
-use Exception;
-use Staple\Form\FieldFilter;
+namespace Staple\Tests;
 
-class ToDateTimeFilter extends FieldFilter
+use Staple\Form\Filter\FloatingPointFilter;
+use PHPUnit\Framework\TestCase;
+
+class FloatingPointFilterTest extends TestCase
 {
 	/**
-	 * @param string $text
-	 * @return DateTime
-	 * @throws Exception
+	 * @return FloatingPointFilter
 	 */
-	public function filter($text)
+	private function getTestIntegerFilter()
 	{
-		try {
-			return new DateTime($text);
-		}
-		catch (Exception $e)
-		{
-			return new DateTime();
-		}
+		return new FloatingPointFilter();
 	}
 
-	/* (non-PHPdoc)
-	 * @see Staple_Form_Filter::getName()
+	/**
+	 * Standard Output Build Test
+	 * @test
 	 */
-	public function getName()
+	public function testFilter()
 	{
-		return 'datetime';
+		$filter = $this->getTestIntegerFilter();
+
+		$test1 = $filter->filter('test123');
+		$test2 = $filter->filter('123.23');
+		$test3 = $filter->filter('47ronin');
+		$test4 = $filter->filter('89.99 dollars');
+
+		$this->assertEquals(0, $test1);
+		$this->assertEquals(123.23, $test2);
+		$this->assertEquals(47, $test3);
+		$this->assertEquals(89.99, $test4);
+		$this->assertEquals('float', $filter->getName());
 	}
-
-
 }
