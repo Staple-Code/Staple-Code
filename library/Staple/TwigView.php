@@ -61,11 +61,15 @@ class TwigView extends View
 				{
 					//Initialize the view model, if set
 					if (isset($this->_viewModel))
-						$this->addData('model',$this->_viewModel);
+					{
+						$this->addData('model', $this->_viewModel);
+					}
 
 					//Setup local $form variable, if set
 					if(isset($this->_viewForm))
-						$this->addData('form',$this->_viewForm);
+					{
+						$this->addData('form', $this->_viewForm);
+					}
 
 					$viewContents = file_get_contents($view);
 
