@@ -13,12 +13,12 @@ use Staple\Config;
 
 class ConfigTest extends TestCase
 {
-	protected function setUp()
+	protected function setUp(): void
 	{
 		Config::changeEnvironment(Config::DEFAULT_CONFIG_SET);
 	}
 
-	protected function tearDown()
+	protected function tearDown(): void
 	{
 		Config::changeEnvironment(Config::DEFAULT_CONFIG_SET);
 	}

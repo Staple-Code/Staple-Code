@@ -27,7 +27,6 @@ use Staple\Exception\EncryptionException;
 
 class Encrypt
 {
-	const AES = 'AES-128-CBC';
 	const AES256 = 'AES-256-CBC';
 
 	/**
@@ -72,7 +71,7 @@ class Encrypt
 	 * @return string
 	 * @throws EncryptionException
 	 */
-	public static function encrypt($encrypt, $key, $cipher = self::AES, $salt = '', $pepper = '', string $nonce = '', int $options = 0)
+	public static function encrypt($encrypt, $key, $cipher = self::AES256, $salt = '', $pepper = '', string $nonce = '', int $options = 0)
 	{
 		//Check for OpenSSL extension
 		if(!function_exists('openssl_encrypt'))
@@ -80,7 +79,7 @@ class Encrypt
 
 		//Check for cipher existence
 		$availableMethods = openssl_get_cipher_methods();
-		if(in_array($cipher, $availableMethods) === false)
+		if(in_array(strtolower($cipher), array_map('strtolower', $availableMethods)) === false)
 			throw new EncryptionException('Encryption cipher is not available on this system.');
 
 		//Add salt and pepper
@@ -101,7 +100,7 @@ class Encrypt
 	 * @return string
 	 * @throws EncryptionException
 	 */
-	public static function decrypt($decrypt, $key, $cipher = self::AES, $salt = '', $pepper = '', $nonce = NULL, int $options = 0)
+	public static function decrypt($decrypt, $key, $cipher = self::AES256, $salt = '', $pepper = '', $nonce = NULL, int $options = 0)
 	{
 		//Check for OpenSSL extension
 		if(!function_exists('openssl_decrypt'))
@@ -109,7 +108,7 @@ class Encrypt
 
 		//Check for cipher existance
 		$availableMethods = openssl_get_cipher_methods();
-		if(in_array($cipher, $availableMethods) === false)
+		if(in_array(strtolower($cipher), array_map('strtolower', $availableMethods)) === false)
 			throw new EncryptionException('Encryption cipher is not available on this system.');
 
 		//To correctly detect string length we trim the output.

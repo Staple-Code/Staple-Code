@@ -130,7 +130,7 @@ class ControllerTest extends TestCase
 	 * @throws SessionException
 	 * @throws SystemException
 	 */
-	protected function setUp()
+	protected function setUp(): void
 	{
 		//Clear auth before each test.
 		Auth::get()->clearAuth();

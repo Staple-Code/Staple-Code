@@ -132,14 +132,14 @@ class PagerTest extends TestCase
 		$pager4->setPage(10);
 
 		//Assert
-		$this->assertEquals(10,count($pager->getPages()));
-		$this->assertArraySubset([1,2,3,4,5,6,7,8,9,10],$pager->getPages());
-		$this->assertEquals(2,count($pager2->getPages()));
-		$this->assertArraySubset([1,2],$pager2->getPages());
-		$this->assertEquals(1,count($pager3->getPages()));
-		$this->assertArraySubset([1],$pager3->getPages());
+		$this->assertCount(10, $pager->getPages());
+		$this->assertEquals([1,2,3,4,5,6,7,8,9,10],$pager->getPages());
+		$this->assertCount(2, $pager2->getPages());
+		$this->assertEquals([1,2],$pager2->getPages());
+		$this->assertCount(1, $pager3->getPages());
+		$this->assertEquals([1],$pager3->getPages());
 
-		$this->assertEquals(7, count($pager4->getPages()));
-		$this->assertArraySubset([7,8,9,10,11,12,13], $pager4->getPages());
+		$this->assertCount(7, $pager4->getPages());
+		$this->assertEquals([7,8,9,10,11,12,13], $pager4->getPages());
 	}
 }
