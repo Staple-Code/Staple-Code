@@ -336,7 +336,7 @@ class ActiveDirectory
 		$Pword = "\"$password\"";
 		for($i=0; $i<10; $i++)
 		{
-			$uniPword .= "{$Pword{$i}}\000";	
+			$uniPword .= "{$Pword[$i]}\000";
 		}
 		return $uniPword;
 	}

@@ -20,8 +20,7 @@
     "twig/twig":"~3.0",
     "phpunit/phpunit": "^8.0",
     "predis/predis":"^1.1",
-    "codacy/coverage": "dev-master",
-    "auth0/auth0-php": "^7.0",
+    "auth0/auth0-php": "^7.4",
     "ext-ldap": "*"
   },
   "suggest": {
@@ -31,8 +30,5 @@
     "psr-0": {
       "Staple": "library/"
     }
-  },
-  "require-dev": {
-    "codacy/coverage": "dev-master"
   }
 }
