@@ -45,5 +45,3 @@ class TrimFilter extends FieldFilter
 	}
 
 }
-
-?>

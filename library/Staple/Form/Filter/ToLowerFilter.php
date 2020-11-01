@@ -45,5 +45,3 @@ class ToLowerFilter extends FieldFilter
 	}
 
 }
-
-?>

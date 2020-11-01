@@ -1,6 +1,6 @@
 <?php
 /**
- * Unit Tests for \Staple\Form\Filter\PhoneFormatFilter object
+ * Test Cases for SelectElement Class
  *
  * @author Ironpilot
  * @copyright Copyright (c) 2011, STAPLE CODE
@@ -19,23 +19,39 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
+
 namespace Staple\Tests;
+
+use Staple\Form\Filter\IntegerFilter;
 use PHPUnit\Framework\TestCase;
-use Staple\Form\Filter\PhoneFormatFilter;
-class PhoneFormatFilterTest extends TestCase
+
+class IntegerFilterTest extends TestCase
 {
-    private function getTestObject()
-    {
-        return new PhoneFormatFilter();
-    }
-    /**
-     * Test the ability to format a phone number
-     */
-    public function testPhoneFilter()
-    {
-        $number = '1.123.456.7890';
-        $format = $this->getTestObject();
-        $this->assertEquals('1 (123) 456-7890',$format->filter($number));
-    }
+	/**
+	 * @return IntegerFilter
+	 */
+	private function getTestIntegerFilter()
+	{
+		return new IntegerFilter();
+	}
+
+	/**
+	 * Standard Output Build Test
+	 * @test
+	 */
+	public function testFilter()
+	{
+		$filter = $this->getTestIntegerFilter();
+
+		$test1 = $filter->filter('test123');
+		$test2 = $filter->filter('123');
+		$test3 = $filter->filter('47ronin');
+
+		$this->assertEquals(0, $test1);
+		$this->assertEquals(123, $test2);
+		$this->assertEquals(47, $test3);
+		$this->assertEquals('integer', $filter->getName());
+	}
 }
