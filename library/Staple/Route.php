@@ -1,6 +1,6 @@
 <?php
 
-/** 
+/**
  * This class will be a container for routes generated from link strings.
  * 
  * @author Ironpilot
@@ -21,6 +21,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace Staple;
 
 use ReflectionClass;
@@ -38,15 +39,15 @@ use Exception;
 class Route
 {
 	const ROUTE_MVC = 1;
-	/** @deprecated  */
+	/** @deprecated */
 	const ROUTE_SCRIPT = 2;
 	const ROUTE_FUNCTIONAL = 3;
 	const CONTROLLER_SUFFIX = "Controller";
 	const PROVIDER_SUFFIX = "Provider";
 	const DEFAULT_ACTION = 'index';
 	const DEFAULT_CONTROLLER = 'index';
-	const ACCEPTABLE_ROUTE_SPECIAL_CHARACTERS = ['-','_'];
-	const ACCEPTABLE_FUNCTION_ROUTE_CHARACTERS = ['{','}','_','-','/'];
+	const ACCEPTABLE_ROUTE_SPECIAL_CHARACTERS = ['-', '_'];
+	const ACCEPTABLE_FUNCTION_ROUTE_CHARACTERS = ['{', '}', '_', '-', '/'];
 
 	/**
 	 * The name of the controller being executed.
@@ -108,9 +109,17 @@ class Route
 	 * Route constructor.
 	 * @param mixed $route
 	 * @throws RoutingException
+	 * @throws ConfigurationException
 	 */
 	public function __construct($route = NULL)
 	{
+		//Check for sub-path configuration.
+		$publicLocation = Config::getValue('application', 'public_location');
+		if(strlen($publicLocation) && substr($route, 0, strlen($publicLocation)) !== $publicLocation)
+		{
+			$route = substr($route, strlen($publicLocation));
+		}
+
 		//Check for functional Route
 		if($this->matchesFunctionalRoute($route))
 		{
@@ -126,7 +135,7 @@ class Route
 			$this->processStringRoute($route);
 		}
 	}
-	
+
 	/**
 	 * Returns the route as a link.
 	 */
@@ -134,19 +143,19 @@ class Route
 	{
 		//Website Base - don't remember why this was here
 		//$link = Staple_Config::getValue('application', 'public_location');
-		
+
 		//Add Controller
-		$link = Link::urlCase($this->getController()).'/';
-		
+		$link = Link::urlCase($this->getController()) . '/';
+
 		//Add Action
 		$link .= Link::urlCase($this->getAction());
-		
+
 		//Add Parameters
 		if(count($this->params) >= 1)
 		{
-			$link .= '/'.implode('/', $this->params);
+			$link .= '/' . implode('/', $this->params);
 		}
-		
+
 		return $link;
 	}
 
@@ -186,9 +195,9 @@ class Route
 		//Route Controller and actions
 		$class = $this->getController();
 		$method = $this->getAction();
-		
+
 		//The class name for the controller
-		$dispatchClass = $class.self::CONTROLLER_SUFFIX;
+		$dispatchClass = $class . self::CONTROLLER_SUFFIX;
 
 		try
 		{
@@ -269,7 +278,7 @@ class Route
 		catch(PageNotFoundException $e)
 		{
 			//The class name for the controller
-			$dispatchProvider = $class.self::PROVIDER_SUFFIX;
+			$dispatchProvider = $class . self::PROVIDER_SUFFIX;
 
 			if(class_exists($dispatchProvider))
 			{
@@ -280,11 +289,11 @@ class Route
 				}
 			}
 		}
-		
+
 		//If a valid page cannot be found, throw page not found exception
 		throw new PageNotFoundException();
 	}
-	
+
 	/**
 	 * Function executes a controller action passing parameters using call_user_func_array().
 	 * It also builds the view for the route.
@@ -296,7 +305,7 @@ class Route
 	protected function dispatchController()
 	{
 		$controller = Main::controller($this->getController());
-		
+
 		if($controller instanceof Controller)
 		{
 			//Call the controller action
@@ -318,7 +327,7 @@ class Route
 					$loader = Main::get()->getLoader();
 					$conString = get_class($controller);
 
-					$return->setController(substr($conString,0,strlen($conString)-strlen($loader::CONTROLLER_SUFFIX)));
+					$return->setController(substr($conString, 0, strlen($conString) - strlen($loader::CONTROLLER_SUFFIX)));
 				}
 
 				//If the view doesn't have a view set, use the route's action.
@@ -330,7 +339,7 @@ class Route
 				//Check for a controller layout and build it.
 				if($controller->layout instanceof Layout)
 				{
-					$controller->layout->build(NULL,$return);
+					$controller->layout->build(NULL, $return);
 				}
 				else
 				{
@@ -372,7 +381,7 @@ class Route
 						Dev::dump($return);
 					}
 				}
-				catch (ReflectionException $e)
+				catch(ReflectionException $e)
 				{
 					throw new RoutingException('Failed Controller Class Reflection', $e->getCode(), $e);
 				}
@@ -408,7 +417,7 @@ class Route
 			throw new RoutingException('Invalid Routing Object');
 		}
 	}
-	
+
 	/**
 	 * Redirect to the route location.
 	 * @throws ConfigurationException
@@ -416,10 +425,10 @@ class Route
 	public function redirect()
 	{
 		$base = Config::getValue('application', 'public_location');
-		header('Location: '.$base.$this);
+		header('Location: ' . $base . $this);
 		exit(0);
 	}
-	
+
 	/**
 	 * @return string $controller
 	 */
@@ -633,7 +642,7 @@ class Route
 			$this->setParams($route);
 		}
 	}
-	
+
 	/**
 	 * Process a string-based route
 	 * @param string $route
@@ -642,30 +651,30 @@ class Route
 	protected function processStringRoute($route)
 	{
 		//Run some route cleaning operations.
-		$route = str_replace('\\','/',$route);			//Convert backslashes to forward slashes
-		
+		$route = str_replace('\\', '/', $route);            //Convert backslashes to forward slashes
+
 		//Remove a starting forward slash
-		if(substr($route, 0, 1) == '/')	$route = substr($route, 1, strlen($route)-1);
-		
+		if(substr($route, 0, 1) == '/') $route = substr($route, 1, strlen($route) - 1);
+
 		//Remove trailing forward slash
-		if(substr($route, (strlen($route)-1), 1) == '/') $route = substr($route, 0, strlen($route)-1);
+		if(substr($route, (strlen($route) - 1), 1) == '/') $route = substr($route, 0, strlen($route) - 1);
 
 		//End routing information on the first . ? or # occurrence, process each separately to get the first of any of the objects.
-		if(($end = strpos($route,'.')) !== false)
+		if(($end = strpos($route, '.')) !== false)
 			$route = substr($route, 0, $end);
-		if(($end = strpos($route,'?')) !== false)
+		if(($end = strpos($route, '?')) !== false)
 			$route = substr($route, 0, $end);
-		if(($end = strpos($route,'#')) !== false)
+		if(($end = strpos($route, '#')) !== false)
 			$route = substr($route, 0, $end);
 
 		//Store the route string for later reference.
 		$this->setRouteString($route);
-		
+
 		//Check to see if a script exists with that route.
 		//Split the route into it's component elements.
-		$splitRoute = explode('/',$route);
+		$splitRoute = explode('/', $route);
 		$routeCount = count($splitRoute);
-		
+
 		//If the route only contains a controller add the index action
 		if($routeCount == 0 || strlen($route) == 0)
 		{
@@ -686,7 +695,7 @@ class Route
 				array_unshift($splitRoute, $shift, self::DEFAULT_ACTION);
 			}
 		}
-		
+
 		//Check the Controller value and Set a valid value
 		$controller = array_shift($splitRoute);
 		if(ctype_alnum(str_replace('-', '', $controller)) && ctype_alpha(substr($controller, 0, 1)))
@@ -698,9 +707,9 @@ class Route
 			//Bad info in the route, error out.
 			throw new RoutingException('Invalid Route', Error::PAGE_NOT_FOUND);
 		}
-		
+
 		//Check the Action Value and Set a valid value
-		$action = str_replace(['{','}'], '', array_shift($splitRoute));
+		$action = str_replace(['{', '}'], '', array_shift($splitRoute));
 		if(ctype_alnum(str_replace(self::ACCEPTABLE_ROUTE_SPECIAL_CHARACTERS, '', $action)) && ctype_alpha(substr($action, 0, 1)))
 		{
 			$this->setAction(Link::methodCase($action));
@@ -710,7 +719,7 @@ class Route
 			//Bad info in the route, error out.
 			throw new RoutingException('Invalid Route', Error::PAGE_NOT_FOUND);
 		}
-		
+
 		$this->setParams($splitRoute);
 
 		//Don't overwrite a functional route type.
@@ -729,7 +738,7 @@ class Route
 	 * @return Route
 	 * @throws RoutingException
 	 */
-	public static function add(string $route, callable $func, bool $protected = false, array $options = []) : Route
+	public static function add(string $route, callable $func, bool $protected = false, array $options = []): Route
 	{
 		// Valid character check
 		if(!self::functionalRouteContainsAllowedCharacters($route))
@@ -798,7 +807,7 @@ class Route
 	protected static function functionalRouteContainsAllowedCharacters($route)
 	{
 		// Valid character check
-		if(ctype_alnum(str_replace(self::ACCEPTABLE_FUNCTION_ROUTE_CHARACTERS,'',$route)))
+		if(ctype_alnum(str_replace(self::ACCEPTABLE_FUNCTION_ROUTE_CHARACTERS, '', $route)))
 		{
 			return true;
 		}
@@ -811,7 +820,7 @@ class Route
 	 * @return Route
 	 * @throws PageNotFoundException
 	 */
-	public static function getFunctionalRouteObject($route) : Route
+	public static function getFunctionalRouteObject($route): Route
 	{
 		if(is_array($route))
 		{
@@ -849,7 +858,7 @@ class Route
 		// Execute the Method
 		$return = call_user_func_array($functionalRoute->getCallbackFunction(), $functionalRoute->getParams());
 
-		if($return instanceof View)		//Check for a returned View object
+		if($return instanceof View)        //Check for a returned View object
 		{
 			//If the view does not have a controller name set, set it to the currently executing controller.
 			if(!$return->hasController())
@@ -865,7 +874,7 @@ class Route
 
 			//Check for a controller layout and build it.
 			//@todo support more than the default layout - View/Layout Refactor
-			$layoutName = Config::getValue('layout','default', false);
+			$layoutName = Config::getValue('layout', 'default', false);
 			if($layoutName != '')
 			{
 				$layout = new Layout($layoutName);
@@ -881,19 +890,19 @@ class Route
 				$return->build();
 			}
 		}
-		elseif ($return instanceof Json)	//Check for a Json object to be converted and echoed.
+		elseif($return instanceof Json)    //Check for a Json object to be converted and echoed.
 		{
 			echo json_encode($return);
 		}
-		elseif ($return instanceof Route)	//Allow a controller to return a route to redirect the program execution to.
+		elseif($return instanceof Route)    //Allow a controller to return a route to redirect the program execution to.
 		{
 			Main::get()->run($return);
 		}
-		elseif ($return instanceof Link)	//Redirect to a link location.
+		elseif($return instanceof Link)    //Redirect to a link location.
 		{
-			header('Location: '.$return);
+			header('Location: ' . $return);
 		}
-		elseif (is_object($return))		//Check for another object type
+		elseif(is_object($return))        //Check for another object type
 		{
 			try
 			{
@@ -916,12 +925,12 @@ class Route
 					Dev::dump($return);
 				}
 			}
-			catch (ReflectionException $e)
+			catch(ReflectionException $e)
 			{
 				throw new RoutingException('Failed Controller Class Reflection', $e->getCode(), $e);
 			}
 		}
-		elseif(is_string($return))		//If the return value was simply a string, echo it out.
+		elseif(is_string($return))        //If the return value was simply a string, echo it out.
 		{
 			echo $return;
 		}
