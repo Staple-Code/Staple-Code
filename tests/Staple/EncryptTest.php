@@ -39,9 +39,9 @@ class EncryptTest extends TestCase
 
 		$iv = openssl_random_pseudo_bytes(16);
 
-		$encrypted = Encrypt::encrypt($originalString, $this->key, Encrypt::AES, $this->salt, $this->pepper, $iv);
+		$encrypted = Encrypt::encrypt($originalString, $this->key, Encrypt::AES256, $this->salt, $this->pepper, $iv);
 
-		$decryptedString = Encrypt::decrypt($encrypted,$this->key, Encrypt::AES, $this->salt, $this->pepper, $iv);
+		$decryptedString = Encrypt::decrypt($encrypted,$this->key, Encrypt::AES256, $this->salt, $this->pepper, $iv);
 
 		$this->assertEquals($originalString,$decryptedString);
 	}

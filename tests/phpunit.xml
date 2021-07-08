@@ -1,4 +1,4 @@
-<phpunit bootstrap="bootstrap.php" colors="true">
+<phpunit bootstrap="bootstrap.php" colors="true" failOnWarning="true">
     <testsuites>
         <testsuite name="Staple Test Suite">
             <directory>Staple/</directory>

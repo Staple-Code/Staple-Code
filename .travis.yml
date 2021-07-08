@@ -3,9 +3,9 @@ language: php
 sudo: false
 
 php:
-  - 7.1
   - 7.2
   - 7.3
+  - 7.4
 
 services:
   - mysql
@@ -16,10 +16,7 @@ install:
 before_script:
   - curl -s http://getcomposer.org/installer | php
 
-script: vendor/bin/phpunit --configuration tests/phpunit.xml --coverage-clover build/logs/clover.xml
-
-after_script:
-  - php vendor/bin/codacycoverage clover build/logs/clover.xml
+script: vendor/bin/phpunit --verbose --configuration tests/phpunit.xml
 
 notifications:
   slack:
