@@ -57,7 +57,7 @@ class Config
 	 * @param string $configName
 	 * @throws ConfigurationException
 	 */
-	public function __construct($configName = NULL)
+	private function __construct($configName = NULL)
 	{
 		$this->read = false;
 		if(isset($configName))
@@ -159,16 +159,10 @@ class Config
 	 * @throws ConfigurationException
 	 * @return mixed
 	 */
-	public static function getValue($set,$key, $throwOnError = true)
+	public static function getValue(string $set, string $key, bool $throwOnError = true)
 	{
 		//Get the config instance
 		$inst = static::getInstance();
-		
-		//Check that the config file has been read.
-		if(!$inst->read)
-		{
-			$inst->read();
-		}
 		
 		//Look for the requested key in the data store.
 		if(array_key_exists($set, $inst->store))

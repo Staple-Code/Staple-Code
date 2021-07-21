@@ -1,6 +1,6 @@
 <?php
 
-/** 
+/**
  * This class will be a container for routes generated from link strings.
  * 
  * @author Ironpilot
@@ -21,6 +21,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace Staple;
 
 use ReflectionClass;
@@ -45,8 +46,8 @@ class Route
 	const PROVIDER_SUFFIX = "Provider";
 	const DEFAULT_ACTION = 'index';
 	const DEFAULT_CONTROLLER = 'index';
-	const ACCEPTABLE_ROUTE_SPECIAL_CHARACTERS = ['-','_'];
-	const ACCEPTABLE_FUNCTION_ROUTE_CHARACTERS = ['{','}','_','-','/'];
+	const ACCEPTABLE_ROUTE_SPECIAL_CHARACTERS = ['-', '_'];
+	const ACCEPTABLE_FUNCTION_ROUTE_CHARACTERS = ['{', '}', '_', '-', '/'];
 
 	/**
 	 * The name of the controller being executed.
@@ -108,9 +109,17 @@ class Route
 	 * Route constructor.
 	 * @param mixed $route
 	 * @throws RoutingException
+	 * @throws ConfigurationException
 	 */
 	public function __construct($route = NULL)
 	{
+		//Check for sub-path configuration.
+		$publicLocation = Config::getValue('application', 'public_location');
+		if(strlen($publicLocation) && substr($route, 0, strlen($publicLocation)) === $publicLocation)
+		{
+			$route = substr($route, strlen($publicLocation));
+		}
+
 		//Check for functional Route
 		if($this->matchesFunctionalRoute($route))
 		{
@@ -318,7 +327,7 @@ class Route
 					$loader = Main::get()->getLoader();
 					$conString = get_class($controller);
 
-					$return->setController(substr($conString,0,strlen($conString)-strlen($loader::CONTROLLER_SUFFIX)));
+					$return->setController(substr($conString, 0, strlen($conString) - strlen($loader::CONTROLLER_SUFFIX)));
 				}
 
 				//If the view doesn't have a view set, use the route's action.
@@ -330,7 +339,7 @@ class Route
 				//Check for a controller layout and build it.
 				if($controller->layout instanceof Layout)
 				{
-					$controller->layout->build(NULL,$return);
+					$controller->layout->build(NULL, $return);
 				}
 				else
 				{

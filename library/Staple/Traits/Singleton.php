@@ -50,5 +50,3 @@ trait Singleton
 		throw new Exception('Clone is not allowed.');
 	}
 }
-
-?>
