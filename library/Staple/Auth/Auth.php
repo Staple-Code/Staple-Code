@@ -151,6 +151,14 @@ class Auth implements IAuthService
 	{
 		return $this->adapter->authRoute($route, $requiredLevel, $reflectionClass, $reflectionMethod);
 	}
+
+	/**
+	 * @return AuthAdapter
+	 */
+	public function getAuthAdapter()
+	{
+		return $this->adapter;
+	}
 	
 	/**
 	 * Returns and integer representing the level of access. Defaults to 0 for no auth and 1 
@@ -159,6 +167,10 @@ class Auth implements IAuthService
 	 */
 	public function getAuthLevel()
 	{
+		if(!($this->adapter instanceof AuthAdapter))
+		{
+			$this->createAuthAdapter();
+		}
 		return $this->adapter->getLevel();
 	}
 	
@@ -169,6 +181,10 @@ class Auth implements IAuthService
 	 */
 	public function getAuthId()
 	{
+		if(!($this->adapter instanceof AuthAdapter))
+		{
+			$this->createAuthAdapter();
+		}
 		return $this->adapter->getUserId();
 	}
 
@@ -314,8 +330,11 @@ class Auth implements IAuthService
 		//Break a potential infinite loop
 		if($this->getLastAttemptedRoute() instanceof Route)
 		{
-			if($attemptedRoute->getController() == $this->getLastAttemptedRoute()->getController()
-				&& $attemptedRoute->getAction() == $this->getLastAttemptedRoute()->getAction())
+			$defaultRoute = $this->getDefaultUnauthenticatedRoute();
+			if($attemptedRoute->getController() === $this->getLastAttemptedRoute()->getController()
+				&& $attemptedRoute->getAction() === $this->getLastAttemptedRoute()->getAction()
+				&& $attemptedRoute->getController() !== $defaultRoute->getController()
+				&& $attemptedRoute->getAction() !== $defaultRoute->getAction())
 			{
 				throw new AuthException('Not Authorized');
 			}

@@ -77,4 +77,3 @@ class Dev
 		return microtime(true) - self::$timer;
 	}
 }
-?>

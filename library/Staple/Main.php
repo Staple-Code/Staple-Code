@@ -87,10 +87,10 @@ class Main
 			}
 			
 			//Instantiate custom loader
-			$loader = new $loader();
-			if($loader instanceof Autoload)
+			$loaderInstance = new $loader();
+			if($loaderInstance instanceof Autoload)
 			{
-				$this->loader = $loader;
+				$this->loader = $loaderInstance;
 			}
 		}
 		
