@@ -106,13 +106,19 @@ class Connection extends PDO implements IConnection
 	 * Stores the last executed SQL Statement
 	 * @var string
 	 */
-	public $lastQuery;
+	public string $lastQuery;
+
+	/**
+	 * Stores the last executed SQL Statement bound parameters
+	 * @var array
+	 */
+	public array $lastQueryParams;
 
 	/**
 	 * Array of named connections that the application can retrieve.
 	 * @var array
 	 */
-	protected static $namedConnections = array();
+	protected static array $namedConnections = array();
 
 	/**
 	 * @param $dsn
@@ -527,21 +533,23 @@ class Connection extends PDO implements IConnection
 	 * @param string $lastQuery
 	 * @return $this
 	 */
-	public function setLastQuery($lastQuery)
+	public function setLastQuery(string $lastQuery, array $params = [])
 	{
 		$this->lastQuery = $lastQuery;
+		$this->lastQueryParams = $params;
 		return $this;
 	}
 
 	/**
 	 * Add a query to the query log and set the lastQuery property to that query.
 	 * @param $query
+	 * @param array $params
 	 * @return $this
 	 */
-	public function addQueryToLog($query)
+	public function addQueryToLog($query, array $params = [])
 	{
-		$this->queryLog[] = $query;
-		$this->setLastQuery($query);
+		$this->queryLog[] = ['query' => $query, 'params' => $params];
+		$this->setLastQuery($query, $params);
 		return $this;
 	}
 
