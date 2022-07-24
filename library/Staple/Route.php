@@ -108,9 +108,17 @@ class Route
 	 * Route constructor.
 	 * @param mixed $route
 	 * @throws RoutingException
+	 * @throws ConfigurationException
 	 */
 	public function __construct($route = NULL)
 	{
+		//Check for sub-path configuration.
+		$publicLocation = Config::getValue('application', 'public_location');
+		if(strlen($publicLocation) && substr($route, 0, strlen($publicLocation)) === $publicLocation)
+		{
+			$route = substr($route, strlen($publicLocation));
+		}
+
 		//Check for functional Route
 		if($this->matchesFunctionalRoute($route))
 		{
@@ -571,6 +579,26 @@ class Route
 	{
 		$this->options = $options;
 		return $this;
+	}
+
+	/**
+	 * Compares the current route to a supplied route to see if they call the same action.
+	 * @param Route $route
+	 * @return bool
+	 */
+	public function sameAction(Route $route): bool
+	{
+		return $this->getController() === $route->getController() && $this->getAction() === $route->getAction() ? true : false;
+	}
+
+	/**
+	 * Compares the current route to a supplied route to see if they are the same call.
+	 * @param Route $route
+	 * @return bool
+	 */
+	public function same(Route $route): bool
+	{
+		return $this->getController() === $route->getController() && $this->getAction() === $route->getAction() ? true : false;
 	}
 
 	/**
