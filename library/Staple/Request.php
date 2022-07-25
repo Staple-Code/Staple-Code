@@ -75,13 +75,42 @@ class Request
 			'digest' => $_SERVER['PHP_AUTH_DIGEST'] ?? null
 		];
 	}
-	
+
+	/**
+	 * Dynamically retrieves request methods or parameters
+	 * @throws Exception
+	 */
 	public function __get($name)
 	{
 		$method = 'get' . $name;
 		if (!method_exists($this, $method))
 		{
-			throw new Exception('Request Object Not Found');
+			switch($this->getMethod())
+			{
+				case self::METHOD_GET:
+					if(isset($_GET[$name]))
+					{
+						return $_GET[$name];
+					}
+					break;
+				case self::METHOD_POST:
+					if(isset($_POST[$name]))
+					{
+						return $_POST[$name];
+					}
+					elseif($_FILES[$name])
+					{
+						return $_FILES[$name];
+					}
+					break;
+				default:
+					if(isset($_REQUEST[$name]))
+					{
+						return $_REQUEST[$name];
+					}
+					break;
+			}
+			return null;
 		}
 		return $this->$method();
 	}
