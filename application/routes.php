@@ -2,7 +2,7 @@
 use Staple\Route;
 
 /**
- * Do this action before the any routes are executed.
+ * Do this action before any routes are executed.
  */
 Route::before(function() {
 

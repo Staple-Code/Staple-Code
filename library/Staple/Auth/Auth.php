@@ -92,7 +92,14 @@ class Auth implements IAuthService
 	public function __construct()
 	{
 		$this->authed = false;
-		$this->defaultUnauthenticatedRoute = new Route('index/index');
+		try
+		{
+			$this->setDefaultUnauthenticatedRoute(Route::create(Config::getValue('auth', 'route')));
+		}
+		catch(Exception $e)
+		{
+			$this->defaultUnauthenticatedRoute = new Route('index/index');
+		}
 	}
 	
 	/**
