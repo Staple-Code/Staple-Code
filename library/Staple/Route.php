@@ -1,6 +1,6 @@
 <?php
 
-/** 
+/**
  * This class will be a container for routes generated from link strings.
  * 
  * @author Ironpilot
@@ -21,6 +21,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace Staple;
 
 use ReflectionClass;
@@ -45,8 +46,8 @@ class Route
 	const PROVIDER_SUFFIX = "Provider";
 	const DEFAULT_ACTION = 'index';
 	const DEFAULT_CONTROLLER = 'index';
-	const ACCEPTABLE_ROUTE_SPECIAL_CHARACTERS = ['-','_'];
-	const ACCEPTABLE_FUNCTION_ROUTE_CHARACTERS = ['{','}','_','-','/'];
+	const ACCEPTABLE_ROUTE_SPECIAL_CHARACTERS = ['-', '_'];
+	const ACCEPTABLE_FUNCTION_ROUTE_CHARACTERS = ['{', '}', '_', '-', '/'];
 
 	/**
 	 * The name of the controller being executed.
@@ -108,9 +109,17 @@ class Route
 	 * Route constructor.
 	 * @param mixed $route
 	 * @throws RoutingException
+	 * @throws ConfigurationException
 	 */
 	public function __construct($route = NULL)
 	{
+		//Check for sub-path configuration.
+		$publicLocation = Config::getValue('application', 'public_location');
+		if(strlen($publicLocation) && substr($route, 0, strlen($publicLocation)) === $publicLocation)
+		{
+			$route = substr($route, strlen($publicLocation));
+		}
+
 		//Check for functional Route
 		if($this->matchesFunctionalRoute($route))
 		{
@@ -198,7 +207,11 @@ class Route
 				$route = $this->getFunctionalRouteObject($this);
 				if($route->isProtected() === true)
 				{
-					$this->functionalRouteAuth($route);
+					$result = $this->functionalRouteAuth($route);
+					if ($result !== true) {
+						Auth::get()->noAuth($route);
+						return false;
+					}
 				}
 
 				$this->beforeFunctionalRouting();
@@ -318,7 +331,7 @@ class Route
 					$loader = Main::get()->getLoader();
 					$conString = get_class($controller);
 
-					$return->setController(substr($conString,0,strlen($conString)-strlen($loader::CONTROLLER_SUFFIX)));
+					$return->setController(substr($conString, 0, strlen($conString) - strlen($loader::CONTROLLER_SUFFIX)));
 				}
 
 				//If the view doesn't have a view set, use the route's action.
@@ -330,7 +343,7 @@ class Route
 				//Check for a controller layout and build it.
 				if($controller->layout instanceof Layout)
 				{
-					$controller->layout->build(NULL,$return);
+					$controller->layout->build(NULL, $return);
 				}
 				else
 				{
@@ -556,6 +569,7 @@ class Route
 	}
 
 	/**
+	 * Get the entire Options Array
 	 * @return array
 	 */
 	public function getOptions(): array
@@ -564,6 +578,7 @@ class Route
 	}
 
 	/**
+	 * Set the entire Options Array
 	 * @param array $options
 	 * @return Route
 	 */
@@ -571,6 +586,43 @@ class Route
 	{
 		$this->options = $options;
 		return $this;
+	}
+
+	/**
+	 * Returns a specific option from the options array.
+	 * @param string $key
+	 * @return mixed|null
+	 */
+	public function getOption(string $key)
+	{
+	if(isset($this->options[$key]))
+		{
+			return $this->options[$key];
+		}
+		else
+		{
+			return null;
+		}
+	}
+
+	/**
+	 * Compares the current route to a supplied route to see if they call the same action.
+	 * @param Route $route
+	 * @return bool
+	 */
+	public function sameAction(Route $route): bool
+	{
+		return $this->getController() === $route->getController() && $this->getAction() === $route->getAction() ? true : false;
+	}
+
+	/**
+	 * Compares the current route to a supplied route to see if they are the same call.
+	 * @param Route $route
+	 * @return bool
+	 */
+	public function same(Route $route): bool
+	{
+		return $this->getController() === $route->getController() && $this->getAction() === $route->getAction() ? true : false;
 	}
 
 	/**
@@ -864,8 +916,14 @@ class Route
 			}
 
 			//Check for a controller layout and build it.
-			//@todo support more than the default layout - View/Layout Refactor
-			$layoutName = Config::getValue('layout','default', false);
+			if(isset($functionalRoute->options['layout']))
+			{
+				$layoutName = $functionalRoute->options['layout'];
+			}
+			else
+			{
+				$layoutName = Config::getValue('layout', 'default', false);
+			}
 			if($layoutName != '')
 			{
 				$layout = new Layout($layoutName);
@@ -934,7 +992,21 @@ class Route
 	 */
 	protected function functionalRouteAuth(Route $route)
 	{
-		//@todo Implement functional routing authentication.
+		$auth = Auth::get();
+		if ($auth->isAuthed()) {
+			if ($requiredLevel = $route->getOption('authLevel'))
+			{
+				$level = $auth->getAuthLevel();
+				if ($requiredLevel == $level)
+				{
+					return true;
+				}
+			}
+			else
+			{
+				return true;
+			}
+		}
 		return false;
 	}
 

@@ -400,7 +400,7 @@ class Autoload
 		foreach($this->layoutSearchDirectories as $dir)
 		{
 			$theLayout = $dir;
-			if(substr($theLayout,strlen($theLayout)-2) == DIRECTORY_SEPARATOR)
+			if(substr($theLayout,strlen($theLayout)-2) === DIRECTORY_SEPARATOR)
 			{
 				$theLayout .= DIRECTORY_SEPARATOR;
 			}
