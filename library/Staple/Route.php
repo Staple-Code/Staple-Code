@@ -583,6 +583,26 @@ class Route
 	}
 
 	/**
+	 * Compares the current route to a supplied route to see if they call the same action.
+	 * @param Route $route
+	 * @return bool
+	 */
+	public function sameAction(Route $route): bool
+	{
+		return $this->getController() === $route->getController() && $this->getAction() === $route->getAction() ? true : false;
+	}
+
+	/**
+	 * Compares the current route to a supplied route to see if they are the same call.
+	 * @param Route $route
+	 * @return bool
+	 */
+	public function same(Route $route): bool
+	{
+		return $this->getController() === $route->getController() && $this->getAction() === $route->getAction() ? true : false;
+	}
+
+	/**
 	 * Process an array route
 	 * @param array $route
 	 * @throws RoutingException

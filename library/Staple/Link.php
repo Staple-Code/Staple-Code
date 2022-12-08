@@ -60,6 +60,19 @@ class Link
 	{
 		return new static($route, $get);
 	}
+
+	/**
+	 * Create a Link object from a supplied Route object.
+	 * @param Route $route
+	 */
+	public static function createFromRoute(Route $route)
+	{
+		return new static([
+			$route->getController(),
+			$route->getAction(),
+			...$route->getParams(),
+		]);
+	}
 	
 	/**
 	 * Creates the shortest link possible to the specified controller/action. 
