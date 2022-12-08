@@ -110,7 +110,7 @@ abstract class Controller
 				if(stripos($classComments, Auth::AUTH_FLAG_LEVEL) !== false)
 				{
 					$levelSplit = explode(Auth::AUTH_FLAG_LEVEL, $classComments);
-					$eolSplit = explode($levelSplit[1], '\n');
+					$eolSplit = explode(PHP_EOL, $levelSplit[1]);
 					$authLevel = trim($eolSplit[0]);
 					$routeAuth = $auth->authRoute(Route::create([str_ireplace(Autoload::CONTROLLER_SUFFIX, '', $reflectClass->getName()),$method]), $authLevel, $reflectClass, $reflectMethod);
 
@@ -118,7 +118,7 @@ abstract class Controller
 				elseif(stripos($methodComments, Auth::AUTH_FLAG_LEVEL) !== false)
 				{
 					$levelSplit = explode(Auth::AUTH_FLAG_LEVEL, $methodComments);
-					$eolSplit = explode($levelSplit[1], '\n');
+					$eolSplit = explode(PHP_EOL, $levelSplit[1]);
 					$authLevel = trim($eolSplit[0]);
 					$routeAuth = $auth->authRoute(Route::create([str_ireplace(Autoload::CONTROLLER_SUFFIX, '', $reflectClass->getName()),$method]), $authLevel, $reflectClass, $reflectMethod);
 				}

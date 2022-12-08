@@ -42,6 +42,12 @@ class Statement extends PDOStatement implements IStatement
     protected $connection;
 
 	/**
+	 * The bound parameters of the query
+	 * @var array
+	 */
+	protected $params = [];
+
+	/**
 	 * Magic method to fake MySQLi property functions
 	 * @deprecated
 	 * @param string $name
@@ -94,6 +100,24 @@ class Statement extends PDOStatement implements IStatement
 	{
 		$this->connection = $connection;
 		return $this;
+	}
+
+	public function bindParam($param, &$var, $type = PDO::PARAM_STR, $maxLength = null, $driverOptions = null)
+	{
+		$this->params[$param] = $var;
+		return parent::bindParam($param, $var, $type, $maxLength, $driverOptions);
+	}
+
+	public function bindColumn($column, &$var, $type = PDO::PARAM_STR, $maxLength = null, $driverOptions = null)
+	{
+		$this->params[$column] = $var;
+		return parent::bindColumn($column, $var, $type, $maxLength, $driverOptions);
+	}
+
+	public function bindValue($param, $value, $type = PDO::PARAM_STR)
+	{
+		$this->params[$param] = $value;
+		return parent::bindValue($param, $value, $type);
 	}
 
 	/**
@@ -156,7 +180,7 @@ class Statement extends PDOStatement implements IStatement
 	 */
 	public function execute($input_parameters = null)
 	{
-		$this->getConnection()->addQueryToLog($this->queryString);
+		$this->getConnection()->addQueryToLog($this->queryString, $this->params);
 		return parent::execute($input_parameters);
 	}
 

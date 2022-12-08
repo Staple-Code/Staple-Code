@@ -65,6 +65,12 @@ class FakeProviderAuthAdapter implements AuthAdapter
 	{
 		return 'Authed';
 	}
+
+	public function clear(): bool
+	{
+		$this->userId = null;
+		return true;
+	}
 }
 
 class ProviderTest extends TestCase

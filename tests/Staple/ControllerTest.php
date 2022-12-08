@@ -115,6 +115,13 @@ class FakeCtrlAuthAdapter implements AuthAdapter
 	{
 		$this->userId = $user;
 	}
+
+	public function clear(): bool
+	{
+		$this->userLevel = 0;
+		$this->userId = null;
+		return true;
+	}
 }
 
 class ControllerTest extends TestCase
