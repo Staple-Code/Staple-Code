@@ -96,6 +96,13 @@ class FakeAuthAdapter implements AuthAdapter
 	{
 		$this->userId = $user;
 	}
+
+	public function clear(): bool
+	{
+		$this->userId = null;
+		$this->userLevel = 0;
+		return true;
+	}
 }
 
 class AuthTest extends TestCase
@@ -177,6 +184,7 @@ class AuthTest extends TestCase
 		];
 		$authed = $auth->doAuth($credentials);
 
+		$this->assertEquals(FakeAuthAdapter::class, $auth->getAdapterImplementation());
 		$this->assertTrue($authed);
 		$this->assertEquals($credentials, $auth->getAuthId());
 		$this->assertEquals(1, $auth->getAuthLevel());
@@ -186,6 +194,7 @@ class AuthTest extends TestCase
 		//Clear the auth
 		$auth->clearAuth();
 
+		$this->assertEquals(FakeAuthAdapter::class, $auth->getAdapterImplementation());
 		$this->assertFalse($auth->isAuthed());
 		$this->assertEquals('Logged Out', $auth->getMessage());
 		$this->assertEquals(null, $auth->getAuthId());

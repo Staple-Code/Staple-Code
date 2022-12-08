@@ -359,15 +359,12 @@ abstract class Query implements IQuery
 		{
 			$varType = gettype($value);
 
-			//Don't bind nulls because they are converted to IS NULL by the query builder.
-			if($varType === 'NULL')
-			{
-				continue;
-			}
-
 			//Bind other types.
 			switch($varType)
 			{
+				case 'NULL':
+					$type = null;
+					break;
 				case "boolean":
 					$type = PDO::PARAM_BOOL;
 					break;
@@ -401,7 +398,6 @@ abstract class Query implements IQuery
 				case "resource":
 				case "resource (closed)":
 					throw new QueryException('Cannot supply a resource to a query.');
-					break;
 				default:
 					throw new QueryException('Unable to determine parameter type.');
 			}
@@ -979,13 +975,10 @@ abstract class Query implements IQuery
 		{
 			case Connection::DRIVER_SQLSRV:
 				return self::composeSqlSrvProcedureString($procedureName, $parameters);
-				break;
 			case Connection::DRIVER_MYSQL:
 				return self::composeMySqlProcedureString($procedureName, $parameters);
-				break;
 			default:
 				throw new QueryException('Could not find a string generator for your database driver.');
-				break;
 		}
 	}
 

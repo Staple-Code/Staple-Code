@@ -26,6 +26,7 @@
  */
 namespace Staple\Auth;
 
+use Staple\Exception\NotAuthorizedException;
 use Staple\Route;
 
 interface AuthAdapter
@@ -36,6 +37,7 @@ interface AuthAdapter
 	 * authentication as successful. If a non-boolean true is returned, authentication will
 	 * fail.
 	 * @param mixed $credentials
+	 * @throws NotAuthorizedException
 	 * @return bool
 	 */
 	public function getAuth($credentials): bool;
@@ -64,4 +66,11 @@ interface AuthAdapter
 	 * @return bool
 	 */
 	public function authRoute(Route $route, $requiredLevel, \ReflectionClass $reflectionClass = null, \ReflectionMethod $reflectionMethod = null): bool;
+
+	/**
+	 * This method should clear out any existing authentication stored in the adapter and reset
+	 * it to it's starting state. Returns a bool true on success or false on failure.
+	 * @return bool
+	 */
+	public function clear(): bool;
 }

@@ -52,7 +52,8 @@ class UpdateTest extends TestCase
 			'address'=>'123 1st St.',
 			'city'=>'Boston',
 			'state'=>'MA',
-			'zip'=>'02110'
+			'zip'=>'02110',
+			'is_resident' => null,
 		];
 		try
 		{
@@ -63,11 +64,10 @@ class UpdateTest extends TestCase
 		catch(QueryException $e)
 		{
 			$this->fail('Query Builder should not throw an exception: '.$e->getMessage());
-			return;
 		}
 
 		//Assert
-		$expected = "UPDATE myschema.".self::TABLE_NAME."\nSET first_name=:first_name, last_name=:last_name, address=:address, city=:city, state=:state, zip=:zip\nWHERE id = :id";
+		$expected = "UPDATE myschema.".self::TABLE_NAME."\nSET first_name=:first_name, last_name=:last_name, address=:address, city=:city, state=:state, zip=:zip, is_resident=:is_resident\nWHERE id = :id";
 		$expectedParamArray = [
 			'first_name'=>'Larry',
 			'last_name'=>'Smith',
@@ -76,6 +76,7 @@ class UpdateTest extends TestCase
 			'state'=>'MA',
 			'zip'=>'02110',
 			'id' => 5,
+			'is_resident' => null,
 		];
 		$this->assertEquals($expected, (string)$query);
 		$this->assertEquals($expectedParamArray, $query->getParams());

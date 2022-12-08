@@ -42,9 +42,9 @@ class DBAuthAdapter implements AuthAdapter
 	use AuthRoute;
 	/**
 	 * Store the user identifier. Usually the username.
-	 * @var string
+	 * @var string|null
 	 */
-	private $uid;
+	private string $uid;
 
 	/**
 	 * getAuth checks the database for valid credentials and returns true if they are found.
@@ -121,5 +121,11 @@ class DBAuthAdapter implements AuthAdapter
 	public function getUserId()
 	{
 		return $this->uid;
+	}
+
+	public function clear(): bool
+	{
+		$this->uid = null;
+		return true;
 	}
 }
