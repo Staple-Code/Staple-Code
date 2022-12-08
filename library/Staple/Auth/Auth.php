@@ -233,7 +233,14 @@ class Auth implements IAuthService
 	 */
 	protected function setLastAttemptedRoute(Route $lastAttemptedRoute): Auth
 	{
-		$this->lastAttemptedRoute = $lastAttemptedRoute;
+		if ($lastAttemptedRoute->getType() == Route::ROUTE_FUNCTIONAL)
+		{
+			$this->lastAttemptedRoute = Route::create($lastAttemptedRoute->getRouteString());
+		}
+		else
+		{
+			$this->lastAttemptedRoute = $lastAttemptedRoute;
+		}
 
 		return $this;
 	}

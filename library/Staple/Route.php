@@ -207,7 +207,11 @@ class Route
 				$route = $this->getFunctionalRouteObject($this);
 				if($route->isProtected() === true)
 				{
-					$this->functionalRouteAuth($route);
+					$result = $this->functionalRouteAuth($route);
+					if ($result !== true) {
+						Auth::get()->noAuth($route);
+						return false;
+					}
 				}
 
 				$this->beforeFunctionalRouting();
@@ -565,6 +569,7 @@ class Route
 	}
 
 	/**
+	 * Get the entire Options Array
 	 * @return array
 	 */
 	public function getOptions(): array
@@ -573,6 +578,7 @@ class Route
 	}
 
 	/**
+	 * Set the entire Options Array
 	 * @param array $options
 	 * @return Route
 	 */
@@ -580,6 +586,23 @@ class Route
 	{
 		$this->options = $options;
 		return $this;
+	}
+
+	/**
+	 * Returns a specific option from the options array.
+	 * @param string $key
+	 * @return mixed|null
+	 */
+	public function getOption(string $key)
+	{
+	if(isset($this->options[$key]))
+		{
+			return $this->options[$key];
+		}
+		else
+		{
+			return null;
+		}
 	}
 
 	/**
@@ -893,8 +916,14 @@ class Route
 			}
 
 			//Check for a controller layout and build it.
-			//@todo support more than the default layout - View/Layout Refactor
-			$layoutName = Config::getValue('layout','default', false);
+			if(isset($functionalRoute->options['layout']))
+			{
+				$layoutName = $functionalRoute->options['layout'];
+			}
+			else
+			{
+				$layoutName = Config::getValue('layout', 'default', false);
+			}
 			if($layoutName != '')
 			{
 				$layout = new Layout($layoutName);
@@ -963,7 +992,21 @@ class Route
 	 */
 	protected function functionalRouteAuth(Route $route)
 	{
-		//@todo Implement functional routing authentication.
+		$auth = Auth::get();
+		if ($auth->isAuthed()) {
+			if ($requiredLevel = $route->getOption('authLevel'))
+			{
+				$level = $auth->getAuthLevel();
+				if ($requiredLevel == $level)
+				{
+					return true;
+				}
+			}
+			else
+			{
+				return true;
+			}
+		}
 		return false;
 	}
 

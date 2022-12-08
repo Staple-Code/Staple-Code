@@ -287,8 +287,8 @@ class Main
 	 * @param string $class
 	 * @return Controller | NULL
 	 */
-	public function getController($class)
-	{
+	public function getController(string $class): ?Controller
+    {
 		$class = strtolower($class);
 		return Session::getController($class);
 	}
@@ -301,7 +301,7 @@ class Main
 	 * @throws AuthException
 	 * @throws \Exception
 	 */
-	public function run($route = NULL)
+	public function run($route = NULL): bool
 	{
 		//First determine which routing information to use
 		if(!is_null($route))								//Use the supplied Route

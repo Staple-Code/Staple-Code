@@ -32,6 +32,7 @@ namespace Staple\Session;
 use Staple\Auth\Auth;
 use Staple\Config;
 use Staple\Controller\Controller;
+use Staple\Exception\ConfigurationException;
 use Staple\Exception\SessionException;
 use Staple\Traits\Singleton;
 
@@ -67,12 +68,12 @@ class Session
 	 * Session constructor. Optional session handler object parameter.
 	 *
 	 * @param Handler $handler
-	 * @param string $name
-	 * @throws SessionException
-	 */
-	public function __construct(Handler $handler = NULL, $name = NULL)
+	 * @param string|null $name
+	 * @throws SessionException | ConfigurationException
+     */
+	public function __construct(Handler $handler = NULL, string $name = NULL)
 	{
-		//Setup the session handler
+		//Set up the session handler
 		if(isset($handler))
 			$this->setHandler($handler);
 		elseif (($configHandler = Config::getValue('session','handler',false)) != NULL)
@@ -83,15 +84,15 @@ class Session
 		//Set the optional session name
 		if(isset($name))
 		{
-			if(php_sapi_name() != 'cli')
+			if(php_sapi_name() !== 'cli')
 				session_name($name);
 			$this->setSessionName($name);
 		}
 		elseif(($configName = Config::getValue('session', 'name', false)) != null)
 		{
-			if(php_sapi_name() != 'cli')
-				session_name($name);
-			$this->setSessionName($name);
+			if(php_sapi_name() !== 'cli')
+				session_name($configName);
+			$this->setSessionName($configName);
 		}
 
 		//Set the session max lifetime
@@ -101,7 +102,7 @@ class Session
 			$this->setMaxLifetime(ini_get('session.gc_maxlifetime'));
 
 		//Setup session handler functions
-		if(php_sapi_name() != 'cli')
+		if(php_sapi_name() !== 'cli')
 		{
 			if(!headers_sent())
 			{

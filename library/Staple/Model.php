@@ -487,7 +487,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 				return $models;
 		}
 
-		throw new ModelNotFoundException();
+		return [];
 	}
 
 	/**
