@@ -8,3 +8,4 @@ RewriteCond %{REQUEST_FILENAME} !-d
 
 RewriteRule ^(.[a-zA-Z0-9\/-]*)$ index.php?/$1 [PT,QSA,L]
 
+Options -Multiviews
