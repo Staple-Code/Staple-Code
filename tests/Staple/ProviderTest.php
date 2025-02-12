@@ -6,8 +6,6 @@
  * Time: 11:36 AM
  */
 
-namespace Staple\Tests;
-
 use PHPUnit\Framework\TestCase;
 use Staple\Auth\Auth;
 use Staple\Auth\AuthAdapter;
@@ -33,10 +31,10 @@ class FakeProviderAuthAdapter implements AuthAdapter
 	 * authentication as successful. If a non-boolean true is returned, authentication will
 	 * fail.
 	 *
-	 * @param Request $request
+	 * @param mixed $credentials
 	 * @return bool
 	 */
-	public function getAuth($request): bool
+	public function getAuth(mixed $credentials): bool
 	{
 		$authHeader = Request::get()->findHeader('Authorization');
 		$token = trim(str_ireplace('Bearer','', $authHeader));

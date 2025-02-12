@@ -6,15 +6,13 @@
  * Time: 10:06 AM
  */
 
-namespace Staple\Tests;
-
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Staple\Auth\Auth;
 use Staple\Auth\AuthAdapter;
 use Staple\Auth\AuthRoute;
 use Staple\Exception\ConfigurationException;
 use Staple\Query\Connection;
-use \Exception;
 
 class FakeAuthAdapter implements AuthAdapter
 {
@@ -39,7 +37,7 @@ class FakeAuthAdapter implements AuthAdapter
 	 * @param mixed $credentials
 	 * @return bool
 	 */
-	public function getAuth($credentials): bool
+	public function getAuth(mixed $credentials): bool
 	{
 		if(is_array($credentials))
 		{
@@ -131,10 +129,9 @@ class AuthTest extends TestCase
 	}
 
 	/**
-	 * @test
-	 * @throws Exception
+     * @throws Exception
 	 */
-	public function testLoginWithArrayOfCredentials()
+	#[Test] public function testLoginWithArrayOfCredentials()
 	{
 		$auth = $this->getAuth();
 		$auth->implementAuthAdapter(new FakeAuthAdapter());
@@ -151,10 +148,9 @@ class AuthTest extends TestCase
 	}
 
 	/**
-	 * @test
-	 * @throws Exception
+     * @throws Exception
 	 */
-	public function testFailedLoginWithArrayOfCredentials()
+	#[Test] public function testFailedLoginWithArrayOfCredentials()
 	{
 		$auth = $this->getAuth();
 		$auth->implementAuthAdapter(new FakeAuthAdapter());
@@ -171,10 +167,9 @@ class AuthTest extends TestCase
 	}
 
 	/**
-	 * @test
-	 * @throws Exception
+     * @throws Exception
 	 */
-	public function testLoginAndLogOut()
+	#[Test] public function testLoginAndLogOut()
 	{
 		$auth = $this->getAuth();
 		$auth->implementAuthAdapter(new FakeAuthAdapter());

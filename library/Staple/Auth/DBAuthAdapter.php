@@ -48,22 +48,22 @@ class DBAuthAdapter implements AuthAdapter
 
 	/**
 	 * getAuth checks the database for valid credentials and returns true if they are found.
-	 * @param mixed $cred
+	 * @param mixed $credentials
 	 * @return bool
 	 * @throws ConfigurationException|QueryException
 	 * @see Staple_AuthAdapter::getAuth()
 	 */
-	public function getAuth($cred): bool
+	public function getAuth(mixed $credentials): bool
 	{
-		if(isset($cred['username']) AND isset($cred['password']))
+		if(isset($credentials['username']) AND isset($credentials['password']))
 		{
 			switch(Config::getValue('DBAuthAdapter','pwenctype', false))
 			{
 				case 'SHA256':
-					$pass = hash('sha256', $cred['password']);
+					$pass = hash('sha256', $credentials['password']);
 					break;
 				default:
-					$pass = password_hash($cred['password'], PASSWORD_DEFAULT);
+					$pass = password_hash($credentials['password'], PASSWORD_DEFAULT);
 			}
 
 			$columns = [
@@ -71,15 +71,15 @@ class DBAuthAdapter implements AuthAdapter
 				Config::getValue('DBAuthAdapter','pwfield')
 			];
 			$query = Query::select(Config::getValue('DBAuthAdapter','authtable'), $columns)
-				->whereEqual(Config::getValue('DBAuthAdapter','uidfield'), $cred['username']);
+				->whereEqual(Config::getValue('DBAuthAdapter','uidfield'), $credentials['username']);
 			if(($result = $query->execute()) !== false)
 			{
 				$row = $result->fetch(PDO::FETCH_ASSOC);
 				//Secondary check to make sure the results did not differ from MySQL's response.
-				if(strtolower($row[Config::getValue('DBAuthAdapter','uidfield')]) == strtolower($cred['username'])
+				if(strtolower($row[Config::getValue('DBAuthAdapter','uidfield')]) == strtolower($credentials['username'])
 					&& password_verify($pass, $row[Config::getValue('DBAuthAdapter','pwfield')]))
 				{
-					$this->uid = $cred['username'];
+					$this->uid = $credentials['username'];
 					return true;
 				}
 			}

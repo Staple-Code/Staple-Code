@@ -12,6 +12,7 @@ namespace Staple\Auth;
 use Auth0\SDK\Exception\CoreException;
 use Auth0\SDK\JWTVerifier;
 use Staple\Config;
+use Staple\Exception\ConfigurationException;
 use Staple\Request;
 
 class OAuthAdapter implements AuthAdapter
@@ -19,12 +20,14 @@ class OAuthAdapter implements AuthAdapter
 	const AUTHORIZATION_HEADER = 'Authorization';
 	use AuthRoute;
 
-	private $userInfo;
-	/**
-	 * @param Request $request
-	 * @return bool
-	 */
-	public function getAuth($request): bool
+	private mixed $userInfo;
+
+    /**
+     * @param mixed $credentials
+     * @return bool
+     * @throws ConfigurationException
+     */
+	public function getAuth(mixed $credentials): bool
 	{
 		try {
 			$verifier = new JWTVerifier([
@@ -32,7 +35,7 @@ class OAuthAdapter implements AuthAdapter
 				'valid_audiences' => Config::getValue('oauth','valid_audiences'),
 				'authorized_iss' => Config::getValue('oauth','authorized_iss'),
 			]);
-			$authHeader = $request->findHeader(self::AUTHORIZATION_HEADER);
+			$authHeader = $credentials->findHeader(self::AUTHORIZATION_HEADER);
 			$token = trim(str_ireplace('Bearer', '', $authHeader));
 
 			$this->userInfo = $verifier->verifyAndDecode($token);
@@ -58,4 +61,13 @@ class OAuthAdapter implements AuthAdapter
 	{
 		return $this->userInfo;
 	}
+
+    /**
+     * @return bool
+     */
+    public function clear(): bool
+    {
+        $this->userInfo = null;
+        return true;
+    }
 }

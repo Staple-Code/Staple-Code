@@ -20,8 +20,8 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Staple\Tests;
 
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Staple\Auth\Auth;
 use Staple\Auth\AuthAdapter;
@@ -58,7 +58,7 @@ class FakeCtrlAuthAdapter implements AuthAdapter
 	 * @param mixed $credentials
 	 * @return bool
 	 */
-	public function getAuth($credentials): bool
+	public function getAuth(mixed $credentials): bool
 	{
 		if(is_array($credentials))
 		{
@@ -144,9 +144,7 @@ class ControllerTest extends TestCase
 	}
 
 	/**
-	 * @throws AuthException
-	 * @throws PageNotFoundException
-	 * @throws RoutingException
+     * @throws RoutingException
 	 */
 	public function testRouting()
 	{
@@ -154,22 +152,27 @@ class ControllerTest extends TestCase
 		Request::fake(self::ROUTE_VIEW, Request::METHOD_GET);
 		$route = Route::create(self::ROUTE_VIEW);
 		ob_start();
-		$route->execute();
-		$textBuffer = ob_get_clean();
+        try {
+            $route->execute();
+        } catch (\ReflectionException $e) {
+        } catch (AuthException $e) {
+        } catch (PageNotFoundException $e) {
+        } catch (RoutingException $e) {
+        }
+        $textBuffer = ob_get_clean();
 
 		$this->assertEquals('This is a test View.', $textBuffer);
 	}
 
 	/**
-	 * @test
-	 * @throws AuthException
+     * @throws AuthException
 	 * @throws ConfigurationException
 	 * @throws PageNotFoundException
 	 * @throws RoutingException
 	 * @throws SessionException
 	 * @throws SystemException
 	 */
-	public function testAuthenticatedRouting()
+	#[Test] public function testAuthenticatedRouting()
 	{
 		//Setup Auth Object
 		$auth = Auth::get();
@@ -201,15 +204,14 @@ class ControllerTest extends TestCase
 	}
 
 	/**
-	 * @test
-	 * @throws AuthException
+     * @throws AuthException
 	 * @throws ConfigurationException
 	 * @throws PageNotFoundException
 	 * @throws RoutingException
 	 * @throws SessionException
 	 * @throws SystemException
 	 */
-	public function testAuthenticatedRoutingWithGlobalControllerProtection()
+	#[Test] public function testAuthenticatedRoutingWithGlobalControllerProtection()
 	{
 		//View Route
 		Request::fake(self::ROUTE_UNPROTECTED_VIEW, Request::METHOD_GET);
@@ -250,12 +252,11 @@ class ControllerTest extends TestCase
 	}
 
 	/**
-	 * @test
-	 * @throws AuthException
+     * @throws AuthException
 	 * @throws PageNotFoundException
 	 * @throws RoutingException
 	 */
-	public function testIndexNotRequired()
+	#[Test] public function testIndexNotRequired()
 	{
 		$route1 = new Route('no-index/account');
 		$route2 = new Route('no-index/index');

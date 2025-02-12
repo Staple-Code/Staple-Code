@@ -40,7 +40,7 @@ interface AuthAdapter
 	 * @throws NotAuthorizedException
 	 * @return bool
 	 */
-	public function getAuth($credentials): bool;
+	public function getAuth(mixed $credentials): bool;
 	/**
 	 * 
 	 * This function must be implemented to return a numeric level of access. This level is
