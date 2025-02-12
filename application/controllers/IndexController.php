@@ -29,7 +29,7 @@ class IndexController extends Controller
 		// Controller Startup Code
 	}
 	
-	public function index()
+	public function index(): View
 	{
 		// Index Action Code Goes Here.
 		return View::create();

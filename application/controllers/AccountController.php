@@ -2,6 +2,11 @@
 
 use Staple\Auth\Auth;
 use Staple\Controller\Controller;
+use Staple\Exception\ConfigurationException;
+use Staple\Exception\NotAuthorizedException;
+use Staple\Exception\RoutingException;
+use Staple\Exception\SessionException;
+use Staple\Exception\SystemException;
 use Staple\Route;
 use Staple\View;
 
@@ -28,22 +33,29 @@ use Staple\View;
  */
 class AccountController extends Controller
 {
-	/**
-	 * @protected
-	 * @return View
-	 */
-	public function index()
-	{
+    /**
+     * @protected
+     * @return View
+     * @throws SessionException
+     * @throws Exception
+     */
+	public function index(): View
+    {
 		return View::create()->data([
 			'message' => Auth::get()->getMessage()
 		]);
 	}
 
-	/**
-	 * @return Route
-	 */
-	public function signin()
-	{
+    /**
+     * @return Route
+     * @throws SessionException
+     * @throws ConfigurationException
+     * @throws NotAuthorizedException
+     * @throws RoutingException
+     * @throws SystemException
+     */
+	public function signin(): Route
+    {
 		$username = $_POST['user'] ?? null;
 		$password = $_POST['pass'] ?? null;
 		

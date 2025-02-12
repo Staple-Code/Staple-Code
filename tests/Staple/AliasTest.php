@@ -21,31 +21,22 @@
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Staple\Tests;
-
-
 use PHPUnit\Framework\TestCase;
 use Staple\Alias;
 
 class AliasTest extends TestCase
 {
-	private $alias;
-
-	public function __construct()
+    public function testAddAlias()
 	{
-		parent::__construct();
-		$this->alias = new Alias();
-	}
+        $alias = new Alias();
 
-	public function testAddAlias()
-	{
 		//Add an alias
-		$this->alias->addAlias('MyNewClass','\\MyNamespace\\MyNewClass');
+		$alias->addAlias('MyNewClass','\\MyNamespace\\MyNewClass');
 
 		//Test that the array key was added
-		$this->assertArrayHasKey('MyNewClass',$this->alias->getClassMap());
+		$this->assertArrayHasKey('MyNewClass', $alias->getClassMap());
 
 		//Test that the alias is returned when checked for.
-		$this->assertEquals($this->alias->checkAlias('MyNewClass'),'\\MyNamespace\\MyNewClass');
+		$this->assertEquals($alias->checkAlias('MyNewClass'),'\\MyNamespace\\MyNewClass');
 	}
 }

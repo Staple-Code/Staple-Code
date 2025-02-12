@@ -21,8 +21,7 @@
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Staple\Tests;
-
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Staple\Exception\ConfigurationException;
 use Staple\Exception\ModelNotFoundException;
@@ -50,7 +49,7 @@ class productListCategoryModel extends Model
 
 class clientModel extends Model
 {
-	protected $_table = 'customers';
+	protected string $_table = 'customers';
 }
 
 
@@ -106,21 +105,20 @@ class ModelTest extends TestCase
 		return $user;
 	}
 
-	protected function getTestProductListCategoryModelObject()
-	{
+	protected function getTestProductListCategoryModelObject(): productListCategoryModel
+    {
 		return new productListCategoryModel();
 	}
 
-	protected function getTestClientModelObject()
-	{
+	protected function getTestClientModelObject(): clientModel
+    {
 		return new clientModel();
 	}
 
 	/**
 	 * Test that the auto-creation of table models is constructed correctly.
-	 * @test
-	 */
-	public function testModelTableNameGeneration()
+     */
+	#[Test] public function testModelTableNameGeneration()
 	{
 		$userModel = $this->getTestUserModelObject();
 		$productListCategoryModel = $this->getTestProductListCategoryModelObject();
@@ -133,20 +131,18 @@ class ModelTest extends TestCase
 
 	/**
 	 * Test the model's ability to create instances of itself.
-	 * @test
-	 */
-	public function testFactory()
+     */
+	#[Test] public function testFactory()
 	{
-		$this->assertInstanceOf('Staple\\Tests\\userModel',userModel::make());
-		$this->assertInstanceOf('Staple\\Tests\\clientModel',clientModel::make());
-		$this->assertInstanceOf('Staple\\Tests\\productListCategoryModel',productListCategoryModel::make());
+		$this->assertInstanceOf('userModel',userModel::make());
+		$this->assertInstanceOf('clientModel',clientModel::make());
+		$this->assertInstanceOf('productListCategoryModel',productListCategoryModel::make());
 	}
 
 	/**
-	 * @test
-	 * @throws ModelNotFoundException
+     * @throws ModelNotFoundException
 	 */
-	public function testFind()
+	#[Test] public function testFind()
 	{
 		/** @var userModel $user */
 		$user = userModel::find(1);
@@ -155,7 +151,7 @@ class ModelTest extends TestCase
 
 
 		//Assert user 1 results
-		$this->assertInstanceOf('Staple\Tests\userModel',$user);
+		$this->assertInstanceOf('userModel',$user);
 		$this->assertEquals(1, $user->id);
 		$this->assertEquals('Joe', $user->name);
 		$this->assertEquals('joe@aol.com', $user->email);
@@ -164,7 +160,7 @@ class ModelTest extends TestCase
 		$this->assertEquals(1, $user->getId());
 
 		//Assert user 2 results
-		$this->assertInstanceOf('Staple\Tests\userModel',$user2);
+		$this->assertInstanceOf('userModel',$user2);
 		$this->assertEquals(2, $user2->id);
 		$this->assertEquals('Tom', $user2->name);
 		$this->assertEquals('tom@hotmail.com', $user2->email);
@@ -176,7 +172,7 @@ class ModelTest extends TestCase
 		{
 			/** @var bool $user3 */
 			userModel::find(3);
-			$this->hasFailed();
+			$this->fail();
 		}
 		catch(ModelNotFoundException $e)
 		{
@@ -186,11 +182,10 @@ class ModelTest extends TestCase
 	}
 
 	/**
-	 * @test
-	 * @throws ModelNotFoundException
+     * @throws ModelNotFoundException
 	 * @throws QueryException
 	 */
-	public function testFindAll()
+	#[Test] public function testFindAll()
 	{
 		/** @var userModel[] $users */
 		$users = userModel::findAll();
@@ -198,12 +193,12 @@ class ModelTest extends TestCase
 		$this->assertCount(2, $users);
 		foreach($users as $user)
 		{
-			$this->assertInstanceOf('Staple\Tests\userModel',$user);
+			$this->assertInstanceOf('userModel',$user);
 		}
 
 		$user2 = array_pop($users);
 		//Assert user 2 results
-		$this->assertInstanceOf('Staple\Tests\userModel',$user2);
+		$this->assertInstanceOf('userModel',$user2);
 		$this->assertEquals(2, $user2->id);
 		$this->assertEquals('Tom', $user2->name);
 		$this->assertEquals('tom@hotmail.com', $user2->email);
@@ -213,7 +208,7 @@ class ModelTest extends TestCase
 
 		$user1 = array_pop($users);
 		//Assert user 1 results
-		$this->assertInstanceOf('Staple\Tests\userModel',$user1);
+		$this->assertInstanceOf('userModel',$user1);
 		$this->assertEquals(1, $user1->id);
 		$this->assertEquals('Joe', $user1->name);
 		$this->assertEquals('joe@aol.com', $user1->email);

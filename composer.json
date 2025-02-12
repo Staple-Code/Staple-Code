@@ -13,15 +13,15 @@
     }
   ],
   "require": {
-    "php": ">=7.4",
+    "php": ">=8.2",
     "ext-pdo": "*",
     "ext-json": "*",
+    "ext-ldap": "*",
     "ext-openssl": "*",
-    "twig/twig":"~3.4.0",
-    "phpunit/phpunit": "^8.0",
+    "twig/twig":"~v3.19.0",
+    "phpunit/phpunit": "^11.5.7",
     "predis/predis":"^1.1",
-    "auth0/auth0-php": "^7.4",
-    "ext-ldap": "*"
+    "auth0/auth0-php": "^8.13.0"
   },
   "suggest": {
     "ext-ctype": "Provide ctype function support for installs without the ctype extension."

@@ -208,8 +208,8 @@ class Main
 	 * @return bool
 	 * @throws ConfigurationException
 	 */
-	public function inDevMode()
-	{
+	public function inDevMode(): bool
+    {
 	    return (bool)Config::getValue('errors', 'devmode');
 	}
 	

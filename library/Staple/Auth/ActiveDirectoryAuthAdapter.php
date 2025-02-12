@@ -77,24 +77,24 @@ class ActiveDirectoryAuthAdapter implements AuthAdapter
 
 	/**
 	 * getAuth checks Active Directory for valid credentials and returns true if they are found.
-	 * @param mixed $cred
+	 * @param mixed $credentials
 	 * @return bool
 	 * @throws Exception
 	 * @see Staple_AuthAdapter::getAuth()
 	 */
-	public function getAuth($cred): bool
+	public function getAuth(mixed $credentials): bool
 	{
 		if($this->checkConfig($this->_settings))
 		{
-			if(array_key_exists('username', $cred) AND array_key_exists('password', $cred))
+			if(array_key_exists('username', $credentials) AND array_key_exists('password', $credentials))
 			{
-				if(strlen($cred['username']) >= 1 && strlen($cred['password']) >= 1)
+				if(strlen($credentials['username']) >= 1 && strlen($credentials['password']) >= 1)
 				{
-					if(AD::validchars($cred['username']) == TRUE && AD::validchars($cred['password']) == TRUE)
+					if(AD::validchars($credentials['username']) == TRUE && AD::validchars($credentials['password']) == TRUE)
 					{
-						$pass = $cred['password'];
+						$pass = $credentials['password'];
 						$LDAP = AD::get();
-						$this->uid = $cred['username'];
+						$this->uid = $credentials['username'];
 						if($LDAP->bind($this->uid, $pass))
 						{
 							return true;
@@ -183,5 +183,13 @@ class ActiveDirectoryAuthAdapter implements AuthAdapter
 	{
 		return $this->uid;
 	}
-	
+
+    /**
+     * @return bool
+     */
+    public function clear(): bool
+    {
+        $this->uid = null;
+        return true;
+    }
 }

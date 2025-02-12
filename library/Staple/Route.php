@@ -38,6 +38,7 @@ use Exception;
 
 class Route
 {
+    const ROUTE_NOT_FOUND = 0;
 	const ROUTE_MVC = 1;
 	/** @deprecated  */
 	const ROUTE_SCRIPT = 2;
@@ -53,27 +54,27 @@ class Route
 	 * The name of the controller being executed.
 	 * @var string
 	 */
-	protected $controller;
+	protected string $controller;
 	/**
 	 * Name of the action being executed.
 	 * @var string
 	 */
-	protected $action;
+	protected string $action;
 	/**
 	 * The parameters that are being sent to the action
 	 * @var array[mixed]
 	 */
-	protected $params = array();
+	protected array $params = array();
 	/**
 	 * Type of route: MVC route or script route.
 	 * @var int
 	 */
-	protected $type;
+	protected int $type = self::ROUTE_NOT_FOUND;
 	/**
 	 * The string interpretation of the route.
 	 * @var string
 	 */
-	protected $routeString;
+	protected string $routeString;
 	/**
 	 * A callback method used for functional routing
 	 * @var callable
@@ -83,39 +84,39 @@ class Route
 	 * Boolean to denote that the route is protected by the auth system.
 	 * @var bool
 	 */
-	private $protected;
+	private bool $protected;
 	/**
 	 * Any additional route options. Used with Functional Routing
 	 * @var array
 	 */
-	private $options;
+	private array $options;
 	/**
 	 * Static array of registered Functional Routes.
 	 * @var [Route]
 	 */
-	private static $functionalRoutes = [];
+	private static array $functionalRoutes = [];
 	/**
 	 * Callback functions to be executed before a functional route is executed.
 	 * @var [callable]
 	 */
-	private static $beforeRouteCallbacks = [];
+	private static array $beforeRouteCallbacks = [];
 	/**
 	 * Callback functions to be executed after a functional route is executed.
 	 * @var [callable]
 	 */
-	private static $afterRouteCallbacks = [];
+	private static array $afterRouteCallbacks = [];
 
 	/**
 	 * Route constructor.
-	 * @param mixed $route
+	 * @param mixed|null $route
 	 * @throws RoutingException
 	 * @throws ConfigurationException
 	 */
-	public function __construct($route = NULL)
+	public function __construct(mixed $route = NULL)
 	{
 		//Check for sub-path configuration.
 		$publicLocation = Config::getValue('application', 'public_location');
-		if(strlen($publicLocation) && substr($route, 0, strlen($publicLocation)) === $publicLocation)
+		if(!is_array($route) && strlen($publicLocation) && str_starts_with($route, $publicLocation))
 		{
 			$route = substr($route, strlen($publicLocation));
 		}
@@ -161,13 +162,13 @@ class Route
 
 	/**
 	 * Create and return an instance of the object.
-	 * @param string $link
+	 * @param string|null $link
 	 * @return static
-	 * @throws RoutingException
-	 * @deprecated
+	 * @throws RoutingException|ConfigurationException
+     * @deprecated
 	 */
-	public static function make($link = NULL)
-	{
+	public static function make(string $link = NULL): static
+    {
 		return new static($link);
 	}
 
@@ -190,8 +191,8 @@ class Route
 	 * @throws AuthException
 	 * @throws ReflectionException
 	 */
-	public function execute()
-	{
+	public function execute(): bool
+    {
 		//Route Controller and actions
 		$class = $this->getController();
 		$method = $this->getAction();
@@ -403,12 +404,12 @@ class Route
 
 	/**
 	 * Push the route to a Restful Controller
-	 * @param $providerClass
+	 * @param string $providerClass
 	 * @throws RoutingException
 	 * @throws Exception
 	 */
-	private function routeToProvider($providerClass)
-	{
+	private function routeToProvider(string $providerClass): void
+    {
 		$providerObject = new $providerClass(Auth::get());
 		if($providerObject instanceof RestfulController)
 		{
@@ -426,8 +427,8 @@ class Route
 	 * Redirect to the route location.
 	 * @throws ConfigurationException
 	 */
-	public function redirect()
-	{
+	public function redirect(): void
+    {
 		$base = Config::getValue('application', 'public_location');
 		header('Location: '.$base.$this);
 		exit(0);
@@ -436,32 +437,32 @@ class Route
 	/**
 	 * @return string $controller
 	 */
-	public function getController()
-	{
+	public function getController(): string
+    {
 		return $this->controller;
 	}
 
 	/**
 	 * @return string $action
 	 */
-	public function getAction()
-	{
+	public function getAction(): string
+    {
 		return $this->action;
 	}
 
 	/**
 	 * @return array $params
 	 */
-	public function getParams()
-	{
+	public function getParams(): array
+    {
 		return $this->params;
 	}
 
 	/**
 	 * @return int $type
 	 */
-	public function getType()
-	{
+	public function getType(): int
+    {
 		return $this->type;
 	}
 
@@ -470,8 +471,8 @@ class Route
 	 * @param int $type
 	 * @return $this
 	 */
-	public function setType($type)
-	{
+	public function setType(int $type): static
+    {
 		switch($type)
 		{
 			case self::ROUTE_MVC:
@@ -488,8 +489,8 @@ class Route
 	 * @param string $controller
 	 * @return $this
 	 */
-	public function setController($controller)
-	{
+	public function setController(string $controller): static
+    {
 		$this->controller = $controller;
 		return $this;
 	}
@@ -498,8 +499,8 @@ class Route
 	 * @param string $action
 	 * @return $this
 	 */
-	public function setAction($action)
-	{
+	public function setAction(string $action): static
+    {
 		$this->action = $action;
 		return $this;
 	}
@@ -829,8 +830,8 @@ class Route
 	 * @param mixed $route
 	 * @return bool
 	 */
-	protected static function matchesFunctionalRoute($route)
-	{
+	protected static function matchesFunctionalRoute(mixed $route): bool
+    {
 		try
 		{
 			$route = self::getFunctionalRouteObject($route);
@@ -863,7 +864,7 @@ class Route
 	 * @return Route
 	 * @throws PageNotFoundException
 	 */
-	public static function getFunctionalRouteObject($route) : Route
+	public static function getFunctionalRouteObject(mixed $route) : Route
 	{
 		if(is_array($route))
 		{

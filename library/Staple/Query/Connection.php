@@ -158,16 +158,12 @@ class Connection extends PDO implements IConnection
 		{
 			case 'insert_id':
 				return $this->lastInsertId();
-				break;
 			case 'last_query':
 				return $this->getLastQuery();
-				break;
 			case 'error':
 				return $this->errorInfo();
-				break;
 			case 'errno':
 				return $this->errorCode();
-				break;
 			default:
 				return NULL;
 		}
@@ -571,8 +567,8 @@ class Connection extends PDO implements IConnection
 	 *
 	 * @return array
 	 */
-	public function getDriverOptions()
-	{
+	public function getDriverOptions(): array
+    {
 		$options = [];
 		switch($this->getDriver())
 		{
@@ -587,10 +583,10 @@ class Connection extends PDO implements IConnection
 
 	/**
 	 * @param string $statement
-	 * @return PDOStatement | boolean
+	 * @return int | false
 	 */
-	public function exec($statement)
-	{
+	public function exec(string $statement): false|int
+    {
 		$this->addQueryToLog($statement);
 
 		//Execute the query and check for errors
@@ -604,17 +600,21 @@ class Connection extends PDO implements IConnection
 		return $return;
 	}
 
-	/**
-	 * @param string $statement
-	 * @return Statement
-	 */
-	public function query($statement)
-	{
+    /**
+     * Executes a query and returns the result as a Statement object.
+     *
+     * @param string $query The SQL query to execute
+     * @param int|null $fetchMode The fetch mode to use, defaults to PDO::FETCH_CLASS
+     * @param mixed ...$fetch_mode_args Additional arguments for the fetch mode
+     * @return Statement The result of the query wrapped in a Statement object
+     */
+	public function query(string $query, int|null $fetchMode = PDO::FETCH_CLASS, mixed ...$fetch_mode_args): Statement
+    {
 		//Log the query
-		$this->addQueryToLog((string)$statement);
+		$this->addQueryToLog($query);
 
 		//Execute the query and check for errors
-		if(($result = parent::query((string)$statement, PDO::FETCH_CLASS, '\Staple\Query\Statement')) === false)
+		if(($result = parent::query($query, $fetchMode, '\Staple\Query\Statement')) === false)
 		{
 			//Notify the observers that an error has occurred.
 			$this->notify();
@@ -630,29 +630,30 @@ class Connection extends PDO implements IConnection
 		return $result;
 	}
 
-	/**
-	 * @param string $statement
-	 * @param array|null $driver_options
-	 * @return IStatement
-	 */
-	public function prepare($statement, $driver_options = [])
-	{
-		/** @var IStatement $statement */
-		$statement = parent::prepare($statement, $driver_options);
-		$statement->setDriver($this->getDriver());
-		$statement->setConnection($this);
-		return $statement;
+    /**
+     * @param string $query
+     * @param array $options
+     * @return false|PDOStatement|IStatement
+     */
+	public function prepare(string $query, array $options = []): false|PDOStatement|IStatement
+    {
+		$query = parent::prepare($query, $options);
+		$query->setDriver($this->getDriver());
+		$query->setConnection($this);
+		return $query;
 	}
 
-	/**
-	 * @param string $query
-	 * @param array $fields
-	 * @return bool|PDOStatement
-	 */
-	public function prepareAndExecute(string $query, array $fields)
-	{
+    /**
+     * Prepares and executes a query with the given fields and returns the result as a Statement object, bool, or PDOStatement.
+     *
+     * @param string $query The SQL query to prepare and execute
+     * @param array $fields The values to bind to the query parameters
+     * @return Statement|bool The result of the query wrapped in a Statement object if successful, boolean false if execution fails, or a PDOStatement
+     */
+	public function prepareAndExecute(string $query, array $fields): Statement|bool
+    {
 		//Log the query
-		$this->addQueryToLog((string)$query);
+		$this->addQueryToLog($query);
 
 		$statement = parent::prepare($query, $this->getDriverOptions());
 

@@ -276,12 +276,12 @@ class ModelSelectQuery extends ModelQuery implements ISelectQuery
 		return $this;
 	}
 
-	/**
-	 * @param $order
-	 * @return ModelSelectQuery
-	 */
-	public function orderBy($order)
-	{
+    /**
+     * @param string|array $order
+     * @return static
+     */
+	public function orderBy(string|array $order): static
+    {
 		$this->queryObject->orderBy($order);
 		return $this;
 	}

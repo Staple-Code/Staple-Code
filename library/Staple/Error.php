@@ -28,6 +28,7 @@ use Exception;
 use SplObjectStorage;
 use SplObserver;
 use SplSubject;
+use Staple\Exception\ConfigurationException;
 use Staple\Exception\PageNotFoundException;
 
 class Error implements SplSubject
@@ -46,19 +47,19 @@ class Error implements SplSubject
 	 * The object observers
 	 * @var SplObjectStorage
 	 */
-	private $_observers;
+	private SplObjectStorage $_observers;
 	
 	/**
 	 * This is the callback for error handling.
 	 * @var SplObserver
 	 */
-	protected $logger;
+	protected SplObserver $logger;
 	
 	/**
 	 * The last exception that was thrown by the system.
 	 * @var Exception
 	 */
-	private static $lastException;
+	private static Exception $lastException;
 	
 	/**
 	 * The default constructor.
@@ -72,8 +73,8 @@ class Error implements SplSubject
 	 * Set the logger Object
 	 * @return SplObserver $logger
 	 */
-	public function getLogger()
-	{
+	public function getLogger(): SplObserver
+    {
 		return $this->logger;
 	}
 	
@@ -82,8 +83,8 @@ class Error implements SplSubject
 	 * @param SplObserver $logger
 	 * @return $this
 	 */
-	public function setLogger(SplObserver $logger)
-	{
+	public function setLogger(SplObserver $logger): static
+    {
 		$this->attach($logger);
 		$this->logger = $logger;
 		return $this;
@@ -92,20 +93,19 @@ class Error implements SplSubject
 	/**
 	 * @return Exception $lastException
 	 */
-	public function getLastException()
-	{
+	public function getLastException(): Exception
+    {
 		return self::$lastException;
 	}
 
 	/**
 	 * @param Exception $lastException
-	 * @return $this
-	 */
-	private function setLastException(Exception $lastException)
-	{
+	 * @return void
+     */
+	private function setLastException(Exception $lastException): void
+    {
 		self::$lastException = $lastException;
-		return $this;
-	}
+    }
 
 	/**
 	 * 
@@ -116,27 +116,26 @@ class Error implements SplSubject
 	 * @param int $errline
 	 * @throws ErrorException
 	 */
-	public static function handleError($errno, $errstr, $errfile, $errline)
+	public static function handleError(int $errno, string $errstr, string $errfile, int $errline)
 	{
 		//Convert Errors into exceptions.
 		throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
 	}
-	/**
-	 * 
-	 * handleException catches Exceptions and displays an error page with the details.
-	 * @todo create and implement and error controller that can display custom errors
-	 * per application.
-	 * @param Exception $ex
-	 */
-	public function handleException($ex)
-	{
+
+    /**
+     *
+     * handleException catches Exceptions and displays an error page with the details.
+     * @param Exception $ex
+     * @throws ConfigurationException
+     * @todo create and implement and error controller that can display custom errors
+     * per application.
+     */
+	public function handleException(Exception $ex): void
+    {
 		//handle the error
 		
 		//Set Last Exception
-		if($ex instanceof Exception)
-		{
-			$this->setLastException($ex);
-		}
+        $this->setLastException($ex);
 		
 		//Notify observers
 		$this->notify();
@@ -201,28 +200,34 @@ class Error implements SplSubject
 	{
 	    
 	}
-	
-	/* (non-PHPdoc)
-	 * @see SplSubject::attach()
-	 */
-	public function attach(SplObserver $observer)
-	{
+
+    /**
+     * Attach an observer to the observers list.
+     *
+     * @param SplObserver $observer The observer to attach
+     * @return void
+     */
+	public function attach(SplObserver $observer): void
+    {
 		$this->_observers->attach($observer);
 	}
 
-	/* (non-PHPdoc)
-	 * @see SplSubject::detach()
-	 */
-	public function detach(SplObserver $observer)
-	{
+    /**
+     * Detach an observer from the observers list.
+     *
+     * @param SplObserver $observer The observer to detach
+     * @return void
+     */
+	public function detach(SplObserver $observer): void
+    {
 		$this->_observers->detach($observer);
 	}
 
-	/* (non-PHPdoc)
-	 * @see SplSubject::notify()
-	 */
-	public function notify()
-	{
+    /**
+     * Notify all observers by calling their update method with $this as parameter.
+     */
+	public function notify(): void
+    {
 		foreach($this->_observers as $observer)
 		{
 		    $observer->update($this);

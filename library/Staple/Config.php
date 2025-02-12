@@ -195,7 +195,7 @@ class Config
 	 * @return bool
 	 * @throws ConfigurationException
 	 */
-    public static function exists($set,$key = null)
+    public static function exists($set,$key = null): bool
     {
         //Get the config instance
         $inst = static::getInstance();

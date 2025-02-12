@@ -26,6 +26,7 @@
 
 namespace Staple\Query;
 
+use PDO;
 use PDOStatement;
 use SplObjectStorage;
 
@@ -35,7 +36,7 @@ class MockConnection extends Connection implements IConnection
 	 * Results to be returned from a query or exec call.
 	 * @var mixed
 	 */
-	private $results;
+	private mixed $results;
 	/**
 	 * @param $dsn
 	 * @param string $username
@@ -68,32 +69,34 @@ class MockConnection extends Connection implements IConnection
 
 	/**
 	 * @param string $statement
-	 * @return PDOStatement | boolean
-	 */
-	public function exec($statement)
-	{
-		$statement = (string)$statement;
+	 * @return int|false
+     */
+	public function exec(string $statement): int|false
+    {
 		$this->addQueryToLog($statement);
 		$this->notify();
 		return $this->getResults();
 	}
 
-	/**
-	 * @param string $statement
-	 * @return Statement
-	 */
-	public function query($statement)
-	{
-		$statement = (string)$statement;
-		$this->addQueryToLog($statement);
+    /**
+     * Executes a query with optional fetch mode and arguments.
+     *
+     * @param string $query The query to execute
+     * @param int|null $fetchMode The fetch mode (default: PDO::FETCH_CLASS)
+     * @param mixed ...$fetch_mode_args Additional arguments for fetch mode
+     * @return Statement The statement object containing the query results
+     */
+	public function query(string $query, int|null $fetchMode = PDO::FETCH_CLASS, mixed ...$fetch_mode_args): Statement
+    {
+		$this->addQueryToLog($query);
 		$this->notify();
 		return $this->getResults();
 	}
 
-	public function prepare($statement, $options = NULL)
-	{
-		$statement = (string)$statement;
-		$this->addQueryToLog($statement);
+	public function prepare($query, $options = NULL): false|PDOStatement|IStatement
+    {
+		$query = (string)$query;
+		$this->addQueryToLog($query);
 		$this->notify();
 		return new MockStatement();
 	}
@@ -102,8 +105,8 @@ class MockConnection extends Connection implements IConnection
 	 * Get the preset results
 	 * @return mixed
 	 */
-	private function getResults()
-	{
+	private function getResults(): mixed
+    {
 		return $this->results;
 	}
 
@@ -111,14 +114,14 @@ class MockConnection extends Connection implements IConnection
 	 * @param mixed $results
 	 * @return $this
 	 */
-	public function setResults($results)
-	{
+	public function setResults(mixed $results): static
+    {
 		$this->results = $results;
 		return $this;
 	}
 
-	public function quote($string, $parameter_type = \PDO::PARAM_STR)
-	{
+	public function quote($string, $type = PDO::PARAM_STR): false|string
+    {
 		if(is_string($string) || is_float($string))
 		{
 			return "'".$string."'";

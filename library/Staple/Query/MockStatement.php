@@ -21,24 +21,29 @@ class MockStatement implements IStatement
 	 * Result rows.
 	 * @var array
 	 */
-	protected $rows = [];
+	protected array $rows = [];
 	/**
 	 * The database driver that is currently in use.
 	 * @var string
 	 */
-	protected $driver;
+	protected string $driver;
 
 	/**
 	 * The Connection object
-	 * @var IConnection
+	 * @var Connection
 	 */
-	protected $connection;
+	protected Connection $connection;
 
-	/**
+    /**
+     * @var int
+     */
+    private int $count;
+
+    /**
 	 * @return array
 	 */
-	public function getRows()
-	{
+	public function getRows(): array
+    {
 		return $this->rows;
 	}
 
@@ -46,8 +51,8 @@ class MockStatement implements IStatement
 	 * @param array $rows
 	 * @return MockStatement
 	 */
-	public function setRows(array $rows)
-	{
+	public function setRows(array $rows): static
+    {
 		$this->rows = $rows;
 		$this->count = count($rows);
 
@@ -57,35 +62,35 @@ class MockStatement implements IStatement
 	/**
 	 * @return int
 	 */
-	public function getCount()
-	{
+	public function getCount(): int
+    {
 		return count($this->rows);
 	}
 
-	public function fetch($fetch_style = PDO::ATTR_DEFAULT_FETCH_MODE, $cursor_orientation = PDO::FETCH_ORI_NEXT, $cursor_offset = 0)
-	{
+	public function fetch(int $fetch_style = PDO::ATTR_DEFAULT_FETCH_MODE, int $cursor_orientation = PDO::FETCH_ORI_NEXT, int $cursor_offset = 0): mixed
+    {
 		$val = current($this->rows);
 		next($this->rows);
 		return $val;
 	}
 
-	public function fetchAll($fetch_style = PDO::ATTR_DEFAULT_FETCH_MODE, $fetch_argument = null, $ctor_args = array())
-	{
+	public function fetchAll(int $fetch_style = PDO::ATTR_DEFAULT_FETCH_MODE, mixed ...$args): array
+    {
 		return $this->getRows();
 	}
 
-	public function rowCount()
-	{
+	public function rowCount(): int
+    {
 		return $this->getCount();
 	}
 
-	public function foundRows()
-	{
+	public function foundRows(): int
+    {
 		return $this->getCount();
 	}
 
-	public function errorInfo()
-	{
+	public function errorInfo(): array
+    {
 		return [];
 	}
 
@@ -102,21 +107,21 @@ class MockStatement implements IStatement
 	 * Set the driver string
 	 * @param string $driver
 	 */
-	public function setDriver($driver)
-	{
+	public function setDriver(string $driver): void
+    {
 		$this->driver = $driver;
 	}
 
 	/**
-	 * @return IConnection
+	 * @return Connection
 	 */
-	public function getConnection(): IConnection
+	public function getConnection(): Connection
 	{
 		return $this->connection;
 	}
 
 	/**
-	 * @param IConnection $connection
+	 * @param Connection $connection
 	 * @return IStatement
 	 */
 	public function setConnection(IConnection $connection): IStatement
@@ -125,27 +130,27 @@ class MockStatement implements IStatement
 		return $this;
 	}
 
-	public function bindColumn($column, &$param, $type = null, $maxlen = null, $driverdata = null)
+	public function bindColumn($column, &$var, $type = null, $maxLength = null, $driverOptions = null): true
+    {
+		return true;
+	}
+
+	public function bindParam($param, &$var, $type = PDO::PARAM_STR, $maxLength = null, $driverOptions = null)
 	{
 		return true;
 	}
 
-	public function bindParam($parameter, &$variable, $data_type = PDO::PARAM_STR, $length = null, $driver_options = null)
-	{
+	public function bindValue($param, $value, $type = PDO::PARAM_STR): true
+    {
 		return true;
 	}
 
-	public function bindValue($parameter, $value, $data_type = PDO::PARAM_STR)
-	{
-		return true;
-	}
-
-	/**
-	 * @param null $bound_input_params
-	 * @return mixed
-	 */
-	public function execute($bound_input_params = NULL)
-	{
+    /**
+     * @param array|null $params
+     * @return mixed
+     */
+	public function execute(array|null $params = NULL): mixed
+    {
 		return true;
 	}
 }

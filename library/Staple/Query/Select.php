@@ -260,21 +260,21 @@ class Select extends Query implements ISelectQuery
 	
 	/**
 	 * Set the order.
-	 * @param string | array $order
+	 * @param array | string $order
      * @return $this
 	 */
-	public function setOrder($order)
-	{
+	public function setOrder(array|string $order): static
+    {
 		$this->order = $order;
 		return $this;
 	}
 	
 	/**
-	 * @param string | array $groupBy
+	 * @param array | string $groupBy
      * @return $this
 	 */
-	public function setGroupBy($groupBy)
-	{
+	public function setGroupBy(array|string $groupBy): static
+    {
 		$this->groupBy = $groupBy;
 		return $this;
 	}
@@ -283,9 +283,9 @@ class Select extends Query implements ISelectQuery
 	 * @param int $limit
 	 * @return Select
 	 */
-	public function setLimit($limit)
-	{
-		$this->limit = (int)$limit;
+	public function setLimit(int $limit): static
+    {
+		$this->limit = $limit;
 		return $this;
 	}
 	
@@ -293,9 +293,9 @@ class Select extends Query implements ISelectQuery
 	 * @param int $limitOffset
 	 * @return Select
 	 */
-	public function setLimitOffset($limitOffset)
-	{
-		$this->limitOffset = (int)$limitOffset;
+	public function setLimitOffset(int $limitOffset): static
+    {
+		$this->limitOffset = $limitOffset;
 		return $this;
 	}
 
@@ -305,14 +305,14 @@ class Select extends Query implements ISelectQuery
 	 * @param string $name
 	 * @return $this
 	 */
-	public function addColumn($col,$name = NULL)
-	{
+	public function addColumn(string|Select $col, string $name = NULL): static
+    {
 		if($col instanceof Query)
-			$col = '('.(string)$col.')';
+			$col = '('.$col.')';
 		
 		if(isset($name))
 		{
-			$this->columns[(string)$name] = $col;
+			$this->columns[$name] = $col;
 		}
 		else
 		{
@@ -327,8 +327,8 @@ class Select extends Query implements ISelectQuery
 	 * @param array $columns
      * @return $this;
 	 */
-	public function addColumnsArray(array $columns)
-	{
+	public function addColumnsArray(array $columns): static
+    {
 		foreach($columns as $name=>$col)
 		{
 			if(is_string($name))
@@ -345,12 +345,12 @@ class Select extends Query implements ISelectQuery
 
 	/**
 	 * An alias of setColumns()
-	 * @param array $cols
+	 * @param array $columns
 	 * @return Select
 	 */
-	public function columns(array $cols)
-	{
-		return $this->setColumns($cols);
+	public function columns(array $columns): static
+    {
+		return $this->setColumns($columns);
 	}
 	
 	/**
@@ -358,8 +358,8 @@ class Select extends Query implements ISelectQuery
 	 * @param string $col
      * @return bool
 	 */
-	public function removeColumn($col)
-	{
+	public function removeColumn(string $col): bool
+    {
 		if(($key = array_search($col, $this->columns)) !== false)
 		{
 			unset($this->columns[$key]);
@@ -373,8 +373,8 @@ class Select extends Query implements ISelectQuery
 	 * @param string $name
      * @return bool
 	 */
-	public function removeColumnByName($name)
-	{
+	public function removeColumnByName(string $name): bool
+    {
 		if(array_key_exists($name, $this->columns))
 		{
 			unset($this->columns[$name]);
@@ -389,8 +389,8 @@ class Select extends Query implements ISelectQuery
      * @param array|string $order
      * @return $this
 	 */
-	public function orderBy($order)
-	{
+	public function orderBy(string|array $order): static
+    {
 		return $this->setOrder($order);
 	}
 	
@@ -404,15 +404,15 @@ class Select extends Query implements ISelectQuery
 	{
 		return $this->setGroupBy($group);
 	}
-	
-	/**
-	 * Sets the limit and the offset in one function.
-	 * @param int | Pager $limit
-	 * @param int $offset
-	 * @return $this
-	 */
-	public function limit($limit,$offset = NULL)
-	{
+
+    /**
+     * Sets the limit and the offset in one function.
+     * @param int | Pager $limit
+     * @param int|null $offset
+     * @return $this
+     */
+	public function limit(int|Pager $limit, int $offset = NULL): static
+    {
 		if($limit instanceof Pager)
 		{
 			$this->setLimit($limit->getItemsPerPage());
@@ -432,8 +432,8 @@ class Select extends Query implements ISelectQuery
 	 * @param $offset
 	 * @return Select
 	 */
-	public function skip($offset)
-	{
+	public function skip($offset): static
+    {
 		return $this->setLimitOffset($offset);
 	}
 
@@ -442,8 +442,8 @@ class Select extends Query implements ISelectQuery
 	 * @param $amount
 	 * @return Select
 	 */
-	public function take($amount)
-	{
+	public function take($amount): static
+    {
 		return $this->setLimit($amount);
 	}
 
