@@ -27,10 +27,10 @@ interface IValidator
 {
     /**
      * Creates the validator and sets and options user defined error message.
-     * @param string $userMessage
+     * @param ?string $userMessage
      * @return IValidator
      */
-    public static function create(string $userMessage = NULL): IValidator;
+    public static function create(?string $userMessage): IValidator;
 
     /**
      * Clears all the errors in the errors array.
@@ -39,10 +39,10 @@ interface IValidator
 
     /**
      * Adds a custom error or adds the default error to the errors array.
-     * @param string $error
+     * @param ?string $error
      * @return IValidator
      */
-    public function addError(string $error = null): IValidator;
+    public function addError(?string $error): IValidator;
 
     /**
      * Return the errors as a string.

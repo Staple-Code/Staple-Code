@@ -172,19 +172,21 @@ class Route
 		return new static($link);
 	}
 
-	/**
-	 * Create and return an instance of the object.
-	 * @param string $link
-	 * @return static
-	 * @throws RoutingException
-	 */
-	public static function create($link = NULL)
-	{
+    /**
+     * Create and return an instance of the object.
+     * @param mixed $link
+     * @return static
+     * @throws RoutingException
+     * @throws ConfigurationException
+     */
+	public static function create(mixed $link = NULL): static
+    {
 		return new static($link);
 	}
 
 	/**
 	 * Execute the route
+     *
 	 * @return bool
 	 * @throws RoutingException
 	 * @throws PageNotFoundException

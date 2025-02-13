@@ -31,7 +31,7 @@ class Database extends Log
 	{
 		$db = DB::get();
 		$errmsg = $db->errno.': '.$db->error;
-		return self::log_DBError($errmsg,$db->last_query,$applicationID);
+		return self::log_DBError($errmsg, $db->getLastQuery(), $applicationID);
 	}
 	
 	public function Log($errmsg, $errsql = NULL, $applicationID = NULL)
@@ -66,5 +66,3 @@ class Database extends Log
 		}
 	}
 }
-
-?>

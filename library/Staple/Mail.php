@@ -30,6 +30,7 @@
 namespace Staple;
 
 use Exception;
+use Staple\Exception\ConfigurationException;
 
 class Mail
 {
@@ -38,70 +39,71 @@ class Mail
 	 * Whether or not to send email as HTML. Defaults to true.
 	 * @var boolean
 	 */
-	protected $html = true;
+	protected bool $html = true;
 	/**
 	 * Array of To addresses
 	 * @var array[string]
 	 */
-	protected $to = array();
+	protected array $to = [];
 	/**
 	 * Array of Carbon Copied addresses.
 	 * @var array[string]
 	 */
-	protected $cc = array();
+	protected array $cc = [];
 	/**
 	 * Array of Blind Carbon Copied addresses.
 	 * @var array[string]
 	 */
-	protected $bcc = array();
+	protected array $bcc = [];
 	/**
 	 * The From field.
 	 * @var string
 	 */
-	protected $from;
+	protected string $from;
 	/**
 	 * The reply-to field. (Optional) Only required if you want the email/text to reply to a
 	 * different address than specified in the from field.
 	 * @var string
 	 */
-	protected $replyto;
+	protected string $replyto;
 	/**
 	 * Subject of the email/text
 	 * @var string
 	 */
-	protected $subject;
+	protected string $subject;
 	/**
 	 * 
 	 * The Body of the email/text.
 	 * @var string
 	 */
-	protected $body;
+	protected string $body;
 	
 	/**
 	 * 
 	 * String listing the location of the email template file.
 	 * @var string
 	 */
-	protected $template;
+	protected string $template;
 	/**
 	 * Stores callback functions to be processed after sending email.
 	 * @var array
 	 */
-	protected $callbacks = array();
+	protected array $callbacks = array();
 	/**
 	 * @var string
 	 */
-	protected $lastEmailStatus;
-	
-	/**
-	 * 
-	 * Default constructor. Accepts optional values for To, From, CC, and BCC.
-	 * @param string | array $to
-	 * @param string $from
-	 * @param array $cc
-	 * @param array $bcc
-	 */
-	public function __construct($to = NULL, $from = NULL, array $cc = array(), array $bcc = array())
+	protected string $lastEmailStatus;
+
+    /**
+     *
+     * Default constructor. Accepts optional values for To, From, CC, and BCC.
+     * @param array | string|null $to
+     * @param string|null $from
+     * @param array $cc
+     * @param array $bcc
+     * @throws ConfigurationException
+     */
+	public function __construct(array|string|null $to, string|null $from, array $cc = [], array $bcc = [])
 	{
 		//Load the ini settings
 		$settings = Config::get('email');

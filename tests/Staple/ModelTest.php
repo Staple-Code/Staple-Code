@@ -224,7 +224,7 @@ class ModelTest extends TestCase
 		//Check that we can get the data
 		$this->assertEquals('Jenny', $user['first_name']);
 		$this->assertEquals('McCarthy', $user['last_name']);
-		$this->assertEquals('Alyson',$user['client']['first_name']);
+		$this->assertEquals('Alyson', $user['client']['first_name']);
 		$this->assertEquals([0,1,1,2,3,5,8,13,21],$user['fibonacci']);
 		$this->assertNull($user['client']['phone']);
 	}

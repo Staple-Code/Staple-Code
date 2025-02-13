@@ -44,7 +44,7 @@ abstract class BaseValidator implements IValidator
 	 * Default Constructor. Supports and optional user defined error message.
 	 * @param string $userMessage
 	 */
-	public function __construct(string $userMessage = NULL)
+	public function __construct(?string $userMessage)
 	{
 		if(isset($userMessage))
 		{
@@ -54,10 +54,10 @@ abstract class BaseValidator implements IValidator
 	
 	/**
 	 * Factory function to create objects.
-	 * @param string $userMessage
+	 * @param ?string $userMessage
 	 * @return BaseValidator
 	 */
-	public static function create(string $userMessage = NULL): IValidator
+	public static function create(?string $userMessage): IValidator
 	{
 		return new static($userMessage);
 	}
@@ -73,10 +73,10 @@ abstract class BaseValidator implements IValidator
 
 	/**
 	 * Adds a custom error or adds the default error to the errors array.
-	 * @param string $error
+	 * @param ?string $error
 	 * @return $this
 	 */
-	public function addError(string $error = null): IValidator
+	public function addError(?string $error): IValidator
 	{
 		if(isset($error))
 		{

@@ -26,6 +26,7 @@ use PHPUnit\Framework\TestCase;
 use Staple\Auth\Auth;
 use Staple\Auth\AuthAdapter;
 use Staple\Auth\AuthRoute;
+use Staple\Exception\NotAuthorizedException;
 use Staple\Request;
 use Staple\Route;
 use \Staple\Exception\AuthException;
@@ -111,8 +112,8 @@ class FakeCtrlAuthAdapter implements AuthAdapter
 	/**
 	 * @param mixed $user
 	 */
-	private function setUserId($user)
-	{
+	private function setUserId(mixed $user): void
+    {
 		$this->userId = $user;
 	}
 
@@ -145,6 +146,7 @@ class ControllerTest extends TestCase
 
 	/**
      * @throws RoutingException
+     * @throws ConfigurationException
 	 */
 	public function testRouting()
 	{
@@ -164,14 +166,16 @@ class ControllerTest extends TestCase
 		$this->assertEquals('This is a test View.', $textBuffer);
 	}
 
-	/**
+    /**
      * @throws AuthException
-	 * @throws ConfigurationException
-	 * @throws PageNotFoundException
-	 * @throws RoutingException
-	 * @throws SessionException
-	 * @throws SystemException
-	 */
+     * @throws ConfigurationException
+     * @throws PageNotFoundException
+     * @throws RoutingException
+     * @throws SessionException
+     * @throws SystemException
+     * @throws ReflectionException
+     * @throws NotAuthorizedException
+     */
 	#[Test] public function testAuthenticatedRouting()
 	{
 		//Setup Auth Object
@@ -203,14 +207,16 @@ class ControllerTest extends TestCase
 		$this->assertTrue($auth->isAuthed());
 	}
 
-	/**
+    /**
      * @throws AuthException
-	 * @throws ConfigurationException
-	 * @throws PageNotFoundException
-	 * @throws RoutingException
-	 * @throws SessionException
-	 * @throws SystemException
-	 */
+     * @throws ConfigurationException
+     * @throws PageNotFoundException
+     * @throws RoutingException
+     * @throws SessionException
+     * @throws SystemException
+     * @throws ReflectionException
+     * @throws NotAuthorizedException
+     */
 	#[Test] public function testAuthenticatedRoutingWithGlobalControllerProtection()
 	{
 		//View Route
@@ -255,7 +261,8 @@ class ControllerTest extends TestCase
      * @throws AuthException
 	 * @throws PageNotFoundException
 	 * @throws RoutingException
-	 */
+     * @throws ReflectionException
+     */
 	#[Test] public function testIndexNotRequired()
 	{
 		$route1 = new Route('no-index/account');

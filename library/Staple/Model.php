@@ -86,7 +86,7 @@ abstract class Model implements JsonSerializable, ArrayAccess
      * @param array|null $options An array containing options for the object
      * @return void
      */
-	public function __construct(array $options = NULL)
+	public function __construct(?array $options = [])
 	{
 		//Setup the table name if not already set.
 		if(!isset($this->_table))
@@ -101,10 +101,10 @@ abstract class Model implements JsonSerializable, ArrayAccess
 	 *
 	 * Allows dynamic setting of Model properties
 	 * @param string $name
-	 * @param float|int|string|array $value
+	 * @param mixed $value
 	 * @throws Exception
 	 */
-	public function __set(string $name, float|int|string|array $value)
+	public function __set(string $name, mixed $value)
 	{
 		$method = 'set' . ucfirst($name);
 		if(method_exists($this, $method))
@@ -427,7 +427,7 @@ abstract class Model implements JsonSerializable, ArrayAccess
      * @throws ModelNotFoundException
      * @throws QueryException
      */
-	public static function find(int $id, IConnection $connection = NULL): static|array
+	public static function find(int $id, ?IConnection $connection): static|array
     {
 		//Make a model instance
 		$model = static::make();
@@ -654,7 +654,7 @@ abstract class Model implements JsonSerializable, ArrayAccess
      * @throws ModelNotFoundException
      * @throws QueryException
      */
-	public static function findWhereStatement(string $statement, string|array $order = NULL, int|Pager $limit = NULL, IConnection $connection = NULL): array
+	public static function findWhereStatement(string $statement, string|array|null $order, int|Pager|null $limit, ?IConnection $connection): array
     {
 		//Make a model instance
 		$model = static::make();
@@ -722,26 +722,28 @@ abstract class Model implements JsonSerializable, ArrayAccess
     /**
      * Perform a query on a model. If no query is specified then a select query is created.
      * @param Query|null $baseQuery
+     * @param array|null $options
      * @return ModelQuery
      * @throws QueryException
      */
-	public static function query(Query $baseQuery = NULL) : ModelQuery
+	public static function query(?Query $baseQuery, ?array $options) : ModelQuery
 	{
 		if(isset($baseQuery))
-			$query = ModelQuery::create(new static())
+			$query = ModelQuery::create(new static($options))
 				->setQueryObject($baseQuery);
 		else
-			$query = new ModelSelectQuery(new static());
+			$query = new ModelSelectQuery(new static($options));
 		return $query;
 	}
 
     /**
      * Perform a SELECT query on the models.
+     * @param array|null $options
      * @return ModelSelectQuery
      * @throws QueryException
      */
-	public static function select() : ModelSelectQuery
+	public static function select(?array $options) : ModelSelectQuery
 	{
-        return new ModelSelectQuery(new static());
+        return new ModelSelectQuery(new static($options));
 	}
 }

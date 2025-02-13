@@ -4,9 +4,14 @@
             <directory>Staple/</directory>
         </testsuite>
     </testsuites>
-    <filter>
-        <whitelist processUncoveredFilesFromWhitelist="true">
+    <coverage>
+        <include>
             <directory suffix=".php">../library/Staple/</directory>
-        </whitelist>
-    </filter>
+        </include>
+    </coverage>
+    <source>
+        <include>
+            <directory>../library/Staple/</directory>
+        </include>
+    </source>
 </phpunit>

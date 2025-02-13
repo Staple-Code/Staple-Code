@@ -104,10 +104,10 @@ class Config
 	 * Get a config set by header.
 	 * @param string $name
 	 * @param bool $getAsObject
-	 * @throws ConfigurationException
 	 * @return array|stdClass
+	 *@throws ConfigurationException
 	 */
-	public static function get($name, $getAsObject = false)
+	public static function get(string $name, bool $getAsObject = false)
 	{
 		//Get the config instance
 		$inst = static::getInstance();

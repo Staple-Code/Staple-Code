@@ -25,15 +25,15 @@ namespace Staple;
 
 class Alias
 {
-	protected static $class_map = [];
+	protected static array $class_map = [];
 	
 	/**
 	 * Checks for an aliased class in the class map. Returns the full name of the class
 	 * @param string $alias
 	 * @return string | NULL
 	 */
-	public static function checkAlias($alias)
-	{
+	public static function checkAlias(string $alias): ?string
+    {
 		//Get the namespaces
 		$namespaces = explode('\\',$alias);
 
@@ -60,8 +60,8 @@ class Alias
 	 * @param string $class
 	 * @return boolean
 	 */
-	public static function addAlias($alias, $class)
-	{
+	public static function addAlias(string $alias, string $class): bool
+    {
 		if(!isset(static::$class_map[$alias]))
 		{
 			static::$class_map[$alias] = $class;
@@ -79,13 +79,13 @@ class Alias
 	 * @param boolean $autoload
 	 * @return boolean
 	 */
-	public static function load($alias, $autoload = true)
-	{
+	public static function load(string $alias, bool $autoload = true): bool
+    {
 		//Check for the class alias
 		$class = static::checkAlias($alias);
 
 		//Check for a Staple Namespace
-		if(substr($class,0,1) == '\\')
+		if(str_starts_with($class, '\\'))
 			$class = substr($class,1);
 
 		//Check that we are not trying to double declare a class
@@ -104,8 +104,8 @@ class Alias
 	 * return the entire class map array
 	 * @return array
 	 */
-	public static function getClassMap()
-	{
+	public static function getClassMap(): array
+    {
 		return self::$class_map;
 	}
 }

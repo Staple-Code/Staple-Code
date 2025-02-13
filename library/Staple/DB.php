@@ -40,6 +40,7 @@ use mysqli_result;
 use SplObjectStorage;
 use SplObserver;
 use SplSubject;
+use Staple\Exception\ConfigurationException;
 
 class DB extends mysqli implements SplSubject
 {
@@ -49,51 +50,51 @@ class DB extends mysqli implements SplSubject
      * The object observers
      * @var SplObjectStorage
      */
-    private $_observers;
+    private SplObjectStorage $_observers;
     
 	/**
 	 * 
 	 * Hostname for the database server
 	 * @var string
 	 */
-	protected $host;
+	protected string $host;
 	/**
 	 * 
 	 * Username to access to the database server
 	 * @var string
 	 */
-	protected $username;
+	protected string $username;
 	/**
 	 * 
 	 * Password to connect to the database
 	 * @var string
 	 */
-	protected $password;
+	protected string $password;
 	
 	/**
 	 * 
 	 * Database name on the server
 	 * @var string
 	 */
-	protected $db;
+	protected string $db;
 	
 	/**
 	 * A boolean value that signifies an active connection to the database server.
 	 * @var boolean
 	 */
-	protected $connected = false;
+	protected bool $connected = false;
 	
 	/**
 	 * Stores the last executed SQL Statement
 	 * @var string
 	 */
-	public $last_query;
+	public string $last_query;
 	
 	/**
 	 * Storage for Named Database Connections
 	 * @var array[Staple_DB]
 	 */
-	protected static $namedConnections = array();
+	protected static array $namedConnections = [];
 	
 	/**
 	 * 
@@ -161,31 +162,45 @@ class DB extends mysqli implements SplSubject
 	{
 		return static::getInstance();
 	}
-	
-	/**
-	 * Creates and/or returns a named database connection.
-	 * @return DB
-	 * @static
-	 */
-	public static function getNamedConnection($name)
-	{
+
+    /**
+     * Creates and/or returns a named database connection.
+     * @param string $name
+     * @return DB
+     * @throws ConfigurationException
+     * @static
+     */
+	public static function getNamedConnection(string $name): DB
+    {
 		if (!isset(self::$namedConnections[$name])) {
 			$c = __CLASS__;
 			self::$namedConnections[$name] = new $c(Config::get($name));
 		}
 		return self::$namedConnections[$name];
 	}
-	
-	/**
-	 * Overrides the MySQL connect() function to perform a check for required connection details.
-	 * connect() is an alias for mysqli->__construct().
-	 * @see mysqli::connect()
-	 */
-	public function connect($host = NULL, $user = NULL, $password = NULL, $database = NULL, $port = NULL, $socket = NULL)
-	{
+
+    /**
+     * Establishes a connection to a MySQL database using the provided parameters.
+     *
+     * @param string|null $hostname The hostname of the database server.
+     * @param string|null $username The username for the database connection.
+     * @param string|null $password The password for the database connection.
+     * @param string|null $database The name of the database to connect to.
+     * @param int|null $port The port number for the database connection.
+     * @param string|null $socket The socket or named pipe to use for the connection.
+     * @return bool Returns true if the connection is successful.
+     * @throws Exception If database connection parameters are not specified.
+     */
+    public function connect(?string $hostname = null, ?string $username = null, ?string $password = null, ?string $database = null, ?int $port = null, ?string $socket = null): bool
+    {
 		if($this->isReady())
 		{
-			$this->__construct();
+            try {
+                $this->__construct();
+                return true;
+            } catch (Exception $e) {
+                throw new Exception("Database Connection Error", 0, $e);
+            }
 		}
 		else
 		{
@@ -198,13 +213,13 @@ class DB extends mysqli implements SplSubject
 	 * @see mysqli::change_user()
 	 * @return bool
 	 */
-	public function change_user($user, $password, $database = NULL)
-	{
+	public function change_user(string $username, string $password, ?string $database): bool
+    {
 		if(isset($database))
 		{
 			$this->setDb($database);
 		}
-		$this->setUsername($user);
+		$this->setUsername($username);
 		$this->setPassword($password);
 		return parent::change_user($this->getUsername(), $this->password, $this->getDb());
 	}
@@ -213,26 +228,29 @@ class DB extends mysqli implements SplSubject
 	 * (non-PHPdoc)
 	 * @see mysqli::select_db()
 	 */
-	public function select_db($dbname)
-	{
-		$this->setDb($dbname);
+	public function select_db(string $database): bool
+    {
+		$this->setDb($database);
 		return parent::select_db($this->getDb());
 	}
-	
-	/**
-	 * Runs a query against the database
-	 * @return mysqli_result | bool
-	 * @throws Exception
-	 */
-	public function query($query,$resultmode = MYSQLI_STORE_RESULT)
-	{
+
+    /**
+     * Runs a query against the database
+     *
+     * @param string $query
+     * @param int $result_mode
+     * @return mysqli_result | bool
+     * @throws Exception
+     */
+	public function query(string $query = '', int $result_mode = MYSQLI_STORE_RESULT): mysqli_result|bool
+    {
 		/**
 		 * @todo add self::multi_query to this function.
 		 */
 		if($this->connected === true)
 		{
 			$this->last_query = $query;
-			return parent::query($query,$resultmode);
+			return parent::query($query, $result_mode);
 		}
 		else
 		{
@@ -243,86 +261,108 @@ class DB extends mysqli implements SplSubject
 	/**
 	 * @return string $host
 	 */
-	public function getHost()
-	{
+	public function getHost(): string
+    {
 		return $this->host;
 	}
 
-	/**
-	 * @param string $host
-	 */
-	public function setHost($host)
-	{
+    /**
+     * Sets the host for the connection
+     *
+     * @param string $host The hostname to set
+     * @return static Returns the current instance
+     */
+	public function setHost(string $host): static
+    {
 		$this->host = $host;
 		return $this;
 	}
 
-	/**
-	 * @return string $username
-	 */
-	public function getUsername()
-	{
+    /**
+     * Retrieves the username.
+     *
+     * @return string The username.
+     */
+	public function getUsername(): string
+    {
 		return $this->username;
 	}
 
-	/**
-	 * @param string $username
-	 */
-	public function setUsername($username)
-	{
+    /**
+     * Sets the username for the current instance.
+     *
+     * @param string $username The username to be set.
+     * @return static Returns the current instance.
+     */
+	public function setUsername(string $username): static
+    {
 		$this->username = $username;
 		return $this;
 	}
 
-	/**
-	 * @return string $db
-	 */
-	public function getDb()
-	{
+    /**
+     * Retrieves the name of the database.
+     *
+     * @return string The name of the database.
+     */
+	public function getDb(): string
+    {
 		return $this->db;
 	}
 
-	/**
-	 * @param string $db
-	 */
-	public function setDb($db)
-	{
+    /**
+     * Sets the database name.
+     *
+     * @param string $db The name of the database to set.
+     * @return static Returns the current instance for method chaining.
+     */
+	public function setDb(string $db): static
+    {
 		$this->db = $db;
 		return $this;
 	}
 
-	/**
-	 * Sets the database password parameter.
-	 * @param string $password
-	 */
-	public function setPassword($password)
-	{
+    /**
+     * Sets the database password parameter.
+     *
+     * @param string $password
+     * @return DB
+     */
+	public function setPassword(string $password): static
+    {
 		$this->password = $password;
 		return $this;
 	}
-	
-	/**
-	 * @return bool $connected
-	 */
-	public function getConnected()
-	{
+
+    /**
+     * Determines the database connection status.
+     *
+     * @return bool Returns true if connected to the database; otherwise, false.
+     */
+	public function getConnected(): bool
+    {
 		return $this->connected;
 	}
 
-	/**
-	 * @param boolean $connected
-	 */
-	protected function setConnected($connected)
-	{
+    /**
+     * Sets the connection status.
+     *
+     * @param bool $connected Indicates whether the connection is active or not.
+     * @return static
+     */
+	protected function setConnected(bool $connected): static
+    {
 		$this->connected = (bool)$connected;
 		return $this;
 	}
 
-	/**
-	 * @return string $last_query
-	 */
-	public function getLastQuery()
-	{
+    /**
+     * Retrieves the most recently executed database query.
+     *
+     * @return string The last executed query as a string.
+     */
+	public function getLastQuery(): string
+    {
 		return $this->last_query;
 	}
 

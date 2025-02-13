@@ -9,20 +9,26 @@
 namespace Staple\Auth;
 
 
+use ReflectionClass;
+use ReflectionMethod;
+use Staple\Exception\ConfigurationException;
+use Staple\Exception\QueryException;
 use Staple\Route;
 
 trait AuthRoute
 {
-	/**
-	 * This is a default Auth Level validation algorithm. The required level is matched with the method's
-	 * required level. If the level is greater than the required level then authorization is granted.
-	 * @param Route $route
-	 * @param $requiredLevel
-	 * @param \ReflectionClass|null $reflectionClass
-	 * @param \ReflectionMethod|null $reflectionMethod
-	 * @return bool
-	 */
-	public function authRoute(Route $route, $requiredLevel, \ReflectionClass $reflectionClass = null, \ReflectionMethod $reflectionMethod = null): bool
+    /**
+     * This is a default Auth Level validation algorithm. The required level is matched with the method's
+     * required level. If the level is greater than the required level then authorization is granted.
+     * @param Route $route
+     * @param $requiredLevel
+     * @param ReflectionClass|null $reflectionClass
+     * @param ReflectionMethod|null $reflectionMethod
+     * @return bool
+     * @throws ConfigurationException
+     * @throws QueryException
+     */
+	public function authRoute(Route $route, $requiredLevel, ?ReflectionClass $reflectionClass, ?ReflectionMethod $reflectionMethod): bool
 	{
 		$userLevel = $this->getLevel();
 		if(is_numeric($requiredLevel))

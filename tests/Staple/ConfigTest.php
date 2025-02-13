@@ -10,28 +10,61 @@ namespace Staple\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Staple\Config;
+use Staple\Exception\ConfigurationException;
+use stdClass;
 
 class ConfigTest extends TestCase
 {
-	protected function setUp(): void
+    /**
+     * @throws ConfigurationException
+     */
+    protected function setUp(): void
 	{
 		Config::changeEnvironment(Config::DEFAULT_CONFIG_SET);
 	}
 
-	protected function tearDown(): void
+    /**
+     * Resets the environment configuration to the default state.
+     *
+     * @return void
+     * @throws ConfigurationException
+     */
+    protected function tearDown(): void
 	{
 		Config::changeEnvironment(Config::DEFAULT_CONFIG_SET);
 	}
 
-	public function testConfigRead()
+    /**
+     * @throws ConfigurationException
+     */
+    public function testConfigRead()
 	{
-		$this->assertCount(3,Config::get('application'));
-		$this->assertArrayHasKey('host',Config::get('db'));
-		$this->assertEquals('localhost',Config::getValue('db','host'));
-		$this->assertEquals(NULL,Config::getValue('forms','elementViewAdapter'));
+		$this->assertCount(3, Config::get('application'));
+		$this->assertArrayHasKey('host', Config::get('db'));
+		$this->assertEquals('localhost', Config::getValue('db','host'));
+		$this->assertEquals(NULL, Config::getValue('forms','elementViewAdapter'));
 	}
 
-	public function testEnvironmentConfig()
+    /**
+     * @throws ConfigurationException
+     */
+    public function testConfigReadAsObject()
+    {
+        $expected = new stdClass();
+        $expected->host = 'localhost';
+        $expected->dsn = 'sqlite::memory:';
+        $expected->driver = 'sqlite';
+        $expected->username = null;
+        $expected->password = null;
+        $expected->db = 'staple';
+        $expected->options = [];
+        $this->assertEquals($expected, Config::get('db', true));
+    }
+
+    /**
+     * @throws ConfigurationException
+     */
+    public function testEnvironmentConfig()
 	{
 		Config::changeEnvironment('dev');
 
@@ -48,7 +81,10 @@ class ConfigTest extends TestCase
 		$this->assertEquals(0,Config::getValue('errors','enable_timer'));
 	}
 
-	public function testSetValue()
+    /**
+     * @throws ConfigurationException
+     */
+    public function testSetValue()
 	{
 		$this->assertCount(3,Config::get('application'));
 		$this->assertArrayHasKey('host',Config::get('db'));

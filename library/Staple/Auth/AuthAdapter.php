@@ -26,6 +26,8 @@
  */
 namespace Staple\Auth;
 
+use ReflectionClass;
+use ReflectionMethod;
 use Staple\Exception\NotAuthorizedException;
 use Staple\Route;
 
@@ -61,11 +63,11 @@ interface AuthAdapter
 	 * check.
 	 * @param Route $route
 	 * @param $requiredLevel
-	 * @param \ReflectionClass|null $reflectionClass
-	 * @param \ReflectionMethod|null $reflectionMethod
+	 * @param ReflectionClass|null $reflectionClass
+	 * @param ReflectionMethod|null $reflectionMethod
 	 * @return bool
 	 */
-	public function authRoute(Route $route, $requiredLevel, \ReflectionClass $reflectionClass = null, \ReflectionMethod $reflectionMethod = null): bool;
+	public function authRoute(Route $route, $requiredLevel, ?ReflectionClass $reflectionClass, ?ReflectionMethod $reflectionMethod): bool;
 
 	/**
 	 * This method should clear out any existing authentication stored in the adapter and reset
