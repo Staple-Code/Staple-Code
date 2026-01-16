@@ -46,7 +46,7 @@ class Delete extends Query implements IQuery
 	 * The array of parameters
 	 * @var array
 	 */
-	protected $params = [];
+	protected array $params = [];
 
 	/**
 	 * @param string $table

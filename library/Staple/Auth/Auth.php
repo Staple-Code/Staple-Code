@@ -24,6 +24,8 @@
 namespace Staple\Auth;
 
 use Exception;
+use ReflectionClass;
+use ReflectionMethod;
 use Staple\Config;
 use Staple\Error;
 use Staple\Exception\AuthException;
@@ -35,7 +37,6 @@ use Staple\Exception\SessionException;
 use Staple\Exception\SystemException;
 use Staple\Route;
 use Staple\Session\Session;
-use ReflectionClass, ReflectionMethod;
 
 class Auth implements IAuthService
 {
@@ -185,9 +186,9 @@ class Auth implements IAuthService
 	/**
 	 * 
 	 * Returns the Auth ID
-	 * @return int | string
+	 * @return mixed
 	 */
-	public function getAuthId()
+	public function getAuthId(): mixed
 	{
 		if(!($this->adapter instanceof AuthAdapter))
 		{
@@ -290,7 +291,7 @@ class Auth implements IAuthService
 	 * @throws ConfigurationException
 	 * @return bool
 	 */
-	private function createAuthAdapter(AuthAdapter $adapter = null)
+	private function createAuthAdapter(AuthAdapter $adapter = null): bool
 	{
 		if($adapter instanceof AuthAdapter)
 		{

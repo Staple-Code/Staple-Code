@@ -24,6 +24,8 @@
 namespace Staple\Query;
 
 
+use Staple\Model\ModelQueryResult;
+
 interface IQuery
 {
 	//Execute the build function and return the result when converting to a string.
@@ -34,24 +36,24 @@ interface IQuery
 	 * Retrieve Query Connection
 	 * @return IConnection
 	 */
-	public function getConnection();
+	public function getConnection(): IConnection;
 	/**
 	 * Set the query table
-	 * @param mixed $table
+	 * @param Query|array|string $table
 	 * @param string|NULL $alias
 	 * @return IQuery
 	 */
-	public function setTable($table,$alias = NULL);
+	public function setTable(Query|array|string $table, string $alias = NULL): IQuery;
 	/**
 	 * Set the query connection
 	 * @param IConnection $connection
 	 * @return IQuery
 	 */
-	public function setConnection(IConnection $connection);
+	public function setConnection(IConnection $connection): IQuery;
 	//Build the query into a string.
 	public function build(bool $parameterized = null);
 	//Execute the query and returns the result.
-	public function execute(IConnection $connection = NULL);
+	public function execute(IConnection $connection = NULL): ModelQueryResult|Statement|false;
 
 	/**
 	 * Get the parameter list.

@@ -42,35 +42,36 @@ class Session
 	/**
 	 * @var Handler
 	 */
-	protected $handler;
+	protected Handler $handler;
 	/**
 	 * The session ID
 	 * @var string
 	 */
-	protected $sessionId;
+	protected string $sessionId;
 	/**
 	 * The session name;
 	 * @var string
 	 */
-	protected $sessionName;
+	protected string $sessionName;
 	/**
 	 * The number of seconds for session life.
 	 * @var int
 	 */
-	protected $maxLifetime = 1440;
+	protected int $maxLifetime = 1440;
 	/**
 	 * Booleon value to signify if the session has already been started or not.
 	 * @var bool
 	 */
-	protected $sessionStarted = false;
+	protected bool $sessionStarted = false;
 
 	/**
 	 * Session constructor. Optional session handler object parameter.
 	 *
-	 * @param Handler $handler
+	 * @param Handler|null $handler
 	 * @param string|null $name
-	 * @throws SessionException | ConfigurationException
-     */
+	 * @throws ConfigurationException
+	 * @throws SessionException
+	 */
 	public function __construct(Handler $handler = NULL, string $name = NULL)
 	{
 		//Set up the session handler

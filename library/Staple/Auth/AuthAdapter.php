@@ -40,19 +40,19 @@ interface AuthAdapter
 	 * @throws NotAuthorizedException
 	 * @return bool
 	 */
-	public function getAuth($credentials): bool;
+	public function getAuth(mixed $credentials): bool;
 	/**
 	 * 
 	 * This function must be implemented to return a numeric level of access. This level is
 	 * used to determine feature access based on account type.
 	 * @return mixed
 	 */
-	public function getLevel();
+	public function getLevel(): mixed;
 	/**
 	 * Returns the User ID from the adapter.
 	 * @return mixed
 	 */
-	public function getUserId();
+	public function getUserId(): mixed;
 	/**
 	 * This method should return a boolean true or false if the supplied auth level is able
 	 * to access the supplied route. Additionally the reflection for the class and method

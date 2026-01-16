@@ -205,7 +205,7 @@ class Error implements SplSubject
 	/* (non-PHPdoc)
 	 * @see SplSubject::attach()
 	 */
-	public function attach(SplObserver $observer)
+	public function attach(SplObserver $observer): void
 	{
 		$this->_observers->attach($observer);
 	}
@@ -213,7 +213,7 @@ class Error implements SplSubject
 	/* (non-PHPdoc)
 	 * @see SplSubject::detach()
 	 */
-	public function detach(SplObserver $observer)
+	public function detach(SplObserver $observer): void
 	{
 		$this->_observers->detach($observer);
 	}
@@ -221,7 +221,7 @@ class Error implements SplSubject
 	/* (non-PHPdoc)
 	 * @see SplSubject::notify()
 	 */
-	public function notify()
+	public function notify(): void
 	{
 		foreach($this->_observers as $observer)
 		{

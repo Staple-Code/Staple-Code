@@ -47,7 +47,7 @@ class Update extends Query
 	 * The array of Parameters
 	 * @var array
 	 */
-	protected $params = [];
+	protected array $params = [];
 	/**
 	 * Holds the order of the SQL query. It can be either a string or an array of the columns to order by.
 	 * @var string | array

@@ -1,6 +1,6 @@
 <?php
 /**
- * An exception class to handle exceptions in queries.
+ * An exception class to handle page not found errors.
  *
  * @author Ironpilot
  * @copyright Copyright (c) 2011, STAPLE CODE
@@ -23,7 +23,9 @@
 
 namespace Staple\Exception;
 
-class QueryException extends \Exception
-{
 
+class BadRequestException extends \Exception
+{
+	protected $message = 'Bad Request';
+	protected $code = 400;
 }

@@ -33,6 +33,7 @@ use PDOStatement;
 use Staple\Error;
 use Staple\Exception\ConfigurationException;
 use Staple\Exception\QueryException;
+use Staple\Model\ModelQueryResult;
 use Staple\Pager;
 
 abstract class Query implements IQuery
@@ -40,45 +41,45 @@ abstract class Query implements IQuery
 	const PARAM_NAME_VALID_CHARACTERS = '/[^a-zA-Z0-9_]/';
 	/**
 	 * Table to act upon.
-	 * @var mixed
+	 * @var Query|array|string
 	 */
-	public $table;
+	public Query|array|string $table;
 	/**
 	 * The schema that the table lives in. For SQL Server.
 	 * @var string
 	 */
-	protected $schema;
+	protected string $schema;
 	
 	/**
 	 * The Connection database object. A database object is required to properly escape input.
 	 * @var IConnection
 	 */
-	protected $connection;
+	protected IConnection $connection;
 
 	/**
 	 * An array to hold all of the parameters of the query.
 	 * @var string[]
 	 */
-	protected $params = [];
+	protected array $params = [];
 	
 	/**
 	 * An array of Where Clauses. The clauses are additive, using the AND  conjunction.
 	 * @var Condition[]
 	 */
-	protected $where = array();
+	protected array $where = array();
 
 	/**
 	 * Set a flag if the query is to be parameterized.
 	 * @var bool
 	 */
-	protected $parameterized = true;
+	protected bool $parameterized = true;
 
 	/**
-	 * @param string $table
-	 * @param IConnection $db
+	 * @param Query|array|string|null $table
+	 * @param IConnection|null $db
 	 * @throws QueryException
 	 */
-	public function __construct($table = NULL, IConnection $db = NULL)
+	public function __construct(Query|array|string $table = NULL, IConnection $db = NULL)
 	{
 		if($db instanceof IConnection)
 		{
@@ -115,9 +116,9 @@ abstract class Query implements IQuery
 	}
 	
 	/**
-	 * @return Query|string $table
+	 * @return Query|array|string $table
 	 */
-	public function getTable()
+	public function getTable(): Query|array|string
 	{
 		return $this->table;
 	}
@@ -125,7 +126,7 @@ abstract class Query implements IQuery
 	/**
 	 * @return IConnection $db
 	 */
-	public function getConnection()
+	public function getConnection(): IConnection
 	{
 		return $this->connection;
 	}
@@ -134,7 +135,7 @@ abstract class Query implements IQuery
 	 * Return the array of where conditions currently attached to the query.
 	 * @return Condition[]
 	 */
-	public function getWhere()
+	public function getWhere(): array
 	{
 		return $this->where;
 	}
@@ -143,7 +144,7 @@ abstract class Query implements IQuery
 	 * Get the schema string
 	 * @return string
 	 */
-	public function getSchema()
+	public function getSchema(): string
 	{
 		return $this->schema;
 	}
@@ -154,27 +155,27 @@ abstract class Query implements IQuery
 	 * @return $this
 	 * @throws QueryException
 	 */
-	public function setSchema($schema)
+	public function setSchema(string $schema): static
 	{
 		//Check that we are not on MYSQL
 		if(isset($this->connection))
 			if($this->connection->getDriver() == Connection::DRIVER_MYSQL)
 				throw new QueryException('Schema cannot be specified on a MySQL Connection');
 
-		$this->schema = (string)$schema;
+		$this->schema = $schema;
 		return $this;
 	}
 
 	/**
-	 * @param Query|string $table
-	 * @param string $alias
+	 * @param Query|array|string $table
+	 * @param string|null $alias
 	 * @return $this
 	 */
-	public function setTable($table,$alias = NULL)
+	public function setTable(Query|array|string $table, string $alias = NULL): IQuery
 	{
 		if(isset($alias) && is_string($table))
 		{
-			$this->table = array($alias=>$table);
+			$this->table = [$alias=>$table];
 		}
 		else 
 		{
@@ -186,10 +187,10 @@ abstract class Query implements IQuery
 	/**
 	 * Alias of setTable()
 	 * @param string | Query $table
-	 * @param string $alias
+	 * @param string|null $alias
 	 * @return Query
 	 */
-	public function fromTable($table, $alias = NULL)
+	public function fromTable(Query|array|string $table, string $alias = NULL): Query
 	{
 		return $this->setTable($table,$alias);
 	}
@@ -198,7 +199,7 @@ abstract class Query implements IQuery
 	 * @param IConnection $connection
 	 * @return $this
 	 */
-	public function setConnection(IConnection $connection)
+	public function setConnection(IConnection $connection): IQuery
 	{
 		$this->connection = $connection;
 		return $this;
@@ -304,14 +305,14 @@ abstract class Query implements IQuery
 	 * @return string
 	 */
 	abstract function build(bool $parameterized = null);
-	
+
 	/**
 	 * Executes the query and returns the result.
-	 * @param IConnection $connection - the database connection to execute the quote upon.
-	 * @return Statement | bool
+	 * @param IConnection|null $connection - the database connection to execute the quote upon.
+	 * @return ModelQueryResult|Statement|false
 	 * @throws QueryException
 	 */
-	public function execute(IConnection $connection = NULL)
+	public function execute(IConnection $connection = NULL): ModelQueryResult|Statement|false
 	{
 		if(isset($connection))
 			$this->setConnection($connection);
@@ -363,7 +364,7 @@ abstract class Query implements IQuery
 			switch($varType)
 			{
 				case 'NULL':
-					$type = null;
+					$type = PDO::PARAM_NULL;
 					break;
 				case "boolean":
 					$type = PDO::PARAM_BOOL;
@@ -801,11 +802,11 @@ abstract class Query implements IQuery
 	/**
 	 * Construct and return an instance of the child object.
 	 *
-	 * @param string $table
+	 * @param Query|array|string $table
 	 * @return static
 	 * @throws QueryException
 	 */
-	public static function table($table)
+	public static function table(Query|array|string $table): static
 	{
 		return new static($table);
 	}

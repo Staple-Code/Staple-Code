@@ -24,6 +24,8 @@
 namespace Staple\Query;
 
 
+use Staple\Pager;
+
 interface ISelectQuery extends IQuery
 {
 	/*-----------------------------------------------WHERE CLAUSES-----------------------------------------------*/
@@ -45,9 +47,9 @@ interface ISelectQuery extends IQuery
 	//SQL NOT LIKE Clause
 	public function whereNotLike($column, $value, bool $columnJoin = null, string $paramName = null, bool $parameterized = true);
 	//SQL IS NULL Clause
-	public function whereNull($column);
+	public function whereNull(string $column);
 	//SQL IN Clause
-	public function whereIn($column, $values, string $paramName = null, bool $parameterized = true);
+	public function whereIn(string $column, mixed $values, string $paramName = null, bool $parameterized = true);
 	//SQL BETWEEN Clause
 	public function whereBetween($column, $start, $end, string $startParamName = null, string $endParamName = null, bool $parameterized = true);
 
@@ -73,17 +75,17 @@ interface ISelectQuery extends IQuery
 	//public function orWhereBetween($column, $start, $end, string $startParamName = null, string $endParamName = null, bool $parameterized = true);
 
 	//Sets the limit and the offset in one function.
-	public function limit($limit,$offset = NULL);
+	public function limit(int|Pager $limit, int $offset = NULL);
 	//Get the select columns
 	public function getColumns();
 	//Add to the list of columns. Optional parameter to name a column.
-	public function addColumn($col,$name = NULL);
+	public function addColumn(string $col, string $name = NULL);
 	//Different from addColumnsArray(), this function replaces all existing columns in the query.
 	public function columns(array $columns);
 	//Add an array of columns to the list of selected columns
 	public function addColumnsArray(array $columns);
 	//Alias of setOrder()
-	public function orderBy($order);
+	public function orderBy(array|string $order): static;
 	//Alias of setGroupBy()
 	public function groupBy($group);
 

@@ -32,8 +32,8 @@ class Alias
 	 * @param string $alias
 	 * @return string | NULL
 	 */
-	public static function checkAlias($alias)
-	{
+	public static function checkAlias(string $alias): ?string
+    {
 		//Get the namespaces
 		$namespaces = explode('\\',$alias);
 
@@ -60,8 +60,8 @@ class Alias
 	 * @param string $class
 	 * @return boolean
 	 */
-	public static function addAlias($alias, $class)
-	{
+	public static function addAlias(string $alias, string $class): bool
+    {
 		if(!isset(static::$class_map[$alias]))
 		{
 			static::$class_map[$alias] = $class;

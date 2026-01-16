@@ -23,13 +23,18 @@
  */
 namespace Staple;
 
+use ArrayAccess;
+use DateTime;
+use DateTimeInterface;
 use Exception;
+use JsonSerializable;
 use PDO;
 use ReflectionClass;
 use ReflectionProperty;
 use Staple\Exception\ModelNotFoundException;
 use Staple\Exception\QueryException;
 use Staple\Model\ModelQuery;
+use Staple\Model\ModelQueryResult;
 use Staple\Model\ModelSelectQuery;
 use Staple\Query\Connection;
 use Staple\Query\IConnection;
@@ -37,47 +42,48 @@ use Staple\Query\Insert;
 use Staple\Query\IStatement;
 use Staple\Query\Query;
 use Staple\Query\Select;
+use Staple\Query\Statement;
 use Staple\Traits\Factory;
 use stdClass;
 
-abstract class Model implements \JsonSerializable, \ArrayAccess
+abstract class Model implements JsonSerializable, ArrayAccess
 {
 	use Factory;
 	/**
 	 * Primary Key Column Name. Use a string for a single primary key column, an array for a composite key.
 	 * @var string | array
 	 */
-	protected $_primaryKey = 'id';
+	protected string|array $_primaryKey = 'id';
 	/**
 	 * The table name of the model if different from the object name.
 	 * @var string
 	 */
-	protected $_table;
+	protected string $_table;
 	/**
 	 * Dynamic Properties of the model.
 	 * @var array
 	 */
-	protected $_data = array();
+	protected array $_data = array();
 	/**
 	 * A database connection object that the model uses
 	 * @var IConnection
 	 */
-	protected $_connection;
+	protected IConnection $_connection;
 	/**
 	 * Bool to decide between soft deletes and hard deletes.
 	 * @var bool
 	 */
-	protected $_softDelete = false;
+	protected bool $_softDelete = false;
 	/**
 	 * The column name of the soft delete column.
 	 * @var string
 	 */
-	protected $_softDeleteField = 'deleted_at';
+	protected string $_softDeleteField = 'deleted_at';
 
-	/**
-	 *
-	 * @param array $options
-	 */
+    /**
+     *
+     * @param array|null $options
+     */
 	public function __construct(array $options = NULL)
 	{
 		//Setup the table name if not already set.
@@ -118,7 +124,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	 * @throws Exception
 	 * @return mixed
 	 */
-	public function __get($name)
+	public function __get(string $name)
 	{
 		$method = 'get' . ucfirst($name);
 		if(method_exists($this, $method))
@@ -162,7 +168,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	 * @throws Exception
 	 * @return mixed
 	 */
-	public function __call($name, array $arguments)
+	public function __call(string $name, array $arguments)
 	{
 		if(strtolower(substr($name, 0, 3)) == 'get')
 		{
@@ -197,7 +203,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	 * @param array $options
 	 * @return $this
 	 */
-	public function _options($options)
+	public function _options(array $options)
 	{
 		foreach($options as $key => $value)
 		{
@@ -268,9 +274,9 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	}
 
 	/**
-	 *
+	 * @return stdClass
 	 */
-	public function jsonSerialize()
+	public function jsonSerialize(): stdClass
 	{
 		$exclude = ['_primaryKey', '_table', '_data', '_connection','_softDelete','_softDeleteField'];
 		$reflect = new ReflectionClass($this);
@@ -294,18 +300,20 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 		return $object;
 	}
 
-	/* (non-PHPdoc)
-	 * @see ArrayAccess::offsetExists()
+	/**
+	 * @param $offset
+	 * @return bool
 	 */
-	public function offsetExists($offset)
+	public function offsetExists($offset): bool
 	{
 		return isset($this->_data[$offset]);
 	}
 
-	/* (non-PHPdoc)
-	 * @see ArrayAccess::offsetGet()
+	/**
+	 * @param $offset
+	 * @return mixed|null
 	 */
-	public function offsetGet($offset)
+	public function offsetGet($offset): mixed
 	{
 		$method = 'get' . ucfirst($offset);
 		if(method_exists($this, $method))
@@ -322,10 +330,11 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 		}
 	}
 
-	/* (non-PHPdoc)
-	 * @see ArrayAccess::offsetSet()
+	/**
+	 * @param mixed $offset
+	 * @param mixed $value
 	 */
-	public function offsetSet($offset, $value)
+	public function offsetSet(mixed $offset, mixed $value): void
 	{
 		$method = 'set' . ucfirst($offset);
 		if(method_exists($this, $method))
@@ -340,19 +349,21 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 		}
 	}
 
-	/* (non-PHPdoc)
-	 * @see ArrayAccess::offsetUnset()
+	/**
+	 * @param mixed $offset
+	 * @return void
 	 */
-	public function offsetUnset($offset)
+	public function offsetUnset(mixed $offset): void
 	{
 		if(isset($this->_data[$offset]))
 			unset($this->_data[$offset]);
 	}
 
 	/**
-	 * @return IConnection $_connection
+	 * @return IConnection
+	 * @throws Exception
 	 */
-	public function getConnection()
+	public function getConnection(): IConnection
 	{
 		if(isset($this->_connection))        //Return the specified model connection
 		{
@@ -366,19 +377,20 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 
 	/**
 	 * @param IConnection $connection
-	 * @return $this
+	 * @return static
 	 */
-	public function setConnection(IConnection $connection)
+	public function setConnection(IConnection $connection): static
 	{
 		$this->_connection = $connection;
 		return $this;
 	}
 
-	/**
-	 * Save the model to the database
-	 * @return boolean
+    /**
+     * Save the model to the database
+     * @return bool|IStatement|Statement
+     * @throws QueryException|Exception
 	 */
-	public function save()
+	public function save(): Statement|bool|IStatement
 	{
 		//if the primary key has been set use update, otherwise insert.
 		if(isset($this->_data[$this->_primaryKey]))
@@ -408,11 +420,12 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	/**
 	 * Return an instance of the model from the primary key.
 	 * @param int $id
-	 * @param IConnection $connection
-	 * @return $this | $this[]
+	 * @param IConnection|null $connection
+	 * @return Model|array
 	 * @throws ModelNotFoundException
+	 * @throws QueryException
 	 */
-	public static function find($id, IConnection $connection = NULL)
+	public static function find(int $id, IConnection $connection = NULL): static|array
 	{
 		//Make a model instance
 		$model = static::make();
@@ -451,11 +464,10 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	 * @param mixed $order
 	 * @param mixed $limit
 	 * @param IConnection|NULL $connection
-	 * @return $this[]
+	 * @return static|array
 	 * @throws QueryException
-	 * @throws ModelNotFoundException
 	 */
-	public static function findAll($order = NULL, $limit = NULL, IConnection $connection = NULL)
+	public static function findAll(mixed $order = NULL, mixed $limit = NULL, IConnection $connection = NULL): static|array
 	{
 		//Make a model instance
 		$model = static::make();
@@ -493,13 +505,14 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	/**
 	 * @param string $column
 	 * @param mixed $value
-	 * @param int $limit
-	 * @param IConnection $connection
-	 * @return $this[]
-	 * @throws QueryException
+	 * @param null $order
+	 * @param null $limit
+	 * @param IConnection|null $connection
+	 * @return static|array
 	 * @throws ModelNotFoundException
+	 * @throws QueryException
 	 */
-	public static function findWhereEqual($column, $value, $order = NULL, $limit = NULL, IConnection $connection = NULL)
+	public static function findWhereEqual(string $column, mixed $value, $order = NULL, $limit = NULL, IConnection $connection = NULL): static|array
 	{
 		//Make a model instance
 		$model = static::make();
@@ -538,12 +551,14 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	/**
 	 * Find models where specified column is null.
 	 * @param string $column
-	 * @param int|Pager $limit
+	 * @param null $order
+	 * @param int|Pager|null $limit
 	 * @param IConnection|NULL $connection
 	 * @return array
 	 * @throws ModelNotFoundException
+	 * @throws QueryException
 	 */
-	public static function findWhereNull($column, $order = NULL, $limit = NULL, IConnection $connection = NULL)
+	public static function findWhereNull(string $column, $order = NULL, int|Pager $limit = NULL, IConnection $connection = NULL): array
 	{
 		//Make a model instance
 		$model = static::make();
@@ -565,7 +580,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 		if($result instanceof IStatement)
 		{
 			//If more than one record was returned return the array of results.
-			$models = array();
+			$models = [];
 			while($row = $result->fetch(PDO::FETCH_ASSOC))
 			{
 				$model = static::make();
@@ -583,12 +598,14 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	 * Find models using a WHERE column IN() clause
 	 * @param string $column
 	 * @param array $values
-	 * @param int|Pager $limit
+	 * @param null $order
+	 * @param int|Pager|null $limit
 	 * @param IConnection|NULL $connection
 	 * @return array
 	 * @throws ModelNotFoundException
+	 * @throws QueryException
 	 */
-	public static function findWhereIn($column, array $values, $order = NULL, $limit = NULL, IConnection $connection = NULL)
+	public static function findWhereIn(string $column, array $values, $order = NULL, int|Pager $limit = NULL, IConnection $connection = NULL): array
 	{
 		//Make a model instance
 		$model = static::make();
@@ -675,18 +692,20 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	/**
 	 * Delete the model from the database.
 	 * @param bool $hardDelete
-	 * @return bool
+	 * @return ModelQueryResult|Statement|false
+	 * @throws QueryException
+	 * @throws Exception
 	 */
-	public function drop($hardDelete = false)
+	public function drop(bool $hardDelete = false): ModelQueryResult|Statement|false
 	{
-		if($this->_softDelete == false || $hardDelete == true)
+		if($this->_softDelete === false || $hardDelete === true)
 		{
 			$query = Query::delete($this->_getTable(), $this->getConnection())
 				->whereEqual($this->_primaryKey, $this->_data[$this->_primaryKey]);
 		}
 		else
 		{
-			$data = [$this->_softDeleteField = new \DateTime('now')];
+			$data = [$this->_softDeleteField = (new DateTime('now'))->format(DateTimeInterface::ATOM)];
 			$query = Query::update($this->_getTable(), $data, $this->getConnection())
 				->whereEqual($this->_primaryKey, $this->_data[$this->_primaryKey]);
 		}

@@ -202,12 +202,12 @@ class Select extends Query implements ISelectQuery
 	/**
 	 * Set the table for the select query. This can be another Select object or a Union object. However, a table
 	 * alias is required when using another object.
-	 * @param mixed $table
-	 * @param string $alias
-	 * @throws QueryException
+	 * @param Query|array|string $table
+	 * @param string|null $alias
 	 * @return $this
+	 * @throws QueryException
 	 */
-	public function setTable($table,$alias = NULL)
+	public function setTable(Query|array|string $table, string $alias = NULL): Select
 	{
 		if(is_array($table))
 		{
@@ -345,12 +345,12 @@ class Select extends Query implements ISelectQuery
 
 	/**
 	 * An alias of setColumns()
-	 * @param array $cols
+	 * @param array $columns
 	 * @return Select
 	 */
-	public function columns(array $cols)
+	public function columns(array $columns): static
 	{
-		return $this->setColumns($cols);
+		return $this->setColumns($columns);
 	}
 	
 	/**
@@ -358,7 +358,7 @@ class Select extends Query implements ISelectQuery
 	 * @param string $col
      * @return bool
 	 */
-	public function removeColumn($col)
+	public function removeColumn(string $col): bool
 	{
 		if(($key = array_search($col, $this->columns)) !== false)
 		{
@@ -369,11 +369,11 @@ class Select extends Query implements ISelectQuery
 	}
 	
 	/**
-	 * Remove a column from the $columns property by it's alias.
+	 * Remove a column from the $columns property by its alias.
 	 * @param string $name
      * @return bool
 	 */
-	public function removeColumnByName($name)
+	public function removeColumnByName(string $name): bool
 	{
 		if(array_key_exists($name, $this->columns))
 		{
@@ -389,7 +389,7 @@ class Select extends Query implements ISelectQuery
      * @param array|string $order
      * @return $this
 	 */
-	public function orderBy($order)
+	public function orderBy(array|string $order): static
 	{
 		return $this->setOrder($order);
 	}
