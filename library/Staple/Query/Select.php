@@ -752,7 +752,7 @@ class Select extends Query implements ISelectQuery
 				//Wrap subqueries in parenthesis
 				if($tbl instanceof Query || $tbl instanceof Union)
 				{
-					$tables	= '('.$tbl.')';
+					$tables	.= '('.$tbl.')';
 				}
 				else 
 				{

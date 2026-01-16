@@ -321,7 +321,7 @@ class Join
 			switch($driver)
 			{
 				case Connection::DRIVER_MYSQL:
-					$join .= ' `'.$this->tableAlias.'`';
+					$join .= ' AS `'.$this->tableAlias.'`';
 					break;
 				case Connection::DRIVER_SQLSRV:
 					$join .= ' ['.$this->tableAlias.']';
