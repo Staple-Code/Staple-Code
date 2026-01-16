@@ -93,26 +93,26 @@ interface ISelectQuery extends IQuery
 
 	public function clearHaving();
 	//Add A HAVING clause to the SELECT statement using the Condition object
-	public function havingCondition($column, $operator, $value, bool $columnJoin = null, string $paramName = null, bool $parameterized = true);
+	public function havingCondition(string $column, string $operator, mixed $value, bool $columnJoin = null, string $paramName = null, bool $parameterized = true);
 	//Add A raw HAVING clause to the SELECT statement
-	public function havingStatement($statement);
+	public function havingStatement(string|Condition $statement);
 	//Add A HAVING EQUAL clause to the SELECT statement
-	public function havingEqual($column, $value, bool $columnJoin = null, string $paramName = null, bool $parameterized = true);
+	public function havingEqual(string $column, mixed $value, bool $columnJoin = null, string $paramName = null, bool $parameterized = true);
 	//Add A HAVING LIKE clause to the SELECT statement
-	public function havingLike($column, $value, bool $columnJoin = null, string $paramName = null, bool $parameterized = true);
+	public function havingLike(string $column, mixed $value, bool $columnJoin = null, string $paramName = null, bool $parameterized = true);
 	//Add A HAVING NULL clause to the SELECT statement
-	public function havingNull($column);
+	public function havingNull(string $column);
 	//Add A HAVING IN clause to the SELECT statement
-	public function havingIn($column, array $values, string $paramName = null, bool $parameterized = true);
+	public function havingIn(string $column, array $values, string $paramName = null, bool $parameterized = true);
 	//Add A HAVING BETWEEN clause to the SELECT statement
-	public function havingBetween($column, $start, $end, string $startParamName = null, string $endParamName = null, bool $parameterized = true);
+	public function havingBetween(string $column, mixed $start, mixed $end, string $startParamName = null, string $endParamName = null, bool $parameterized = true);
 
 	/*-----------------------------------------------JOIN FUNCTIONS-----------------------------------------------*/
 
 	//Join to another table using an outer join.
-	public function leftJoin($table, $condition, $alias = NULL, $schema = null);
+	public function leftJoin(string $table, string $condition, string|null $alias = NULL, string|null $schema = null);
 	//Join to another table using an inner join.
-	public function innerJoin($table, $condition, $alias = NULL, $schema = null);
+	public function innerJoin(string $table, string $condition, string|null  $alias = NULL, string|null $schema = null);
 	//Join to another table using an inner join.
-	public function join($table, $condition, $alias = NULL, $schema = null);
+	public function join(string $table, string $condition, string|null $alias = NULL, string|null $schema = null);
 }

@@ -48,54 +48,54 @@ class Select extends Query implements ISelectQuery
      * Additional Query Flags
      * @var array[string]
      */
-	protected $flags = array();
+	protected array $flags = array();
 	/**
 	 * The columns with which to act upon.
 	 * @var array[string]
 	 */
-	public $columns = array();
+	public array $columns = array();
 
 	/**
 	 * Holds the order of the SQL query. It can be either a string or an array of the columns to order by.
 	 * @var string | array
 	 */
-	protected $order;
+	protected string | array $order;
 	/**
 	 * Limit number of rows to return.
 	 * @var int
 	 */
-	protected $limit;
+	protected int $limit;
 	/**
 	 * The Limit Offset. Used to skip a number of rows before selecting.
 	 * @var int
 	 */
-	protected $limitOffset = 0;
+	protected int $limitOffset = 0;
 	/**
 	 * Stores the GROUP BY columns;
 	 * @var array | string
 	 */
-	protected $groupBy;
+	protected array | string $groupBy;
 	/**
 	 * An array that holds the HAVING clauses
 	 * @var Condition[]
 	 */
-	protected $having = array();
+	protected array $having = array();
 	/**
 	 * Array of Staple_Query_Join objects that represent table joins on the query
 	 * @var Join[]
 	 */
-	protected $joins = array();
+	protected array $joins = array();
 
 	/**
-	 * @param string $table
-	 * @param array $columns
-	 * @param IConnection $db
-	 * @param array | string $order
-	 * @param Pager | int $limit
-	 * @param bool $parameterized
+	 * @param null $table
+	 * @param array|null $columns
+	 * @param IConnection|null $db
+	 * @param string|array|null $order
+	 * @param int|null $limit
+	 * @param bool|null $parameterized
 	 * @throws QueryException
 	 */
-	public function __construct($table = NULL, array $columns = NULL, IConnection $db = NULL, $order = NULL, $limit = NULL, bool $parameterized = null)
+	public function __construct(mixed $table = NULL, array $columns = NULL, IConnection | null $db = NULL, string | array | null $order = NULL, int | null $limit = NULL, bool | null $parameterized = null)
 	{
 		parent::__construct(NULL, $db);
 		
@@ -119,7 +119,7 @@ class Select extends Query implements ISelectQuery
 		{
 			$this->limit($limit);
 		}
-		//Set Paramterized
+		//Set Parameterized
 		if(isset($parameterized))
 		{
 			$this->setParameterized($parameterized);
@@ -151,17 +151,22 @@ class Select extends Query implements ISelectQuery
 		}
 		return $this;
 	}
-	
-	public function clearFlags()
+
+	/**
+	 * Clears any flags set on the query.
+	 *
+	 * @return $this
+	 */
+	public function clearFlags(): static
 	{
-		$this->flags = array();
+		$this->flags = [];
 		return $this;
 	}
 
 	/**
 	 * @return array $columns
 	 */
-	public function getColumns()
+	public function getColumns(): array
 	{
 		return $this->columns;
 	}
@@ -170,7 +175,7 @@ class Select extends Query implements ISelectQuery
 	 * Returns array | string order.
 	 * @return string | array
 	 */
-	public function getOrder()
+	public function getOrder(): array|string
 	{
 		return $this->order;
 	}
@@ -178,7 +183,7 @@ class Select extends Query implements ISelectQuery
 	/**
 	 * @return array | string $groupBy
 	 */
-	public function getGroupBy()
+	public function getGroupBy(): array|string
 	{
 		return $this->groupBy;
 	}
@@ -186,7 +191,7 @@ class Select extends Query implements ISelectQuery
 	/**
 	 * @return Pager | int $limit
 	 */
-	public function getLimit()
+	public function getLimit(): Pager|int
 	{
 		return $this->limit;
 	}
@@ -194,7 +199,7 @@ class Select extends Query implements ISelectQuery
 	/**
 	 * @return int $limitOffset
 	 */
-	public function getLimitOffset()
+	public function getLimitOffset(): int
 	{
 		return $this->limitOffset;
 	}
@@ -202,12 +207,12 @@ class Select extends Query implements ISelectQuery
 	/**
 	 * Set the table for the select query. This can be another Select object or a Union object. However, a table
 	 * alias is required when using another object.
-	 * @param Query|array|string $table
+	 * @param Query|Union|array|string $table
 	 * @param string|null $alias
 	 * @return $this
 	 * @throws QueryException
 	 */
-	public function setTable(Query|array|string $table, string $alias = NULL): Select
+	public function setTable(Query|Union|array|string $table, string $alias = NULL): Select
 	{
 		if(is_array($table))
 		{
@@ -219,7 +224,7 @@ class Select extends Query implements ISelectQuery
 			if(!isset($alias))
 				throw new QueryException('Every derived table must have its own alias', Error::DB_ERROR);
 
-			//Remove the order by clause in derived table.
+			//Remove the order by clause in the derived table.
 			$table->setOrder(null);
 
 			//Set the table.
@@ -241,7 +246,7 @@ class Select extends Query implements ISelectQuery
      * @param array $columns
      * @return $this
 	 */
-	public function setColumns(array $columns)
+	public function setColumns(array $columns): static
 	{
 		$this->columns = array();
 		foreach($columns as $name=>$col)
@@ -263,7 +268,7 @@ class Select extends Query implements ISelectQuery
 	 * @param string | array $order
      * @return $this
 	 */
-	public function setOrder($order)
+	public function setOrder($order): static
 	{
 		$this->order = $order;
 		return $this;
@@ -273,7 +278,7 @@ class Select extends Query implements ISelectQuery
 	 * @param string | array $groupBy
      * @return $this
 	 */
-	public function setGroupBy($groupBy)
+	public function setGroupBy($groupBy): static
 	{
 		$this->groupBy = $groupBy;
 		return $this;
@@ -283,7 +288,7 @@ class Select extends Query implements ISelectQuery
 	 * @param int $limit
 	 * @return Select
 	 */
-	public function setLimit($limit)
+	public function setLimit($limit): static
 	{
 		$this->limit = (int)$limit;
 		return $this;
@@ -293,7 +298,7 @@ class Select extends Query implements ISelectQuery
 	 * @param int $limitOffset
 	 * @return Select
 	 */
-	public function setLimitOffset($limitOffset)
+	public function setLimitOffset($limitOffset): static
 	{
 		$this->limitOffset = (int)$limitOffset;
 		return $this;
@@ -302,10 +307,10 @@ class Select extends Query implements ISelectQuery
 	/**
 	 * Add to the list of columns. Optional parameter to name a column.
 	 * @param string | Select $col
-	 * @param string $name
+	 * @param string|null $name
 	 * @return $this
 	 */
-	public function addColumn($col,$name = NULL)
+	public function addColumn(string|Select $col, string|null $name = NULL): static
 	{
 		if($col instanceof Query)
 			$col = '('.(string)$col.')';
@@ -327,7 +332,7 @@ class Select extends Query implements ISelectQuery
 	 * @param array $columns
      * @return $this;
 	 */
-	public function addColumnsArray(array $columns)
+	public function addColumnsArray(array $columns): static
 	{
 		foreach($columns as $name=>$col)
 		{
@@ -408,10 +413,10 @@ class Select extends Query implements ISelectQuery
 	/**
 	 * Sets the limit and the offset in one function.
 	 * @param int | Pager $limit
-	 * @param int $offset
+	 * @param int|null $offset
 	 * @return $this
 	 */
-	public function limit($limit,$offset = NULL)
+	public function limit(Pager|int $limit, int|null $offset = NULL): static
 	{
 		if($limit instanceof Pager)
 		{
@@ -430,9 +435,9 @@ class Select extends Query implements ISelectQuery
 	/**
 	 * Alias of setLimitOffset() method
 	 * @param $offset
-	 * @return Select
+	 * @return $this
 	 */
-	public function skip($offset)
+	public function skip($offset): static
 	{
 		return $this->setLimitOffset($offset);
 	}
@@ -440,22 +445,22 @@ class Select extends Query implements ISelectQuery
 	/**
 	 * Alias of setLimit() method
 	 * @param $amount
-	 * @return Select
+	 * @return $this
 	 */
-	public function take($amount)
+	public function take($amount): static
 	{
 		return $this->setLimit($amount);
 	}
 
 	/*-----------------------------------------------HAVING CLAUSES-----------------------------------------------*/
 	
-	public function addHaving(Condition $having)
+	public function addHaving(Condition $having): static
 	{
 		$this->having[] = $having;
 		return $this;
 	}
 	
-	public function clearHaving()
+	public function clearHaving(): static
 	{
 		$this->having = array();
 		return $this;
@@ -471,7 +476,7 @@ class Select extends Query implements ISelectQuery
 	 * @param bool $parameterized
 	 * @return $this
 	 */
-	public function havingCondition($column, $operator, $value, bool $columnJoin = null, string $paramName = null, bool $parameterized = true)
+	public function havingCondition(string $column, string $operator, mixed $value, bool|null $columnJoin = null, string $paramName = null, bool $parameterized = true): static
 	{
 		$this->addHaving(Condition::get($column, $operator, $value, $columnJoin, $paramName, Condition::SQL_AND, $parameterized));
 		return $this;
@@ -482,7 +487,7 @@ class Select extends Query implements ISelectQuery
 	 * @param string|Condition $statement
 	 * @return $this
 	 */
-	public function havingStatement($statement)
+	public function havingStatement(string|Condition $statement): static
 	{
 		$this->addHaving(Condition::statement($statement));
 		return $this;
@@ -497,7 +502,7 @@ class Select extends Query implements ISelectQuery
 	 * @param bool $parameterized
 	 * @return $this
 	 */
-	public function havingEqual($column, $value, bool $columnJoin = null, string $paramName = null, bool $parameterized = true)
+	public function havingEqual(string $column, mixed $value, bool|null $columnJoin = null, string $paramName = null, bool $parameterized = true): static
 	{
 		$this->addHaving(Condition::equal($column, $value, $columnJoin, $paramName, Condition::SQL_AND, $parameterized));
 		return $this;
@@ -512,7 +517,7 @@ class Select extends Query implements ISelectQuery
 	 * @param bool $parameterized
 	 * @return $this
 	 */
-	public function havingLike($column, $value, bool $columnJoin = null, string $paramName = null, bool $parameterized = true)
+	public function havingLike(string $column, mixed $value, bool|null $columnJoin = null, string $paramName = null, bool $parameterized = true): static
 	{
 		$this->addHaving(Condition::like($column, $value, $columnJoin, $paramName, Condition::SQL_AND, $parameterized));
 		return $this;
@@ -523,7 +528,7 @@ class Select extends Query implements ISelectQuery
 	 * @param string $column
 	 * @return $this
 	 */
-	public function havingNull($column)
+	public function havingNull(string $column): static
 	{
 		$this->addHaving(Condition::null($column));
 		return $this;
@@ -537,7 +542,7 @@ class Select extends Query implements ISelectQuery
 	 * @param bool $parameterized
 	 * @return $this
 	 */
-	public function havingIn($column, array $values, string $paramName = null, bool $parameterized = true)
+	public function havingIn(string $column, array $values, string $paramName = null, bool $parameterized = true): static
 	{
 		$this->addHaving(Condition::in($column, $values, $paramName, Condition::SQL_AND, $parameterized));
 		return $this;
@@ -554,7 +559,7 @@ class Select extends Query implements ISelectQuery
 	 * @return $this
 	 * @throws QueryException
 	 */
-	public function havingBetween($column, $start, $end, string $startParamName = null, string $endParamName = null, bool $parameterized = true)
+	public function havingBetween(string $column, mixed $start, mixed $end, string $startParamName = null, string $endParamName = null, bool $parameterized = true): static
 	{
 		$this->addHaving(Condition::between($column, $start, $end, $startParamName, $endParamName, Condition::SQL_AND, $parameterized));
 		return $this;
@@ -567,7 +572,7 @@ class Select extends Query implements ISelectQuery
 	 * @param Join $join
 	 * @return $this
 	 */
-	public function addJoin(Join $join)
+	public function addJoin(Join $join): static
 	{
 		$join->setParentQuery($this);
 		$this->joins[] = $join;
@@ -579,7 +584,7 @@ class Select extends Query implements ISelectQuery
 	 * @param string $table
 	 * @return boolean
 	 */
-	public function removeJoin($table)
+	public function removeJoin(string $table): bool
 	{
 		foreach($this->joins as $key=>$join)
 		{
@@ -593,11 +598,11 @@ class Select extends Query implements ISelectQuery
 	}
 	
 	/**
-	 * Returns true is specified table is already joined to the query, false otherwise.
+	 * Returns true if a specified table is already joined to the query, false otherwise.
 	 * @param string $table
 	 * @return boolean
 	 */
-	public function isJoined($table)
+	public function isJoined(string $table): bool
 	{
 		foreach($this->joins as $key=>$join)
 		{
@@ -617,7 +622,7 @@ class Select extends Query implements ISelectQuery
 	 * @param string|null $schema
 	 * @return $this
 	 */
-	public function leftJoin($table, $condition, $alias = NULL, $schema = NULL)
+	public function leftJoin(string $table, string $condition, string|null $alias = NULL, string|null $schema = NULL): static
 	{
 		$this->addJoin(Join::left($table, $condition, $alias, $schema));
 		return $this;
@@ -631,7 +636,7 @@ class Select extends Query implements ISelectQuery
 	 * @param string|null $schema
 	 * @return $this
 	 */
-	public function innerJoin($table, $condition, $alias = NULL, $schema = NULL)
+	public function innerJoin(string $table, string $condition, string|null $alias = NULL, string|null $schema = NULL): static
 	{
 		$this->addJoin(Join::inner($table, $condition, $alias, $schema));
 		return $this;
@@ -645,17 +650,17 @@ class Select extends Query implements ISelectQuery
 	 * @param string|null $schema
 	 * @return $this
 	 */
-	public function join($table, $condition, $alias = NULL, $schema = null)
+	public function join(string $table, string $condition, string|null $alias = NULL, string|null $schema = null): static
 	{
 		$this->addJoin(Join::inner($table, $condition, $alias, $schema));
 		return $this;
 	}
 	
 	/**
-	 * Returns the joins array
+	 * Returns the "joins" array
 	 * @return Join[]
 	 */
-	public function getJoins()
+	public function getJoins(): array
 	{
 		return $this->joins;
 	}
@@ -668,7 +673,7 @@ class Select extends Query implements ISelectQuery
 	 * @param bool $parameterized
 	 * @return string
 	 */
-	function build(bool $parameterized = null)
+	function build(bool $parameterized = null): string
 	{
 		if(isset($parameterized))
 			$this->setParameterized($parameterized);
