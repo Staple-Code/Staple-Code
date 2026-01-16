@@ -168,6 +168,10 @@ class Condition
 						foreach($this->value as $aValue)
 						{
 							$count++;
+							if($count > 1)
+							{
+								$value .= ", ";
+							}
 							$value .=
 								$this->columnJoin ? $aValue : ((strlen($this->paramName) > 0) ?
 									':' . $this->getParamName() . '_in_' . $count :

@@ -24,13 +24,15 @@
  */
 namespace Staple;
 
+require_once 'Traits/Singleton.php';
+
 use Exception;
 use Staple\Exception\ConfigurationException;
 use stdClass;
 
 class Config
 {
-	use Traits\Singleton;
+	use \Staple\Traits\Singleton;
 
 	const DEFAULT_CONFIG_SET = 'application';
 	
@@ -163,6 +165,12 @@ class Config
 	{
 		//Get the config instance
 		$inst = static::getInstance();
+		
+		//Check that the config file has been read.
+		if(!$inst->read)
+		{
+			$inst->read();
+		}
 		
 		//Look for the requested key in the data store.
 		if(array_key_exists($set, $inst->store))

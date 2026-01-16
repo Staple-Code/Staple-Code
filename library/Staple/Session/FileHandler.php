@@ -27,6 +27,7 @@
 namespace Staple\Session;
 
 use Staple\Config;
+use Staple\Exception\ConfigurationException;
 
 class FileHandler implements Handler
 {
@@ -34,14 +35,15 @@ class FileHandler implements Handler
 	 * The location where the session files will be stored.
 	 * @var string
 	 */
-	private $fileLocation;
+	private string $fileLocation;
 
 	/**
 	 * FileHandler constructor.
 	 *
-	 * @param string $location
+	 * @param string|null $location
+	 * @throws ConfigurationException
 	 */
-	public function __construct($location = NULL)
+	public function __construct(string $location = NULL)
 	{
 		if(isset($location))
 			$this->setFileLocation($location);
@@ -52,9 +54,11 @@ class FileHandler implements Handler
 	}
 
 	/**
+	 * Get the file location for session storage
+	 *
 	 * @return string
 	 */
-	public function getFileLocation()
+	public function getFileLocation(): string
 	{
 		return $this->fileLocation;
 	}
@@ -64,7 +68,7 @@ class FileHandler implements Handler
 	 * @param string $fileLocation
 	 * @return $this
 	 */
-	protected function setFileLocation($fileLocation)
+	protected function setFileLocation(string $fileLocation): self
 	{
 		$this->fileLocation = $fileLocation;
 		return $this;
@@ -80,7 +84,7 @@ class FileHandler implements Handler
 	 * </p>
 	 * @since 5.4.0
 	 */
-	public function close()
+	public function close(): bool
 	{
 		return true;
 	}
@@ -89,16 +93,16 @@ class FileHandler implements Handler
 	 * Destroy a session
 	 *
 	 * @link http://php.net/manual/en/sessionhandlerinterface.destroy.php
-	 * @param string $session_id The session ID being destroyed.
+	 * @param string $id The session ID being destroyed.
 	 * @return bool <p>
 	 * The return value (usually TRUE on success, FALSE on failure).
 	 * Note this value is returned internally to PHP for processing.
 	 * </p>
 	 * @since 5.4.0
 	 */
-	public function destroy($session_id)
+	public function destroy(string $id): bool
 	{
-		$file = $this->fileLocation.DIRECTORY_SEPARATOR.'session_'.$session_id;
+		$file = $this->fileLocation.DIRECTORY_SEPARATOR.'session_'.$id;
 		if (file_exists($file))
 		{
 			unlink($file);
@@ -111,21 +115,21 @@ class FileHandler implements Handler
 	 * Cleanup old sessions
 	 *
 	 * @link http://php.net/manual/en/sessionhandlerinterface.gc.php
-	 * @param int $maxlifetime <p>
+	 * @param int $max_lifetime <p>
 	 * Sessions that have not updated for
 	 * the last maxlifetime seconds will be removed.
 	 * </p>
-	 * @return bool <p>
+	 * @return false|int <p>
 	 * The return value (usually TRUE on success, FALSE on failure).
 	 * Note this value is returned internally to PHP for processing.
 	 * </p>
 	 * @since 5.4.0
 	 */
-	public function gc($maxlifetime)
+	public function gc(int $max_lifetime): false|int
 	{
 		foreach (glob($this->fileLocation.DIRECTORY_SEPARATOR.'session_*') as $file)
 		{
-			if (filemtime($file) + $maxlifetime < time() && file_exists($file))
+			if (filemtime($file) + $max_lifetime < time() && file_exists($file))
 			{
 				unlink($file);
 			}
@@ -138,15 +142,15 @@ class FileHandler implements Handler
 	 * Initialize session
 	 *
 	 * @link http://php.net/manual/en/sessionhandlerinterface.open.php
-	 * @param string $save_path The path where to store/retrieve the session.
-	 * @param string $session_id The session id.
+	 * @param string $path The path where to store/retrieve the session.
+	 * @param string $name The session id.
 	 * @return bool <p>
 	 * The return value (usually TRUE on success, FALSE on failure).
 	 * Note this value is returned internally to PHP for processing.
 	 * </p>
 	 * @since 5.4.0
 	 */
-	public function open($save_path, $session_id)
+	public function open(string $path, string $name): bool
 	{
 		if (!is_dir($this->fileLocation))
 		{
@@ -160,7 +164,7 @@ class FileHandler implements Handler
 	 * Read session data
 	 *
 	 * @link http://php.net/manual/en/sessionhandlerinterface.read.php
-	 * @param string $session_id The session id to read data for.
+	 * @param string $id The session id to read data for.
 	 * @return string <p>
 	 * Returns an encoded string of the read data.
 	 * If nothing was read, it must return an empty string.
@@ -168,9 +172,9 @@ class FileHandler implements Handler
 	 * </p>
 	 * @since 5.4.0
 	 */
-	public function read($session_id)
+	public function read(string $id): string
 	{
-		$session_file = $this->fileLocation.DIRECTORY_SEPARATOR.'session_'.$session_id;
+		$session_file = $this->fileLocation.DIRECTORY_SEPARATOR.'session_'.$id;
 		if(file_exists($session_file))
 		{
 			return (string)@file_get_contents($session_file);
@@ -185,8 +189,8 @@ class FileHandler implements Handler
 	 * Write session data
 	 *
 	 * @link http://php.net/manual/en/sessionhandlerinterface.write.php
-	 * @param string $session_id The session id.
-	 * @param string $session_data <p>
+	 * @param string $id The session id.
+	 * @param string $data <p>
 	 * The encoded session data. This data is the
 	 * result of the PHP internally encoding
 	 * the $_SESSION superglobal to a serialized
@@ -199,8 +203,8 @@ class FileHandler implements Handler
 	 * </p>
 	 * @since 5.4.0
 	 */
-	public function write($session_id, $session_data)
+	public function write(string $id, string $data): bool
 	{
-		return file_put_contents($this->fileLocation.DIRECTORY_SEPARATOR.'session_'.$session_id, $session_data) === false ? false : true;
+		return !(file_put_contents($this->fileLocation . DIRECTORY_SEPARATOR . 'session_' . $id, $data) === false);
 	}
 }

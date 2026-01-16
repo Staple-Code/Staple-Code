@@ -41,13 +41,19 @@ class Json implements \JsonSerializable
 	 * An array of dynamic properties that will be converted to a JSON object.
 	 * @var array
 	 */
-	protected $_properties = [];
+	protected array $_properties = [];
 
 	/**
 	 * The data to encode for the JSON response.
 	 * @var mixed
 	 */
-	protected $_data;
+	protected mixed $_data;
+
+	/**
+	 * Flag for JSON_PRETTY_PRINT
+	 * @var bool $pretty
+	 */
+	protected bool $pretty = false;
 
 	/**
 	 * Allows dynamic setting of properties
@@ -55,7 +61,7 @@ class Json implements \JsonSerializable
 	 * @param mixed $value
 	 * @throws Exception
 	 */
-	public function __set($name, $value)
+	public function __set(string $name, mixed $value): void
 	{
 		//Set the property dynamically
 		$this->_properties[$name] = $value;
@@ -64,10 +70,10 @@ class Json implements \JsonSerializable
 	/**
 	 * Allows dynamic calling of properties
 	 * @param string $name
-	 * @throws Exception
 	 * @return mixed
+	 * @throws Exception
 	 */
-	public function __get($name)
+	public function __get(string $name): mixed
 	{
 		return $this->_properties[$name] ?? null;
 	}
@@ -79,7 +85,7 @@ class Json implements \JsonSerializable
 	 * @return mixed
 	 * @throws Exception
 	 */
-	public function __call($name, $arguments)
+	public function __call(string $name, array $arguments)
 	{
 		if(strtolower(substr($name, 0, 3)) == 'get')
 		{
@@ -102,19 +108,19 @@ class Json implements \JsonSerializable
 
 	/**
 	 * Return the set status of the dynamic properties
-	 * @param $name
+	 * @param string $name
 	 * @return bool
 	 */
-	public function __isset($name)
+	public function __isset(string $name)
 	{
 		return isset($this->_properties[$name]);
 	}
 
 	/**
 	 * Unset a dynamic property
-	 * @param $name
+	 * @param string $name
 	 */
-	public function __unset($name)
+	public function __unset(string $name)
 	{
 		if(isset($this->_properties[$name]))
 			unset($this->_properties[$name]);
@@ -126,14 +132,37 @@ class Json implements \JsonSerializable
 	 */
 	public function __toString()
 	{
-		return json_encode($this->jsonSerialize());
+		$flags = 0;
+		if ($this->pretty)
+		{
+			$flags = JSON_PRETTY_PRINT;
+		}
+		return json_encode($this->jsonSerialize(), $flags);
+	}
+
+	/**
+	 * Set the JSON_PRETTY_PRINT flag
+	 * @param bool $pretty
+	 */
+	public function setPretty(bool $pretty): void
+	{
+		$this->pretty = $pretty;
+	}
+
+	/**
+	 * Return the JSON_PRETTY_PRINT flag
+	 * @return bool
+	 */
+	public function getPretty(): bool
+	{
+		return $this->pretty;
 	}
 
 	/**
 	 * Returns an object to serialize via JSON.
 	 * @return mixed
 	 */
-	function jsonSerialize()
+	function jsonSerialize(): mixed
 	{
 		if(isset($this->_data))
 			return $this->_data;
@@ -167,7 +196,7 @@ class Json implements \JsonSerializable
 	 * @param $_data
 	 * @return $this
 	 */
-	public function setData($_data)
+	public function setData($_data): static
 	{
 		$this->_data = $_data;
 		return $this;
@@ -176,12 +205,12 @@ class Json implements \JsonSerializable
 	/**
 	 * Encode the parameters as a JSend response: https://labs.omniti.com/labs/jsend
 	 * @param string $status
-	 * @param mixed $data
-	 * @param string $message
+	 * @param mixed|null $data
+	 * @param string|null $message
 	 * @param int $code
 	 * @return string
 	 */
-	public static function JSend(string $status = self::SUCCESS, $data = NULL, string $message = NULL, int $code = self::DEFAULT_SUCCESS_CODE)
+	public static function JSend(string $status = self::SUCCESS, mixed $data = NULL, string $message = NULL, int $code = self::DEFAULT_SUCCESS_CODE): string
 	{
 		$json = new static();
 		$json->setResponseCode($code);
@@ -193,22 +222,22 @@ class Json implements \JsonSerializable
 
 	/**
 	 * Return a successful JSON response and set the HTTP response code
-	 * @param mixed $data
+	 * @param mixed|null $data
 	 * @param int $code
-	 * @return null|string
+	 * @return Json|string|null
 	 */
-	public static function success($data = NULL, int $code = self::DEFAULT_SUCCESS_CODE)
+	public static function success(mixed $data = NULL, int $code = self::DEFAULT_SUCCESS_CODE): Json|string|null
 	{
 		return self::response($data, $code);
 	}
 
 	/**
-	 * Return a JSON encoded HTTP response and set the HTTP response code.
-	 * @param mixed $data
+	 * Return a JSON-encoded HTTP response and set the HTTP response code.
+	 * @param mixed|null $data
 	 * @param int $code
 	 * @return Json
 	 */
-	public static function response($data = NULL, int $code = self::DEFAULT_SUCCESS_CODE)
+	public static function response(mixed $data = NULL, int $code = self::DEFAULT_SUCCESS_CODE): Json
 	{
 		$json = new static();
 		$json->setResponseCode($code);
@@ -219,12 +248,12 @@ class Json implements \JsonSerializable
 	/**
 	 * Return an error response JSON object and set the HTTP response code. This includes
 	 * a optional message and detail keys in the JSON object.
-	 * @param string $message
+	 * @param string|null $message
 	 * @param int $code
-	 * @param mixed $details
+	 * @param mixed|null $details
 	 * @return string
 	 */
-	public static function error($message = null, int $code = self::DEFAULT_ERROR_CODE, $details = null)
+	public static function error(string $message = null, int $code = self::DEFAULT_ERROR_CODE, mixed $details = null): string
 	{
 		$json = new static();
 		$json->setResponseCode($code, true);
@@ -235,13 +264,13 @@ class Json implements \JsonSerializable
 
 	/**
 	 * Return an error response JSON object and set the HTTP response code. This includes
-	 * a optional message and detail keys in the JSON object.
-	 * @param string $message
+	 * an optional message and detail keys in the JSON object.
+	 * @param string|null $message
 	 * @param int $code
-	 * @param mixed $details
+	 * @param mixed|null $details
 	 * @return string
 	 */
-	public static function authError($message = null, int $code = self::DEFAULT_AUTH_ERROR_CODE, $details = null)
+	public static function authError(string $message = null, int $code = self::DEFAULT_AUTH_ERROR_CODE, mixed $details = null): string
 	{
 		return self::error($message, $code, $details);
 	}

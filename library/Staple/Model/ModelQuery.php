@@ -31,23 +31,24 @@ use Staple\Query\IConnection;
 use Staple\Query\IQuery;
 use Staple\Query\IStatement;
 use Staple\Query\Query;
+use Staple\Query\Statement;
 
 class ModelQuery implements IQuery
 {
 	/**
 	 * @var IQuery
 	 */
-	protected $queryObject;
+	protected IQuery $queryObject;
 
 	/**
 	 * @var Model
 	 */
-	protected $model;
+	protected Model $model;
 
 	/**
 	 * ModelQuery constructor.
 	 * @param Model $model
-	 * @param IConnection $connection
+	 * @param IConnection|null $connection
 	 * @throws QueryException
 	 */
 	public function __construct(Model $model, IConnection $connection = NULL)
@@ -66,11 +67,11 @@ class ModelQuery implements IQuery
 
 	/**
 	 * @param Model $model
-	 * @param IConnection $connection
+	 * @param IConnection|null $connection
 	 * @return static
 	 * @throws QueryException
 	 */
-	public static function create(Model $model, IConnection $connection = NULL)
+	public static function create(Model $model, IConnection $connection = NULL): static
 	{
 		return new static($model, $connection);
 	}
@@ -122,7 +123,7 @@ class ModelQuery implements IQuery
 	}
 
 	/**
-	 * Alias of the model query first() method
+	 * Alias of the ModelQuery->first() method
 	 * @return Model | null
 	 */
 	public function firstOrNull()
@@ -132,15 +133,15 @@ class ModelQuery implements IQuery
 
 	/**
 	 * Return all results as array of models.
-	 * @return array|Model[]
+	 * @return Model[]
 	 */
-	public function all()
+	public function all(): array
 	{
 		return $this->get()->all();
 	}
 
 	/**
-	 * @return Model[]
+	 * @return ModelQueryResult
 	 */
 	public function get() : ModelQueryResult
 	{
@@ -231,11 +232,11 @@ class ModelQuery implements IQuery
 	}
 
 	/**
-	 * Alias of get()
+	 * @alias static::get()
 	 * @param IConnection|NULL $connection
-	 * @return mixed
+	 * @return ModelQueryResult
 	 */
-	public function execute(IConnection $connection = NULL)
+	public function execute(IConnection $connection = NULL): ModelQueryResult
 	{
 		return $this->get();
 	}

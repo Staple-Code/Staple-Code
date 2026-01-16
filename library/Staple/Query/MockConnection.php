@@ -68,9 +68,9 @@ class MockConnection extends Connection implements IConnection
 
 	/**
 	 * @param string $statement
-	 * @return PDOStatement | boolean
+	 * @return int|false
 	 */
-	public function exec($statement)
+	public function exec(string $statement): int|false
 	{
 		$statement = (string)$statement;
 		$this->addQueryToLog($statement);
@@ -79,21 +79,22 @@ class MockConnection extends Connection implements IConnection
 	}
 
 	/**
-	 * @param string $statement
-	 * @return Statement
+	 * @param string $query
+	 * @param null $fetchMode
+	 * @param null $fetchModeArgs
+	 * @return Statement|false
 	 */
-	public function query($statement)
+	public function query(string $query, $fetchMode = null, ...$fetchModeArgs): Statement|false
 	{
-		$statement = (string)$statement;
-		$this->addQueryToLog($statement);
+		$this->addQueryToLog($query);
 		$this->notify();
 		return $this->getResults();
 	}
 
-	public function prepare($statement, $options = NULL)
+	public function prepare(string|IStatement $query, array $options = []): \PDOStatement|false
 	{
-		$statement = (string)$statement;
-		$this->addQueryToLog($statement);
+		$query = (string)$query;
+		$this->addQueryToLog($query);
 		$this->notify();
 		return new MockStatement();
 	}
@@ -111,13 +112,13 @@ class MockConnection extends Connection implements IConnection
 	 * @param mixed $results
 	 * @return $this
 	 */
-	public function setResults($results)
+	public function setResults($results): static
 	{
 		$this->results = $results;
 		return $this;
 	}
 
-	public function quote($string, $parameter_type = \PDO::PARAM_STR)
+	public function quote($string, $type = \PDO::PARAM_STR): string
 	{
 		if(is_string($string) || is_float($string))
 		{

@@ -9,9 +9,10 @@
 namespace Staple\Auth;
 
 
-use Auth0\SDK\Exception\CoreException;
 use Auth0\SDK\JWTVerifier;
+use Exception;
 use Staple\Config;
+use Staple\Exception\ConfigurationException;
 use Staple\Request;
 
 class OAuthAdapter implements AuthAdapter
@@ -19,12 +20,14 @@ class OAuthAdapter implements AuthAdapter
 	const AUTHORIZATION_HEADER = 'Authorization';
 	use AuthRoute;
 
-	private $userInfo;
+	private mixed $userInfo;
+
 	/**
 	 * @param Request $request
 	 * @return bool
+	 * @throws ConfigurationException
 	 */
-	public function getAuth($request): bool
+	public function getAuth(mixed $request): bool
 	{
 		try {
 			$verifier = new JWTVerifier([
@@ -38,15 +41,15 @@ class OAuthAdapter implements AuthAdapter
 			$this->userInfo = $verifier->verifyAndDecode($token);
 			return true;
 		}
-		catch(CoreException $e) {
+		catch(Exception $e) {
 			return false;
 		}
 	}
 
 	/**
-	 * @return mixed
+	 * @return int
 	 */
-	public function getLevel()
+	public function getLevel(): int
 	{
 		return 1;
 	}
@@ -54,8 +57,14 @@ class OAuthAdapter implements AuthAdapter
 	/**
 	 * @return object
 	 */
-	public function getUserId()
+	public function getUserId(): mixed
 	{
 		return $this->userInfo;
+	}
+
+	public function clear(): bool
+	{
+		// TODO: Implement clear() method.
+		return false;
 	}
 }

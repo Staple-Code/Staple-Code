@@ -50,7 +50,7 @@ class productListCategoryModel extends Model
 
 class clientModel extends Model
 {
-	protected $_table = 'customers';
+	protected string $_table = 'customers';
 }
 
 

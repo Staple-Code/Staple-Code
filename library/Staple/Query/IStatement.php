@@ -27,17 +27,17 @@ use PDO;
 
 interface IStatement
 {
-	public function fetch($fetch_style = PDO::ATTR_DEFAULT_FETCH_MODE, $cursor_orientation = PDO::FETCH_ORI_NEXT, $cursor_offset = 0);
-	public function fetchAll($fetch_style = PDO::ATTR_DEFAULT_FETCH_MODE, $fetch_argument = NULL, $ctor_args = array());
+	public function fetch(int $mode = PDO::FETCH_DEFAULT, int $cursorOrientation = PDO::FETCH_ORI_NEXT, int $cursorOffset = 0): mixed;
+	public function fetchAll(int $mode = PDO::FETCH_DEFAULT, ...$constructorArgs): array;
 	public function rowCount();
 	public function foundRows();
-	public function setDriver($driver);
-	public function getDriver();
+	public function setDriver(string $driver);
+	public function getDriver(): string;
 	public function getConnection(): IConnection;
 	public function setConnection(IConnection $connection);
-	public function bindColumn($column, &$param, $type = NULL, $maxlen = NULL, $driverdata = NULL);
-	public function bindParam($parameter, &$variable, $data_type = PDO::PARAM_STR, $length = NULL, $driver_options = NULL);
-	public function bindValue($parameter, $value, $data_type = PDO::PARAM_STR);
-	public function execute ($bound_input_params = NULL);
+	public function bindColumn(int|string $column, &$var, $type = NULL, $maxLength = NULL, $driverOptions = NULL): bool;
+	public function bindParam(int|string $param, mixed &$var, int $type = PDO::PARAM_STR, int $maxLength = NULL, mixed $driverOptions = NULL): bool;
+	public function bindValue(string $param, mixed $value, int $type = PDO::PARAM_STR): bool;
+	public function execute (array $params = NULL): bool;
 	public function errorInfo();
 }

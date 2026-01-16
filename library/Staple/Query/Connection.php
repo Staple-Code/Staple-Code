@@ -158,16 +158,12 @@ class Connection extends PDO implements IConnection
 		{
 			case 'insert_id':
 				return $this->lastInsertId();
-				break;
 			case 'last_query':
 				return $this->getLastQuery();
-				break;
 			case 'error':
 				return $this->errorInfo();
-				break;
 			case 'errno':
 				return $this->errorCode();
-				break;
 			default:
 				return NULL;
 		}
@@ -589,7 +585,7 @@ class Connection extends PDO implements IConnection
 	 * @param string $statement
 	 * @return PDOStatement | boolean
 	 */
-	public function exec($statement)
+	public function exec(string $statement): int|false
 	{
 		$this->addQueryToLog($statement);
 
@@ -605,16 +601,18 @@ class Connection extends PDO implements IConnection
 	}
 
 	/**
-	 * @param string $statement
-	 * @return Statement
+	 * @param string $query
+	 * @param int $fetchMode
+	 * @param mixed ...$fetchModeArgs
+	 * @return Statement|false
 	 */
-	public function query($statement)
+	public function query(string $query, $fetchMode = PDO::FETCH_CLASS, ...$fetchModeArgs): Statement|false
 	{
 		//Log the query
-		$this->addQueryToLog((string)$statement);
+		$this->addQueryToLog($query);
 
 		//Execute the query and check for errors
-		if(($result = parent::query((string)$statement, PDO::FETCH_CLASS, '\Staple\Query\Statement')) === false)
+		if(($result = parent::query($query, $fetchMode, '\Staple\Query\Statement')) === false)
 		{
 			//Notify the observers that an error has occurred.
 			$this->notify();
@@ -631,14 +629,13 @@ class Connection extends PDO implements IConnection
 	}
 
 	/**
-	 * @param string $statement
-	 * @param array|null $driver_options
-	 * @return IStatement
+	 * @param string|IStatement $query
+	 * @param array $options
+	 * @return PDOStatement|false
 	 */
-	public function prepare($statement, $driver_options = [])
+	public function prepare(string|IStatement $query, array $options = []): PDOStatement|false
 	{
-		/** @var IStatement $statement */
-		$statement = parent::prepare($statement, $driver_options);
+		$statement = parent::prepare($query, $options);
 		$statement->setDriver($this->getDriver());
 		$statement->setConnection($this);
 		return $statement;
@@ -674,18 +671,13 @@ class Connection extends PDO implements IConnection
 	/*-------------------------------------------------Observer Methods-------------------------------------------------*/
 
 	/**
-	 * (PHP 5 &gt;= 5.1.0)<br/>
-	 * Attach an SplObserver
-	 * @link http://php.net/manual/en/splsubject.attach.php
-	 * @param SplObserver $observer <p>
-	 * The <b>SplObserver</b> to attach.
-	 * </p>
-	 * @return $this
+	 * @param SplObserver $observer
+	 * @return void
 	 */
-	public function attach(SplObserver $observer)
+	public function attach(SplObserver $observer): void
 	{
 		self::$_observers->attach($observer);
-		return $this;
+//		return $this;
 	}
 
 	/**
@@ -710,10 +702,10 @@ class Connection extends PDO implements IConnection
 	 * </p>
 	 * @return $this
 	 */
-	public function detach(SplObserver $observer)
+	public function detach(SplObserver $observer): void
 	{
 		self::$_observers->detach($observer);
-		return $this;
+//		return $this;
 	}
 
 	/**
@@ -735,13 +727,13 @@ class Connection extends PDO implements IConnection
 	 * @link http://php.net/manual/en/splsubject.notify.php
 	 * @return $this
 	 */
-	public function notify()
+	public function notify(): void
 	{
 		foreach(self::$_observers as $observer)
 		{
 			$observer->update($this);
 		}
 
-		return $this;
+//		return $this;
 	}
 }

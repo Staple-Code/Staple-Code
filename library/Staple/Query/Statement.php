@@ -33,19 +33,19 @@ class Statement extends PDOStatement implements IStatement
      * The database driver that is currently in use.
      * @var string
      */
-    protected $driver;
+    protected string $driver;
 
     /**
 	 * The data store connection.
      * @var Connection
      */
-    protected $connection;
+    protected Connection $connection;
 
 	/**
 	 * The bound parameters of the query
 	 * @var array
 	 */
-	protected $params = [];
+	protected array $params = [];
 
 	/**
 	 * Magic method to fake MySQLi property functions
@@ -54,13 +54,12 @@ class Statement extends PDOStatement implements IStatement
 	 * @return int|null
 	 * @throws ConfigurationException
 	 */
-	public function __get($name)
+	public function __get(string $name)
 	{
 		switch($name)
 		{
 			case 'num_rows':
 				return $this->rowCount();
-				break;
 			default:
 				return NULL;
 		}
@@ -70,7 +69,7 @@ class Statement extends PDOStatement implements IStatement
      * Get the driver string
      * @return string
      */
-    public function getDriver()
+    public function getDriver(): string
     {
         return $this->driver;
     }
@@ -79,8 +78,8 @@ class Statement extends PDOStatement implements IStatement
      * Set the driver string
      * @param string $driver
      */
-    public function setDriver($driver)
-    {
+    public function setDriver(string $driver): void
+	{
         $this->driver = $driver;
     }
 
@@ -102,51 +101,31 @@ class Statement extends PDOStatement implements IStatement
 		return $this;
 	}
 
-	public function bindParam($param, &$var, $type = PDO::PARAM_STR, $maxLength = null, $driverOptions = null)
+	public function bindParam(string|int $param, mixed &$var, int $type = PDO::PARAM_STR, int $maxLength = null, mixed $driverOptions = null): bool
 	{
 		$this->params[$param] = $var;
 		return parent::bindParam($param, $var, $type, $maxLength, $driverOptions);
 	}
 
-	public function bindColumn($column, &$var, $type = PDO::PARAM_STR, $maxLength = null, $driverOptions = null)
+	public function bindColumn(int|string $column, mixed &$var, $type = PDO::PARAM_STR, $maxLength = null, $driverOptions = null): bool
 	{
 		$this->params[$column] = $var;
 		return parent::bindColumn($column, $var, $type, $maxLength, $driverOptions);
 	}
 
-	public function bindValue($param, $value, $type = PDO::PARAM_STR)
+	public function bindValue(string|int $param, mixed $value, int $type = PDO::PARAM_STR): bool
 	{
 		$this->params[$param] = $value;
 		return parent::bindValue($param, $value, $type);
 	}
 
-	/**
-	 * Mysqli style associative array fetch style
-	 * @return mixed
-	 * @deprecated
-	 */
-	public function fetch_assoc()
-	{
-		return $this->fetch(PDO::FETCH_ASSOC);
-	}
-
-	/**
-	 * Mysqli style standard array fetch style
-	 * @return mixed
-	 * @deprecated
-	 */
-	public function fetch_array()
-	{
-		return $this->fetch(PDO::FETCH_BOTH);
-	}
-
     /**
      * Returns the number of rows found in the previous query.
-     * @return string
+     * @return int|string
 	 * @throws ConfigurationException
      */
-    public function foundRows()
-    {
+    public function foundRows(): int|string
+	{
         switch($this->getDriver())
         {
             case Connection::DRIVER_MYSQL:
@@ -163,7 +142,7 @@ class Statement extends PDOStatement implements IStatement
 	 * @return int
 	 * @throws ConfigurationException
 	 */
-	public function rowCount()
+	public function rowCount(): int
 	{
 		switch($this->getDriver())
 		{
@@ -175,13 +154,13 @@ class Statement extends PDOStatement implements IStatement
 	}
 
 	/**
-	 * @param array|null $input_parameters
+	 * @param array|null $params
 	 * @return bool
 	 */
-	public function execute($input_parameters = null)
+	public function execute(array $params = null): bool
 	{
 		$this->getConnection()->addQueryToLog($this->queryString, $this->params);
-		return parent::execute($input_parameters);
+		return parent::execute($params);
 	}
 
 

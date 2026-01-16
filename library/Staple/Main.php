@@ -23,8 +23,12 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the STAPLE Framework.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace Staple;
 
+include_once('Config.php');
+
+use Exception;
 use Staple\Controller\Controller;
 use Staple\Exception\AuthException;
 use Staple\Exception\ConfigurationException;
@@ -66,7 +70,7 @@ class Main
 	 * APPLICATION_ROOT directory. The constructor loads and checks configuration, sets up the autoloader, sets custom error handlers
 	 * and begins a session.
 	 * @throws ConfigurationException
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	private function __construct()
 	{
@@ -124,7 +128,7 @@ class Main
 		$this->addRoutes();
 	}
 
-	public static function setGlobals()
+	public static function setGlobals(): void
 	{
 		//Application Constants, if not already defined
 		defined('FOLDER_ROOT')
@@ -184,7 +188,7 @@ class Main
 	 * Get the error handler for the application.
 	 * @return Error $errorHandler
 	 */
-	public function getErrorHandler()
+	public function getErrorHandler(): Error
 	{
 		return $this->errorHandler;
 	}
@@ -193,7 +197,7 @@ class Main
 	 * @param Error $errorHandler
 	 * @return Main
 	 */
-	public function setErrorHandler(Error $errorHandler)
+	public function setErrorHandler(Error $errorHandler): static
 	{
 		$this->errorHandler = $errorHandler;
 		
@@ -208,14 +212,14 @@ class Main
 	 * @return bool
 	 * @throws ConfigurationException
 	 */
-	public function inDevMode()
+	public function inDevMode(): bool
 	{
 	    return (bool)Config::getValue('errors', 'devmode');
 	}
 	
 	/**
 	 * 
-	 * Instantiates the application as a singleton, and/or returns the current instance.
+	 * Instantiates the application as a singleton and/or returns the current instance.
 	 */
 	public static function get()
 	{
@@ -228,22 +232,20 @@ class Main
 	
 	/**
 	 * Get or set a controller on the Main object
-	 * @param Controller | string $class
+	 * @param string | Controller $class
 	 * @return Controller | NULL
 	 */
-	public static function controller($class)
+	public static function controller(string|Controller $class): ?Controller
 	{
 		if($class instanceof Controller)
 		{
 			return Session::registerController($class);
 		}
-		elseif(is_string($class))
+		else
 		{
 			$class = strtolower($class);
 			return Session::getController($class);
 		}
-
-		return NULL;
 	}
 	
 	/**
@@ -295,13 +297,13 @@ class Main
 	
 	/**
 	 * Executes the application process.
-	 * @param Route | string $route
+	 * @param string | Route|null $route
 	 * @return boolean
 	 * @throws RoutingException
 	 * @throws AuthException
-	 * @throws \Exception
+	 * @throws Exception
 	 */
-	public function run($route = NULL): bool
+	public function run(string|Route $route = NULL): bool
 	{
 		//First determine which routing information to use
 		if(!is_null($route))								//Use the supplied Route
@@ -352,7 +354,7 @@ class Main
 	 * @throws PageNotFoundException
 	 * @throws RoutingException
 	 * @throws AuthException
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	protected function executeRoute()
 	{

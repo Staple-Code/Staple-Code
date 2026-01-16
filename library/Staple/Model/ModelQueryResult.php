@@ -24,6 +24,7 @@
 namespace Staple\Model;
 
 
+use Staple\Exception\ConfigurationException;
 use Staple\Exception\ModelNotFoundException;
 use Staple\Model;
 use Staple\Query\Connection;
@@ -34,28 +35,29 @@ class ModelQueryResult implements \Iterator, \ArrayAccess, \JsonSerializable
 	/**
 	 * @var int
 	 */
-	private $position = 0;
+	private int $position = 0;
 
 	/**
 	 * @var Model[]
 	 */
-	protected $results = [];
+	protected array $results = [];
 
 	/**
 	 * @var IConnection
 	 */
-	protected $connection;
+	protected IConnection $connection;
 
 	/**
 	 * @var string
 	 */
-	protected $query;
+	protected string $query;
 
 	/**
 	 * ModelQueryResult constructor.
 	 * @param array|null $results
 	 * @param IConnection|NULL $connection
 	 * @param string|NULL $query
+	 * @throws ConfigurationException
 	 */
 	public function __construct(array $results = NULL, IConnection $connection = NULL, string $query = NULL)
 	{
@@ -77,8 +79,9 @@ class ModelQueryResult implements \Iterator, \ArrayAccess, \JsonSerializable
 	 * @param IConnection|NULL $connection
 	 * @param string|NULL $query
 	 * @return static
+	 * @throws ConfigurationException
 	 */
-	public static function create(array $results = NULL, IConnection $connection = NULL, string $query = NULL)
+	public static function create(array $results = NULL, IConnection $connection = NULL, string $query = NULL): static
 	{
 		return new static($results, $connection, $query);
 	}
@@ -87,7 +90,7 @@ class ModelQueryResult implements \Iterator, \ArrayAccess, \JsonSerializable
 	 * Return the query results to be json encoded.
 	 * @return array
 	 */
-	function jsonSerialize()
+	function jsonSerialize(): array
 	{
 		return $this->results;
 	}
@@ -97,7 +100,7 @@ class ModelQueryResult implements \Iterator, \ArrayAccess, \JsonSerializable
 	 * Return the count of the results of the query.
 	 * @return int
 	 */
-	public function count()
+	public function count(): int
 	{
 		return count($this->results);
 	}
@@ -123,7 +126,7 @@ class ModelQueryResult implements \Iterator, \ArrayAccess, \JsonSerializable
 	 * Returns the first retrieved Model object, returns null on failure
 	 * @return Model|null
 	 */
-	public function firstOrNull()
+	public function firstOrNull(): ?Model
 	{
 		if(count($this->results) >= 1)
 		{
@@ -138,7 +141,7 @@ class ModelQueryResult implements \Iterator, \ArrayAccess, \JsonSerializable
 	 * Alias of getResults() method.
 	 * @return Model[]
 	 */
-	public function toArray()
+	public function toArray(): array
 	{
 		return $this->getResults();
 	}
@@ -147,7 +150,7 @@ class ModelQueryResult implements \Iterator, \ArrayAccess, \JsonSerializable
 	 * Alias of getResults() method.
 	 * @return array|Model[]
 	 */
-	public function all()
+	public function all(): array
 	{
 		return $this->getResults();
 	}
@@ -215,12 +218,15 @@ class ModelQueryResult implements \Iterator, \ArrayAccess, \JsonSerializable
 	/**
 	 * @return Model
 	 */
-	public function current()
+	public function current(): Model
 	{
 		return $this->results[$this->position];
 	}
 
-	public function next()
+	/**
+	 * @return void
+	 */
+	public function next(): void
 	{
 		++$this->position;
 	}
@@ -228,7 +234,7 @@ class ModelQueryResult implements \Iterator, \ArrayAccess, \JsonSerializable
 	/**
 	 * @return int
 	 */
-	public function key()
+	public function key(): int
 	{
 		return $this->position;
 	}
@@ -241,7 +247,7 @@ class ModelQueryResult implements \Iterator, \ArrayAccess, \JsonSerializable
 		return isset($this->results[$this->position]);
 	}
 
-	public function rewind()
+	public function rewind(): void
 	{
 		$this->position = 0;
 	}
@@ -250,7 +256,7 @@ class ModelQueryResult implements \Iterator, \ArrayAccess, \JsonSerializable
 	 * @param mixed $offset
 	 * @return bool
 	 */
-	public function offsetExists($offset) : bool
+	public function offsetExists(mixed $offset) : bool
 	{
 		return isset($this->results[$offset]);
 	}
@@ -259,7 +265,7 @@ class ModelQueryResult implements \Iterator, \ArrayAccess, \JsonSerializable
 	 * @param mixed $offset
 	 * @return Model
 	 */
-	public function offsetGet($offset) : Model
+	public function offsetGet(mixed $offset) : Model
 	{
 		return $this->results[$offset];
 	}
@@ -268,7 +274,7 @@ class ModelQueryResult implements \Iterator, \ArrayAccess, \JsonSerializable
 	 * @param mixed $offset
 	 * @param mixed $value
 	 */
-	public function offsetSet($offset, $value)
+	public function offsetSet(mixed $offset, mixed $value): void
 	{
 		if(is_null($offset))
 			$this->results[] = $value;
@@ -279,7 +285,7 @@ class ModelQueryResult implements \Iterator, \ArrayAccess, \JsonSerializable
 	/**
 	 * @param mixed $offset
 	 */
-	public function offsetUnset($offset)
+	public function offsetUnset(mixed $offset): void
 	{
 		unset($this->results[$offset]);
 	}
