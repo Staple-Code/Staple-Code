@@ -48,7 +48,7 @@ abstract class Query implements IQuery
 	 * The schema that the table lives in. For SQL Server.
 	 * @var string
 	 */
-	protected string $schema;
+	protected string | null $schema = null;
 	
 	/**
 	 * The Connection database object. A database object is required to properly escape input.
@@ -309,10 +309,10 @@ abstract class Query implements IQuery
 	/**
 	 * Executes the query and returns the result.
 	 * @param IConnection|null $connection - the database connection to execute the quote upon.
-	 * @return ModelQueryResult|Statement|false
+	 * @return ModelQueryResult|IStatement|false
 	 * @throws QueryException
 	 */
-	public function execute(IConnection $connection = NULL): ModelQueryResult|Statement|false
+	public function execute(IConnection $connection = NULL): ModelQueryResult|IStatement|false
 	{
 		if(isset($connection))
 			$this->setConnection($connection);

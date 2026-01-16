@@ -31,9 +31,8 @@ class AliasTest extends TestCase
 {
 	private $alias;
 
-	public function __construct()
+	protected function setUp(): void
 	{
-		parent::__construct();
 		$this->alias = new Alias();
 	}
 

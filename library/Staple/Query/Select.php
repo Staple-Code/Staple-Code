@@ -59,12 +59,12 @@ class Select extends Query implements ISelectQuery
 	 * Holds the order of the SQL query. It can be either a string or an array of the columns to order by.
 	 * @var string | array
 	 */
-	protected string | array $order;
+	protected string | array | null $order = null;
 	/**
 	 * Limit number of rows to return.
 	 * @var int
 	 */
-	protected int $limit;
+	protected Pager | int | null $limit = null;
 	/**
 	 * The Limit Offset. Used to skip a number of rows before selecting.
 	 * @var int
@@ -74,7 +74,7 @@ class Select extends Query implements ISelectQuery
 	 * Stores the GROUP BY columns;
 	 * @var array | string
 	 */
-	protected array | string $groupBy;
+	protected array | string | null $groupBy = null;
 	/**
 	 * An array that holds the HAVING clauses
 	 * @var Condition[]
@@ -95,7 +95,7 @@ class Select extends Query implements ISelectQuery
 	 * @param bool|null $parameterized
 	 * @throws QueryException
 	 */
-	public function __construct(mixed $table = NULL, array $columns = NULL, IConnection | null $db = NULL, string | array | null $order = NULL, int | null $limit = NULL, bool | null $parameterized = null)
+	public function __construct(mixed $table = NULL, array $columns = NULL, IConnection | null $db = NULL, string | array | null $order = NULL, int | Pager | null $limit = NULL, bool | null $parameterized = null)
 	{
 		parent::__construct(NULL, $db);
 		
@@ -191,9 +191,9 @@ class Select extends Query implements ISelectQuery
 	/**
 	 * @return Pager | int $limit
 	 */
-	public function getLimit(): Pager|int
+	public function getLimit(): Pager|int|null
 	{
-		return $this->limit;
+		return $this->limit ?? null;
 	}
 
 	/**

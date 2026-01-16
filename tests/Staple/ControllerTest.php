@@ -58,7 +58,7 @@ class FakeCtrlAuthAdapter implements AuthAdapter
 	 * @param mixed $credentials
 	 * @return bool
 	 */
-	public function getAuth($credentials): bool
+	public function getAuth(mixed $credentials): bool
 	{
 		if(is_array($credentials))
 		{
@@ -83,9 +83,9 @@ class FakeCtrlAuthAdapter implements AuthAdapter
 	 * This function must be implemented to return a numeric level of access. This level is
 	 * used to determine feature access based on account type.
 	 *
-	 * @return int
+	 * @return mixed
 	 */
-	public function getLevel()
+	public function getLevel(): mixed
 	{
 		return $this->userLevel;
 	}
@@ -103,9 +103,14 @@ class FakeCtrlAuthAdapter implements AuthAdapter
 	 *
 	 * @return mixed
 	 */
-	public function getUserId()
+	public function getUserId(): mixed
 	{
 		return $this->userId;
+	}
+
+	public function authRoute(\Staple\Route $route, $requiredLevel, \ReflectionClass $reflectionClass = null, \ReflectionMethod $reflectionMethod = null): bool
+	{
+		return true;
 	}
 
 	/**

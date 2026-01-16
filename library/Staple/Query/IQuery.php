@@ -53,7 +53,7 @@ interface IQuery
 	//Build the query into a string.
 	public function build(bool $parameterized = null);
 	//Execute the query and returns the result.
-	public function execute(IConnection $connection = NULL): ModelQueryResult|Statement|false;
+	public function execute(IConnection $connection = NULL): ModelQueryResult|IStatement|false;
 
 	/**
 	 * Get the parameter list.

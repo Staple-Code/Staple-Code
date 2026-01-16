@@ -111,11 +111,11 @@ class Route
 	 * @throws RoutingException
 	 * @throws ConfigurationException
 	 */
-	public function __construct($route = NULL)
+	public function __construct(mixed $route = NULL)
 	{
 		//Check for sub-path configuration.
 		$publicLocation = Config::getValue('application', 'public_location');
-		if(strlen($publicLocation) && substr($route, 0, strlen($publicLocation)) === $publicLocation)
+		if(strlen($publicLocation) && str_starts_with($route, $publicLocation))
 		{
 			$route = substr($route, strlen($publicLocation));
 		}
@@ -894,9 +894,9 @@ class Route
 	 * Execute a functional route action passing parameters using call_user_func_array().
 	 * @param Route $functionalRoute
 	 * @throws RoutingException
-	 * @throws \Exception
+	 * @throws Exception
 	 */
-	private function dispatchFunctionalRoute(Route $functionalRoute)
+	private function dispatchFunctionalRoute(Route $functionalRoute): void
 	{
 		// Execute the Method
 		$return = call_user_func_array($functionalRoute->getCallbackFunction(), $functionalRoute->getParams());
